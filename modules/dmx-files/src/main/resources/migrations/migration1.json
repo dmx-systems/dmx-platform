@@ -3,21 +3,11 @@
 
 {
     "topic_types": [
-
-        ### File ###
-
+        // File
         {
             "value":       "File Content",
             "uri":         "dmx.files.file_content",
-            "dataTypeUri": "dmx.core.html",
-            /* "viewConfigTopics": [    ### TODO
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.simple_renderer_uri": "dmx.files.file_content_renderer"
-                    }
-                }
-            ] */
+            "dataTypeUri": "dmx.core.html"
         },
         {
             "value":       "File Name",
@@ -38,14 +28,6 @@
             "value":       "Size",
             "uri":         "dmx.files.size",
             "dataTypeUri": "dmx.core.number"
-            /* "viewConfigTopics": [    ### TODO
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.simple_renderer_uri": "dmx.files.file_size_renderer",
-                    }
-                }
-            ] */
         },
         {
             "value":       "File",
@@ -78,15 +60,12 @@
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dmx.webclient.icon": "\uf15b",
-                        "dmx.webclient.locked": true
+                        "dmx.webclient.icon": "\uf15b"
                     }
                 }
             ]
         },
-
-        ### Folder ###
-
+        // Folder
         {
             "value":       "Folder Name",
             "uri":         "dmx.files.folder_name",
@@ -96,14 +75,6 @@
             "value":       "Folder Content",
             "uri":         "dmx.files.folder_content",
             "dataTypeUri": "dmx.core.html"
-            /* "viewConfigTopics": [    ### TODO
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.simple_renderer_uri": "dmx.files.folder_content_renderer"
-                    }
-                }
-            ] */
         },
         {
             "value":       "Folder",
@@ -127,8 +98,7 @@
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dmx.webclient.icon": "\uf07b",
-                        "dmx.webclient.locked": true
+                        "dmx.webclient.icon": "\uf07b"
                     }
                 }
             ]

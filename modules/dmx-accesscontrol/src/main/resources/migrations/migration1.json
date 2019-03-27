@@ -3,35 +3,16 @@
 
 {
     "topic_types": [
-
         // User Account
-
         {
             "value":       "Username",
             "uri":         "dmx.accesscontrol.username",
-            "dataTypeUri": "dmx.core.text",
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.locked": true
-                    }
-                }
-            ]
+            "dataTypeUri": "dmx.core.text"
         },
         {
             "value":       "Password",
             "uri":         "dmx.accesscontrol.password",
-            "dataTypeUri": "dmx.core.text",
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.hidden": true,
-                        "dmx.webclient.locked": true
-                    }
-                }
-            ]
+            "dataTypeUri": "dmx.core.text"
         },
         {
             "value":       "User Account",
@@ -40,27 +21,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.accesscontrol.username",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.locked": false
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.accesscontrol.password",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.locked": false
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [

@@ -1,6 +1,5 @@
 [{
     // View Configuration
-
     "topic_types": [
         {
             "value":       "Icon",
@@ -31,27 +30,10 @@
             "value":       "Customizable",
             "uri":         "dmx.webclient.customizable",
             "dataTypeUri": "dmx.core.boolean"
-        },
-        {
-            "value":       "Input Field Rows",
-            "uri":         "dmx.webclient.input_field_rows",
-            "dataTypeUri": "dmx.core.number"
-        },
-        {
-            "value":       "Hidden",
-            "uri":         "dmx.webclient.hidden",
-            "dataTypeUri": "dmx.core.boolean"
-        },
-        {
-            "value":       "Locked",
-            "uri":         "dmx.webclient.locked",
-            "dataTypeUri": "dmx.core.boolean"
         }
     ],
-
     // Note: the Widget instances must be created *before* the "View Configuration" composite.
     // The Widget assoc def refers to a Widget instance. ### Not necessarily. See Icon assoc def.
-
     "topics": [
         // Widgets
         {
@@ -99,18 +81,6 @@
                 },
                 {
                     "childTypeUri":        "dmx.webclient.customizable",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.input_field_rows",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.hidden",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.locked",
                     "childCardinalityUri": "dmx.core.one"
                 }
             ]

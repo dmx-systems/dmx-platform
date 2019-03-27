@@ -16,16 +16,7 @@
     {
       "value":       "Topicmap Type URI",
       "uri":         "dmx.topicmaps.topicmap_type_uri",
-      "dataTypeUri": "dmx.core.text",
-      "viewConfigTopics": [
-        {
-          "typeUri": "dmx.webclient.view_config",
-          "childs": {
-            "dmx.webclient.hidden": true,       // TODO: move to assoc def?
-            "dmx.webclient.locked": true        // TODO: move to assoc def?
-          }
-        }
-      ]
+      "dataTypeUri": "dmx.core.text"
     },
     {
       "value":       "Private",                 // TODO: implement in webclient
