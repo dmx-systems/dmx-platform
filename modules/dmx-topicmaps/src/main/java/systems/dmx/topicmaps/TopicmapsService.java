@@ -1,5 +1,6 @@
 package systems.dmx.topicmaps;
 
+import systems.dmx.core.Association;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewProps;
@@ -32,9 +33,9 @@ public interface TopicmapsService {
      */
     Topicmap getTopicmap(long topicmapId, boolean includeChilds);
 
-    boolean isTopicInTopicmap(long topicmapId, long topicId);
+    Association getTopicMapcontext(long topicmapId, long topicId);
 
-    boolean isAssociationInTopicmap(long topicmapId, long assocId);
+    Association getAssocMapcontext(long topicmapId, long assocId);
 
     /**
      * Returns all topicmaps which contain the given topic/assoc.

@@ -124,13 +124,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @Override
-    public boolean isTopicInTopicmap(long topicmapId, long topicId) {
-        return _fetchTopicMapcontext(topicmapId, topicId) != null;
+    public Association getTopicMapcontext(long topicmapId, long topicId) {
+        return dmx.getAssociation(TOPICMAP_CONTEXT, topicmapId, topicId,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     @Override
-    public boolean isAssociationInTopicmap(long topicmapId, long assocId) {
-        return _fetchAssocMapcontext(topicmapId, assocId) != null;
+    public Association getAssocMapcontext(long topicmapId, long assocId) {
+        return dmx.getAssociationBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     @GET
@@ -171,7 +173,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
-                    if (isTopicInTopicmap(topicmapId, topicId)) {
+                    if (getTopicMapcontext(topicmapId, topicId) != null) {
                         throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                     }
                     createTopicMapcontext(topicmapId, topicId, viewProps);
@@ -195,7 +197,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
-                    if (isAssociationInTopicmap(topicmapId, assocId)) {
+                    if (getAssocMapcontext(topicmapId, assocId) != null) {
                         throw new RuntimeException("Association " + assocId + " already added to topicmap " +
                             topicmapId);
                     }
@@ -222,14 +224,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 @Override
                 public Void call() {
                     // 1) add topic
-                    Association topicMapcontext = _fetchTopicMapcontext(topicmapId, topicId);
+                    Association topicMapcontext = getTopicMapcontext(topicmapId, topicId);
                     if (topicMapcontext == null) {
                         createTopicMapcontext(topicmapId, topicId, viewProps);
                     } else if (!visibility(topicMapcontext)) {
                         _setTopicVisibility(topicmapId, topicId, true, topicMapcontext);
                     }
                     // 2) add association
-                    Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assocId);
+                    Association assocMapcontext = getAssocMapcontext(topicmapId, assocId);
                     if (assocMapcontext == null) {
                         createAssociationMapcontext(topicmapId, assocId, mf.newViewProps()
                             .put(PROP_VISIBILITY, true)
@@ -551,17 +553,17 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void autoRevealAssocs(DMXObject object, long topicmapId) {
         for (RelatedTopic topic : object.getRelatedTopics()) {
-            _autoRevealAssocs(topic, _fetchTopicMapcontext(topicmapId, topic.getId()), topicmapId);
+            _autoRevealAssocs(topic, getTopicMapcontext(topicmapId, topic.getId()), topicmapId);
         }
         for (RelatedAssociation assoc : object.getRelatedAssociations()) {
-            _autoRevealAssocs(assoc, _fetchAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
+            _autoRevealAssocs(assoc, getAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
         }
     }
 
     private void _autoRevealAssocs(RelatedObject object, Association topicmapContext, long topicmapId) {
         if (topicmapContext != null && visibility(topicmapContext)) {
             Association assoc = object.getRelatingAssociation();
-            Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
+            Association assocMapcontext = getAssocMapcontext(topicmapId, assoc.getId());
             if (assocMapcontext != null && !visibility(assocMapcontext)) {
                 // update DB
                 mf.newViewProps(true).store(assocMapcontext);       // visibility=true
@@ -573,7 +575,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void autoHideAssocs(DMXObject object, long topicmapId) {
         for (Association assoc : object.getAssociations()) {
-            Association topicmapContext = _fetchAssocMapcontext(topicmapId, assoc.getId());
+            Association topicmapContext = getAssocMapcontext(topicmapId, assoc.getId());
             if (topicmapContext != null) {
                 // update DB
                 mf.newViewProps(false).store(topicmapContext);      // visibility=false
@@ -585,7 +587,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void deleteAllAssocMapcontexts(Association object, long topicmapId) {
         for (Association assoc : object.getAssociations()) {
-            Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
+            Association assocMapcontext = getAssocMapcontext(topicmapId, assoc.getId());
             if (assocMapcontext != null) {
                 deleteAssocMapcontext(assocMapcontext);
                 deleteAllAssocMapcontexts(assoc, topicmapId);     // recursion
@@ -628,7 +630,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Topicmap Contexts ---
 
     private Association fetchTopicMapcontext(long topicmapId, long topicId) {
-        Association topicmapContext = _fetchTopicMapcontext(topicmapId, topicId);
+        Association topicmapContext = getTopicMapcontext(topicmapId, topicId);
         if (topicmapContext == null) {
             throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
         }
@@ -636,21 +638,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private Association fetchAssocMapcontext(long topicmapId, long assocId) {
-        Association topicmapContext = _fetchAssocMapcontext(topicmapId, assocId);
+        Association topicmapContext = getAssocMapcontext(topicmapId, assocId);
         if (topicmapContext == null) {
             throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
         }
         return topicmapContext;
-    }
-
-    private Association _fetchTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssociation(TOPICMAP_CONTEXT, topicmapId, topicId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
-    }
-
-    private Association _fetchAssocMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssociationBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     // ---
