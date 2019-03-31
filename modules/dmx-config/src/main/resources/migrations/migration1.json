@@ -1,3 +1,6 @@
+# Part of DMX 5.0
+# Runs ALWAYS
+
 {
     "assoc_types": [
         {
@@ -14,9 +17,8 @@
             ]
         }
     ],
-
     "topics": [
-        ### Role Types ###
+        // Role Types
         {
             "value":   "Configurable",
             "uri":     "dmx.config.configurable",
