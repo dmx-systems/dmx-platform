@@ -1,3 +1,5 @@
+import dm5 from 'dm5'
+
 export default ({store}) => {
   return {
 
@@ -30,7 +32,7 @@ export default ({store}) => {
             ],
             topic_danger: [
               {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
-                                                                                             disabled: deleteDisabled}
+                                                                                             disabled: isTopicDisabled}
             ],
             assoc: [
               {label: 'Hide',    handler: idLists => store.dispatch('hideMulti', idLists), multi: true},
@@ -39,7 +41,8 @@ export default ({store}) => {
               {label: 'Details', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'info'})}
             ],
             assoc_danger: [
-              {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true}
+              {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
+                                                                                             disabled: isAssocDisabled}
             ]
           }),
           quillConfig: state => state.quillConfig
@@ -83,10 +86,40 @@ export default ({store}) => {
     }
   }
 
-  function deleteDisabled (idLists) {
+  /**
+   * @return    a boolean or a promise for a boolean
+   */
+  function isTopicDisabled (idLists) {
+    return containUnselectedTopicmap(idLists) ||    // returns boolean, so must be checked first
+           containUnwritableObject(idLists)         // returns a promise
+  }
+
+  /**
+   * @return    a promise for a boolean
+   */
+  function isAssocDisabled (idLists) {
+    return containUnwritableObject(idLists)
+  }
+
+  /**
+   * @return    a promise for a boolean
+   */
+  function containUnwritableObject (idLists) {
+    return Promise.all([
+      ...idLists.topicIds.map(dm5.permCache.isTopicWritable),
+      ...idLists.assocIds.map(dm5.permCache.isAssocWritable)
+    ]).then(writables =>
+      writables.some(writable => !writable)
+    )
+  }
+
+  /**
+   * @return    a boolean
+   */
+  function containUnselectedTopicmap (idLists) {
     // only the selected topicmap is enabled for deletion
+    const topicmap = store.state.topicmaps.topicmap
     return idLists.topicIds.some(id => {
-      const topicmap = store.state.topicmaps.topicmap
       const topic = topicmap.getTopic(id)
       return topic.typeUri === 'dmx.topicmaps.topicmap' && topic.id !== topicmap.id
     })
