@@ -25,25 +25,31 @@ export default ({store}) => {
           // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => ({
             topic: [
-              {label: 'Hide',    handler: idLists => store.dispatch('hideMulti', idLists), multi: true},
-              {label: 'Edit',    handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})},
+              {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
+              {
+                label: 'Edit', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
+                disabled: isTopicEditDisabled
+              },
               {label: 'Related', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})},
               {label: 'Details', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'info'})}
             ],
-            topic_danger: [
-              {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
-                                                                                             disabled: isTopicDisabled}
-            ],
+            topic_danger: [{
+              label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+              disabled: isTopicDeleteDisabled
+            }],
             assoc: [
-              {label: 'Hide',    handler: idLists => store.dispatch('hideMulti', idLists), multi: true},
-              {label: 'Edit',    handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})},
+              {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
+              {
+                label: 'Edit', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
+                disabled: isAssocEditDisabled
+              },
               {label: 'Related', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})},
               {label: 'Details', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'info'})}
             ],
-            assoc_danger: [
-              {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
-                                                                                             disabled: isAssocDisabled}
-            ]
+            assoc_danger: [{
+              label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+              disabled: isAssocDeleteDisabled
+            }]
           }),
           quillConfig: state => state.quillConfig
         },
@@ -87,30 +93,32 @@ export default ({store}) => {
   }
 
   /**
+   * @return    a promise for a boolean
+   */
+  function isTopicEditDisabled (id) {
+    return isTopicWritable(id).then(writable => !writable)
+  }
+
+  /**
+   * @return    a promise for a boolean
+   */
+  function isAssocEditDisabled (id) {
+    return isAssocWritable(id).then(writable => !writable)
+  }
+
+  /**
    * @return    a boolean or a promise for a boolean
    */
-  function isTopicDisabled (idLists) {
-    return containUnselectedTopicmap(idLists) ||    // returns boolean, so must be checked first
+  function isTopicDeleteDisabled (idLists) {
+    return containUnselectedTopicmap(idLists) ||    // returns a boolean, so must be checked first
            containUnwritableObject(idLists)         // returns a promise
   }
 
   /**
    * @return    a promise for a boolean
    */
-  function isAssocDisabled (idLists) {
+  function isAssocDeleteDisabled (idLists) {
     return containUnwritableObject(idLists)
-  }
-
-  /**
-   * @return    a promise for a boolean
-   */
-  function containUnwritableObject (idLists) {
-    return Promise.all([
-      ...idLists.topicIds.map(dm5.permCache.isTopicWritable),
-      ...idLists.assocIds.map(dm5.permCache.isAssocWritable)
-    ]).then(writables =>
-      writables.some(writable => !writable)
-    )
   }
 
   /**
@@ -123,6 +131,26 @@ export default ({store}) => {
       const topic = topicmap.getTopic(id)
       return topic.typeUri === 'dmx.topicmaps.topicmap' && topic.id !== topicmap.id
     })
+  }
+
+  /**
+   * @return    a promise for a boolean
+   */
+  function containUnwritableObject (idLists) {
+    return Promise.all([
+      ...idLists.topicIds.map(isTopicWritable),
+      ...idLists.assocIds.map(isAssocWritable)
+    ]).then(writables =>
+      writables.some(writable => !writable)
+    )
+  }
+
+  function isTopicWritable (id) {
+    return dm5.permCache.isTopicWritable(id)
+  }
+
+  function isAssocWritable (id) {
+    return dm5.permCache.isAssocWritable(id)
   }
 
   function selectTopicmapIf (topic) {
