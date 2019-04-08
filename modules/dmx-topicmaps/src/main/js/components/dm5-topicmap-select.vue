@@ -5,8 +5,9 @@
         <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" icon="el-icon-info" @click="revealTopicmapTopic"></el-button>
-    <el-button type="text" icon="el-icon-rank" @click="fitTopicmapViewport"></el-button>
+    <el-button type="text" class="fa fa-info-circle" @click="revealTopicmapTopic"></el-button>
+    <el-button type="text" class="fa fa-arrows-alt" @click="fitTopicmapViewport"></el-button>
+    <el-button type="text" class="fa fa-compress" @click="resetTopicmapViewport"></el-button>
   </div>
 </template>
 
@@ -42,7 +43,11 @@ export default {
     },
 
     fitTopicmapViewport () {
-      this.$store.dispatch('fitTopicmapViewport', this.topicmapId)
+      this.$store.dispatch('fitTopicmapViewport')
+    },
+
+    resetTopicmapViewport () {
+      this.$store.dispatch('resetTopicmapViewport')
     }
   }
 }
@@ -56,6 +61,6 @@ export default {
 .dm5-topicmap-select .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
-  margin-left: 0;
+  margin-left: 0 !important;
 }
 </style>
