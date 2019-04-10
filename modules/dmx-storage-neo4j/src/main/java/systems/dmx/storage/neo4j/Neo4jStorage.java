@@ -12,6 +12,7 @@ import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.storage.spi.DMXTransaction;
+import systems.dmx.core.util.JavaUtils;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -33,7 +34,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import java.util.ArrayList;
-import static java.util.Arrays.asList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +69,6 @@ public class Neo4jStorage implements DMXStorage {
     private enum IndexMode {
         KEY, FULLTEXT, FULLTEXT_KEY;
     }
-
-    private static final List<IndexMode> ALL_INDEX_MODES = asList(
-        IndexMode.KEY, IndexMode.FULLTEXT, IndexMode.FULLTEXT_KEY
-    );
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -198,7 +194,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+    public void storeTopicValue(long topicId, SimpleValue value, String indexKey, boolean isHtmlValue) {
         if (indexKey == null) {
             throw new IllegalArgumentException("indexKey must be not null (value=\"" + value + "\")");
         }
@@ -207,7 +203,7 @@ public class Neo4jStorage implements DMXStorage {
         // store
         topicNode.setProperty(KEY_VALUE, value.value());
         // index
-        indexTopicNodeValue(topicNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
+        indexTopicNodeValue(topicNode, indexKey, value.value(), isHtmlValue);
     }
 
     // ---
@@ -317,7 +313,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+    public void storeAssociationValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue) {
         if (indexKey == null) {
             throw new IllegalArgumentException("indexKey must be not null (value=\"" + value + "\")");
         }
@@ -326,7 +322,7 @@ public class Neo4jStorage implements DMXStorage {
         // store
         assocNode.setProperty(KEY_VALUE, value.value());
         // index
-        indexAssociationNodeValue(assocNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
+        indexAssociationNodeValue(assocNode, indexKey, value.value(), isHtmlValue);
     }
 
     @Override
@@ -647,45 +643,53 @@ public class Neo4jStorage implements DMXStorage {
         if (value instanceof Number) {
             value = ValueContext.numeric((Number) value);
         }
-        indexNodeValue(node, value, asList(IndexMode.KEY), key, exactIndex, null);      // fulltextIndex=null
+        indexNodeValue(node, value, IndexMode.KEY, key, exactIndex, null);      // fulltextIndex=null
     }
 
     // ---
 
-    private void indexTopicNodeValue(Node topicNode, List<IndexMode> indexModes, String indexKey, Object indexValue) {
-        indexNodeValue(topicNode, indexValue, indexModes, indexKey, topicContentExact, topicContentFulltext);
+    private void indexTopicNodeValue(Node topicNode, String indexKey, Object value, boolean isHtmlValue) {
+        indexNodeValue(topicNode, value, IndexMode.KEY,          indexKey, topicContentExact, topicContentFulltext);
+        // TODO: don't fulltext index numbers/booleans?
+        value = getIndexValue(value, isHtmlValue);
+        indexNodeValue(topicNode, value, IndexMode.FULLTEXT,     indexKey, topicContentExact, topicContentFulltext);
+        indexNodeValue(topicNode, value, IndexMode.FULLTEXT_KEY, indexKey, topicContentExact, topicContentFulltext);
     }
 
-    private void indexAssociationNodeValue(Node assocNode, List<IndexMode> indexModes, String indexKey,
-                                                                                       Object indexValue) {
-        indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
+    private void indexAssociationNodeValue(Node assocNode, String indexKey, Object value, boolean isHtmlValue) {
+        indexNodeValue(assocNode, value, IndexMode.KEY,          indexKey, assocContentExact, assocContentFulltext);
+        // TODO: don't fulltext index numbers/booleans?
+        value = getIndexValue(value, isHtmlValue);
+        indexNodeValue(assocNode, value, IndexMode.FULLTEXT,     indexKey, assocContentExact, assocContentFulltext);
+        indexNodeValue(assocNode, value, IndexMode.FULLTEXT_KEY, indexKey, assocContentExact, assocContentFulltext);
     }
 
     // ---
 
-    private Object getIndexValue(SimpleValue value, SimpleValue indexValue) {
-        return indexValue != null ? indexValue.value() : value.value();
+    /**
+     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
+     */
+    private Object getIndexValue(Object value, boolean isHtmlValue) {
+        return isHtmlValue ? JavaUtils.stripHTML((String) value) : value;
     }
 
 
 
     // === Indexing ===
 
-    private void indexNodeValue(Node node, Object value, List<IndexMode> indexModes, String indexKey,
+    private void indexNodeValue(Node node, Object value, IndexMode indexMode, String indexKey,
                                                          Index<Node> exactIndex, Index<Node> fulltextIndex) {
-        for (IndexMode indexMode : indexModes) {
-            if (indexMode == IndexMode.KEY) {
-                exactIndex.remove(node, indexKey);              // remove old
-                exactIndex.add(node, indexKey, value);          // index new
-            } else if (indexMode == IndexMode.FULLTEXT) {
-                fulltextIndex.remove(node, KEY_FULLTEXT);       // remove old
-                fulltextIndex.add(node, KEY_FULLTEXT, value);   // index new
-            } else if (indexMode == IndexMode.FULLTEXT_KEY) {
-                fulltextIndex.remove(node, indexKey);           // remove old
-                fulltextIndex.add(node, indexKey, value);       // index new
-            } else {
-                throw new RuntimeException("Unexpected index mode: \"" + indexMode + "\"");
-            }
+        if (indexMode == IndexMode.KEY) {
+            exactIndex.remove(node, indexKey);              // remove old
+            exactIndex.add(node, indexKey, value);          // index new
+        } else if (indexMode == IndexMode.FULLTEXT) {
+            fulltextIndex.remove(node, KEY_FULLTEXT);       // remove old
+            fulltextIndex.add(node, KEY_FULLTEXT, value);   // index new
+        } else if (indexMode == IndexMode.FULLTEXT_KEY) {
+            fulltextIndex.remove(node, indexKey);           // remove old
+            fulltextIndex.add(node, indexKey, value);       // index new
+        } else {
+            throw new RuntimeException("Unexpected index mode: \"" + indexMode + "\"");
         }
     }
 

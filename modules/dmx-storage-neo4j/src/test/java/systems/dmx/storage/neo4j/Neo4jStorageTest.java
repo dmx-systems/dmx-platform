@@ -246,15 +246,14 @@ public class Neo4jStorageTest {
             //
             // Fulltext indexing
             //
-            createTopic("note-1", "dmx.notes.note", "DMX is a platform for collaboration and knowledge management",
-                null);
-            createTopic("note-2", "dmx.notes.note", "Lead developer of DMX is Jörg Richter", null);
+            createTopic("note-1", "dmx.notes.note", "DMX is a platform for collaboration and knowledge management");
+            createTopic("note-2", "dmx.notes.note", "Lead developer of DMX is Jörg Richter");
             //
             // Fulltext HTML indexing
             //
             String htmlText = "Java and Oracle is no fun anymore. I'm learning <b>Haskell</b> now.";
-            createTopic("note-3", "dmx.notes.note", htmlText, null);
-            createTopic("note-4", "dmx.notes.note", htmlText, JavaUtils.stripHTML(htmlText));
+            createTopic("note-3", "dmx.notes.note", htmlText);
+            createTopic("note-4", "dmx.notes.note", htmlText, true);
             //
             // Property indexing
             //
@@ -272,10 +271,10 @@ public class Neo4jStorageTest {
     // ---
 
     private long createTopic(String uri, String typeUri, String value) {
-        return createTopic(uri, typeUri, value, null);
+        return createTopic(uri, typeUri, value, false);
     }
 
-    private long createTopic(String uri, String typeUri, String value, String indexValue) {
+    private long createTopic(String uri, String typeUri, String value, boolean isHtmlValue) {
         TopicModel topic = mf.newTopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
@@ -284,8 +283,7 @@ public class Neo4jStorageTest {
         long topicId = topic.getId();
         assertTrue(topicId != -1);
         //
-        storage.storeTopicValue(topicId, topic.getSimpleValue(), typeUri,
-            indexValue != null ? new SimpleValue(indexValue) : null);
+        storage.storeTopicValue(topicId, topic.getSimpleValue(), typeUri, isHtmlValue);
         //
         return topicId;
     }
@@ -310,7 +308,7 @@ public class Neo4jStorageTest {
         long assocId = assoc.getId();
         assertTrue(assocId != -1);
         //
-        storage.storeAssociationValue(assocId, new SimpleValue(""), typeUri, null);
+        storage.storeAssociationValue(assocId, new SimpleValue(""), typeUri, false);
         //
         return assocId;
     }

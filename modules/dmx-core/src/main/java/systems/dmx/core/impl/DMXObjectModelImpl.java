@@ -9,7 +9,6 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
-import systems.dmx.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -559,34 +558,21 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // ===
 
-    /**
-     * Calculates the simple value that is to be indexed for this object.
-     *
-     * HTML tags are stripped from HTML values. Non-HTML values are returned directly. ### FIXDOC
-     */
-    SimpleValue getIndexValue() {
-        // TODO: rethink HTML indexing.
-        // DM5's value updater needs the exact index also for HTML values.
-        return value;
-        /* SimpleValue value = getSimpleValue();
-        if (getType().getDataTypeUri().equals("dmx.core.html")) {
-            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
-        } else {
-            return value;
-        } */
-    }
-
-    boolean uriChange(String newUri, String compareUri) {
+    final boolean uriChange(String newUri, String compareUri) {
         return newUri != null && !newUri.equals(compareUri);
     }
 
-    boolean isSimple() {
+    final boolean isSimple() {
         // TODO: add isSimple() to type model
         String dataTypeUri = getType().getDataTypeUri();
         return dataTypeUri.equals("dmx.core.text")
             || dataTypeUri.equals("dmx.core.html")
             || dataTypeUri.equals("dmx.core.number")
             || dataTypeUri.equals("dmx.core.boolean");
+    }
+
+    final boolean isHtml() {
+        return getType().getDataTypeUri().equals("dmx.core.html");
     }
 
 

@@ -59,9 +59,9 @@ public interface DMXStorage {
      * Stores and indexes a topic value.
      *
      * @param   indexKey    must not null
-     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
+     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used. ### FIXDOC
      */
-    void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue);
+    void storeTopicValue(long topicId, SimpleValue value, String indexKey, boolean isHtmlValue);
 
     // ---
 
@@ -99,9 +99,9 @@ public interface DMXStorage {
      * Stores and indexes an association value.
      *
      * @param   indexKey    must not null
-     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
+     * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used. ### FIXDOC
      */
-    void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue);
+    void storeAssociationValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 

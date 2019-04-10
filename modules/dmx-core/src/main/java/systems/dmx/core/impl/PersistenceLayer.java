@@ -443,12 +443,12 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssociationModel assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicRoleModel(topicId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
-            createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
+            storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            createAssociationInstantiation(assoc.id, assoc.typeUri);
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
                 topicTypeUri + "\" failed", e);
@@ -457,11 +457,11 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createAssociationInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssociationModel assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssociationRoleModel(assocId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
+            storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId + " with association type \"" +
                 assocTypeUri + "\" failed", e);

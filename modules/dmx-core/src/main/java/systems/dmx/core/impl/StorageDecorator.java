@@ -114,20 +114,11 @@ class StorageDecorator {
         storage.storeTopicTypeUri(topicId, topicTypeUri);
     }
 
-    // ---
-
-    /**
-     * Convenience method (no index value).
-     */
-    final void storeTopicValue(long topicId, SimpleValue value, String indexKey) {
-        storeTopicValue(topicId, value, indexKey, null);
-    }
-
     /**
      * Stores and indexes a topic value.
      */
-    final void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue) {
-        storage.storeTopicValue(topicId, value, indexKey, indexValue);
+    final void storeTopicValue(long topicId, SimpleValue value, String indexKey, boolean isHtmlValue) {
+        storage.storeTopicValue(topicId, value, indexKey, isHtmlValue);
     }
 
     // ---
@@ -246,6 +237,10 @@ class StorageDecorator {
 
     // ---
 
+    final void storeAssociation(AssociationModel model) {
+        storage.storeAssociation(model);
+    }
+
     /**
      * Stores and indexes the association's URI.
      */
@@ -261,27 +256,14 @@ class StorageDecorator {
         storage.storeRoleTypeUri(assocId, playerId, roleTypeUri);
     }
 
-    // ---
-
-    /**
-     * Convenience method (no index value).
-     */
-    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey) {
-        storeAssociationValue(assocId, value, indexKey, null);
-    }
-
     /**
      * Stores and indexes an association value.
      */
-    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue) {
-        storage.storeAssociationValue(assocId, value, indexKey, indexValue);
+    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue) {
+        storage.storeAssociationValue(assocId, value, indexKey, isHtmlValue);
     }
 
     // ---
-
-    final void storeAssociation(AssociationModel model) {
-        storage.storeAssociation(model);
-    }
 
     final void _deleteAssociation(long assocId) {
         storage.deleteAssociation(assocId);

@@ -35,7 +35,7 @@ public class CoreServiceImpl implements CoreService {
     BundleContext bundleContext;
     PersistenceLayer pl;
     EventManager em;
-    ModelFactory mf;
+    ModelFactoryImpl mf;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     AccessControl accessControl;
@@ -489,9 +489,9 @@ public class CoreServiceImpl implements CoreService {
         try {
             // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and
             // asscociation types
-            TopicModel t = mf.newTopicModel("dmx.core.topic_type", "dmx.core.meta_type",
+            TopicModelImpl t = mf.newTopicModel("dmx.core.topic_type", "dmx.core.meta_type",
                 new SimpleValue("Topic Type"));
-            TopicModel a = mf.newTopicModel("dmx.core.assoc_type", "dmx.core.meta_type",
+            TopicModelImpl a = mf.newTopicModel("dmx.core.assoc_type", "dmx.core.meta_type",
                 new SimpleValue("Association Type"));
             _createTopic(t);
             _createTopic(a);
@@ -499,16 +499,16 @@ public class CoreServiceImpl implements CoreService {
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
-            TopicModel dataType = mf.newTopicTypeModel("dmx.core.data_type", "Data Type", "dmx.core.text");
+            TopicModelImpl dataType = mf.newTopicTypeModel("dmx.core.data_type", "Data Type", "dmx.core.text");
             _createTopic(dataType);
             // Create data type "Text"
-            TopicModel text = mf.newTopicModel("dmx.core.text", "dmx.core.data_type", new SimpleValue("Text"));
+            TopicModelImpl text = mf.newTopicModel("dmx.core.text", "dmx.core.data_type", new SimpleValue("Text"));
             _createTopic(text);
             // Create association type "Composition" -- needed to associate topic/association types with data types
-            TopicModel composition = mf.newAssociationTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
+            TopicModelImpl composition = mf.newAssociationTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
             _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
-            TopicModel instn = mf.newAssociationTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
+            TopicModelImpl instn = mf.newAssociationTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
             _createTopic(instn);
             //
             // 1) Postponed topic type association
@@ -563,9 +563,9 @@ public class CoreServiceImpl implements CoreService {
      * Low-level method that stores a topic without its "Instantiation" association.
      * Needed for bootstrapping.
      */
-    private void _createTopic(TopicModel model) {
+    private void _createTopic(TopicModelImpl model) {
         pl.storeTopic(model);
-        pl.storeTopicValue(model.getId(), model.getSimpleValue(), model.getTypeUri());
+        pl.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
     }
 
     /**
@@ -573,10 +573,10 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModel assoc = mf.newAssociationModel("dmx.core.composition",
+        AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.composition",
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
             mf.newTopicRoleModel(dataTypeUri, "dmx.core.default"));
         pl.storeAssociation(assoc);
-        pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
+        pl.storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
     }
 }
