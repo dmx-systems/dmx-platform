@@ -285,6 +285,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
+    @Path("/{id}")
+    @Transactional
+    @Override
+    public void setTopicPositions(@PathParam("id") long topicmapId, TopicCoords coords) {
+        for (TopicCoords.Entry entry : coords) {
+            setTopicPosition(topicmapId, entry.topicId, entry.x, entry.y);
+        }
+    }
+
+    @PUT
     @Path("/{id}/topic/{topic_id}/{visibility}")    // TODO: extend URL .../visibility/{visibility}
     @Transactional
     @Override
@@ -346,16 +356,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     // ---
-
-    @PUT
-    @Path("/{id}")
-    @Transactional
-    @Override
-    public void setClusterPosition(@PathParam("id") long topicmapId, ClusterCoords coords) {
-        for (ClusterCoords.Entry entry : coords) {
-            setTopicPosition(topicmapId, entry.topicId, entry.x, entry.y);
-        }
-    }
 
     @PUT
     @Path("/{id}/pan/{x}/{y}/zoom/{zoom}")

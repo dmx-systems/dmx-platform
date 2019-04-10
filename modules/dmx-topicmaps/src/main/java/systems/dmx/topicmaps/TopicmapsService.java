@@ -79,6 +79,8 @@ public interface TopicmapsService {
      */
     void setTopicPosition(long topicmapId, long topicId, int x, int y);
 
+    void setTopicPositions(long topicmapId, TopicCoords coords);
+
     /**
      * Convenience method to update the "dmx.topicmaps.visibility" standard view property.
      */
@@ -97,9 +99,6 @@ public interface TopicmapsService {
     void hideMulti(long topicmapId, IdList topicIds, IdList assocIds);
 
     // ---
-
-    // TODO: rename to "setTopicPositions"
-    void setClusterPosition(long topicmapId, ClusterCoords coords);
 
     void setTopicmapViewport(long topicmapId, int panX, int panY, double zoom);
 
