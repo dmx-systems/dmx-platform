@@ -5,7 +5,8 @@
         <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" class="fa fa-info-circle" @click="revealWorkspaceTopic"></el-button>
+    <el-button type="text" class="fa fa-info-circle" title="Reveal Workspace Topic" @click="revealWorkspaceTopic">
+    </el-button>
   </div>
 </template>
 

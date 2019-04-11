@@ -5,9 +5,11 @@
         <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" class="fa fa-info-circle" @click="revealTopicmapTopic"></el-button>
-    <el-button type="text" class="fa fa-arrows-alt" @click="fitTopicmapViewport"></el-button>
-    <el-button type="text" class="fa fa-compress" @click="resetTopicmapViewport"></el-button>
+    <el-button type="text" class="fa fa-info-circle" title="Reveal Topicmap Topic" @click="revealTopicmapTopic">
+    </el-button>
+    <el-button type="text" class="fa fa-arrows-alt" title="Zoom to Fit" @click="fitTopicmapViewport"></el-button>
+    <el-button type="text" class="fa fa-compress" title="Reset Zoom and Center" @click="resetTopicmapViewport">
+    </el-button>
   </div>
 </template>
 
