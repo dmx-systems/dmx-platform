@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Integrates new values into the DB.
+ * Integrates new values into the DB and maintains the references.
  *
  * Note: this class is not thread-safe. A ValueIntegrator instance must not be shared between threads.
  */

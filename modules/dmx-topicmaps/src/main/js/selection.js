@@ -24,10 +24,12 @@ export default class Selection {
     this._defer()
   }
 
+  // Note: called twice while box-selecting an assoc; the 2nd call is ignored
   addAssoc (id) {
-    this._checkAddAssoc(id)
-    this.assocIds.push(id)
-    this._defer()
+    if (!this.includesAssoc(id)) {
+      this.assocIds.push(id)
+      this._defer()
+    }
   }
 
   removeTopic (id) {
@@ -36,10 +38,13 @@ export default class Selection {
     this._defer()
   }
 
+  // Note: called twice while unselecting an assoc; the 2nd call is ignored
   removeAssoc (id) {
-    const i = this._checkRemoveAssoc(id)
-    this.assocIds.splice(i, 1)
-    this._defer()
+    const i = this.assocIds.indexOf(id)
+    if (i !== -1) {
+      this.assocIds.splice(i, 1)
+      this._defer()
+    }
   }
 
   // These 4 methods manipulate the selection *silently*, that is without handler invocation.
@@ -130,14 +135,6 @@ export default class Selection {
     const i = this.topicIds.indexOf(id)
     if (i === -1) {
       throw Error(`${id} not found in the selected topic list`)
-    }
-    return i
-  }
-
-  _checkRemoveAssoc (id) {
-    const i = this.assocIds.indexOf(id)
-    if (i === -1) {
-      throw Error(`${id} not found in the selected assoc list`)
     }
     return i
   }
