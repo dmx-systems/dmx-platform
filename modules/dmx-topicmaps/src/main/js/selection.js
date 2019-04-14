@@ -19,7 +19,7 @@ export default class Selection {
   // They are called *before* a route change.
 
   addTopic (id) {
-    this._checkAddTopic(id)
+    this._checkAddTopic(id)                 // TODO: drop check and make idempotent?
     this.topicIds.push(id)
     this._defer()
   }
@@ -33,7 +33,7 @@ export default class Selection {
   }
 
   removeTopic (id) {
-    const i = this._checkRemoveTopic(id)
+    const i = this._checkRemoveTopic(id)    // TODO: drop check and make idempotent?
     this.topicIds.splice(i, 1)
     this._defer()
   }
@@ -122,12 +122,6 @@ export default class Selection {
   _checkAddTopic (id) {
     if (this.includesTopic(id)) {
       throw Error(`${id} is already in the selected topic list`)
-    }
-  }
-
-  _checkAddAssoc (id) {
-    if (this.includesAssoc(id)) {
-      throw Error(`${id} is already in the selected assoc list`)
     }
   }
 

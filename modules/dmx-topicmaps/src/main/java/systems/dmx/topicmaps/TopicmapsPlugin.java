@@ -233,10 +233,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     // 2) add association
                     Association assocMapcontext = getAssocMapcontext(topicmapId, assocId);
                     if (assocMapcontext == null) {
-                        createAssociationMapcontext(topicmapId, assocId, mf.newViewProps()
-                            .put(PROP_VISIBILITY, true)
-                            .put(PROP_PINNED, false)
-                        );
+                        createAssociationMapcontext(topicmapId, assocId, mf.newViewProps(true, false));
                     } else if (!visibility(assocMapcontext)) {
                         _setAssocVisibility(topicmapId, assocId, true, assocMapcontext);
                     }
@@ -508,9 +505,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private ViewProps fetchAssocViewProps(Association topicmapContext) {
-        return mf.newViewProps()
-            .put(PROP_VISIBILITY, visibility(topicmapContext))
-            .put(PROP_PINNED, pinned(topicmapContext));
+        return mf.newViewProps(
+            visibility(topicmapContext),
+            pinned(topicmapContext)
+        );
     }
 
     private boolean visibility(Association topicmapContext) {
@@ -525,13 +523,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void _setTopicVisibility(long topicmapId, long topicId, boolean visibility, Association topicmapContext) {
         Topic topic = dmx.getTopic(topicId);
+        ViewProps viewProps = mf.newViewProps(visibility);
         if (visibility) {
             autoRevealAssocs(topic, topicmapId);
         } else {
             autoHideAssocs(topic, topicmapId);
+            viewProps.put(PROP_PINNED, false);      // hide implies unpin
         }
         // update DB
-        mf.newViewProps(visibility).store(topicmapContext);
+        viewProps.store(topicmapContext);
         // send message
         me.setTopicVisibility(topicmapId, topicId, visibility);
     }
@@ -578,7 +578,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             Association topicmapContext = getAssocMapcontext(topicmapId, assoc.getId());
             if (topicmapContext != null) {
                 // update DB
-                mf.newViewProps(false).store(topicmapContext);      // visibility=false
+                mf.newViewProps(false, false).store(topicmapContext);       // visibility=false, pinned=false
                 // recursion
                 autoHideAssocs(assoc, topicmapId);
             }

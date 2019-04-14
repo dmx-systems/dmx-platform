@@ -33,6 +33,13 @@ class ViewPropsImpl implements ViewProps {
     }
 
     /**
+     * Convenience constructor that initializes the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.
+     */
+    ViewPropsImpl(int x, int y) {
+        initPos(x, y);
+    }
+
+    /**
      * Convenience constructor that initializes the "dmx.topicmaps.x", "dmx.topicmaps.y", "dmx.topicmaps.visibility",
      * and "dmx.topicmaps.pinned" standard view properties.
      */
@@ -43,17 +50,19 @@ class ViewPropsImpl implements ViewProps {
     }
 
     /**
-     * Convenience constructor that initializes the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.
-     */
-    ViewPropsImpl(int x, int y) {
-        initPos(x, y);
-    }
-
-    /**
      * Convenience constructor that initializes the "dmx.topicmaps.visibility" standard view property.
      */
     ViewPropsImpl(boolean visibility) {
         initVisibility(visibility);
+    }
+
+    /**
+     * Convenience constructor that initializes the "dmx.topicmaps.visibility" and "dmx.topicmaps.pinned" standard
+     * view properties.
+     */
+    ViewPropsImpl(boolean visibility, boolean pinned) {
+        initVisibility(visibility);
+        initPinned(pinned);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

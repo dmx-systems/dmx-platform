@@ -843,18 +843,23 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned) {
-        return new ViewPropsImpl(x, y, visibility, pinned);
-    }
-
-    @Override
     public ViewProps newViewProps(int x, int y) {
         return new ViewPropsImpl(x, y);
     }
 
     @Override
+    public ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned) {
+        return new ViewPropsImpl(x, y, visibility, pinned);
+    }
+
+    @Override
     public ViewProps newViewProps(boolean visibility) {
         return new ViewPropsImpl(visibility);
+    }
+
+    @Override
+    public ViewProps newViewProps(boolean visibility, boolean pinned) {
+        return new ViewPropsImpl(visibility, pinned);
     }
 
     @Override

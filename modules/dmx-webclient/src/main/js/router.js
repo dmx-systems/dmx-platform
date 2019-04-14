@@ -272,7 +272,7 @@ function navigate (to, from) {
     }
   }
   // 3) detail
-  const detail    = to.params.detail
+  const detail = to.params.detail
   const oldDetail = from.params.detail
   if (detail != oldDetail) {
     store.dispatch('setDetailPanelVisibility', detail !== undefined)

@@ -243,11 +243,13 @@ public interface ModelFactory {
 
     ViewProps newViewProps();
 
-    ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned);
-
     ViewProps newViewProps(int x, int y);
 
+    ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned);
+
     ViewProps newViewProps(boolean visibility);
+
+    ViewProps newViewProps(boolean visibility, boolean pinned);
 
     ViewProps newViewProps(JSONObject viewProps);
 

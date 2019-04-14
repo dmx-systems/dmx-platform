@@ -27,7 +27,7 @@
     "leaflet": "^1.4.0",
     "vue": "^2.6.10",
     "vue-font-awesome-search": "https://github.com/jri/vue-font-awesome-search.git",
-    "vue-router": "^3.0.3",
+    "vue-router": "^3.0.4",
     "vue2-leaflet": "^2.0.3",
     "vuedraggable": "^2.20.0",
     "vuex": "^3.1.0"
@@ -47,8 +47,8 @@
     "style-loader": "^0.23.1",
     "vue-loader": "^15.7.0",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.29.6",
-    "webpack-bundle-analyzer": "^3.3.1",
+    "webpack": "^4.30.0",
+    "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.3.1"
   }
