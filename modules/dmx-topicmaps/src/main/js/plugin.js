@@ -54,17 +54,19 @@ export default ({store}) => {
           quillConfig: state => state.quillConfig
         },
         listeners: {
-          'topic-select':         id          => store.dispatch('selectTopic', id),
-          'topic-unselect':       id          => store.dispatch('unselectTopic', id),
-          'topic-double-click':   topic       => selectTopicmapIf(topic),
-          'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
-          'topics-drag':          topicCoords => store.dispatch('setTopicPositions', topicCoords),
-          'assoc-create':         playerIds   => store.dispatch('createAssoc', playerIds),
-          'assoc-select':         id          => store.dispatch('selectAssoc', id),
-          'assoc-unselect':       id          => store.dispatch('unselectAssoc', id),
-          'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos}),
-          'object-submit':        object      => store.dispatch('submit', object),
-          'child-topic-reveal':   relTopic    => store.dispatch('revealRelatedTopic', {relTopic})
+          'topic-select':         id             => store.dispatch('selectTopic', id),
+          'topic-unselect':       id             => store.dispatch('unselectTopic', id),
+          'topic-double-click':   topic          => selectTopicmapIf(topic),
+          'topic-drag':           ({id, pos})    => store.dispatch('setTopicPosition', {id, pos}),
+          'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {topicId: id, pinned}),
+          'topics-drag':          topicCoords    => store.dispatch('setTopicPositions', topicCoords),
+          'assoc-create':         playerIds      => store.dispatch('createAssoc', playerIds),
+          'assoc-select':         id             => store.dispatch('selectAssoc', id),
+          'assoc-unselect':       id             => store.dispatch('unselectAssoc', id),
+          'assoc-pin':            ({id, pinned}) => store.dispatch('setAssocPinned', {assocId: id, pinned}),
+          'topicmap-contextmenu': pos            => store.dispatch('openSearchWidget', {pos}),
+          'object-submit':        object         => store.dispatch('submit', object),
+          'child-topic-reveal':   relTopic       => store.dispatch('revealRelatedTopic', {relTopic})
         }
       },
       {
