@@ -58,12 +58,14 @@ export default ({store}) => {
           'topic-unselect':       id             => store.dispatch('unselectTopic', id),
           'topic-double-click':   topic          => selectTopicmapIf(topic),
           'topic-drag':           ({id, pos})    => store.dispatch('setTopicPosition', {id, pos}),
-          'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {topicId: id, pinned}),
+          'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {topicId: id, pinned,
+                                                                                      showDetails: showDetails()}),
           'topics-drag':          topicCoords    => store.dispatch('setTopicPositions', topicCoords),
           'assoc-create':         playerIds      => store.dispatch('createAssoc', playerIds),
           'assoc-select':         id             => store.dispatch('selectAssoc', id),
           'assoc-unselect':       id             => store.dispatch('unselectAssoc', id),
-          'assoc-pin':            ({id, pinned}) => store.dispatch('setAssocPinned', {assocId: id, pinned}),
+          'assoc-pin':            ({id, pinned}) => store.dispatch('setAssocPinned', {assocId: id, pinned,
+                                                                                      showDetails: showDetails()}),
           'topicmap-contextmenu': pos            => store.dispatch('openSearchWidget', {pos}),
           'object-submit':        object         => store.dispatch('submit', object),
           'child-topic-reveal':   relTopic       => store.dispatch('revealRelatedTopic', {relTopic})
@@ -159,5 +161,9 @@ export default ({store}) => {
     if (topic.typeUri === 'dmx.topicmaps.topicmap') {
       store.dispatch('selectTopicmap', topic.id)
     }
+  }
+
+  function showDetails () {
+    return store.getters.showInmapDetails
   }
 }
