@@ -173,7 +173,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
-                    if (getTopicMapcontext(topicmapId, topicId) != null) {
+                    if (getTopicMapcontext(topicmapId, topicId) != null) {      // TODO: idempotence?
                         throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                     }
                     createTopicMapcontext(topicmapId, topicId, viewProps);
@@ -197,7 +197,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
-                    if (getAssocMapcontext(topicmapId, assocId) != null) {
+                    if (getAssocMapcontext(topicmapId, assocId) != null) {      // TODO: idempotence?
                         throw new RuntimeException("Association " + assocId + " already added to topicmap " +
                             topicmapId);
                     }
@@ -312,7 +312,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setAssocVisibility(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
-            _setAssocVisibility(topicmapId, assocId, visibility, fetchAssocMapcontext(topicmapId, assocId));
+            Association assocMapcontext = getAssocMapcontext(topicmapId, assocId);
+            if (assocMapcontext != null) {      // Note: idempotence is needed for hide-multi
+                _setAssocVisibility(topicmapId, assocId, visibility, assocMapcontext);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Setting visibility of assoc " + assocId + " from topicmap " + topicmapId +
                 " failed", e);
@@ -541,9 +544,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // update DB
         if (visibility) {
             autoRevealAssocs(assoc, topicmapId);
-            // FIXME: idempotence of remove-assoc-from-topicmap is needed for delete-muti?
             mf.newViewProps(visibility).store(topicmapContext);
         } else {
+            // Note: topicmap contexts of *explicitly* hidden assocs are removed
             deleteAllAssocMapcontexts(assoc, topicmapId);
             deleteAssocMapcontext(topicmapContext);
         }
