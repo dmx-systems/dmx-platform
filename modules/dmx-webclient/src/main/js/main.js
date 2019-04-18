@@ -12,22 +12,21 @@ import './websocket'
 console.log('[DMX] 2019/04/18')
 
 // 1) Init dm5 library
-// The dm5 library must be inited *before* the dm5-webclient component is created.
-// The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init().
-const ready = dm5.init({
+// The dm5 library must be inited *before* the dm5-webclient component is instantiated.
+// The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init(). ### TODO: still true?
+const dm5ready = dm5.init({
   store,
   onHttpError
 })
 
 // 2) Create Vue root instance
-// In particular instantiates dm5-webclient component, and its child component dm5-search-widget. ### FIXDOC
+// Instantiates router-view and dm5-webclient components.
 const root = new Vue({
   el: '#app',
   store,
   router,
   render: h => h(App)
 })
-// console.log('### Vue root instance created!', root)
 
 // 3) Register own renderers
 store.dispatch('registerDetailRenderer', {
@@ -42,17 +41,18 @@ store.dispatch('registerDetailRenderer', {
 })
 
 // 4) Load plugins
-// Plugin loading (and initialization) must take place *after* the Vue root instance is created.
-// Plugins that provide entries for the create menu rely on the "registerExtraMenuItems" action,
-// which is only registered in dm5-search-widget's created() hook. ### FIXDOC
+// Note: loading plugins and mounting the Weblient toplevel components (step 5) does not require synchronization at the
+// moment. This is because all toplevel components (basically dm5-topicmap-panel and dm5-detail-panel) are provided by
+// *standard* plugins. Standard plugins are "linked" into the Webclient at build time. At runtime no asynchronicity is
+// involved.
+// As soon as we want allow an *external* plugin to provide Webclient toplevel components synchronization is required.
+// Note: in production mode external plugins are loaded asynchronously. Mounting can only start once loading completes.
+// In contrast external plugins in *development mode* as well as standard plugins (both modes) are "linked" into the
+// Webclient at build time. At runtime no asynchronicity is involved.
 loadPlugins()
-// console.log('### Plugins loaded!')
 
-// TODO: synchronize initial navigation with loading the external plugins?
-// (Note: the standard plugins are "loaded" synchronously anyways.)
-
-// 5) Mount Webclient components (as provided by plugins)
-// Note: the mount point DOM is ready only on next tick.
+// 5) Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
+// Note: the mount point DOM exists only on next tick.
 Vue.nextTick(() => {
   const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
   store.dispatch('mountComponents', webclient)
@@ -64,7 +64,7 @@ Vue.nextTick(() => {
 Promise.all([
   // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
   // The type cache must be ready *before* "initialNavigation" is dispatched.
-  ready,
+  dm5ready,
   // Initial navigation might involve "select the 1st workspace", so the workspace
   // topics must be already loaded.
   store.state.workspaces.ready

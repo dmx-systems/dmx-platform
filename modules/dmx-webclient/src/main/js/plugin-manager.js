@@ -26,15 +26,14 @@ export default () => {
       'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement add your plugin to ' +
       'modules/dmx-webclient/src/main/js/plugin_manager.js')
   } else {
-    loadPluginsFromServer()
+    fetchPluginsFromServer()
   }
 }
 
 /**
  * Registers a plugin's assets (store module, webclient components, renderers, ...).
  *
- * @param   pluginConfig    either a plugin configuration object or a function that returns a plugin configuration
- *                          object.
+ * @param   pluginConfig    either a plugin config object or a function that returns a plugin config object.
  */
 function initPlugin (pluginConfig) {
   const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dm5, axios, Vue}) : pluginConfig
@@ -86,16 +85,16 @@ function registerDetailRenderers (renderers, renderer) {
   }
 }
 
-// --- Load from server ---
+// --- Fetch from server ---
 
 /**
  * Fetches the list of installed plugins from the server, then fetches the frontend script and style of those
  * plugins which provide one.
  * Note: only frontend script/style of *external* plugins (not included in the DMX standard distro) is fetched.
- * In contrast the frontend script/style of the *standard* plugins is bundled along with the webclient at build time.
- * For the standard plugins no individual `plugin.js` files exist.
+ * In contrast the frontend script of the *standard* plugins is "linked" into the Webclient at build time.
+ * A standard plugin's .jar file does not contain a `plugin.js` file.
  */
-function loadPluginsFromServer () {
+function fetchPluginsFromServer () {
   dm5.restClient.getPlugins().then(pluginInfos => {
     console.group("[DMX] Fetching plugins")
     pluginInfos.forEach(pluginInfo => {
@@ -103,7 +102,7 @@ function loadPluginsFromServer () {
         console.group(pluginInfo.pluginUri)
         if (pluginInfo.pluginFile) {
           console.log('script', pluginInfo.pluginFile)
-          loadPlugin(pluginInfo).then(initPlugin)
+          fetchPlugin(pluginInfo).then(initPlugin)
         }
         if (pluginInfo.styleFile) {
           console.log('stylesheet', pluginInfo.styleFile)
@@ -116,7 +115,12 @@ function loadPluginsFromServer () {
   })
 }
 
-function loadPlugin (pluginInfo) {
+/**
+ * Fetches a plugin from server.
+ *
+ * @return  a promise for the plugin's export.
+ */
+function fetchPlugin (pluginInfo) {
   const p = installCallback(pluginInfo.pluginUri)
   loadScript(pluginURL(pluginInfo))
   return p
