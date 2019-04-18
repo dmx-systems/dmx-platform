@@ -20,16 +20,20 @@ Live demo (login as "admin" with no password):
 <https://demo.dmx.systems>
 
 Download:  
-<https://download.dmx.systems>
+<https://download.dmx.systems> (releases)  
+<https://download.dmx.systems/ci/> (snapshots)
 
 Documentation:  
 <https://docs.dmx.systems>
 
-Mailing lists:  
+Forum (new!):  
+<https://forum.dmx.systems>
+
+Mailing lists (will be closed soon in favor of forum):  
 <https://lists.deepamehta.de>
 
-Issue tracker:  
-<https://github.com/jri/deepamehta/issues> (public)  
+Issues:  
+<https://github.com/jri/deepamehta/issues> (read/write)  
 <https://git.dmx.systems/dmx-platform/dmx-platform/issues> (read only)
 
 Source code:  
@@ -55,4 +59,4 @@ DeepaMehta is under heavy development. While you can do productive work with it,
 
 
 ------------
-Jan 30, 2019
+Apr 18, 2019

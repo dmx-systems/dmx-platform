@@ -298,6 +298,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
+            // TODO: idempotence?
             _setTopicVisibility(topicmapId, topicId, visibility, fetchTopicMapcontext(topicmapId, topicId));
         } catch (Exception e) {
             throw new RuntimeException("Setting visibility of topic " + topicId + " in topicmap " + topicmapId +

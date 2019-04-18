@@ -19,8 +19,10 @@ const state = {
     value: {}               //     typeUri: component
   },                        //   }
 
-  compDefs: {},             // Registered webclient components
-
+  compDefs: {},             // Registered webclient components:
+                            // {
+                            //    mount: [compDef]
+                            // }
   quillConfig: {
     options: {
       theme: 'bubble',
