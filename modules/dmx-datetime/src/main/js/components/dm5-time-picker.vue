@@ -39,22 +39,23 @@ export default {
     time: {
 
       get () {
-        console.log('time getter', this.object)
+        // console.log('time getter', this.object)
         const c = this.object.childs
         const h = c['dmx.datetime.hour'].value
         const m = c['dmx.datetime.minute'].value
         // Topics created through "filling" have empty string values. If any topic is empty we don't create a
-        // Date object but return an empty string. The Element UI Time Picker interprets that as "not set".
-        return h && m && new Date(0, 0, 0, h, m)
+        // Date object but return false. The Element UI Time Picker interprets that as "not set" and shows an empty
+        // field. Passing empty strings to Date() would result in a Date representing 0:00.
+        return h !== '' && m !== '' && new Date(0, 0, 0, h, m)
       },
 
       set (time) {
-        console.log('time setter', time)
+        // console.log('time setter', time, time && time.getHours(), time && time.getMinutes())
         // Note: if a time field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
         const c = this.object.childs
-        c['dmx.datetime.hour'].value   = time && time.getHours()   || ''
-        c['dmx.datetime.minute'].value = time && time.getMinutes() || ''
+        c['dmx.datetime.hour'].value   = time === null ? '' : time.getHours()
+        c['dmx.datetime.minute'].value = time === null ? '' : time.getMinutes()
       }
     }
   },

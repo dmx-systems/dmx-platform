@@ -4,7 +4,7 @@ import dm5 from 'dm5'
 
 Vue.use(Vuex)
 
-var compCount = 0
+let compCount = 0
 
 const state = {
 
