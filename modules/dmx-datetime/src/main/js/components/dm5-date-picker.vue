@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-date-picker">
     <div class="field-label">{{fieldLabel}}</div>
-    <div v-if="infoMode">{{object.value}}</div>
+    <div v-if="infoMode">{{dateString}}</div>
     <el-date-picker v-else v-model="date"></el-date-picker>
   </div>
 </template>
@@ -58,6 +58,12 @@ export default {
         c['dmx.datetime.month'].value = date && date.getMonth() + 1 || ''
         c['dmx.datetime.day'].value   = date && date.getDate()      || ''
       }
+    },
+
+    dateString () {
+      // Note: after updating the server sends the Date topic without its childs. This is a bug (#153).
+      // Calculation of "this.date" would fail. As a workaround we display nothing.
+      return this.object.childs['dmx.datetime.year'] && this.date.toLocaleDateString()
     }
   },
 

@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-time-picker">
     <div class="field-label">{{fieldLabel}}</div>
-    <div v-if="infoMode">{{object.value}}</div>
+    <div v-if="infoMode">{{timeString}}</div>
     <el-time-picker v-else v-model="time"></el-time-picker>
   </div>
 </template>
@@ -39,10 +39,10 @@ export default {
     time: {
 
       get () {
-        // console.log('time getter', this.object)
         const c = this.object.childs
         const h = c['dmx.datetime.hour'].value
         const m = c['dmx.datetime.minute'].value
+        // console.log('time getter', this.object, h, m)
         // Topics created through "filling" have empty string values. If any topic is empty we don't create a
         // Date object but return false. The Element UI Time Picker interprets that as "not set" and shows an empty
         // field. Passing empty strings to Date() would result in a Date representing 0:00.
@@ -57,6 +57,12 @@ export default {
         c['dmx.datetime.hour'].value   = time === null ? '' : time.getHours()
         c['dmx.datetime.minute'].value = time === null ? '' : time.getMinutes()
       }
+    },
+
+    timeString () {
+      // Note: after updating the server sends the Time topic without its childs. This is a bug (#153).
+      // Calculation of "this.time" would fail. As a workaround we display nothing.
+      return this.object.childs['dmx.datetime.hour'] && this.time.toLocaleTimeString()
     }
   },
 
