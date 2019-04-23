@@ -7,13 +7,13 @@
     <name>DMX Access Control</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-accesscontrol</artifactId>
-    <version>5.0-beta-2-SNAPSHOT</version>
+    <version>5.0-beta-2</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0-beta-2-SNAPSHOT</version>
+        <version>5.0-beta-2</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-workspaces</artifactId>
-            <version>5.0-beta-2-SNAPSHOT</version>
+            <version>5.0-beta-2</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-files</artifactId>
-            <version>5.0-beta-2-SNAPSHOT</version>
+            <version>5.0-beta-2</version>
         </dependency>
     </dependencies>
 
