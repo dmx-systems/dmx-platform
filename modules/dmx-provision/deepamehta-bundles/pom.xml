@@ -6,7 +6,7 @@
     <name>DMX Bundles</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-bundles</artifactId>
-    <version>5.0-beta-2</version>
+    <version>5.0-beta-3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>
         List of DMX bundles that make up the DMX Standard Distribution.
@@ -16,7 +16,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-provision</artifactId>
-        <version>5.0-beta-2</version>
+        <version>5.0-beta-3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -24,112 +24,112 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-webservice</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-webclient</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-base</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-notes</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-bookmarks</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-contacts</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-events</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-tags</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-datetime</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-workspaces</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-topicmaps</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-files</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-filemanager</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-help</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-accesscontrol</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-facets</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-geomaps</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-timestamps</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-caching</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-config</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-storage-neo4j</artifactId>
-            <version>5.0-beta-2</version>
+            <version>5.0-beta-3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
