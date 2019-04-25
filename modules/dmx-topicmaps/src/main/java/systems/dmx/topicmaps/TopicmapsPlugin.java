@@ -87,7 +87,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                 @QueryParam("private") boolean isPrivate) {
         logger.info("Creating topicmap \"" + name + "\" (topicmapTypeUri=\"" + topicmapTypeUri + "\", isPrivate=" +
             isPrivate +")");
-        Topic topicmapTopic = dmx.createTopic(mf.newTopicModel("dmx.topicmaps.topicmap", mf.newChildTopicsModel()
+        Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
             .put("dmx.topicmaps.topicmap_name", name)
             .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
             .put("dmx.topicmaps.private", isPrivate)
@@ -142,7 +142,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             List<RelatedTopic> topicmapTopics = new ArrayList();
             for (RelatedTopic topic : dmx.getObject(objectId).getRelatedTopics(TOPICMAP_CONTEXT, ROLE_TYPE_CONTENT,
-                                                                        ROLE_TYPE_TOPICMAP, "dmx.topicmaps.topicmap")) {
+                                                                               ROLE_TYPE_TOPICMAP, TOPICMAP)) {
                 if (visibility(topic.getRelatingAssociation())) {
                     topicmapTopics.add(topic);
                 }

@@ -10,12 +10,12 @@ import java.util.List;
 
 
 
-public interface TopicmapsService {
+public interface TopicmapsService extends TopicmapsConstants {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     static final String DEFAULT_TOPICMAP_NAME     = "untitled";
-    static final String DEFAULT_TOPICMAP_TYPE_URI = "dmx.topicmaps.topicmap";
+    static final String DEFAULT_TOPICMAP_TYPE_URI = TOPICMAP;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

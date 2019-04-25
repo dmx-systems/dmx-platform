@@ -4,6 +4,9 @@ package systems.dmx.topicmaps;
 
 public interface TopicmapsConstants {
 
+    // topic type
+    static final String TOPICMAP           = "dmx.topicmaps.topicmap";
+
     // content assoc
     static final String TOPICMAP_CONTEXT   = "dmx.topicmaps.topicmap_context";
     static final String ROLE_TYPE_TOPICMAP = "dmx.core.default";

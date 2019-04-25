@@ -8,7 +8,7 @@ class DefaultTopicmapType implements TopicmapType, TopicmapsConstants {
 
     @Override
     public String getUri() {
-        return "dmx.topicmaps.topicmap";
+        return TOPICMAP;
     }
 
     @Override
