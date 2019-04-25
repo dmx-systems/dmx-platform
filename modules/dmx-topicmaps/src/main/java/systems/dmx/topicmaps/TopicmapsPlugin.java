@@ -145,6 +145,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             boolean isAssoc = object instanceof Association;
             for (RelatedTopic topic : object.getRelatedTopics((String) null, null, ROLE_TYPE_TOPICMAP,
                                                                                    "dmx.topicmaps.topicmap")) {
+                // FIXME: meanwhile assocs have visibility as well
                 if (isAssoc || visibility(topic.getRelatingAssociation())) {
                     topicmapTopics.add(topic);
                 }
