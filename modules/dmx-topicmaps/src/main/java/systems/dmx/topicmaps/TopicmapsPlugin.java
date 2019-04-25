@@ -141,12 +141,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public List<RelatedTopic> getTopicmapTopics(@PathParam("id") long objectId) {
         try {
             List<RelatedTopic> topicmapTopics = new ArrayList();
-            DMXObject object = dmx.getObject(objectId);
-            boolean isAssoc = object instanceof Association;
-            for (RelatedTopic topic : object.getRelatedTopics((String) null, null, ROLE_TYPE_TOPICMAP,
-                                                                                   "dmx.topicmaps.topicmap")) {
-                // FIXME: meanwhile assocs have visibility as well
-                if (isAssoc || visibility(topic.getRelatingAssociation())) {
+            for (RelatedTopic topic : dmx.getObject(objectId).getRelatedTopics(TOPICMAP_CONTEXT, ROLE_TYPE_CONTENT,
+                                                                        ROLE_TYPE_TOPICMAP, "dmx.topicmaps.topicmap")) {
+                if (visibility(topic.getRelatingAssociation())) {
                     topicmapTopics.add(topic);
                 }
             }
