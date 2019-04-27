@@ -692,31 +692,52 @@ class TypeStorage {
     // --- Store ---
 
     private void storeViewConfig(TypeModelImpl type) {
-        _storeViewConfig(newTypeRole(type.id), type.viewConfig);
+        ViewConfigurationModelImpl viewConfig = type.viewConfig;
+        TopicModel configTopic = _storeViewConfig(newTypeRole(type.id), viewConfig);
+        // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
+        // would be missing on a cold start. Subsequent migrations operating on them would fail.
+        if (configTopic != null) {
+            viewConfig.updateConfigTopic(configTopic);
+        }
     }
 
     void storeViewConfig(AssociationDefinitionModelImpl assocDef) {
-        _storeViewConfig(newAssocDefRole(assocDef.id), assocDef.viewConfig);
+        ViewConfigurationModelImpl viewConfig = assocDef.viewConfig;
+        TopicModel configTopic = _storeViewConfig(newAssocDefRole(assocDef.id), viewConfig);
+        // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
+        // would be missing on a cold start. Subsequent migrations operating on them would fail.
+        if (configTopic != null) {
+            viewConfig.updateConfigTopic(configTopic);
+        }
     }
 
-    private void _storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
+    /**
+     * @return      may be null
+     */
+    private TopicModel _storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
         try {
+            TopicModel topic = null;
             for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {
-                storeViewConfigTopic(configurable, configTopic);
+                if (topic != null) {
+                    throw new RuntimeException("DM5 does not support more than one view config topic per configurable");
+                }
+                topic = storeViewConfigTopic(configurable, configTopic);
             }
+            return topic;
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration failed (configurable=" + configurable +
                 ", viewConfig=" + viewConfig + ")", e);
         }
     }
 
-    void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
-        pl.createTopic(configTopic);
+    TopicModel storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
+        TopicImpl topic = pl.createTopic(configTopic);
         pl.createAssociation(
             "dmx.core.composition",
             configurable,
-            mf.newTopicRoleModel(configTopic.getId(), "dmx.core.child")
+            mf.newTopicRoleModel(configTopic.id, "dmx.core.child")
         );
+        return topic.getModel();
     }
 
     // --- Helper ---

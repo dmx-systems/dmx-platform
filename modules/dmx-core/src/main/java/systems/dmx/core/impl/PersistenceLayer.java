@@ -395,7 +395,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void updateAssociation(AssociationModelImpl assoc, AssociationModelImpl updateModel) {
         try {
-            checkAssociationWriteAccess(assoc.getId());
+            assoc.checkWriteAccess();
             assoc.update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating association " + assoc.getId() + " failed, assoc=" + assoc +
@@ -430,7 +430,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteAssociation(AssociationModelImpl assoc) {
         try {
-            checkAssociationWriteAccess(assoc.getId());
+            assoc.checkWriteAccess();
             assoc.delete();
         } catch (Exception e) {
             throw new RuntimeException("Deleting association " + assoc.getId() + " failed", e);

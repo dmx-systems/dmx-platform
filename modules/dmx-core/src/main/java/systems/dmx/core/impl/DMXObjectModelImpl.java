@@ -451,6 +451,9 @@ class DMXObjectModelImpl implements DMXObjectModel {
      */
     final void delete() {
         try {
+            if (id == -1) {
+                throw new RuntimeException("ID not initialzed in " + this);
+            }
             em.fireEvent(getPreDeleteEvent(), instantiate());
             //
             preDelete();
