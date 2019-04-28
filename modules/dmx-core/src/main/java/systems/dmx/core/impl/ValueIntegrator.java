@@ -334,8 +334,9 @@ class ValueIntegrator {
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
-                return !childValues.isEmpty() ? unifyChildTopics(
-                    identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris) : null;
+                return !childValues.isEmpty() ?
+                    unifyChildTopics(identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris) :
+                    null;
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
                 // Note: for value-types this is fixed meanwhile, but not for identity-types.
@@ -690,6 +691,35 @@ class ValueIntegrator {
         }
     }
 
+    /**
+     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     */
+    private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
+        TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
+        ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
+        Topic topic = pl.createSingleTopic(model, false);       // firePostCreate=false
+        logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
+        for (String assocDefUri : childValues.keySet()) {
+            if (isOne(assocDefUri)) {
+                TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(assocDefUri)).value;
+                // update DB
+                AssociationModelImpl assoc = createChildAssociation(model, childTopic, assocDefUri);
+                // update memory
+                childTopics.put(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+            } else {
+                for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(assocDefUri)) {
+                    TopicModel childTopic = value.value;
+                    // update DB
+                    AssociationModelImpl assoc = createChildAssociation(model, childTopic, assocDefUri);
+                    // update memory
+                    childTopics.add(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+                }
+            }
+        }
+        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+        return model;
+    }
+
     // --- DB Access ---
 
     /**
@@ -708,26 +738,8 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     * Convenience
      */
-    private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
-        TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
-        Topic topic = pl.createSingleTopic(model, false);       // firePostCreate=false
-        logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
-        for (String assocDefUri : childValues.keySet()) {
-            if (isOne(assocDefUri)) {
-                DMXObjectModel childTopic = ((UnifiedValue) childValues.get(assocDefUri)).value;
-                createChildAssociation(model, childTopic, assocDefUri);
-            } else {
-                for (UnifiedValue value : (List<UnifiedValue>) childValues.get(assocDefUri)) {
-                    createChildAssociation(model, value.value, assocDefUri);
-                }
-            }
-        }
-        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
-        return model;
-    }
-
     private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
                                                                                String assocDefUri) {
         return createChildAssociation(parent, child, assocDefUri, false);
@@ -737,7 +749,8 @@ class ValueIntegrator {
                                                                                String assocDefUri, boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
             assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
-        return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
+        return pl.createAssociation(
+            assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dmx.core.parent"),
             child.createRoleModel("dmx.core.child")
         ).getModel();
