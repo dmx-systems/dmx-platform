@@ -255,13 +255,13 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                  String roleTypeUri2) {
+    AssociationImpl getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                      String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? this.<AssociationImpl>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);

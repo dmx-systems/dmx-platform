@@ -1,7 +1,6 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
@@ -584,11 +583,11 @@ class ValueIntegrator {
      * @return  the found (or created) parent topic; never null.
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
-        List<RelatedTopicModelImpl> candidates = parentCandidates(childValues);
+        List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
         // logger.info("### " + candidates.size() + " candidates " + DMXUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
             if (isOne(assocDefUri)) {
-                UnifiedValue value = (UnifiedValue) childValues.get(assocDefUri);
+                UnifiedValue<TopicModelImpl> value = (UnifiedValue) childValues.get(assocDefUri);
                 // Note: value is null if added to emptyValues (see integrateComposite())
                 eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
             } else {
@@ -626,7 +625,7 @@ class ValueIntegrator {
      *                              key: assocDefUri
      *                              value: UnifiedValue or List<UnifiedValue>
      */
-    private List<RelatedTopicModelImpl> parentCandidates(Map<String, Object> childValues) {
+    private List<? extends TopicModelImpl> parentCandidates(Map<String, Object> childValues) {
         // TODO: drop "emptyValues" and search for the first non-null value.value
         String assocDefUri = childValues.keySet().iterator().next();
         // logger.fine("### assocDefUri=\"" + assocDefUri + "\", childValues=" + childValues);
@@ -653,23 +652,30 @@ class ValueIntegrator {
      * @param   childTopic      the child topic to check; may be null
      * @param   assocDefUri     the assoc def underlying the child topic
      */
-    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, DMXObjectModel childTopic,
-                                                                                   String assocDefUri) {
+    private void eliminateParentCandidates(List<? extends TopicModelImpl> candidates, TopicModelImpl childTopic,
+                                                                                      String assocDefUri) {
         AssociationDefinitionModel assocDef = assocDef(assocDefUri);
-        Iterator<RelatedTopicModelImpl> i = candidates.iterator();
+        Iterator<? extends TopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
-            long parentId = i.next().getId();
+            TopicModelImpl parent = i.next();
             String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dmx.core.parent", "dmx.core.child")
-                        == null) {
+                AssociationImpl assoc = pl.getAssociation(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
+                    "dmx.core.child");
+                if (assoc != null) {
+                    // update memory
+                    parent.getChildTopicsModel().put(
+                        assocDefUri,
+                        mf.newRelatedTopicModel(childTopic, assoc.getModel())
+                    );
+                } else {
                     // logger.info("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
                 // TODO: assoc parents?
-                if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dmx.core.parent", "dmx.core.child",
+                if (!pl.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (childs exist)");
                     i.remove();
@@ -678,9 +684,9 @@ class ValueIntegrator {
         }
     }
 
-    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, List<UnifiedValue> childValues,
-                                                                                   String assocDefUri) {
-        Iterator<RelatedTopicModelImpl> i = candidates.iterator();
+    private void eliminateParentCandidates(List<? extends TopicModelImpl> candidates, List<UnifiedValue> childValues,
+                                                                                      String assocDefUri) {
+        Iterator<? extends TopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
             TopicModelImpl parent = i.next();
             parent.loadChildTopics(assocDefUri, false);     // deep=false
@@ -697,7 +703,7 @@ class ValueIntegrator {
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
         ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
-        Topic topic = pl.createSingleTopic(model, false);       // firePostCreate=false
+        TopicImpl topic = pl.createSingleTopic(model, false);       // firePostCreate=false
         logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childValues.keySet()) {
             if (isOne(assocDefUri)) {
