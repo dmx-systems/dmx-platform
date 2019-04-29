@@ -786,8 +786,21 @@ class ValueIntegrator {
         throw new RuntimeException("Topic " + topicId + " not found in " + topics);
     }
 
+    /**
+     * Checks whether the 1st list contains the same topics as represented by the 2nd list of values,
+     * based on topic ID, regardless of order. Only non-empty values are compared.
+     */
     private static boolean matches(List<? extends TopicModel> topics, List<UnifiedValue> values) {
-        return topics.size() == values.size() && topics.containsAll(values);
+        int valueCount = 0;
+        for (UnifiedValue value : values) {
+            if (value.value != null) {
+                if (!topics.contains(value)) {
+                    return false;
+                }
+                valueCount++;
+            }
+        }
+        return topics.size() == valueCount;
     }
 
     // ---
