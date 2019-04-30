@@ -16,10 +16,10 @@
   "dependencies": {
     "dm5": "0.30.0",
     "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
-    "dm5-detail-panel": "0.24.0",
+    "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
-    "dm5-search-widget": "0.23.0",
-    "dm5-topic-list": "0.11.0",
+    "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
+    "dm5-topic-list": "https://github.com/jri/dm5-topic-list.git",
     "dm5-topicmap-panel": "0.22.0",
     "dm5-websocket": "0.3.0",
     "element-ui": "^2.8.2",
