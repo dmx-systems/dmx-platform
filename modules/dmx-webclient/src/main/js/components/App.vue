@@ -34,13 +34,16 @@
   --label-font-size: 12px;
   --label-color: #909399;   /* matches --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
   --label-color-disabled: #c0c4cc;            /* matches --color-text-placeholder */
+  --heading-font-size: 16px;
+  --heading-spacing: 17px;                    /* vertical spacing before/after heading */
   --color-topic-icon:  hsl(210, 50%, 53%);    /* matches dm5-color-picker blue */
   --color-topic-hover: hsl(210, 50%, 53%);    /* matches dm5-color-picker blue */
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
   --field-spacing: 1.2em;                     /* vertical spacing between data fields */
   --icon-spacing: 7px;                        /* horizontal spacing between icon and label */
-  --detail-panel-padding: 12px;               /* padding for detail panel tab panes */
+  --detail-panel-padding: 12px;               /* left/right padding for detail panel tab panes */
+  --detail-panel-padding-all: 29px 12px 12px 12px;
   --highlight-color: #409eff;                 /* matches --color-primary */
   --background-color: #f5f7fa;                /* matches --background-color-base (used for detail panel background) */
   --background-color-darker: #ebeef5;

@@ -3,13 +3,17 @@
     <!-- Type Value -->
     <dm5-value-renderer :object="object" :level="0" :context="context"></dm5-value-renderer>
     <!-- Type URI -->
-    <div class="field-label">Type URI</div>
-    <div v-if="infoMode">{{object.uri}}</div>
-    <el-input v-else v-model="object.uri"></el-input>
+    <div class="field">
+      <div class="field-label">Type URI</div>
+      <div v-if="infoMode">{{object.uri}}</div>
+      <el-input v-else v-model="object.uri"></el-input>
+    </div>
     <!-- Data Type -->
-    <div class="field-label">Data Type</div>
-    <div v-if="infoMode">{{dataType.value}}</div>
-    <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
+    <div class="field">
+      <div class="field-label">Data Type</div>
+      <div v-if="infoMode">{{dataType.value}}</div>
+      <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
+    </div>
     <!-- Assoc Defs -->
     <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode" @assoc-def-click="click"></dm5-assoc-def-list>
   </div>
@@ -71,7 +75,8 @@ export default {
 </script>
 
 <style>
-.dm5-type-renderer .field-label {
+.dm5-type-renderer > .field,
+.dm5-type-renderer .dm5-assoc-def-list {
   margin-top: var(--field-spacing);
 }
 </style>
