@@ -238,7 +238,8 @@
         "assocDefs": [
           {
             "childTypeUri":        "dmx.contacts.organization_name",
-            "childCardinalityUri": "dmx.core.one"
+            "childCardinalityUri": "dmx.core.one",
+            "isIdentityAttr":      true
           },
           {
             "childTypeUri":        "dmx.contacts.phone_number",

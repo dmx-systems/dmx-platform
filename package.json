@@ -24,13 +24,13 @@
     "dm5-websocket": "0.3.0",
     "element-ui": "^2.8.2",
     "font-awesome": "^4.7.0",
-    "leaflet": "^1.5.0",
+    "leaflet": "^1.5.1",
     "vue": "^2.6.10",
     "vue-font-awesome-search": "1.0.0",
     "vue-router": "^3.0.6",
     "vue2-leaflet": "^2.1.1",
     "vuedraggable": "^2.20.0",
-    "vuex": "^3.1.0"
+    "vuex": "^3.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -47,7 +47,7 @@
     "style-loader": "^0.23.1",
     "vue-loader": "^15.7.0",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.30.0",
+    "webpack": "^4.31.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.3.1"
