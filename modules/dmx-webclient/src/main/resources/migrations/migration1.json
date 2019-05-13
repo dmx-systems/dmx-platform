@@ -35,8 +35,15 @@
             "dataTypeUri": "dmx.core.boolean"
         }
     ],
+    "assoc_types": [
+        {
+            "value":       "Background Color",
+            "uri":         "dmx.webclient.background_color",
+            "dataTypeUri": "dmx.core.text"
+        }
+    ],
     // Note: the Widget instances must be created *before* the "View Configuration" composite.
-    // The Widget assoc def refers to a Widget instance. ### Not necessarily. See Icon assoc def.
+    // The Widget assoc def refers to a Widget instance.
     "topics": [
         // Widgets
         {
@@ -60,6 +67,11 @@
                 {
                     "childTypeUri":        "dmx.webclient.color",
                     "childCardinalityUri": "dmx.core.one"
+                },
+                {
+                    "childTypeUri":        "dmx.webclient.color",
+                    "childCardinalityUri": "dmx.core.one",
+                    "customAssocTypeUri":  "dmx.webclient.background_color"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.add_to_create_menu",
