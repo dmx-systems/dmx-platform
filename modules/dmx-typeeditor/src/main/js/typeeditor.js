@@ -18,6 +18,15 @@ const actions = {
       dispatch('putAssocType', assocType)
       dispatch('revealTopic', {topic: assocType, pos})
     })
+  },
+
+  createRoleType ({dispatch}, {name, pos}) {
+    console.log('Creating role type', name)
+    dm5.restClient.createRoleType(defaultRoleType(name)).then(roleType => {
+      console.log('Created', roleType)
+      dispatch('putRoleType', roleType)
+      dispatch('revealTopic', {topic: roleType, pos})
+    })
   }
 }
 
@@ -25,22 +34,34 @@ export default {
   actions
 }
 
-const defaultTopicType = name => ({
-  // Note: a new type gets its default URI at server-side.
-  // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
-  value: name,
-  dataTypeUri: 'dmx.core.text',
-  viewConfigTopics: [{
-    typeUri: 'dmx.webclient.view_config',
-    childs: {
-      'dmx.webclient.add_to_create_menu': true
-    }
-  }]
-})
+function defaultTopicType (name) {
+  return {
+    // Note: a new type gets its default URI at server-side.
+    // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
+    value: name,
+    dataTypeUri: 'dmx.core.text',
+    viewConfigTopics: [{
+      typeUri: 'dmx.webclient.view_config',
+      childs: {
+        'dmx.webclient.add_to_create_menu': true
+      }
+    }]
+  }
+}
 
-const defaultAssocType = name => ({
-  // Note: a new type gets its default URI at server-side.
-  // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
-  value: name,
-  dataTypeUri: 'dmx.core.text'
-})
+function defaultAssocType (name) {
+  return {
+    // Note: a new type gets its default URI at server-side.
+    // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
+    value: name,
+    dataTypeUri: 'dmx.core.text'
+  }
+}
+
+function defaultRoleType (name) {
+  return {
+    // Note: a new type gets its default URI at server-side.
+    // Also "typeUri" is provided at server-side (see PersistenceLayer#createRoleType).
+    value: name
+  }
+}

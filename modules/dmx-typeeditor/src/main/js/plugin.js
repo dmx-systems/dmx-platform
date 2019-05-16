@@ -22,6 +22,12 @@ export default ({store}) => ({
       create: (name, _, pos) => {
         store.dispatch('createAssocType', {name, pos})
       }
+    },
+    {
+      uri: 'dmx.core.role_type',
+      create: (name, _, pos) => {
+        store.dispatch('createRoleType', {name, pos})
+      }
     }
   ]
 })
