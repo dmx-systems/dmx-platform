@@ -1,11 +1,11 @@
 <template>
   <div :class="['dm5-color-picker', mode]">
     <template v-if="infoMode">
-      <div class="color-box" :style="style"></div>
+      <div class="color-box" :style="{'background-color': object.value}"></div>
       <div class="color-value">{{object.value}}</div>
     </template>
     <template v-else>
-      <el-color-picker v-model="object.value" :predefine="colors" size="medium"></el-color-picker>
+      <el-color-picker v-model="object.value" :predefine="colors" size="medium" @input="input"></el-color-picker>
       <el-input class="color-value" v-model="object.value"></el-input>
     </template>
   </div>
@@ -45,9 +45,13 @@ export default {
     ]
   }),
 
-  computed: {
-    style () {
-      return {'background-color': this.object.value}
+  methods: {
+    input () {
+      // Note: an <el-color-picker> represents a cleared value as null.
+      // A serialized object sent to the server must not contain JSON null, but ''.
+      if (this.object.value === null) {
+        this.object.value = ''
+      }
     }
   }
 }
