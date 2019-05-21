@@ -295,7 +295,9 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/assoctype")
     @Transactional
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        return dmx.createAssociationType(model);
+        AssociationType assocType = dmx.createAssociationType(model);
+        me.newAssocType(assocType);
+        return assocType;
     }
 
     @PUT
@@ -509,6 +511,9 @@ public class WebservicePlugin extends PluginActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
+    // Note: client-sync for new types is only performed when type is created through REST API, not when type is created
+    // through Core Service (e.g. while running a migration). This is because message-to-all-but-one requires a request.
+    // Technically the Core Service is not a JAX-RS root resource, so injection (e.g. the request) does not work there.
     private class Messenger {
 
         private String pluginUri;
@@ -529,6 +534,19 @@ public class WebservicePlugin extends PluginActivator {
                 );
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error while sending a \"newTopicType\" message:", e);
+            }
+        }
+
+        private void newAssocType(AssociationType assocType) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "newAssocType")
+                    .put("args", new JSONObject()
+                        .put("assocType", assocType.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"newAssocType\" message:", e);
             }
         }
 
