@@ -287,7 +287,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/all")
-    public List<AssociationType> getAssociationAllTypes() {
+    public List<AssociationType> getAllAssociationTypes() {
         return dmx.getAllAssociationTypes();
     }
 
@@ -324,7 +324,9 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/roletype")
     @Transactional
     public Topic createRoleType(TopicModel model) {
-        return dmx.createRoleType(model);
+        Topic roleType = dmx.createRoleType(model);
+        me.newRoleType(roleType);
+        return roleType;
     }
 
 
@@ -525,32 +527,31 @@ public class WebservicePlugin extends PluginActivator {
         // ---
 
         private void newTopicType(TopicType topicType) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "newTopicType")
-                    .put("args", new JSONObject()
-                        .put("topicType", topicType.toJSON())
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"newTopicType\" message:", e);
-            }
+            newType(topicType, "topicType", "newTopicType");
         }
 
         private void newAssocType(AssociationType assocType) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "newAssocType")
-                    .put("args", new JSONObject()
-                        .put("assocType", assocType.toJSON())
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"newAssocType\" message:", e);
-            }
+            newType(assocType, "assocType", "newAssocType");
+        }
+
+        private void newRoleType(Topic roleType) {
+            newType(roleType, "roleType", "newRoleType");
         }
 
         // ---
+
+        private void newType(Topic type, String argName, String messageType) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", messageType)
+                    .put("args", new JSONObject()
+                        .put(argName, type.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"" + messageType + "\" message:", e);
+            }
+        }
 
         private void messageToAllButOne(JSONObject message) {
             dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
