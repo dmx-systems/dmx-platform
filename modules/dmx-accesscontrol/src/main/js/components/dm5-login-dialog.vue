@@ -1,14 +1,22 @@
 <template>
   <el-dialog custom-class="dm5-login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
-    <div>
+    <div class="field">
+      <div class="field-label">Authorization Method</div>
+      <el-select v-model="authMethod">
+        <el-option v-for="authMethod in authMethods" :value="authMethod" :key="authMethod"></el-option>
+      </el-select>
+    </div>
+    <div class="field">
       <div class="field-label">Username</div>
       <el-input v-model="credentials.username" ref="username" @keyup.native.enter="advance"></el-input>
     </div>
-    <div class="password-field">
+    <div class="field">
       <div class="field-label">Password</div>
       <el-input v-model="credentials.password" ref="password" @keyup.native.enter="login" type="password"></el-input>
     </div>
-    <div class="message">{{message}}</div>
+    <div class="field">
+      {{message}}
+    </div>
     <div slot="footer">
       <el-button type="primary" @click="login">OK</el-button>
     </div>
@@ -18,8 +26,18 @@
 <script>
 export default {
 
+  created () {
+    // console.log('dm5-login-dialog created', this.authMethods)
+    this.authMethod = this.authMethods[0]
+  },
+
+  mounted () {
+    // console.log('dm5-login-dialog mounted')
+  },
+
   data () {
     return {
+      authMethod: undefined,
       credentials: {
         username: '',
         password: ''
@@ -29,6 +47,11 @@ export default {
   },
 
   computed: {
+
+    authMethods () {
+      return this.$store.state.accesscontrol.authMethods
+    },
+
     visible () {
       return this.$store.state.accesscontrol.visible
     }
@@ -67,11 +90,7 @@ export default {
 </script>
 
 <style>
-.dm5-login-dialog .password-field {
-  margin-top: 1em;
-}
-
-.dm5-login-dialog .message {
-  margin-top: 1em;
+.dm5-login-dialog .field + .field {
+  margin-top: var(--field-spacing);
 }
 </style>

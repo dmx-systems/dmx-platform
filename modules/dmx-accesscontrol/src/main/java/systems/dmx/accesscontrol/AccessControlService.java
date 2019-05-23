@@ -207,9 +207,9 @@ public interface AccessControlService {
 
     // === Authorization Methods ===
 
+    Set<String> getAuthorizationMethods();
+
     void registerAuthorizationMethod(String name, AuthorizationMethod am);
 
     void unregisterAuthorizationMethod(String name);
-
-    Set<String> getAuthorizationMethods();
 }

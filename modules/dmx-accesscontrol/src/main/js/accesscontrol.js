@@ -4,10 +4,9 @@ import SHA256 from './lib/sha256'
 const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
-
-  username: undefined,    // the logged in user (string); falsish if no user is logged in
-
-  visible: false          // Login dialog visibility
+  username: undefined,      // the logged in user (string); falsish if no user is logged in
+  authMethods: ['Basic'],   // names of installed auth methods (array of string), may be empty
+  visible: false            // Login dialog visibility
 }
 
 const actions = {
@@ -54,6 +53,10 @@ const actions = {
 
 dm5.restClient.getUsername().then(username => {
   state.username = username
+})
+dm5.restClient.getAuthorizationMethods().then(authMethods => {
+  console.log('[DMX] Installed auth methods', authMethods)
+  state.authMethods = state.authMethods.concat(authMethods)
 })
 
 // helper

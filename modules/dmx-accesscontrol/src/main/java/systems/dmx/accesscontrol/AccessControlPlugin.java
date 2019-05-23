@@ -433,6 +433,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Authorization Methods ===
 
+    @GET
+    @Path("/methods")
+    @Override
+    public Set<String> getAuthorizationMethods() {
+        return authorizationMethods.keySet();
+    }
+
     @Override
     public void registerAuthorizationMethod(String name, AuthorizationMethod am) {
         if (authorizationMethods.containsKey(name)) {
@@ -444,13 +451,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void unregisterAuthorizationMethod(String name) {
         authorizationMethods.remove(name);
-    }
-
-    @GET
-    @Path("/methods")
-    @Override
-    public Set<String> getAuthorizationMethods() {
-        return authorizationMethods.keySet();
     }
 
 
