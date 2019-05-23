@@ -60,7 +60,10 @@ export default {
   methods: {
 
     login () {
-      this.$store.dispatch('login', this.credentials).then(success => {
+      this.$store.dispatch('login', {
+        credentials: this.credentials,
+        authMethod:  this.authMethod
+      }).then(success => {
         if (success) {
           this.message = 'Login OK'
           this.close()

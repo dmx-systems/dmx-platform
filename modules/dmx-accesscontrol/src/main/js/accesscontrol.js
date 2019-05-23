@@ -5,14 +5,14 @@ const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
   username: undefined,      // the logged in user (string); falsish if no user is logged in
-  authMethods: ['Basic'],   // names of installed auth methods (array of string), may be empty
+  authMethods: ['Basic'],   // names of installed auth methods (array of string)
   visible: false            // Login dialog visibility
 }
 
 const actions = {
 
-  login ({dispatch}, credentials) {
-    return dm5.restClient.login(credentials).then(() => {
+  login ({dispatch}, {credentials, authMethod}) {
+    return dm5.restClient.login(credentials, authMethod).then(() => {
       const username = credentials.username
       console.log('Login', username)
       setUsername(username)

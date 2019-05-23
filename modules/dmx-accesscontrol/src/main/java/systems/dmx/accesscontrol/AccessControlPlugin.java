@@ -725,7 +725,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private AuthorizationMethod getAuthorizationMethod(String name) {
         AuthorizationMethod am = authorizationMethods.get(name);
         if (am == null) {
-            throw new RuntimeException("Authorization method \"" + name + "\" is not registered");
+            throw new RuntimeException("Authorization method \"" + name + "\" is unknown");
         }
         return am;
     }
