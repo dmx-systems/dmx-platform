@@ -17,7 +17,7 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dmx.core.meta_type",  "\uf10c");    // fa-circle-o
+        addIconToTopicType("dmx.core.meta_type",  "\uf1ce");    // fa-circle-o-notch
         addIconToTopicType("dmx.core.topic_type", "\uf10c");    // fa-circle-o
         addIconToTopicType("dmx.core.assoc_type", "\uf192");    // fa-dot-circle-o
         addIconToTopicType("dmx.core.role_type",  "\uf04b");    // fa-play
