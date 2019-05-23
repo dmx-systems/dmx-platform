@@ -1,6 +1,6 @@
 <template>
   <el-dialog custom-class="dm5-login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
-    <div class="field">
+    <div class="field" v-if="showSelect">
       <div class="field-label">Authorization Method</div>
       <el-select v-model="authMethod">
         <el-option v-for="authMethod in authMethods" :value="authMethod" :key="authMethod"></el-option>
@@ -54,6 +54,10 @@ export default {
 
     visible () {
       return this.$store.state.accesscontrol.visible
+    },
+
+    showSelect () {
+      return this.authMethods.length > 1
     }
   },
 
