@@ -23,7 +23,7 @@ export default {
   computed: {
 
     type () {
-      return this.object.getType()
+      return this.object.type
     },
 
     // TODO: copy in dm5-value-renderer.vue

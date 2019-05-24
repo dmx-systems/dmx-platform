@@ -238,6 +238,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId,
                                          @PathParam("topic_type_uri") String topicTypeUri) {
+        // TODO: optimization. Use getRelatedTopics() by using "Workspace Assignment" type.
         List<Topic> topics = dmx.getTopicsByType(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
         return topics;
