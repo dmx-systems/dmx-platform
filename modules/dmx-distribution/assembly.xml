@@ -77,9 +77,9 @@
             <fileMode>0555</fileMode>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>deepamehta-linux.sh</include>
-                <include>deepamehta-macosx.command</include>
-                <include>deepamehta-windows.bat</include>
+                <include>dmx-linux.sh</include>
+                <include>dmx-mac.command</include>
+                <include>dmx-windows.bat</include>
             </includes>
         </fileSet>
         <!-- copy COPYRIGHT and LICENSE to / -->
