@@ -1,5 +1,4 @@
-DeepaMehta is a platform for collaboration and knowledge management.
-<http://www.deepamehta.de/>
+DMX is a platform for knowledge management and collaboration.
 
 Copyright 2000-2018 Jörg Richter <jri@dmx.berlin> et al.
 Copyright 2019 DMX Systems <https://dmx.systems>
