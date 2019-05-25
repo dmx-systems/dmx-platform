@@ -46,6 +46,7 @@
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
   --field-spacing: 1.2em;                     /* vertical spacing between data fields */
+  --object-item-padding: 8px;                 /* padding for topic/assoc items e.g. in a topic list */
   --icon-spacing: 7px;                        /* horizontal spacing between icon and label */
   --detail-panel-padding: 12px;               /* left/right padding for detail panel tab panes */
   --detail-panel-padding-all: 29px 12px 12px 12px;

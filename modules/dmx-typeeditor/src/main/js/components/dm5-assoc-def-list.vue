@@ -61,13 +61,14 @@ export default {
 </script>
 
 <style>
+/* copy in dm5-topic-list.vue */
 .dm5-assoc-def-list .dm5-assoc-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);
   border-right:  3px solid var(--border-color);
   background-color: white;
   transition: background-color 0.25s;
-  padding: 8px;
+  padding: var(--object-item-padding);
 }
 
 .dm5-assoc-def-list .dm5-assoc-def:nth-child(1) {
