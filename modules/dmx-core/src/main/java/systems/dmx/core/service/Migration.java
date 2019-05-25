@@ -25,7 +25,6 @@ public abstract class Migration {
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
     // Note: exceptionally here the Core has some knowledge about the Webclient.
-    // ### TODO: move these methods to the Webclient service.
 
     /**
      * Convenience method for plugin authors to set a Webclient view config value for a certain topic type.

@@ -29,6 +29,11 @@ public class Migration2 extends Migration {
         addColorToAssociationType("dmx.core.composition_def", "hsl(210, 50%, 53%)");
         addColorToAssociationType("dmx.core.instantiation",   "hsl(180, 50%, 53%)");
         addColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 53%)");
+        addBackgroundColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 97%)");
+        addBackgroundColorToAssociationType("dmx.core.composition",     "hsl(5, 80%, 96%)");
+        addBackgroundColorToAssociationType("dmx.core.composition_def", "hsl(210, 80%, 96%)");
+        addBackgroundColorToAssociationType("dmx.core.instantiation",   "hsl(180, 80%, 96%)");
+        addBackgroundColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 96%)");
         //
         AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
         compDef.getAssocDef("dmx.core.cardinality")
@@ -48,5 +53,9 @@ public class Migration2 extends Migration {
 
     private void addColorToAssociationType(String assocTypeUri, String color) {
         setAssocTypeViewConfigValue(assocTypeUri, "color", color);
+    }
+
+    private void addBackgroundColorToAssociationType(String assocTypeUri, String color) {
+        setAssocTypeViewConfigValue(assocTypeUri, "color#dmx.webclient.background_color", color);
     }
 }
