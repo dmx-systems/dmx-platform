@@ -10,13 +10,13 @@ import systems.dmx.core.service.Migration;
 
 
 /**
- * Create the "System" and "Administration" workspaces.
+ * Create "System" and "Administration" workspaces.
  * <p>
  * Part of DMX 5.0
  * Runs ALWAYS
  * <p>
- * Note: the "admin" user account is created in migration 6. At this moment both must exist, the "Login enabled"
- * config topic type (created in migration 5), and the "Administration" workspace (created here).
+ * Note: the "admin" user account is created in migration 4. At this moment both must exist, the "Login enabled"
+ * config topic type (created in migration 1), and the "Administration" workspace (created here).
  */
 public class Migration2 extends Migration {
 

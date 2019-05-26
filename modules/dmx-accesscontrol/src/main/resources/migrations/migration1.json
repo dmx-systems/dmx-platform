@@ -2,40 +2,62 @@
 # Runs ALWAYS
 
 {
-    "topic_types": [
-        // User Account
+  "topic_types": [
+    // User Account
+    {
+      "value":       "Username",
+      "uri":         "dmx.accesscontrol.username",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Password",
+      "uri":         "dmx.accesscontrol.password",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "User Account",
+      "uri":         "dmx.accesscontrol.user_account",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
         {
-            "value":       "Username",
-            "uri":         "dmx.accesscontrol.username",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.accesscontrol.username",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":       "Password",
-            "uri":         "dmx.accesscontrol.password",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "User Account",
-            "uri":         "dmx.accesscontrol.user_account",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.accesscontrol.username",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.accesscontrol.password",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.icon": "\uf21b"
-                    }
-                }
-            ]
+          "childTypeUri":        "dmx.accesscontrol.password",
+          "childCardinalityUri": "dmx.core.one"
         }
-    ]
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf21b"
+          }
+        }
+      ]
+    },
+    // Config
+    {
+      "value": "Login enabled",
+      "uri": "dmx.accesscontrol.login_enabled",
+      "dataTypeUri": "dmx.core.boolean"
+    }
+  ],
+  "assoc_types": [
+    {
+      "value":       "Membership",
+      "uri":         "dmx.accesscontrol.membership",
+      "dataTypeUri": "dmx.core.text",
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.color": "hsl(40, 70%, 53%)",
+            "dmx.webclient.color#dmx.webclient.background_color": "hsl(40, 80%, 96%)"
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -1,18 +1,21 @@
 package systems.dmx.accesscontrol.migrations;
 
 import systems.dmx.accesscontrol.AccessControlService;
-import systems.dmx.workspaces.WorkspacesService;
 
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Migration;
+import systems.dmx.core.service.accesscontrol.Credentials;
 
 
 
 /**
- * Set "admin" as the owner of the "DMX" workspace.
+ * Create "admin" user account.
  * <p>
  * Part of DMX 5.0
  * Runs ALWAYS
+ * <p>
+ * Note: both must exist already, the "Login enabled" config topic type (created in migration 1), and the
+ * "Administration" workspace (created in migration 2).
  */
 public class Migration4 extends Migration {
 
@@ -21,17 +24,13 @@ public class Migration4 extends Migration {
     @Inject
     private AccessControlService acService;
 
-    @Inject
-    private WorkspacesService wsService;
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public void run() {
-        acService.setWorkspaceOwner(wsService.getWorkspace(WorkspacesService.DMX_WORKSPACE_URI),
-            AccessControlService.ADMIN_USERNAME);
-        // Note: we don't set a particular creator/modifier here as we don't want suggest that the DMX
-        // workspace has been created by the "admin" user. Instead the creator/modifier of the DeepaMehhta
-        // workspace remain undefined as the DMX workspace is actually created by the system itself.
+        acService.createUserAccount(new Credentials(
+            AccessControlService.ADMIN_USERNAME,
+            AccessControlService.ADMIN_INITIAL_PASSWORD
+        ));
     }
 }
