@@ -11,6 +11,7 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Create "System" and "Administration" workspaces.
+ * Set owner of "System", "Administration", and "DMX" workspaces.
  * <p>
  * Part of DMX 5.0
  * Runs ALWAYS
@@ -32,6 +33,12 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
+        // Note 1: at migration running time our plugin listeners are not yet registered (furthermore there is no user
+        // logged in). So we set the workspace owner manually here.
+        // Note 2: we don't set a particular creator/modifier here as we don't want suggest the workspaces have been
+        // created by the "admin" user. Instead the creator/modifier of the workspaces remain undefined as the
+        // workspaces are actually created by the system itself.
+        //
         // "System"
         Topic systemWorkspace = wsService.createWorkspace(
             AccessControlService.SYSTEM_WORKSPACE_NAME,
@@ -48,10 +55,8 @@ public class Migration2 extends Migration {
         );
         acService.setWorkspaceOwner(adminWorkspace, AccessControlService.ADMIN_USERNAME);
         //
-        // Note 1: at migration running time our plugin listeners are not yet registered (furthermore there is no user
-        // logged in). So we set the workspace owner manually here.
-        // Note 2: we don't set a particular creator/modifier here as we don't want suggest the workspaces have been
-        // created by the "admin" user. Instead the creator/modifier of the workspaces remain undefined as the
-        // workspaces are actually created by the system itself.
+        // "DMX"
+        acService.setWorkspaceOwner(wsService.getWorkspace(WorkspacesService.DMX_WORKSPACE_URI),
+            AccessControlService.ADMIN_USERNAME);
     }
 }
