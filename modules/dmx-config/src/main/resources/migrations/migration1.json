@@ -1,29 +1,29 @@
-# Part of DMX 5.0
-# Runs ALWAYS
+// Part of DMX 5.0-beta-3
+// Runs ALWAYS
 
 {
-    "assoc_types": [
+  "assoc_types": [
+    {
+      "value":       "Configuration",
+      "uri":         "dmx.config.configuration",
+      "dataTypeUri": "dmx.core.text",
+      "viewConfigTopics": [
         {
-            "value":       "Configuration",
-            "uri":         "dmx.config.configuration",
-            "dataTypeUri": "dmx.core.text",
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.color": "hsl(255, 40%, 53%)",
-                        "dmx.webclient.color#dmx.webclient.background_color": "hsl(255, 80%, 96%)"
-                    }
-                }
-            ]
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.color": "hsl(255, 40%, 53%)",
+            "dmx.webclient.color#dmx.webclient.background_color": "hsl(255, 80%, 96%)"
+          }
         }
-    ],
-    "topics": [
-        // Role Types
-        {
-            "value":   "Configurable",
-            "uri":     "dmx.config.configurable",
-            "typeUri": "dmx.core.role_type"
-        }
-    ]
+      ]
+    }
+  ],
+  "topics": [
+    // Role Types
+    {
+      "value":   "Configurable",
+      "uri":     "dmx.config.configurable",
+      "typeUri": "dmx.core.role_type"
+    }
+  ]
 }

@@ -1,104 +1,106 @@
-# Part of DMX 5.0
-# Runs ALWAYS
+// Part of DMX 5.0-beta-3
+// Runs ALWAYS
 
-[{
+[
+  {
     // View Configuration
     "topic_types": [
-        {
-            "value":       "Icon",
-            "uri":         "dmx.webclient.icon",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Color",
-            "uri":         "dmx.webclient.color",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Add to Create Menu",
-            "uri":         "dmx.webclient.add_to_create_menu",
-            "dataTypeUri": "dmx.core.boolean"
-        },
-        {
-            "value":       "Widget",
-            "uri":         "dmx.webclient.widget",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Clearable",
-            "uri":         "dmx.webclient.clearable",
-            "dataTypeUri": "dmx.core.boolean"
-        },
-        {
-            "value":       "Customizable",
-            "uri":         "dmx.webclient.customizable",
-            "dataTypeUri": "dmx.core.boolean"
-        }
+      {
+        "value":       "Icon",
+        "uri":         "dmx.webclient.icon",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Color",
+        "uri":         "dmx.webclient.color",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Add to Create Menu",
+        "uri":         "dmx.webclient.add_to_create_menu",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      {
+        "value":       "Widget",
+        "uri":         "dmx.webclient.widget",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Clearable",
+        "uri":         "dmx.webclient.clearable",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      {
+        "value":       "Customizable",
+        "uri":         "dmx.webclient.customizable",
+        "dataTypeUri": "dmx.core.boolean"
+      }
     ],
     "assoc_types": [
-        {
-            "value":       "Background Color",
-            "uri":         "dmx.webclient.background_color",
-            "dataTypeUri": "dmx.core.text"
-        }
+      {
+        "value":       "Background Color",
+        "uri":         "dmx.webclient.background_color",
+        "dataTypeUri": "dmx.core.text"
+      }
     ],
     // Note: the Widget instances must be created *before* the "View Configuration" composite.
     // The Widget assoc def refers to a Widget instance.
     "topics": [
-        // Widgets
-        {
-            "value":   "Select",
-            "uri":     "dmx.webclient.select",
-            "typeUri": "dmx.webclient.widget"
-        }
+      // Widgets
+      {
+        "value":   "Select",
+        "uri":     "dmx.webclient.select",
+        "typeUri": "dmx.webclient.widget"
+      }
     ]
-},
-{
+  },
+  {
     "topic_types": [
-        {
-            "value":       "View Configuration",
-            "uri":         "dmx.webclient.view_config",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.webclient.icon",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.color",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.color",
-                    "childCardinalityUri": "dmx.core.one",
-                    "customAssocTypeUri":  "dmx.webclient.background_color"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.add_to_create_menu",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.widget",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
-                                "dmx.webclient.clearable": true
-                            }
-                        }
-                    ]
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.clearable",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.customizable",
-                    "childCardinalityUri": "dmx.core.one"
+      {
+        "value":       "View Configuration",
+        "uri":         "dmx.webclient.view_config",
+        "dataTypeUri": "dmx.core.identity",
+        "assocDefs": [
+          {
+            "childTypeUri":        "dmx.webclient.icon",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.color",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.color",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "dmx.webclient.background_color"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.add_to_create_menu",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.widget",
+            "childCardinalityUri": "dmx.core.one",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "childs": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
                 }
+              }
             ]
-        }
+          },
+          {
+            "childTypeUri":        "dmx.webclient.clearable",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.customizable",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ]
+      }
     ]
-}]
+  }
+]

@@ -13,10 +13,10 @@ import systems.dmx.core.service.Migration;
  * Create "System" and "Administration" workspaces.
  * Set owner of "System", "Administration", and "DMX" workspaces.
  * <p>
- * Part of DMX 5.0
+ * Part of DMX 5.0-beta-3
  * Runs ALWAYS
  * <p>
- * Note: the "admin" user account is created in migration 4. At this moment both must exist, the "Login enabled"
+ * Note: the "admin" user account is created in migration 3. At this moment both must exist, the "Login enabled"
  * config topic type (created in migration 1), and the "Administration" workspace (created here).
  */
 public class Migration2 extends Migration {
@@ -33,11 +33,10 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        // Note 1: at migration running time our plugin listeners are not yet registered (furthermore there is no user
-        // logged in). So we set the workspace owner manually here.
-        // Note 2: we don't set a particular creator/modifier here as we don't want suggest the workspaces have been
-        // created by the "admin" user. Instead the creator/modifier of the workspaces remain undefined as the
-        // workspaces are actually created by the system itself.
+        // Note 1: at migration time our plugin listeners are not yet registered (furthermore no user is logged in).
+        // We set the workspace owners manually.
+        // Note 2: we don't set a creator/modifier; we don't want suggest the workspaces have been created by the
+        // "admin" user. Instead creator/modifier remain undefined as the workspaces are created by the system itself.
         //
         // "System"
         Topic systemWorkspace = wsService.createWorkspace(

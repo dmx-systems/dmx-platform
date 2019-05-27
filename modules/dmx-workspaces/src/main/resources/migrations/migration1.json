@@ -1,7 +1,6 @@
-# Part of DMX 5.0
-# Runs ALWAYS
+// Part of DMX 5.0-beta-3
+// Runs ALWAYS
 
-// Workspace
 [
   {
     "assoc_types": [
@@ -23,6 +22,7 @@
   },
   {
     "topic_types": [
+      // Workspace
       {
         "value":       "Workspace Name",
         "uri":         "dmx.workspaces.workspace_name",
@@ -34,6 +34,11 @@
         "dataTypeUri": "dmx.core.html"
       },
       {
+        "value":       "Sharing Mode",
+        "uri":         "dmx.workspaces.sharing_mode",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
         "value":       "Workspace",
         "uri":         "dmx.workspaces.workspace",
         "dataTypeUri": "dmx.core.identity",
@@ -41,6 +46,18 @@
           {
             "childTypeUri":        "dmx.workspaces.workspace_name",
             "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.workspaces.sharing_mode",
+            "childCardinalityUri": "dmx.core.one",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "childs": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select"
+                }
+              }
+            ]
           },
           {
             "childTypeUri":        "dmx.workspaces.workspace_description",
@@ -56,6 +73,7 @@
           }
         ]
       },
+      // Workspace Facet
       {
         "value":       "Workspace Facet",
         "uri":         "dmx.workspaces.workspace_facet",
@@ -67,6 +85,33 @@
             "customAssocTypeUri":  "dmx.workspaces.workspace_assignment"
           }
         ]
+      }
+    ],
+    "topics": [
+      {
+        "value":   "Private",
+        "uri":     "dmx.workspaces.private",
+        "typeUri": "dmx.workspaces.sharing_mode"
+      },
+      {
+        "value":   "Confidential",
+        "uri":     "dmx.workspaces.confidential",
+        "typeUri": "dmx.workspaces.sharing_mode"
+      },
+      {
+        "value":   "Collaborative",
+        "uri":     "dmx.workspaces.collaborative",
+        "typeUri": "dmx.workspaces.sharing_mode"
+      },
+      {
+        "value":   "Public",
+        "uri":     "dmx.workspaces.public",
+        "typeUri": "dmx.workspaces.sharing_mode"
+      },
+      {
+        "value":   "Common",
+        "uri":     "dmx.workspaces.common",
+        "typeUri": "dmx.workspaces.sharing_mode"
       }
     ]
   }

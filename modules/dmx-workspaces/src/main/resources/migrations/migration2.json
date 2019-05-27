@@ -1,41 +1,65 @@
-# Part of DMX 5.0
-# Runs ALWAYS
+// Part of DMX 5.0-beta-3
+// Runs ALWAYS
 
-// TODO: rethink whether "Sharing Mode" should be defined in the Access Control module
+// Enabled Sharing Modes
 {
   "topic_types": [
-    // Sharing Mode
     {
-      "value":       "Sharing Mode",
-      "uri":         "dmx.workspaces.sharing_mode",
-      "dataTypeUri": "dmx.core.text"
-    }
-  ],
-  "topics": [
-    {
-      "value":   "Private",
-      "uri":     "dmx.workspaces.private",
-      "typeUri": "dmx.workspaces.sharing_mode"
+      "value":       "Private",
+      "uri":         "dmx.workspaces.private.enabled",
+      "dataTypeUri": "dmx.core.boolean"
     },
     {
-      "value":   "Confidential",
-      "uri":     "dmx.workspaces.confidential",
-      "typeUri": "dmx.workspaces.sharing_mode"
+      "value":       "Confidential",
+      "uri":         "dmx.workspaces.confidential.enabled",
+      "dataTypeUri": "dmx.core.boolean"
     },
     {
-      "value":   "Collaborative",
-      "uri":     "dmx.workspaces.collaborative",
-      "typeUri": "dmx.workspaces.sharing_mode"
+      "value":       "Collaborative",
+      "uri":         "dmx.workspaces.collaborative.enabled",
+      "dataTypeUri": "dmx.core.boolean"
     },
     {
-      "value":   "Public",
-      "uri":     "dmx.workspaces.public",
-      "typeUri": "dmx.workspaces.sharing_mode"
+      "value":       "Public",
+      "uri":         "dmx.workspaces.public.enabled",
+      "dataTypeUri": "dmx.core.boolean"
     },
     {
-      "value":   "Common",
-      "uri":     "dmx.workspaces.common",
-      "typeUri": "dmx.workspaces.sharing_mode"
+      "value":       "Common",
+      "uri":         "dmx.workspaces.common.enabled",
+      "dataTypeUri": "dmx.core.boolean"
+    },
+    {
+      "value":       "Enabled Sharing Modes",
+      "uri":         "dmx.workspaces.enabled_sharing_modes",
+      "dataTypeUri": "dmx.core.value",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.workspaces.private.enabled",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.workspaces.confidential.enabled",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.workspaces.collaborative.enabled",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.workspaces.public.enabled",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.workspaces.common.enabled",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        }
+      ]
     }
   ]
 }
