@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 
 
@@ -15,6 +16,8 @@ class WebSocketConnectionPool {
      * 2nd hash: session ID
      */
     private Map<String, Map<String, WebSocketConnection>> pool = new ConcurrentHashMap();
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
@@ -34,12 +37,13 @@ class WebSocketConnectionPool {
     WebSocketConnection getConnection(String pluginUri, String sessionId) {
         Map<String, WebSocketConnection> connections = pool.get(pluginUri);
         if (connections == null) {
-            throw new RuntimeException("No WebSocket connection open for plugin \"" + pluginUri + "\"");
+            logger.warning("No WebSocket connection open for plugin \"" + pluginUri + "\"");
+            return null;
         }
         WebSocketConnection connection = connections.get(sessionId);
         if (connection == null) {
-            throw new RuntimeException("No WebSocket connection open for session \"" + sessionId + "\" (plugin \"" +
-                pluginUri + "\")");
+            logger.warning("No WebSocket connection open for session \"" + sessionId + "\" (plugin \"" + pluginUri +
+                "\")");
         }
         return connection;
     }

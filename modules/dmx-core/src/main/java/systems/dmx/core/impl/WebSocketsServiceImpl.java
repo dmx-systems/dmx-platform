@@ -59,18 +59,15 @@ class WebSocketsServiceImpl implements WebSocketsService {
     @Override
     public void messageToAllButOne(HttpServletRequest request, String pluginUri, String message) {
         if (request == null) {
-            throw new IllegalArgumentException("request must not be null");
+            throw new IllegalArgumentException("request is null");
         }
-        WebSocketConnection connection = getConnection(request, pluginUri);
-        if (connection != null) {
-            broadcast(pluginUri, message, connection);
-        }
+        broadcast(pluginUri, message, getConnection(request, pluginUri));
     }
 
     @Override
     public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
         if (request == null) {
-            throw new IllegalArgumentException("request must not be null");
+            throw new IllegalArgumentException("request is null");
         }
         WebSocketConnection connection = getConnection(request, pluginUri);
         if (connection != null) {
@@ -118,7 +115,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     /**
      * @return  the WebSocket connection that is associated with the given request (based on its session cookie),
-     *          or null if called outside request scope (e.g. while system startup).
+     *          or null if no such session exists or if called outside request scope (e.g. while system startup).
      *
      * @throws  RuntimeException    if no valid session is associated with the request.
      */
@@ -126,7 +123,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                throw new RuntimeException("No valid session is associated with the request");
+                throw new RuntimeException("No valid session associated with the request");
             }
             return pool.getConnection(pluginUri, session.getId());
         } catch (IllegalStateException e) {
@@ -135,6 +132,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
         }
     }
 
+    /**
+     * @param   exclude     may be null
+     */
     private void broadcast(String pluginUri, String message, WebSocketConnection exclude) {
         Collection<WebSocketConnection> connections = pool.getConnections(pluginUri);
         if (connections != null) {
