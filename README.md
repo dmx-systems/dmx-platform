@@ -4,7 +4,7 @@
 DeepaMehta 5
 ============
 
-DeepaMehta is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content.
+DeepaMehta is a platform for knowledge management and collaboration. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content.
 
 Technically DeepaMehta 5 is made of  
 Server-side: Java, Felix (OSGi), Neo4j, Lucene, Jetty, Jetty WebSocket, Jersey (JAX-RS).  
@@ -17,7 +17,8 @@ Company website:
 <https://dmx.systems>
 
 Live demo (login as "admin" with no password):  
-<https://demo.dmx.systems>
+<https://demo.dmx.systems> (latest release)  
+<https://dev.dmx.systems> (latest snapshot, content is reset regularly)
 
 Download:  
 <https://download.dmx.systems> (releases)  
@@ -59,4 +60,4 @@ DeepaMehta is under heavy development. While you can do productive work with it,
 
 
 ------------
-Apr 23, 2019
+May 29, 2019
