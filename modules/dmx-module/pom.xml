@@ -7,7 +7,7 @@
     <name>DMX Module</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-module</artifactId>
-    <version>5.0-beta-3</version>
+    <version>5.0-beta-4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>
@@ -25,7 +25,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.0-beta-3</version>
+        <version>5.0-beta-4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

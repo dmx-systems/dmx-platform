@@ -7,13 +7,13 @@
     <name>DMX Help</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-help</artifactId>
-    <version>5.0-beta-3</version>
+    <version>5.0-beta-4-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0-beta-3</version>
+        <version>5.0-beta-4-SNAPSHOT</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 
