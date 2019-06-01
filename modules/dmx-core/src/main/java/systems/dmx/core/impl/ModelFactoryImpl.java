@@ -256,16 +256,15 @@ public class ModelFactoryImpl implements ModelFactory {
             Iterator<String> i = values.keys();
             while (i.hasNext()) {
                 String assocDefUri = i.next();
-                String childTypeUri = childTypeUri(assocDefUri);
                 Object value = values.get(assocDefUri);
                 if (!(value instanceof JSONArray)) {
-                    childTopics.put(assocDefUri, createTopicModel(childTypeUri, value));
+                    childTopics.put(assocDefUri, createChildTopicModel(assocDefUri, value));
                 } else {
                     JSONArray valueArray = (JSONArray) value;
                     List<RelatedTopicModel> topics = new ArrayList();
                     childTopics.put(assocDefUri, topics);
                     for (int j = 0; j < valueArray.length(); j++) {
-                        topics.add(createTopicModel(childTypeUri, valueArray.get(j)));
+                        topics.add(createChildTopicModel(assocDefUri, valueArray.get(j)));
                     }
                 }
             }
@@ -280,16 +279,22 @@ public class ModelFactoryImpl implements ModelFactory {
         return assocDefUri.split("#")[0];
     }
 
+    private String assocTypeUri(String assocDefUri) {
+        String[] s = assocDefUri.split("#");
+        return s.length == 2 ? s[1] : "dmx.core.composition";
+    }
+
     // ---
 
     /**
-     * Creates a topic model from a JSON value.
+     * Creates a child topic model from a JSON value.
      *
      * Both topic serialization formats are supported:
      * 1) canonic format -- contains entire topic models.
      * 2) simplified format -- contains the topic value only (simple or composite).
      */
-    private RelatedTopicModel createTopicModel(String childTypeUri, Object value) throws JSONException {
+    private RelatedTopicModel createChildTopicModel(String assocDefUri, Object value) throws JSONException {
+        String childTypeUri = childTypeUri(assocDefUri);
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for mandatory topic properties
@@ -297,7 +302,9 @@ public class ModelFactoryImpl implements ModelFactory {
                 // canonic format (topic or topic reference)
                 AssociationModel relatingAssoc = null;
                 if (val.has("assoc")) {
-                    relatingAssoc = newAssociationModel(val.getJSONObject("assoc"));
+                    JSONObject assoc = val.getJSONObject("assoc");
+                    initTypeUri(assoc, assocTypeUri(assocDefUri));
+                    relatingAssoc = newAssociationModel(assoc);
                 }
                 if (val.has("value")) {
                     RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
@@ -309,9 +316,7 @@ public class ModelFactoryImpl implements ModelFactory {
                         return topicRef;
                     }
                 }
-                //
                 initTypeUri(val, childTypeUri);
-                //
                 TopicModel topic = newTopicModel(val);
                 if (relatingAssoc != null) {
                     return newRelatedTopicModel(topic, relatingAssoc);
@@ -359,16 +364,18 @@ public class ModelFactoryImpl implements ModelFactory {
         return null;
     }
 
-    private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {
-        if (!value.has("typeUri")) {
-            value.put("typeUri", childTypeUri);
-        } else {
-            // sanity check
-            String typeUri = value.getString("typeUri");
-            if (!typeUri.equals(childTypeUri)) {
-                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has typeUri=\"" + typeUri +
-                    "\"");
-            }
+    /**
+     * @param   object      a topic or an assoc JSON
+     */
+    private void initTypeUri(JSONObject object, String typeUri) throws JSONException {
+        if (!object.has("typeUri")) {
+            object.put("typeUri", typeUri);
+            return;
+        }
+        // sanity check
+        String _typeUri = object.getString("typeUri");
+        if (!_typeUri.equals(typeUri)) {
+            throw new IllegalArgumentException("A \"" + typeUri + "\" update model has type \"" + _typeUri + "\"");
         }
     }
 
