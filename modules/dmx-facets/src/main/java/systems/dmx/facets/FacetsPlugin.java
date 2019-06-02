@@ -1,7 +1,7 @@
 package systems.dmx.facets;
 
 import systems.dmx.core.Association;
-import systems.dmx.core.AssociationDefinition;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -144,7 +144,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     // ---
 
     // Note: there is a similar private method in DMXObjectImpl:
-    // fetchChildTopic(AssociationDefinition assocDef, long childTopicId)
+    // fetchChildTopic(CompDef assocDef, long childTopicId)
     // ### TODO: Extend DMXObject interface by hasChildTopic()?
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
@@ -165,7 +165,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private RelatedTopic fetchChildTopic(DMXObject object, AssociationDefinition assocDef) {
+    private RelatedTopic fetchChildTopic(DMXObject object, CompDef assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopic(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
@@ -178,7 +178,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private List<RelatedTopic> fetchChildTopics(DMXObject object, AssociationDefinition assocDef) {
+    private List<RelatedTopic> fetchChildTopics(DMXObject object, CompDef assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
@@ -194,7 +194,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
         return getAssocDef(facetTypeUri).getChildTypeUri();
     }
 
-    private AssociationDefinition getAssocDef(String facetTypeUri) {
+    private CompDef getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
         return dmx.getTopicType(facetTypeUri).getAssocDefs().iterator().next();
     }

@@ -1,9 +1,9 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
@@ -36,7 +36,7 @@ class ValueIntegrator {
 
     private DMXObjectModelImpl newValues;
     private DMXObjectModelImpl targetObject;        // may null
-    private AssociationDefinitionModel assocDef;    // may null
+    private CompDefModel assocDef;    // may null
     private TypeModelImpl type;
     private boolean isAssoc;
     private boolean isType;
@@ -73,7 +73,7 @@ class ValueIntegrator {
      * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
     <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject,
-                                                             AssociationDefinitionModel assocDef) {
+                                                             CompDefModel assocDef) {
         try {
             this.newValues = newValues;
             this.targetObject = targetObject;
@@ -654,7 +654,7 @@ class ValueIntegrator {
      */
     private void eliminateParentCandidates(List<? extends TopicModelImpl> candidates, TopicModelImpl childTopic,
                                                                                       String assocDefUri) {
-        AssociationDefinitionModel assocDef = assocDef(assocDefUri);
+        CompDefModel assocDef = assocDef(assocDefUri);
         Iterator<? extends TopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
             TopicModelImpl parent = i.next();
@@ -805,7 +805,7 @@ class ValueIntegrator {
 
     // ---
 
-    private AssociationDefinitionModel assocDef(String assocDefUri) {
+    private CompDefModel assocDef(String assocDefUri) {
         if (!isFacetUpdate) {
             return type.getAssocDef(assocDefUri);
         } else {

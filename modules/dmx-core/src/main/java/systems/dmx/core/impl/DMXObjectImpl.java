@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.AssociationDefinition;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.RelatedAssociation;
@@ -163,7 +163,7 @@ abstract class DMXObjectImpl implements DMXObject {
     // === Updating ===
 
     @Override
-    public final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinition assocDef) {
+    public final void updateChildTopics(ChildTopicsModel updateModel, CompDef assocDef) {
         model.updateChildTopics(updateModel, assocDef.getModel());
     }
 

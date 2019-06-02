@@ -362,8 +362,7 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // Note 1: the postCreate() hook is invoked on the update model, *not* on the value integration result
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
-            // at AssociationDefinitionModelImpl). "model" might be an AssociationDefinitionModel while "_model" is
-            // always an AssociationModel.
+            // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssociationModel.
             // Note 2: postCreate() creates and caches the assoc def based on "model". Cached assoc defs need an
             // up-to-date value (as being displayed in webclient's type editor). The value is calculated while
             // value integration. We must transfer that value to "model".

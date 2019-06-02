@@ -1,10 +1,10 @@
 package systems.dmx.core.service;
 
 import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -184,7 +184,7 @@ public interface ModelFactory {
     // === TopicTypeModel ===
 
     TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                     List<AssociationDefinitionModel> assocDefs,
+                                     List<CompDefModel> assocDefs,
                                      ViewConfigurationModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
@@ -196,7 +196,7 @@ public interface ModelFactory {
     // === AssociationTypeModel ===
 
     AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                 List<AssociationDefinitionModel> assocDefs,
+                                                 List<CompDefModel> assocDefs,
                                                  ViewConfigurationModel viewConfig);
 
     AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
@@ -205,23 +205,23 @@ public interface ModelFactory {
 
 
 
-    // === AssociationDefinitionModel ===
+    // === CompDefModel ===
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
+    CompDefModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
+    CompDefModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri,
                                                              ViewConfigurationModel viewConfig);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String customAssocTypeUri,
+    CompDefModel newAssociationDefinitionModel(String customAssocTypeUri,
                                                              boolean isIdentityAttr, boolean includeInLabel,
                                                              String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
+    CompDefModel newAssociationDefinitionModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
+    CompDefModel newAssociationDefinitionModel(JSONObject assocDef);
 
 
 

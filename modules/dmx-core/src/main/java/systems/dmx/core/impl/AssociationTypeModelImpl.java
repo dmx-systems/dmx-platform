@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.Directive;
 
@@ -29,7 +29,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationTypeModel addAssocDef(AssociationDefinitionModel assocDef) {
+    public AssociationTypeModel addAssocDef(CompDefModel assocDef) {
         return (AssociationTypeModel) super.addAssocDef(assocDef);
     }
 

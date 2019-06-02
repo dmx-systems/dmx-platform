@@ -1,8 +1,8 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Association;
-import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.ChildTopics;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.RelatedAssociation;
@@ -67,7 +67,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.topic_type", topicType.getTypeUri());
         assertEquals("dmx.core.composite",  topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getAssocDefs().size());
-        AssociationDefinition assocDef =    topicType.getAssocDef("dmx.core.plugin_migration_nr");
+        CompDef assocDef =    topicType.getAssocDef("dmx.core.plugin_migration_nr");
         assertEquals("dmx.core.composition_def",     assocDef.getTypeUri());
         assertEquals("dmx.core.plugin",              assocDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", assocDef.getChildTypeUri());
@@ -482,11 +482,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.getAssociation(assocDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
             // assoc def order must not have changed
-            Collection<AssociationDefinition> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated assoc defs
             assertEquals(3, assocDefs.size());
-            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            Iterator<CompDef> i = assocDefs.iterator();
             assertEquals("dmx.core.plugin_name",          i.next().getAssocDefUri());
             assertEquals("dmx.core.plugin_symbolic_name", i.next().getAssocDefUri());
             assertEquals("dmx.core.plugin_migration_nr",  i.next().getAssocDefUri());
@@ -661,10 +661,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<AssociationDefinition> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
-            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            Iterator<CompDef> i = assocDefs.iterator();
             assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new assoc def is at pos 0
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
             //
@@ -690,10 +690,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<AssociationDefinition> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
-            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            Iterator<CompDef> i = assocDefs.iterator();
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());           // pos 0 is unchanged
             assertEquals("dmx.test.name", i.next().getChildTypeUri());                  // new assoc def is at pos 1
             assertEquals("dmx.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2
@@ -1015,7 +1015,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         //
-        AssociationDefinition assocDef = dmx.getTopicType("dmx.test.item_facet").getAssocDef("dmx.test.item");
+        CompDef assocDef = dmx.getTopicType("dmx.test.item_facet").getAssocDef("dmx.test.item");
         //
         // update facet
         tx = dmx.beginTx();

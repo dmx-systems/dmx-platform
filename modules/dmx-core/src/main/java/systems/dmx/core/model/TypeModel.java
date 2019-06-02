@@ -20,9 +20,9 @@ public interface TypeModel extends TopicModel, Iterable<String> {
     // === Association Definitions ===
 
     // TODO: drop it? We're Iterable meanwhile
-    Collection<? extends AssociationDefinitionModel> getAssocDefs();
+    Collection<? extends CompDefModel> getAssocDefs();
 
-    AssociationDefinitionModel getAssocDef(String assocDefUri);
+    CompDefModel getAssocDef(String assocDefUri);
 
     boolean hasAssocDef(String assocDefUri);
 
@@ -30,7 +30,7 @@ public interface TypeModel extends TopicModel, Iterable<String> {
      * @param   assocDef    the assoc def to add.
      *                      Note: its ID might be uninitialized (-1).
      */
-    TypeModel addAssocDef(AssociationDefinitionModel assocDef);
+    TypeModel addAssocDef(CompDefModel assocDef);
 
     /**
      * @param   assocDef            the assoc def to add.
@@ -38,9 +38,9 @@ public interface TypeModel extends TopicModel, Iterable<String> {
      * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
+    TypeModel addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri);
 
-    AssociationDefinitionModel removeAssocDef(String assocDefUri);
+    CompDefModel removeAssocDef(String assocDefUri);
 
 
 

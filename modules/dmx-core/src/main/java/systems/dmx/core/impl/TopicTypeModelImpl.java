@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.Directive;
@@ -29,7 +29,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public TopicTypeModel addAssocDef(AssociationDefinitionModel assocDef) {
+    public TopicTypeModel addAssocDef(CompDefModel assocDef) {
         return (TopicTypeModel) super.addAssocDef(assocDef);
     }
 

@@ -10,5 +10,5 @@ package systems.dmx.core.model;
 public interface AssociationTypeModel extends TypeModel {
 
     @Override
-    AssociationTypeModel addAssocDef(AssociationDefinitionModel assocDef);
+    AssociationTypeModel addAssocDef(CompDefModel assocDef);
 }

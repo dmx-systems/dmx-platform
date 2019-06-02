@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 
 import java.util.List;
@@ -34,7 +34,7 @@ class ChildTopicsFetcher {
      *
      * @param   assocDef    The child topic models according to this association definition are fetched.
      */
-    void fetch(DMXObjectModel object, AssociationDefinitionModel assocDef, boolean deep) {
+    void fetch(DMXObjectModel object, CompDefModel assocDef, boolean deep) {
         try {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
@@ -72,7 +72,7 @@ class ChildTopicsFetcher {
      * overhead in others (e.g. when updating composite structures).
      */
     private void fetchChildTopics(DMXObjectModelImpl object, boolean deep) {
-        for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
+        for (CompDefModel assocDef : object.getType().getAssocDefs()) {
             fetch(object, assocDef, deep);
         }
     }
@@ -82,7 +82,7 @@ class ChildTopicsFetcher {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
-    private RelatedTopicModelImpl fetchChildTopic(long objectId, AssociationDefinitionModel assocDef) {
+    private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel assocDef) {
         return pl.fetchRelatedTopic(
             objectId,
             assocDef.getInstanceLevelAssocTypeUri(),
@@ -91,7 +91,7 @@ class ChildTopicsFetcher {
         );
     }
 
-    private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, AssociationDefinitionModel assocDef) {
+    private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel assocDef) {
         return pl.fetchRelatedTopics(
             objectId,
             assocDef.getInstanceLevelAssocTypeUri(),

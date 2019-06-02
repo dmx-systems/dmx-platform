@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.ViewConfigurationModel;
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 
 
-class AssociationDefinitionModelImpl extends AssociationModelImpl implements AssociationDefinitionModel {
+class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,14 +22,14 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionModelImpl(AssociationModelImpl assoc) {
+    CompDefModelImpl(AssociationModelImpl assoc) {
         this(assoc, null);
     }
 
     /**
      * @param   assoc   the underlying association.
      */
-    AssociationDefinitionModelImpl(AssociationModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
+    CompDefModelImpl(AssociationModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
         super(assoc);
         this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
         // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
@@ -109,12 +109,12 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    AssociationDefinitionImpl instantiate() {
-        return new AssociationDefinitionImpl(this, pl);
+    CompDefImpl instantiate() {
+        return new CompDefImpl(this, pl);
     }
 
     @Override
-    AssociationDefinitionModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+    CompDefModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
         return mf.newAssociationDefinitionModel(childTopics);
     }
 
@@ -126,7 +126,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     void postCreate() {
         // Note: defining an empty postCreate() hook suppresses Type Editor Support as invoked by the superclass's
         // postCreate() hook.
-        // - When an assoc def is created *programmatically* (through a migration) a full AssociationDefinitionModel
+        // - When an assoc def is created *programmatically* (through a migration) a full CompDefModel
         //   is instantiated, and no further Type Editor Support must be executed.
         // - When an assoc def is created *interactively* (by creating an association in conjunction with auto-typing)
         //   a sole AssociationModel is instantiated, and Type editor support is required.

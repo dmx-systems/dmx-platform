@@ -1,9 +1,9 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.AssociationDefinition;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.ViewConfiguration;
-import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TypeModel;
 
@@ -49,12 +49,12 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     // === Association Definitions ===
 
     @Override
-    public final Collection<AssociationDefinition> getAssocDefs() {
+    public final Collection<CompDef> getAssocDefs() {
         return pl.instantiate(getModel().getAssocDefs());
     }
 
     @Override
-    public final AssociationDefinition getAssocDef(String assocDefUri) {
+    public final CompDef getAssocDef(String assocDefUri) {
         return getModel().getAssocDef(assocDefUri).instantiate();
     }
 
@@ -64,13 +64,13 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     }
 
     @Override
-    public final DMXType addAssocDef(AssociationDefinitionModel assocDef) {
+    public final DMXType addAssocDef(CompDefModel assocDef) {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public final DMXType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        AssociationDefinitionModelImpl _assocDef = (AssociationDefinitionModelImpl) assocDef;
+    public final DMXType addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri) {
+        CompDefModelImpl _assocDef = (CompDefModelImpl) assocDef;
         pl.typeStorage.storeAssociationDefinition(_assocDef);
         _getModel()._addAssocDefBefore(_assocDef, beforeAssocDefUri);
         return this;

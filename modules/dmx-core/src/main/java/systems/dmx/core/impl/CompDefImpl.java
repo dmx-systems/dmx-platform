@@ -1,8 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.AssociationDefinition;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.ViewConfiguration;
-import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RoleModel;
 
 
@@ -10,11 +10,11 @@ import systems.dmx.core.model.RoleModel;
 /**
  * An association definition that is attached to the {@link CoreService}.
  */
-class AssociationDefinitionImpl extends AssociationImpl implements AssociationDefinition {
+class CompDefImpl extends AssociationImpl implements CompDef {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionImpl(AssociationDefinitionModelImpl model, PersistenceLayer pl) {
+    CompDefImpl(CompDefModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -22,9 +22,9 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
 
 
-    // ********************************************
-    // *** AssociationDefinition Implementation ***
-    // ********************************************
+    // ******************************
+    // *** CompDef Implementation ***
+    // ******************************
 
 
 
@@ -80,14 +80,14 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     // ---
 
     @Override
-    public void update(AssociationDefinitionModel updateModel) {
-        model.update((AssociationDefinitionModelImpl) updateModel);     // ### FIXME: call through pl for access control
+    public void update(CompDefModel updateModel) {
+        model.update((CompDefModelImpl) updateModel);     // ### FIXME: call through pl for access control
     }
 
     // ---
 
     @Override
-    public AssociationDefinitionModelImpl getModel() {
-        return (AssociationDefinitionModelImpl) model;
+    public CompDefModelImpl getModel() {
+        return (CompDefModelImpl) model;
     }
 }

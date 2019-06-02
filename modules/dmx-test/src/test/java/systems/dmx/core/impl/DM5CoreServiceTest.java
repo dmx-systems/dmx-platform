@@ -1,8 +1,8 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Association;
-import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.ChildTopics;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.RelatedAssociation;
@@ -198,7 +198,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertTrue("Test".equals(topic.getSimpleValue().toString()));
             // updating simple child text topic
             TopicType parentType = dmx.getTopicType(topic.getTypeUri());
-            AssociationDefinition typeRelation = parentType.getAssocDef(fullAssocDefUriToBeUpdated);
+            CompDef typeRelation = parentType.getAssocDef(fullAssocDefUriToBeUpdated);
             ChildTopicsModel cm2 = mf.newChildTopicsModel().put(fullAssocDefUriToBeUpdated, "Test Studio");
             topic.updateChildTopics(cm2, typeRelation);
             // assert child topic value and parent value update

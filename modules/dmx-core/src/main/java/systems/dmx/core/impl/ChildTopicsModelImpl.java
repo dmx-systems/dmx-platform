@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -420,7 +420,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     /**
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID. ### FIXDOC
      */
-    RelatedTopicModelImpl findChildTopicById(long childTopicId, AssociationDefinitionModel assocDef) {
+    RelatedTopicModelImpl findChildTopicById(long childTopicId, CompDefModel assocDef) {
         List<RelatedTopicModelImpl> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
         if (childTopics != null) {
             for (RelatedTopicModelImpl childTopic : childTopics) {
@@ -438,7 +438,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      *
      * @param   assocDef    the child topics according to this association definition are considered.
      */
-    RelatedTopicModelImpl findChildTopicByRef(TopicReferenceModelImpl topicRef, AssociationDefinitionModel assocDef) {
+    RelatedTopicModelImpl findChildTopicByRef(TopicReferenceModelImpl topicRef, CompDefModel assocDef) {
         List<? extends RelatedTopicModel> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
         if (childTopics != null) {
             return topicRef.findReferencedTopic(childTopics);
@@ -468,28 +468,28 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     /**
      * For single-valued childs
      */
-    void putInChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+    void putInChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
         put(assocDef.getAssocDefUri(), childTopic);
     }
 
     /**
      * For single-valued childs
      */
-    void removeChildTopic(AssociationDefinitionModel assocDef) {
+    void removeChildTopic(CompDefModel assocDef) {
         remove(assocDef.getAssocDefUri());
     }
 
     /**
      * For multiple-valued childs
      */
-    void addToChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+    void addToChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
         add(assocDef.getAssocDefUri(), childTopic);
     }
 
     /**
      * For multiple-valued childs
      */
-    void removeFromChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+    void removeFromChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
         remove(assocDef.getAssocDefUri(), childTopic);
     }
 

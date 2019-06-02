@@ -1,6 +1,6 @@
 package systems.dmx.core;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.CompDefModel;
 
 
 
@@ -10,7 +10,7 @@ import systems.dmx.core.model.AssociationDefinitionModel;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface AssociationDefinition extends Association {
+public interface CompDef extends Association {
 
     String getAssocDefUri();
 
@@ -47,9 +47,9 @@ public interface AssociationDefinition extends Association {
 
     // ---
 
-    void update(AssociationDefinitionModel model);
+    void update(CompDefModel model);
 
     // ---
 
-    AssociationDefinitionModel getModel();
+    CompDefModel getModel();
 }

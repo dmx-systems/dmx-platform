@@ -1,8 +1,8 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -381,7 +381,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         update(createModelWithChildTopics(childTopics));
     }
 
-    final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinitionModel assocDef) {
+    final void updateChildTopics(ChildTopicsModel updateModel, CompDefModel assocDef) {
         // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
         // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
         // Compare to update() method.
@@ -511,7 +511,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics which are not loaded already.
      */
     final DMXObjectModel loadChildTopics(boolean deep) {
-        for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+        for (CompDefModel assocDef : getType().getAssocDefs()) {
             loadChildTopics(assocDef, deep);
         }
         return this;
@@ -521,11 +521,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
      * If the child topics are loaded already nothing is performed.
      * <p>
-     * Implemented on top of {@link #loadChildTopics(AssociationDefinitionModel, boolean)}.
+     * Implemented on top of {@link #loadChildTopics(CompDefModel, boolean)}.
      * The assoc def is get from this object's type definition.
      * <p>
      * Can <i>not</i> be used to load facet values.
-     * To load facet values use {@link #loadChildTopics(AssociationDefinitionModel, boolean)} and pass the facet type's
+     * To load facet values use {@link #loadChildTopics(CompDefModel, boolean)} and pass the facet type's
      * assoc def.
      */
     final DMXObjectModel loadChildTopics(String assocDefUri, boolean deep) {
@@ -548,7 +548,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      *                      Note: the association definition must not necessarily originate from this object's
      *                      type definition. It may originate from a facet type as well.
      */
-    final DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef, boolean deep) {
+    final DMXObjectModel loadChildTopics(CompDefModel assocDef, boolean deep) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Loading \"" + assocDefUri + "\" child topics of " + objectInfo());
@@ -625,7 +625,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // === Helper ===
 
     // Note: doesn't work for facets
-    private AssociationDefinitionModel getAssocDef(String assocDefUri) {
+    private CompDefModel getAssocDef(String assocDefUri) {
         return getType().getAssocDef(assocDefUri);
     }
 

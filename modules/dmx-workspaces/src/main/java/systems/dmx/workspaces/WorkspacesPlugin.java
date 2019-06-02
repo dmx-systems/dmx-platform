@@ -8,8 +8,8 @@ import systems.dmx.facets.FacetsService;
 import systems.dmx.topicmaps.TopicmapsService;
 
 import systems.dmx.core.Association;
-import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.AssociationType;
+import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
@@ -200,7 +200,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 _assignToWorkspace(configTopic, workspaceId);
             }
             // association definitions
-            for (AssociationDefinition assocDef : type.getAssocDefs()) {
+            for (CompDef assocDef : type.getAssocDefs()) {
                 _assignToWorkspace(assocDef, workspaceId);
                 // view config topics (of association definition)
                 for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {

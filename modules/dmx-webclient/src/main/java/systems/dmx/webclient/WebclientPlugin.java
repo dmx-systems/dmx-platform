@@ -6,8 +6,8 @@ import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfiguration;
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
@@ -259,8 +259,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Looks up an assoc def by ID.
      */
-    private AssociationDefinitionModel getAssocDef(TypeModel type, long assocDefId) {
-        for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
+    private CompDefModel getAssocDef(TypeModel type, long assocDefId) {
+        for (CompDefModel assocDef : type.getAssocDefs()) {
             if (assocDef.getId() == assocDefId) {
                 return assocDef;
             }

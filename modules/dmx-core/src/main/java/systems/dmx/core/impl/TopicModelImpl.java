@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.DMXEvent;
@@ -190,7 +190,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
                 return this;
             }
             //
-            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+            for (CompDefModel assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 TopicModelImpl childTopic = null;

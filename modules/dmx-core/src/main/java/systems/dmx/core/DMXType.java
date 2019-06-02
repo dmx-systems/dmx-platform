@@ -1,6 +1,6 @@
 package systems.dmx.core;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TypeModel;
 
 import java.util.Collection;
@@ -22,19 +22,19 @@ public interface DMXType extends Topic, Iterable<String> {
     // === Association Definitions ===
 
     // TODO: drop it? We're Iterable meanwhile
-    Collection<AssociationDefinition> getAssocDefs();
+    Collection<CompDef> getAssocDefs();
 
-    AssociationDefinition getAssocDef(String assocDefUri);
+    CompDef getAssocDef(String assocDefUri);
 
     boolean hasAssocDef(String assocDefUri);
 
-    DMXType addAssocDef(AssociationDefinitionModel assocDef);
+    DMXType addAssocDef(CompDefModel assocDef);
 
     /**
      * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    DMXType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
+    DMXType addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri);
 
     DMXType removeAssocDef(String assocDefUri);
 

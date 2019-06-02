@@ -1,8 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -103,7 +103,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<CompDefModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
             TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, assocDefs, null);
@@ -134,7 +134,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<CompDefModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
             AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, assocDefs, null);
@@ -236,8 +236,8 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private List<AssociationDefinitionModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
-        Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
+    private List<CompDefModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
+        Map<Long, CompDefModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
         List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (assocDefs.size() != sequence.size()) {
@@ -248,8 +248,8 @@ class TypeStorage {
         return sortAssocDefs(assocDefs, DMXUtils.idList(sequence));
     }
 
-    private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(TopicModelImpl typeTopic) {
-        Map<Long, AssociationDefinitionModel> assocDefs = new HashMap();
+    private Map<Long, CompDefModel> fetchAssociationDefinitionsUnsorted(TopicModelImpl typeTopic) {
+        Map<Long, CompDefModel> assocDefs = new HashMap();
         //
         // 1) fetch child topic types
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
@@ -265,7 +265,7 @@ class TypeStorage {
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
-            AssociationDefinitionModel assocDef = fetchAssociationDefinition(childType.getRelatingAssociation(),
+            CompDefModel assocDef = fetchAssociationDefinition(childType.getRelatingAssociation(),
                 typeTopic.getUri(), childType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
@@ -283,7 +283,7 @@ class TypeStorage {
      *
      * @param   assoc   an assoc whose players are ref'd by-ID
      */
-    AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModelImpl assoc) {
+    CompDefModelImpl newAssociationDefinitionModel(AssociationModelImpl assoc) {
         return mf.newAssociationDefinitionModel(
             addPlayerUris(assoc, fetchParentTypeTopic(assoc).uri, fetchChildTypeTopic(assoc).uri),
             mf.newViewConfigurationModel().addConfigTopic(
@@ -314,7 +314,7 @@ class TypeStorage {
      *                  1) players are ref'd by-ID
      *                  2) childs are not retrieved
      */
-    private AssociationDefinitionModel fetchAssociationDefinition(AssociationModelImpl assoc, String parentTypeUri,
+    private CompDefModel fetchAssociationDefinition(AssociationModelImpl assoc, String parentTypeUri,
                                                                                               String childTypeUri) {
         try {
             // 2 roles
@@ -372,7 +372,7 @@ class TypeStorage {
         return assoc;
     }
 
-    private AssociationDefinitionModelImpl addPlayerIds(AssociationDefinitionModelImpl assocDef) {
+    private CompDefModelImpl addPlayerIds(CompDefModelImpl assocDef) {
         assocDef.getRoleModel("dmx.core.parent_type").playerId = assocDef.getParentType().id;
         assocDef.getRoleModel("dmx.core.child_type").playerId  = assocDef.getChildType().id;
         return assocDef;
@@ -380,11 +380,11 @@ class TypeStorage {
 
     // ---
 
-    private List<AssociationDefinitionModel> sortAssocDefs(Map<Long, AssociationDefinitionModel> assocDefs,
+    private List<CompDefModel> sortAssocDefs(Map<Long, CompDefModel> assocDefs,
                                                            List<Long> sequence) {
-        List<AssociationDefinitionModel> sortedAssocDefs = new ArrayList();
+        List<CompDefModel> sortedAssocDefs = new ArrayList();
         for (long assocDefId : sequence) {
-            AssociationDefinitionModel assocDef = assocDefs.get(assocDefId);
+            CompDefModel assocDef = assocDefs.get(assocDefId);
             // error check
             if (assocDef == null) {
                 throw new RuntimeException("DB inconsistency: ID " + assocDefId +
@@ -397,14 +397,14 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeAssocDefs(long typeId, Collection<AssociationDefinitionModelImpl> assocDefs) {
-        for (AssociationDefinitionModelImpl assocDef : assocDefs) {
+    private void storeAssocDefs(long typeId, Collection<CompDefModelImpl> assocDefs) {
+        for (CompDefModelImpl assocDef : assocDefs) {
             storeAssociationDefinition(assocDef);
         }
         storeSequence(typeId, assocDefs);
     }
 
-    void storeAssociationDefinition(AssociationDefinitionModelImpl assocDef) {
+    void storeAssociationDefinition(CompDefModelImpl assocDef) {
         try {
             // 1) create association
             pl.createAssociation(addPlayerIds(assocDef));
@@ -555,10 +555,10 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeSequence(long typeId, Collection<AssociationDefinitionModelImpl> assocDefs) {
+    private void storeSequence(long typeId, Collection<CompDefModelImpl> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
         long predAssocDefId = -1;
-        for (AssociationDefinitionModel assocDef : assocDefs) {
+        for (CompDefModel assocDef : assocDefs) {
             addAssocDefToSequence(typeId, assocDef.getId(), -1, -1, predAssocDefId);
             predAssocDefId = assocDef.getId();
         }
@@ -652,8 +652,8 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private void fetchViewConfigOfAssocDefs(List<AssociationDefinitionModel> assocDefs) {
-        for (AssociationDefinitionModel assocDef : assocDefs) {
+    private void fetchViewConfigOfAssocDefs(List<CompDefModel> assocDefs) {
+        for (CompDefModel assocDef : assocDefs) {
             assocDef.setViewConfig(fetchViewConfigOfAssocDef(assocDef));
         }
     }
@@ -701,7 +701,7 @@ class TypeStorage {
         }
     }
 
-    void storeViewConfig(AssociationDefinitionModelImpl assocDef) {
+    void storeViewConfig(CompDefModelImpl assocDef) {
         ViewConfigurationModelImpl viewConfig = assocDef.viewConfig;
         TopicModel configTopic = _storeViewConfig(newAssocDefRole(assocDef.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
