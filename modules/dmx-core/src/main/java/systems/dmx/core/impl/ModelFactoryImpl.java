@@ -579,10 +579,9 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TopicTypeModel ===
 
     @Override
-    public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                List<CompDefModel> assocDefs,
+    public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
                                                 ViewConfigurationModel viewConfig) {
-        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, assocDefs,
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -606,9 +605,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                            List<CompDefModel> assocDefs,
+                                                            List<CompDefModel> compDefs,
                                                             ViewConfigurationModel viewConfig) {
-        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, assocDefs,
+        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -631,9 +630,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // === TypeModel ===
 
-    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> assocDefs,
+    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
                                                                          ViewConfigurationModelImpl viewConfig) {
-        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, assocDefs, viewConfig);
+        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, compDefs, viewConfig);
     }
 
     TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
@@ -645,17 +644,17 @@ public class ModelFactoryImpl implements ModelFactory {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
-            parseCompDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),     // optJSONArray may return null
+            parseCompDefs(typeModel.optJSONArray("compDefs"), typeTopic.getUri()),      // optJSONArray may return null
             newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null
     }
 
     // ---
 
-    private List<CompDefModel> parseCompDefs(JSONArray assocDefs, String parentTypeUri) throws JSONException {
+    private List<CompDefModel> parseCompDefs(JSONArray compDefs, String parentTypeUri) throws JSONException {
         List<CompDefModel> _assocDefs = new ArrayList();
-        if (assocDefs != null) {
-            for (int i = 0; i < assocDefs.length(); i++) {
-                JSONObject compDef = assocDefs.getJSONObject(i)
+        if (compDefs != null) {
+            for (int i = 0; i < compDefs.length(); i++) {
+                JSONObject compDef = compDefs.getJSONObject(i)
                     .put("parentTypeUri", parentTypeUri);
                 _assocDefs.add(newCompDefModel(compDef));
             }

@@ -183,8 +183,7 @@ public interface ModelFactory {
 
     // === TopicTypeModel ===
 
-    TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                     List<CompDefModel> assocDefs,
+    TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
                                      ViewConfigurationModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
@@ -195,8 +194,7 @@ public interface ModelFactory {
 
     // === AssociationTypeModel ===
 
-    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                 List<CompDefModel> assocDefs,
+    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
                                                  ViewConfigurationModel viewConfig);
 
     AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);

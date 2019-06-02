@@ -103,16 +103,16 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            List<CompDefModel> assocDefs = fetchCompDefs(typeTopic);
+            List<CompDefModel> compDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
-            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, assocDefs, null);
-            putInTypeCache(topicType);                                                             // viewConfig=null
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, compDefs, null);
+            putInTypeCache(topicType);                                                            // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
             topicType.setViewConfig(fetchViewConfigOfType(typeTopic));
-            fetchViewConfigOfCompDefs(assocDefs);
+            fetchViewConfigOfCompDefs(compDefs);
             //
             return topicType;
         } catch (Exception e) {
@@ -134,16 +134,16 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            List<CompDefModel> assocDefs = fetchCompDefs(typeTopic);
+            List<CompDefModel> compDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, assocDefs, null);
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, compDefs, null);
             putInTypeCache(assocType);                                                                // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
             assocType.setViewConfig(fetchViewConfigOfType(typeTopic));
-            fetchViewConfigOfCompDefs(assocDefs);
+            fetchViewConfigOfCompDefs(compDefs);
             //
             return assocType;
         } catch (Exception e) {
@@ -237,19 +237,19 @@ class TypeStorage {
     // --- Fetch ---
 
     private List<CompDefModel> fetchCompDefs(TopicModelImpl typeTopic) {
-        Map<Long, CompDefModel> assocDefs = fetchCompDefsUnsorted(typeTopic);
+        Map<Long, CompDefModel> compDefs = fetchCompDefsUnsorted(typeTopic);
         List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
-        if (assocDefs.size() != sequence.size()) {
+        if (compDefs.size() != sequence.size()) {
             throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " +
-                assocDefs.size() + " association definitions but in sequence are " + sequence.size());
+                compDefs.size() + " association definitions but in sequence are " + sequence.size());
         }
         //
-        return sortCompDefs(assocDefs, DMXUtils.idList(sequence));
+        return sortCompDefs(compDefs, DMXUtils.idList(sequence));
     }
 
     private Map<Long, CompDefModel> fetchCompDefsUnsorted(TopicModelImpl typeTopic) {
-        Map<Long, CompDefModel> assocDefs = new HashMap();
+        Map<Long, CompDefModel> compDefs = new HashMap();
         //
         // 1) fetch child topic types
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
@@ -267,9 +267,9 @@ class TypeStorage {
         for (RelatedTopicModelImpl childType : childTypes) {
             CompDefModel compDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
                 childType.getUri());
-            assocDefs.put(compDef.getId(), compDef);
+            compDefs.put(compDef.getId(), compDef);
         }
-        return assocDefs;
+        return compDefs;
     }
 
     // ---
@@ -379,10 +379,10 @@ class TypeStorage {
 
     // ---
 
-    private List<CompDefModel> sortCompDefs(Map<Long, CompDefModel> assocDefs, List<Long> sequence) {
+    private List<CompDefModel> sortCompDefs(Map<Long, CompDefModel> compDefs, List<Long> sequence) {
         List<CompDefModel> sortedCompDefs = new ArrayList();
         for (long assocDefId : sequence) {
-            CompDefModel compDef = assocDefs.get(assocDefId);
+            CompDefModel compDef = compDefs.get(assocDefId);
             // error check
             if (compDef == null) {
                 throw new RuntimeException("DB inconsistency: ID " + assocDefId +
@@ -395,11 +395,11 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeCompDefs(long typeId, Collection<CompDefModelImpl> assocDefs) {
-        for (CompDefModelImpl compDef : assocDefs) {
+    private void storeCompDefs(long typeId, Collection<CompDefModelImpl> compDefs) {
+        for (CompDefModelImpl compDef : compDefs) {
             storeCompDef(compDef);
         }
-        storeSequence(typeId, assocDefs);
+        storeSequence(typeId, compDefs);
     }
 
     void storeCompDef(CompDefModelImpl compDef) {
@@ -411,7 +411,7 @@ class TypeStorage {
             // Note: if the underlying association was an association definition before it has cardinality
             // assignments already. These must be removed before assigning new cardinality. ### TODO?
             // ### removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
-            // ### associateCardinality(assocDefId, CHILD_CARDINALITY,  compDef.getChildCardinalityUri());
+            // ### associateCardinality(assocDefId, CHILD_CARDINALITY, compDef.getChildCardinalityUri());
             //
             // 3) view config
             storeViewConfig(compDef);
@@ -553,10 +553,10 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeSequence(long typeId, Collection<CompDefModelImpl> assocDefs) {
-        logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
+    private void storeSequence(long typeId, Collection<CompDefModelImpl> compDefs) {
+        logger.fine("### Storing " + compDefs.size() + " sequence segments for type " + typeId);
         long predCompDefId = -1;
-        for (CompDefModel compDef : assocDefs) {
+        for (CompDefModel compDef : compDefs) {
             addCompDefToSequence(typeId, compDef.getId(), -1, -1, predCompDefId);
             predCompDefId = compDef.getId();
         }
@@ -650,8 +650,8 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private void fetchViewConfigOfCompDefs(List<CompDefModel> assocDefs) {
-        for (CompDefModel compDef : assocDefs) {
+    private void fetchViewConfigOfCompDefs(List<CompDefModel> compDefs) {
+        for (CompDefModel compDef : compDefs) {
             compDef.setViewConfig(fetchViewConfigOfCompDef(compDef));
         }
     }

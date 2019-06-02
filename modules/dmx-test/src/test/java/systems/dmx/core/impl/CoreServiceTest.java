@@ -482,11 +482,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.getAssociation(assocDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
             // assoc def order must not have changed
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated assoc defs
-            assertEquals(3, assocDefs.size());
-            Iterator<CompDef> i = assocDefs.iterator();
+            assertEquals(3, compDefs.size());
+            Iterator<CompDef> i = compDefs.iterator();
             assertEquals("dmx.core.plugin_name",          i.next().getCompDefUri());
             assertEquals("dmx.core.plugin_symbolic_name", i.next().getCompDefUri());
             assertEquals("dmx.core.plugin_migration_nr",  i.next().getCompDefUri());
@@ -661,10 +661,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
-            assertSame(4, assocDefs.size());
+            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            assertSame(4, compDefs.size());
             //
-            Iterator<CompDef> i = assocDefs.iterator();
+            Iterator<CompDef> i = compDefs.iterator();
             assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new assoc def is at pos 0
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
             //
@@ -690,10 +690,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
-            assertSame(4, assocDefs.size());
+            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            assertSame(4, compDefs.size());
             //
-            Iterator<CompDef> i = assocDefs.iterator();
+            Iterator<CompDef> i = compDefs.iterator();
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());           // pos 0 is unchanged
             assertEquals("dmx.test.name", i.next().getChildTypeUri());                  // new assoc def is at pos 1
             assertEquals("dmx.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2

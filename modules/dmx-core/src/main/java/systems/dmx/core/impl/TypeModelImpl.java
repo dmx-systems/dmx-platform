@@ -26,26 +26,26 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     String dataTypeUri;     // may be null in models used for an update operation
-    SequencedHashMap<String, CompDefModelImpl> assocDefs;       // is never null, may be empty
+    SequencedHashMap<String, CompDefModelImpl> compDefs;        // is never null, may be empty
     ViewConfigurationModelImpl viewConfig;                      // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<CompDefModel> assocDefs,
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
                                                                 ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
-        this.dataTypeUri  = dataTypeUri;
-        this.assocDefs    = toMap(assocDefs);
-        this.viewConfig   = viewConfig;
+        this.dataTypeUri = dataTypeUri;
+        this.compDefs    = toMap(compDefs);
+        this.viewConfig  = viewConfig;
     }
 
     TypeModelImpl(TypeModelImpl type) {
         super(type);
-        this.dataTypeUri  = type.getDataTypeUri();
-        this.assocDefs    = toMap(type.getCompDefs());
-        this.viewConfig   = type.getViewConfig();
+        this.dataTypeUri = type.getDataTypeUri();
+        this.compDefs    = toMap(type.getCompDefs());
+        this.viewConfig  = type.getViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -70,7 +70,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     public Collection<CompDefModelImpl> getCompDefs() {
-        return assocDefs.values();
+        return compDefs.values();
     }
 
     @Override
@@ -108,7 +108,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 throw new RuntimeException("Type \"" + uri + "\" has a \"" + compDefUri + "\" assoc def already");
             }
             //
-            assocDefs.putBefore(compDefUri, (CompDefModelImpl) compDef, beforeCompDefUri);
+            compDefs.putBefore(compDefUri, (CompDefModelImpl) compDef, beforeCompDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding assoc def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
@@ -119,9 +119,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public CompDefModel removeCompDef(String compDefUri) {
         try {
-            CompDefModel compDef = assocDefs.remove(compDefUri);
+            CompDefModel compDef = compDefs.remove(compDefUri);
             if (compDef == null) {
-                throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
+                throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + compDefs.keySet());
             }
             return compDef;
         } catch (Exception e) {
@@ -157,7 +157,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      */
     @Override
     public Iterator<String> iterator() {
-        return assocDefs.keySet().iterator();
+        return compDefs.keySet().iterator();
     }
 
 
@@ -173,7 +173,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             return super.toJSON()
                 .put("dataTypeUri", dataTypeUri)
-                .put("assocDefs", toJSONArray(assocDefs.values()))
+                .put("compDefs", toJSONArray(compDefs.values()))
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
@@ -192,7 +192,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public TypeModelImpl clone() {
         try {
             TypeModelImpl model = (TypeModelImpl) super.clone();
-            model.assocDefs = (SequencedHashMap) model.assocDefs.clone();
+            model.compDefs = (SequencedHashMap) model.compDefs.clone();
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Cloning a TypeModel failed", e);
@@ -562,19 +562,19 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
         if (assocDefUris[0] == null) {
             throw new RuntimeException("Assoc def " + assocDefId + " not found in assoc defs of type \"" + uri +
-                "\" (" + assocDefs.keySet() + ")");
+                "\" (" + compDefs.keySet() + ")");
         }
         return assocDefUris;
     }
 
     // ### TODO: not called
-    private boolean hasSameCompDefSequence(Collection<? extends CompDefModel> assocDefs) {
+    private boolean hasSameCompDefSequence(Collection<? extends CompDefModel> compDefs) {
         Collection<? extends CompDefModel> _assocDefs = getCompDefs();
-        if (assocDefs.size() != _assocDefs.size()) {
+        if (compDefs.size() != _assocDefs.size()) {
             return false;
         }
         //
-        Iterator<? extends CompDefModel> i = assocDefs.iterator();
+        Iterator<? extends CompDefModel> i = compDefs.iterator();
         for (CompDefModel _assocDef : _assocDefs) {
             CompDefModel compDef = i.next();
             // Note: if the assoc def's custom association type changed the assoc def URI changes as well.
@@ -609,13 +609,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private CompDefModelImpl getCompDefOrThrow(String compDefUri) {
         CompDefModelImpl compDef = _getCompDef(compDefUri);
         if (compDef == null) {
-            throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
+            throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + compDefs.keySet());
         }
         return compDef;
     }
 
     private CompDefModelImpl _getCompDef(String compDefUri) {
-        return assocDefs.get(compDefUri);
+        return compDefs.get(compDefUri);
     }
 
     // ---
@@ -653,10 +653,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private SequencedHashMap<String, CompDefModelImpl> toMap(
-                                                           Collection<? extends CompDefModel> assocDefs) {
+    private SequencedHashMap<String, CompDefModelImpl> toMap(Collection<? extends CompDefModel> compDefs) {
         SequencedHashMap<String, CompDefModelImpl> _assocDefs = new SequencedHashMap();
-        for (CompDefModel compDef : assocDefs) {
+        for (CompDefModel compDef : compDefs) {
             _assocDefs.put(compDef.getCompDefUri(), (CompDefModelImpl) compDef);
         }
         return _assocDefs;
@@ -684,9 +683,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Serialization ===
 
-    private JSONArray toJSONArray(Collection<? extends CompDefModel> assocDefs) {
+    private JSONArray toJSONArray(Collection<? extends CompDefModel> compDefs) {
         JSONArray _assocDefs = new JSONArray();
-        for (CompDefModel compDef : assocDefs) {
+        for (CompDefModel compDef : compDefs) {
             _assocDefs.put(compDef.toJSON());
         }
         return _assocDefs;
