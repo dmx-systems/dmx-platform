@@ -74,13 +74,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
-    public CompDefModelImpl getCompDef(String assocDefUri) {
-        return getCompDefOrThrow(assocDefUri);
+    public CompDefModelImpl getCompDef(String compDefUri) {
+        return getCompDefOrThrow(compDefUri);
     }
 
     @Override
-    public boolean hasCompDef(String assocDefUri) {
-        return _getCompDef(assocDefUri) != null;
+    public boolean hasCompDef(String compDefUri) {
+        return _getCompDef(compDefUri) != null;
     }
 
     /**
@@ -101,14 +101,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public TypeModel addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri) {
         try {
-            String assocDefUri = assocDef.getCompDefUri();
+            String compDefUri = assocDef.getCompDefUri();
             // error check
-            CompDefModel existing = _getCompDef(assocDefUri);
+            CompDefModel existing = _getCompDef(compDefUri);
             if (existing != null) {
-                throw new RuntimeException("Type \"" + uri + "\" has a \"" + assocDefUri + "\" assoc def already");
+                throw new RuntimeException("Type \"" + uri + "\" has a \"" + compDefUri + "\" assoc def already");
             }
             //
-            assocDefs.putBefore(assocDefUri, (CompDefModelImpl) assocDef, beforeCompDefUri);
+            assocDefs.putBefore(compDefUri, (CompDefModelImpl) assocDef, beforeCompDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding assoc def \"" + assocDef.getCompDefUri() + "\" to type \"" + uri +
@@ -117,16 +117,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
-    public CompDefModel removeCompDef(String assocDefUri) {
+    public CompDefModel removeCompDef(String compDefUri) {
         try {
-            CompDefModel assocDef = assocDefs.remove(assocDefUri);
+            CompDefModel assocDef = assocDefs.remove(compDefUri);
             if (assocDef == null) {
-                throw new RuntimeException("Assoc def \"" + assocDefUri + "\" not found in " + assocDefs.keySet());
+                throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
             }
             return assocDef;
         } catch (Exception e) {
-            throw new RuntimeException("Removing assoc def \"" + assocDefUri + "\" from type \"" + uri + "\" failed",
-                e);
+            throw new RuntimeException("Removing assoc def \"" + compDefUri + "\" from type \"" + uri + "\" failed", e);
         }
     }
 
@@ -269,9 +268,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         // Note 2: iterating with a for-loop here would cause ConcurrentModificationException. Deleting an assoc def
         // implies rebuilding the sequence and that iterates with a for-loop already. Instead we must create a new
         // iterator for every single assoc def.
-        String assocDefUri;
-        while ((assocDefUri = getFirstCompDefUri()) != null) {
-            _getCompDef(assocDefUri).delete();
+        String compDefUri;
+        while ((compDefUri = getFirstCompDefUri()) != null) {
+            _getCompDef(compDefUri).delete();
         }
     }
 
@@ -322,13 +321,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    final void _removeCompDef(String assocDefUri) {
+    final void _removeCompDef(String compDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
         // is triggered then by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
-        getCompDef(assocDefUri).delete();
+        getCompDef(compDefUri).delete();
     }
 
 
@@ -386,9 +385,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      */
     final void _removeCompDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
         String[] assocDefUris = findCompDefUris(assoc.getId());
-        String assocDefUri = getCompDef(assocDefUris[0]).getCompDefUri();
+        String compDefUri = getCompDef(assocDefUris[0]).getCompDefUri();
         // update memory
-        removeCompDef(assocDefUri);
+        removeCompDef(compDefUri);
         // update DB
         pl.typeStorage.rebuildSequence(this);
         //
@@ -402,9 +401,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final List<String> getIdentityAttrs() {
         try {
             List<String> identityAttrs = new ArrayList();
-            for (String assocDefUri : this) {
-                if (getCompDef(assocDefUri).isIdentityAttr()) {
-                    identityAttrs.add(assocDefUri);
+            for (String compDefUri : this) {
+                if (getCompDef(compDefUri).isIdentityAttr()) {
+                    identityAttrs.add(compDefUri);
                 }
             }
             return identityAttrs;
@@ -438,9 +437,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final List<String> getLabelConfig() {
         try {
             List<String> labelConfig = new ArrayList();
-            for (String assocDefUri : this) {
-                if (getCompDef(assocDefUri).includeInLabel()) {
-                    labelConfig.add(assocDefUri);
+            for (String compDefUri : this) {
+                if (getCompDef(compDefUri).includeInLabel()) {
+                    labelConfig.add(compDefUri);
                 }
             }
             return labelConfig;
@@ -457,8 +456,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             Iterator<String> i = iterator();
             while (i.hasNext()) {
-                String assocDefUri = i.next();
-                if (!_getCompDef(assocDefUri).isReadable()) {
+                String compDefUri = i.next();
+                if (!_getCompDef(compDefUri).isReadable()) {
                     i.remove();
                 }
             }
@@ -551,10 +550,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         String[] assocDefUris = new String[2];
         Iterator<String> i = iterator();
         while (i.hasNext()) {
-            String assocDefUri = i.next();
-            long _assocDefId = checkCompDefId(_getCompDef(assocDefUri));
+            String compDefUri = i.next();
+            long _assocDefId = checkCompDefId(_getCompDef(compDefUri));
             if (_assocDefId == assocDefId) {
-                assocDefUris[0] = assocDefUri;
+                assocDefUris[0] = compDefUri;
                 if (i.hasNext()) {
                     assocDefUris[1] = i.next();
                 }
@@ -598,25 +597,25 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void rehashCompDef(String assocDefUri, String beforeCompDefUri) {
-        CompDefModel assocDef = removeCompDef(assocDefUri);
-        logger.info("Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getCompDefUri() + "\" (put " +
+    private void rehashCompDef(String compDefUri, String beforeCompDefUri) {
+        CompDefModel assocDef = removeCompDef(compDefUri);
+        logger.info("Rehashing assoc def \"" + compDefUri + "\" -> \"" + assocDef.getCompDefUri() + "\" (put " +
             (beforeCompDefUri != null ? "before \"" + beforeCompDefUri + "\"" : "at end") + ")");
         addCompDefBefore(assocDef, beforeCompDefUri);
     }
 
     // ---
 
-    private CompDefModelImpl getCompDefOrThrow(String assocDefUri) {
-        CompDefModelImpl assocDef = _getCompDef(assocDefUri);
+    private CompDefModelImpl getCompDefOrThrow(String compDefUri) {
+        CompDefModelImpl assocDef = _getCompDef(compDefUri);
         if (assocDef == null) {
-            throw new RuntimeException("Assoc def \"" + assocDefUri + "\" not found in " + assocDefs.keySet());
+            throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
         }
         return assocDef;
     }
 
-    private CompDefModelImpl _getCompDef(String assocDefUri) {
-        return assocDefs.get(assocDefUri);
+    private CompDefModelImpl _getCompDef(String compDefUri) {
+        return assocDefs.get(compDefUri);
     }
 
     // ---

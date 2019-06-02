@@ -63,8 +63,8 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     }
 
     @Override
-    public final Topic loadChildTopics(String assocDefUri) {
-        super.loadChildTopics(assocDefUri);
+    public final Topic loadChildTopics(String compDefUri) {
+        super.loadChildTopics(compDefUri);
         return this;
     }
 

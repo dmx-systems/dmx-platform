@@ -22,9 +22,9 @@ public interface TypeModel extends TopicModel, Iterable<String> {
     // TODO: drop it? We're Iterable meanwhile
     Collection<? extends CompDefModel> getCompDefs();
 
-    CompDefModel getCompDef(String assocDefUri);
+    CompDefModel getCompDef(String compDefUri);
 
-    boolean hasCompDef(String assocDefUri);
+    boolean hasCompDef(String compDefUri);
 
     /**
      * @param   assocDef    the assoc def to add.
@@ -40,7 +40,7 @@ public interface TypeModel extends TopicModel, Iterable<String> {
      */
     TypeModel addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri);
 
-    CompDefModel removeCompDef(String assocDefUri);
+    CompDefModel removeCompDef(String compDefUri);
 
 
 

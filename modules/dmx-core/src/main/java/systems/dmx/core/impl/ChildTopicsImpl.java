@@ -54,34 +54,34 @@ class ChildTopicsImpl implements ChildTopics {
     // === Accessors ===
 
     @Override
-    public RelatedTopic getTopic(String assocDefUri) {
-        loadChildTopics(assocDefUri);
-        return _getTopic(assocDefUri);
+    public RelatedTopic getTopic(String compDefUri) {
+        loadChildTopics(compDefUri);
+        return _getTopic(compDefUri);
     }
 
     @Override
-    public RelatedTopic getTopicOrNull(String assocDefUri) {
-        loadChildTopics(assocDefUri);
-        return _getTopicOrNull(assocDefUri);
+    public RelatedTopic getTopicOrNull(String compDefUri) {
+        loadChildTopics(compDefUri);
+        return _getTopicOrNull(compDefUri);
     }
 
     @Override
-    public List<RelatedTopic> getTopics(String assocDefUri) {
-        loadChildTopics(assocDefUri);
-        return _getTopics(assocDefUri);
+    public List<RelatedTopic> getTopics(String compDefUri) {
+        loadChildTopics(compDefUri);
+        return _getTopics(compDefUri);
     }
 
     @Override
-    public List<RelatedTopic> getTopicsOrNull(String assocDefUri) {
-        loadChildTopics(assocDefUri);
-        return _getTopicsOrNull(assocDefUri);
+    public List<RelatedTopic> getTopicsOrNull(String compDefUri) {
+        loadChildTopics(compDefUri);
+        return _getTopicsOrNull(compDefUri);
     }
 
     // ---
 
     @Override
-    public Object get(String assocDefUri) {
-        Object value = model.get(assocDefUri);
+    public Object get(String compDefUri) {
+        Object value = model.get(compDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return null;
@@ -110,76 +110,76 @@ class ChildTopicsImpl implements ChildTopics {
     // === Convenience Accessors ===
 
     @Override
-    public String getString(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().toString();
+    public String getString(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().toString();
     }
 
     @Override
-    public String getStringOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public String getStringOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().toString() : null;
     }
 
     @Override
-    public int getInt(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().intValue();
+    public int getInt(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().intValue();
     }
 
     @Override
-    public Integer getIntOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public Integer getIntOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().intValue() : null;
     }
 
     @Override
-    public long getLong(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().longValue();
+    public long getLong(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().longValue();
     }
 
     @Override
-    public Long getLongOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public Long getLongOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().longValue() : null;
     }
 
     @Override
-    public double getDouble(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().doubleValue();
+    public double getDouble(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().doubleValue();
     }
 
     @Override
-    public Double getDoubleOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public Double getDoubleOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().doubleValue() : null;
     }
 
     @Override
-    public boolean getBoolean(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().booleanValue();
+    public boolean getBoolean(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().booleanValue();
     }
 
     @Override
-    public Boolean getBooleanOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public Boolean getBooleanOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().booleanValue() : null;
     }
 
     @Override
-    public Object getObject(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().value();
+    public Object getObject(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().value();
     }
 
     @Override
-    public Object getObjectOrNull(String assocDefUri) {
-        Topic topic = getTopicOrNull(assocDefUri);
+    public Object getObjectOrNull(String compDefUri) {
+        Topic topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().value() : null;
     }
 
     // ---
 
     @Override
-    public ChildTopics getChildTopics(String assocDefUri) {
-        return getTopic(assocDefUri).getChildTopics();
+    public ChildTopics getChildTopics(String compDefUri) {
+        return getTopic(compDefUri).getChildTopics();
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
@@ -191,107 +191,107 @@ class ChildTopicsImpl implements ChildTopics {
     // --- Single-valued Childs ---
 
     @Override
-    public ChildTopics set(String assocDefUri, TopicModel value) {
-        return _updateOne(assocDefUri, mf.newRelatedTopicModel(value));
+    public ChildTopics set(String compDefUri, TopicModel value) {
+        return _updateOne(compDefUri, mf.newRelatedTopicModel(value));
     }
 
     // ---
 
     @Override
-    public ChildTopics set(String assocDefUri, Object value) {
-        return _updateOne(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
+    public ChildTopics set(String compDefUri, Object value) {
+        return _updateOne(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
     }
 
     @Override
-    public ChildTopics set(String assocDefUri, ChildTopicsModel value) {
-        return _updateOne(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), value));
-    }
-
-    // ---
-
-    @Override
-    public ChildTopics setRef(String assocDefUri, long refTopicId) {
-        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics setRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
-    }
-
-    @Override
-    public ChildTopics setRef(String assocDefUri, String refTopicUri) {
-        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
-    }
-
-    @Override
-    public ChildTopics setRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    public ChildTopics set(String compDefUri, ChildTopicsModel value) {
+        return _updateOne(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), value));
     }
 
     // ---
 
     @Override
-    public ChildTopics setDeletionRef(String assocDefUri, long refTopicId) {
-        return _updateOne(assocDefUri, mf.newTopicDeletionModel(refTopicId));
+    public ChildTopics setRef(String compDefUri, long refTopicId) {
+        return _updateOne(compDefUri, mf.newTopicReferenceModel(refTopicId));
     }
 
     @Override
-    public ChildTopics setDeletionRef(String assocDefUri, String refTopicUri) {
-        return _updateOne(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
+    public ChildTopics setRef(String compDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(compDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
+    public ChildTopics setRef(String compDefUri, String refTopicUri) {
+        return _updateOne(compDefUri, mf.newTopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics setRef(String compDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(compDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics setDeletionRef(String compDefUri, long refTopicId) {
+        return _updateOne(compDefUri, mf.newTopicDeletionModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics setDeletionRef(String compDefUri, String refTopicUri) {
+        return _updateOne(compDefUri, mf.newTopicDeletionModel(refTopicUri));
     }
 
     // --- Multiple-valued Childs ---
 
     @Override
-    public ChildTopics add(String assocDefUri, TopicModel value) {
-        return _updateMany(assocDefUri, mf.newRelatedTopicModel(value));
+    public ChildTopics add(String compDefUri, TopicModel value) {
+        return _updateMany(compDefUri, mf.newRelatedTopicModel(value));
     }
 
     // ---
 
     @Override
-    public ChildTopics add(String assocDefUri, Object value) {
-        return _updateMany(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
+    public ChildTopics add(String compDefUri, Object value) {
+        return _updateMany(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
     }
 
     @Override
-    public ChildTopics add(String assocDefUri, ChildTopicsModel value) {
-        return _updateMany(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), value));
-    }
-
-    // ---
-
-    @Override
-    public ChildTopics addRef(String assocDefUri, long refTopicId) {
-        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics addRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
-    }
-
-    @Override
-    public ChildTopics addRef(String assocDefUri, String refTopicUri) {
-        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
-    }
-
-    @Override
-    public ChildTopics addRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    public ChildTopics add(String compDefUri, ChildTopicsModel value) {
+        return _updateMany(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), value));
     }
 
     // ---
 
     @Override
-    public ChildTopics addDeletionRef(String assocDefUri, long refTopicId) {
-        return _updateMany(assocDefUri, mf.newTopicDeletionModel(refTopicId));
+    public ChildTopics addRef(String compDefUri, long refTopicId) {
+        return _updateMany(compDefUri, mf.newTopicReferenceModel(refTopicId));
     }
 
     @Override
-    public ChildTopics addDeletionRef(String assocDefUri, String refTopicUri) {
-        return _updateMany(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
+    public ChildTopics addRef(String compDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(compDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
+    public ChildTopics addRef(String compDefUri, String refTopicUri) {
+        return _updateMany(compDefUri, mf.newTopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics addRef(String compDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(compDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics addDeletionRef(String compDefUri, long refTopicId) {
+        return _updateMany(compDefUri, mf.newTopicDeletionModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics addDeletionRef(String compDefUri, String refTopicUri) {
+        return _updateMany(compDefUri, mf.newTopicDeletionModel(refTopicUri));
     }
 
 
@@ -305,8 +305,8 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    boolean has(String assocDefUri) {
-        return model.has(assocDefUri);
+    boolean has(String compDefUri) {
+        return model.has(compDefUri);
     }
 
     int size() {
@@ -325,13 +325,13 @@ class ChildTopicsImpl implements ChildTopics {
     // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dmx-test). ### still true?
 
-    private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
+    private ChildTopics _updateOne(String compDefUri, RelatedTopicModel newChildTopic) {
+        parent.updateChildTopics(mf.newChildTopicsModel().put(compDefUri, newChildTopic));
         return this;
     }
 
-    private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
+    private ChildTopics _updateMany(String compDefUri, RelatedTopicModel newChildTopic) {
+        parent.updateChildTopics(mf.newChildTopicsModel().add(compDefUri, newChildTopic));
         return this;
     }
 
@@ -340,31 +340,31 @@ class ChildTopicsImpl implements ChildTopics {
     /**
      * Loads the child topics for the given assoc def, provided they are not loaded already.
      */
-    private void loadChildTopics(String assocDefUri) {
-        parent.loadChildTopics(assocDefUri, false);       // deep=false, FIXME?
+    private void loadChildTopics(String compDefUri) {
+        parent.loadChildTopics(compDefUri, false);       // deep=false, FIXME?
     }
 
 
 
     // === Instantiation ===
 
-    private RelatedTopic _getTopic(String assocDefUri) {
-        return instantiate(model.getTopic(assocDefUri));
+    private RelatedTopic _getTopic(String compDefUri) {
+        return instantiate(model.getTopic(compDefUri));
     }
 
-    private RelatedTopic _getTopicOrNull(String assocDefUri) {
-        RelatedTopicModel topic = model.getTopicOrNull(assocDefUri);
+    private RelatedTopic _getTopicOrNull(String compDefUri) {
+        RelatedTopicModel topic = model.getTopicOrNull(compDefUri);
         return topic != null ? instantiate(topic) : null;
     }
 
     // ---
 
-    private List<RelatedTopic> _getTopics(String assocDefUri) {
-        return instantiate(model.getTopics(assocDefUri));
+    private List<RelatedTopic> _getTopics(String compDefUri) {
+        return instantiate(model.getTopics(compDefUri));
     }
 
-    private List<RelatedTopic> _getTopicsOrNull(String assocDefUri) {
-        List<? extends RelatedTopicModel> topics = model.getTopicsOrNull(assocDefUri);
+    private List<RelatedTopic> _getTopicsOrNull(String compDefUri) {
+        List<? extends RelatedTopicModel> topics = model.getTopicsOrNull(compDefUri);
         return topics != null ? instantiate(topics) : null;
     }
 

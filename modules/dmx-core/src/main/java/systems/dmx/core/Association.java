@@ -98,7 +98,7 @@ public interface Association extends DMXObject {
     Association loadChildTopics();
 
     @Override
-    Association loadChildTopics(String assocDefUri);
+    Association loadChildTopics(String compDefUri);
 
     // ---
 

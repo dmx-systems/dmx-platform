@@ -255,16 +255,16 @@ public class ModelFactoryImpl implements ModelFactory {
             Map<String, Object> childTopics = new HashMap();
             Iterator<String> i = values.keys();
             while (i.hasNext()) {
-                String assocDefUri = i.next();
-                Object value = values.get(assocDefUri);
+                String compDefUri = i.next();
+                Object value = values.get(compDefUri);
                 if (!(value instanceof JSONArray)) {
-                    childTopics.put(assocDefUri, createChildTopicModel(assocDefUri, value));
+                    childTopics.put(compDefUri, createChildTopicModel(compDefUri, value));
                 } else {
                     JSONArray valueArray = (JSONArray) value;
                     List<RelatedTopicModel> topics = new ArrayList();
-                    childTopics.put(assocDefUri, topics);
+                    childTopics.put(compDefUri, topics);
                     for (int j = 0; j < valueArray.length(); j++) {
-                        topics.add(createChildTopicModel(assocDefUri, valueArray.get(j)));
+                        topics.add(createChildTopicModel(compDefUri, valueArray.get(j)));
                     }
                 }
             }
@@ -275,12 +275,12 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public String childTypeUri(String assocDefUri) {
-        return assocDefUri.split("#")[0];
+    public String childTypeUri(String compDefUri) {
+        return compDefUri.split("#")[0];
     }
 
-    private String assocTypeUri(String assocDefUri) {
-        String[] s = assocDefUri.split("#");
+    private String assocTypeUri(String compDefUri) {
+        String[] s = compDefUri.split("#");
         return s.length == 2 ? s[1] : "dmx.core.composition";
     }
 
@@ -293,8 +293,8 @@ public class ModelFactoryImpl implements ModelFactory {
      * 1) canonic format -- contains entire topic models.
      * 2) simplified format -- contains the topic value only (simple or composite).
      */
-    private RelatedTopicModel createChildTopicModel(String assocDefUri, Object value) throws JSONException {
-        String childTypeUri = childTypeUri(assocDefUri);
+    private RelatedTopicModel createChildTopicModel(String compDefUri, Object value) throws JSONException {
+        String childTypeUri = childTypeUri(compDefUri);
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for mandatory topic properties
@@ -303,7 +303,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 AssociationModel relatingAssoc = null;
                 if (val.has("assoc")) {
                     JSONObject assoc = val.getJSONObject("assoc");
-                    initTypeUri(assoc, assocTypeUri(assocDefUri));
+                    initTypeUri(assoc, assocTypeUri(compDefUri));
                     relatingAssoc = newAssociationModel(assoc);
                 }
                 if (val.has("value")) {

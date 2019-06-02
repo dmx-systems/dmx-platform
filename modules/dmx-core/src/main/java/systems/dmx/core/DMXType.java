@@ -24,9 +24,9 @@ public interface DMXType extends Topic, Iterable<String> {
     // TODO: drop it? We're Iterable meanwhile
     Collection<CompDef> getCompDefs();
 
-    CompDef getCompDef(String assocDefUri);
+    CompDef getCompDef(String compDefUri);
 
-    boolean hasCompDef(String assocDefUri);
+    boolean hasCompDef(String compDefUri);
 
     DMXType addCompDef(CompDefModel assocDef);
 
@@ -36,7 +36,7 @@ public interface DMXType extends Topic, Iterable<String> {
      */
     DMXType addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri);
 
-    DMXType removeCompDef(String assocDefUri);
+    DMXType removeCompDef(String compDefUri);
 
 
 

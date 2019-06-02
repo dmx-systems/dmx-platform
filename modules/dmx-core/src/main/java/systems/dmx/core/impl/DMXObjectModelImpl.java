@@ -528,12 +528,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * To load facet values use {@link #loadChildTopics(CompDefModel, boolean)} and pass the facet type's
      * assoc def.
      */
-    final DMXObjectModel loadChildTopics(String assocDefUri, boolean deep) {
+    final DMXObjectModel loadChildTopics(String compDefUri, boolean deep) {
         try {
-            return loadChildTopics(getCompDef(assocDefUri), deep);
+            return loadChildTopics(getCompDef(compDefUri), deep);
         } catch (Exception e) {
-            throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
-                e);
+            throw new RuntimeException("Loading \"" + compDefUri + "\" child topics of " + objectInfo() + " failed", e);
         }
     }
 
@@ -549,9 +548,9 @@ class DMXObjectModelImpl implements DMXObjectModel {
      *                      type definition. It may originate from a facet type as well.
      */
     final DMXObjectModel loadChildTopics(CompDefModel assocDef, boolean deep) {
-        String assocDefUri = assocDef.getCompDefUri();
-        if (!childTopics.has(assocDefUri)) {
-            logger.fine("### Loading \"" + assocDefUri + "\" child topics of " + objectInfo());
+        String compDefUri = assocDef.getCompDefUri();
+        if (!childTopics.has(compDefUri)) {
+            logger.fine("### Loading \"" + compDefUri + "\" child topics of " + objectInfo());
             new ChildTopicsFetcher(pl).fetch(this, assocDef, deep);
         }
         return this;
@@ -625,8 +624,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // === Helper ===
 
     // Note: doesn't work for facets
-    private CompDefModel getCompDef(String assocDefUri) {
-        return getType().getCompDef(assocDefUri);
+    private CompDefModel getCompDef(String compDefUri) {
+        return getType().getCompDef(compDefUri);
     }
 
     // ### TODO: drop it?

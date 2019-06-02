@@ -54,22 +54,22 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // === Accessors ===
 
     @Override
-    public final RelatedTopicModelImpl getTopic(String assocDefUri) {
-        RelatedTopicModelImpl topic = getTopicOrNull(assocDefUri);
+    public final RelatedTopicModelImpl getTopic(String compDefUri) {
+        RelatedTopicModelImpl topic = getTopicOrNull(compDefUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Assoc Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topic;
     }
 
     @Override
-    public final RelatedTopicModelImpl getTopicOrNull(String assocDefUri) {
+    public final RelatedTopicModelImpl getTopicOrNull(String compDefUri) {
         try {
-            return (RelatedTopicModelImpl) childTopics.get(assocDefUri);
+            return (RelatedTopicModelImpl) childTopics.get(compDefUri);
         } catch (ClassCastException e) {
-            throwInvalidSingleAccess(assocDefUri, e);
+            throwInvalidSingleAccess(compDefUri, e);
             return null;    // never reached
         }
     }
@@ -77,22 +77,22 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final List<RelatedTopicModelImpl> getTopics(String assocDefUri) {
-        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
+    public final List<RelatedTopicModelImpl> getTopics(String compDefUri) {
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(compDefUri);
         // error check
         if (topics == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Assoc Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topics;
     }
 
     @Override
-    public final List<RelatedTopicModelImpl> getTopicsOrNull(String assocDefUri) {
+    public final List<RelatedTopicModelImpl> getTopicsOrNull(String compDefUri) {
         try {
-            return (List<RelatedTopicModelImpl>) childTopics.get(assocDefUri);
+            return (List<RelatedTopicModelImpl>) childTopics.get(compDefUri);
         } catch (ClassCastException e) {
-            throwInvalidMultiAccess(assocDefUri, e);
+            throwInvalidMultiAccess(compDefUri, e);
             return null;    // never reached
         }
     }
@@ -100,8 +100,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final Object get(String assocDefUri) {
-        return childTopics.get(assocDefUri);
+    public final Object get(String compDefUri) {
+        return childTopics.get(compDefUri);
     }
 
 
@@ -109,91 +109,91 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // === Convenience Accessors ===
 
     @Override
-    public final String getString(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().toString();
+    public final String getString(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().toString();
     }
 
     @Override
-    public final String getString(String assocDefUri, String defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final String getString(String compDefUri, String defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final int getInt(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().intValue();
+    public final int getInt(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().intValue();
     }
 
     @Override
-    public final int getInt(String assocDefUri, int defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final int getInt(String compDefUri, int defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final long getLong(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().longValue();
+    public final long getLong(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().longValue();
     }
 
     @Override
-    public final long getLong(String assocDefUri, long defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final long getLong(String compDefUri, long defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final double getDouble(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().doubleValue();
+    public final double getDouble(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().doubleValue();
     }
 
     @Override
-    public final double getDouble(String assocDefUri, double defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final double getDouble(String compDefUri, double defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final boolean getBoolean(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().booleanValue();
+    public final boolean getBoolean(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().booleanValue();
     }
 
     @Override
-    public final boolean getBoolean(String assocDefUri, boolean defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final boolean getBoolean(String compDefUri, boolean defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final Object getObject(String assocDefUri) {
-        return getTopic(assocDefUri).getSimpleValue().value();
+    public final Object getObject(String compDefUri) {
+        return getTopic(compDefUri).getSimpleValue().value();
     }
 
     @Override
-    public final Object getObject(String assocDefUri, Object defaultValue) {
-        TopicModel topic = getTopicOrNull(assocDefUri);
+    public final Object getObject(String compDefUri, Object defaultValue) {
+        TopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
     // ---
 
     @Override
-    public final ChildTopicsModel getChildTopicsModel(String assocDefUri) {
-        return getTopic(assocDefUri).getChildTopicsModel();
+    public final ChildTopicsModel getChildTopicsModel(String compDefUri) {
+        return getTopic(compDefUri).getChildTopicsModel();
     }
 
     @Override
-    public final ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
-        RelatedTopicModel topic = getTopicOrNull(assocDefUri);
+    public final ChildTopicsModel getChildTopicsModel(String compDefUri, ChildTopicsModel defaultValue) {
+        RelatedTopicModel topic = getTopicOrNull(compDefUri);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }
 
@@ -206,86 +206,86 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // --- Single-valued Childs ---
 
     @Override
-    public final ChildTopicsModel put(String assocDefUri, RelatedTopicModel value) {
+    public final ChildTopicsModel put(String compDefUri, RelatedTopicModel value) {
         try {
             // check argument
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put null in a ChildTopicsModel");
             }
             //
-            childTopics.put(assocDefUri, value);
+            childTopics.put(compDefUri, value);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (assocDefUri=\"" +
-                assocDefUri + "\", value=" + value + ")", e);
+            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (compDefUri=\"" +
+                compDefUri + "\", value=" + value + ")", e);
         }
     }
 
     @Override
-    public final ChildTopicsModel put(String assocDefUri, TopicModel value) {
-        return put(assocDefUri, mf.newRelatedTopicModel(value));
+    public final ChildTopicsModel put(String compDefUri, TopicModel value) {
+        return put(compDefUri, mf.newRelatedTopicModel(value));
     }
 
     @Override
-    public final ChildTopicsModel put(String assocDefUri, Object value) {
+    public final ChildTopicsModel put(String compDefUri, Object value) {
         try {
-            return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
+            return put(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (assocDefUri=\"" +
-                assocDefUri + "\", value=" + value + ")", e);
+            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (compDefUri=\"" + compDefUri +
+                "\", value=" + value + ")", e);
         }
     }
 
     @Override
-    public final ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
-        return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), value));
+    public final ChildTopicsModel put(String compDefUri, ChildTopicsModel value) {
+        return put(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), value));
     }
 
     // ---
 
     @Override
-    public final ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
-        put(assocDefUri, mf.newTopicReferenceModel(refTopicId));
+    public final ChildTopicsModel putRef(String compDefUri, long refTopicId) {
+        put(compDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
     @Override
-    public final ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
-        put(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
-        return this;
-    }
-
-    // ---
-
-    @Override
-    public final ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
-        put(assocDefUri, mf.newTopicDeletionModel(refTopicId));
-        return this;
-    }
-
-    @Override
-    public final ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
-        put(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
+    public final ChildTopicsModel putRef(String compDefUri, String refTopicUri) {
+        put(compDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
 
     // ---
 
     @Override
-    public final ChildTopicsModel remove(String assocDefUri) {
-        childTopics.remove(assocDefUri);    // ### TODO: throw if not in map?
+    public final ChildTopicsModel putDeletionRef(String compDefUri, long refTopicId) {
+        put(compDefUri, mf.newTopicDeletionModel(refTopicId));
+        return this;
+    }
+
+    @Override
+    public final ChildTopicsModel putDeletionRef(String compDefUri, String refTopicUri) {
+        put(compDefUri, mf.newTopicDeletionModel(refTopicUri));
+        return this;
+    }
+
+    // ---
+
+    @Override
+    public final ChildTopicsModel remove(String compDefUri) {
+        childTopics.remove(compDefUri);    // ### TODO: throw if not in map?
         return this;
     }
 
     // --- Multiple-valued Childs ---
 
     @Override
-    public final ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
-        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
+    public final ChildTopicsModel add(String compDefUri, RelatedTopicModel value) {
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(compDefUri);
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
-            childTopics.put(assocDefUri, topics);
+            childTopics.put(compDefUri, topics);
         }
         //
         topics.add((RelatedTopicModelImpl) value);
@@ -294,24 +294,24 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public final ChildTopicsModel add(String assocDefUri, TopicModel value) {
-        return add(assocDefUri, mf.newRelatedTopicModel(value));
+    public final ChildTopicsModel add(String compDefUri, TopicModel value) {
+        return add(compDefUri, mf.newRelatedTopicModel(value));
     }
 
     @Override
-    public final ChildTopicsModel add(String assocDefUri, Object value) {
-        return add(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
+    public final ChildTopicsModel add(String compDefUri, Object value) {
+        return add(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
     }
 
     @Override
-    public final ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values) {
-        childTopics.put(assocDefUri, values);
+    public final ChildTopicsModel put(String compDefUri, List<RelatedTopicModel> values) {
+        childTopics.put(compDefUri, values);
         return this;
     }
 
     @Override
-    public final ChildTopicsModel remove(String assocDefUri, TopicModel value) {
-        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
+    public final ChildTopicsModel remove(String compDefUri, TopicModel value) {
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(compDefUri);
         if (topics != null) {
             topics.remove(value);
         }
@@ -321,28 +321,28 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
-        add(assocDefUri, mf.newTopicReferenceModel(refTopicId));
+    public final ChildTopicsModel addRef(String compDefUri, long refTopicId) {
+        add(compDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
     @Override
-    public final ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
-        add(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
+    public final ChildTopicsModel addRef(String compDefUri, String refTopicUri) {
+        add(compDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
 
     // ---
 
     @Override
-    public final ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
-        add(assocDefUri, mf.newTopicDeletionModel(refTopicId));
+    public final ChildTopicsModel addDeletionRef(String compDefUri, long refTopicId) {
+        add(compDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
     @Override
-    public final ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
-        add(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
+    public final ChildTopicsModel addDeletionRef(String compDefUri, String refTopicUri) {
+        add(compDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
 
@@ -366,12 +366,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     public final JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
-            for (String assocDefUri : this) {
-                Object value = get(assocDefUri);
+            for (String compDefUri : this) {
+                Object value = get(compDefUri);
                 if (value instanceof RelatedTopicModel) {
-                    json.put(assocDefUri, ((RelatedTopicModel) value).toJSON());
+                    json.put(compDefUri, ((RelatedTopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(assocDefUri, DMXUtils.toJSONArray((List<RelatedTopicModel>) value));
+                    json.put(compDefUri, DMXUtils.toJSONArray((List<RelatedTopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
                 }
@@ -393,14 +393,14 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     @Override
     public final ChildTopicsModel clone() {
         ChildTopicsModel clone = mf.newChildTopicsModel();
-        for (String assocDefUri : this) {
-            Object value = get(assocDefUri);
+        for (String compDefUri : this) {
+            Object value = get(compDefUri);
             if (value instanceof RelatedTopicModel) {
                 RelatedTopicModel model = (RelatedTopicModel) value;
-                clone.put(assocDefUri, model.clone());
+                clone.put(compDefUri, model.clone());
             } else if (value instanceof List) {
                 for (RelatedTopicModel model : (List<RelatedTopicModel>) value) {
-                    clone.add(assocDefUri, model.clone());
+                    clone.add(compDefUri, model.clone());
                 }
             } else {
                 throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
@@ -451,8 +451,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     /**
      * Checks if a child is contained in this ChildTopicsModel.
      */
-    boolean has(String assocDefUri) {
-        return childTopics.containsKey(assocDefUri);
+    boolean has(String compDefUri) {
+        return childTopics.containsKey(compDefUri);
     }
 
     /**
@@ -497,19 +497,19 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
+    private void throwInvalidSingleAccess(String compDefUri, ClassCastException e) {
         if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but is defined as multi", e);
+            throw new RuntimeException("\"" + compDefUri + "\" is accessed as single but is defined as multi", e);
         } else {
-            throw new RuntimeException("Accessing \"" + assocDefUri + "\" failed", e);
+            throw new RuntimeException("Accessing \"" + compDefUri + "\" failed", e);
         }
     }
 
-    private void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
+    private void throwInvalidMultiAccess(String compDefUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but is defined as single", e);
+            throw new RuntimeException("\"" + compDefUri + "\" is accessed as multi but is defined as single", e);
         } else {
-            throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
+            throw new RuntimeException("Accessing \"" + compDefUri + " failed", e);
         }
     }
 }

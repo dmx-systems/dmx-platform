@@ -38,19 +38,19 @@ class ChildTopicsFetcher {
         try {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
-            String assocDefUri    = assocDef.getCompDefUri();
+            String compDefUri     = assocDef.getCompDefUri();
             if (cardinalityUri.equals("dmx.core.one")) {
                 RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), assocDef);
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
-                    childTopics.put(assocDefUri, childTopic);
+                    childTopics.put(compDefUri, childTopic);
                     if (deep) {
                         fetchChildTopics(childTopic, deep);    // recursion
                     }
                 }
             } else if (cardinalityUri.equals("dmx.core.many")) {
                 for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), assocDef)) {
-                    childTopics.add(assocDefUri, childTopic);
+                    childTopics.add(compDefUri, childTopic);
                     if (deep) {
                         fetchChildTopics(childTopic, deep);    // recursion
                     }

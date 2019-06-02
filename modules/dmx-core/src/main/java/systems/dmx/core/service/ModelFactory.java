@@ -101,7 +101,7 @@ public interface ModelFactory {
     /**
      * Utility.
      */
-    String childTypeUri(String assocDefUri);
+    String childTypeUri(String compDefUri);
 
 
 
@@ -253,7 +253,7 @@ public interface ModelFactory {
 
     // === Facets ===
 
-    FacetValueModel newFacetValueModel(String childTypeUri);    // TODO: rename param to "assocDefUri"?
+    FacetValueModel newFacetValueModel(String childTypeUri);    // TODO: rename param to "compDefUri"?
 
     FacetValueModel newFacetValueModel(JSONObject facetValue);
 }

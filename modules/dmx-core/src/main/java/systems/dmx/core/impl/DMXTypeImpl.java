@@ -54,13 +54,13 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     }
 
     @Override
-    public final CompDef getCompDef(String assocDefUri) {
-        return getModel().getCompDef(assocDefUri).instantiate();
+    public final CompDef getCompDef(String compDefUri) {
+        return getModel().getCompDef(compDefUri).instantiate();
     }
 
     @Override
-    public final boolean hasCompDef(String assocDefUri) {
-        return getModel().hasCompDef(assocDefUri);
+    public final boolean hasCompDef(String compDefUri) {
+        return getModel().hasCompDef(compDefUri);
     }
 
     @Override
@@ -77,8 +77,8 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     }
 
     @Override
-    public final DMXType removeCompDef(String assocDefUri) {
-        _getModel()._removeCompDef(assocDefUri);
+    public final DMXType removeCompDef(String compDefUri) {
+        _getModel()._removeCompDef(compDefUri);
         return this;
     }
 

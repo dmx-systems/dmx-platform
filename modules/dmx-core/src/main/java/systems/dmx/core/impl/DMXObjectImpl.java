@@ -141,8 +141,8 @@ abstract class DMXObjectImpl implements DMXObject {
     }
 
     @Override
-    public DMXObject loadChildTopics(String assocDefUri) {
-        model.loadChildTopics(assocDefUri, true);   // deep=true
+    public DMXObject loadChildTopics(String compDefUri) {
+        model.loadChildTopics(compDefUri, true);   // deep=true
         return this;
     }
 

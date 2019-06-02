@@ -22,13 +22,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Accesses a single-valued child.
      * Throws if there is no such child.
      */
-    RelatedTopicModel getTopic(String assocDefUri);
+    RelatedTopicModel getTopic(String compDefUri);
 
     /**
      * Accesses a single-valued child.
      * Returns <code>null</code> if there is no such child.
      */
-    RelatedTopicModel getTopicOrNull(String assocDefUri);
+    RelatedTopicModel getTopicOrNull(String compDefUri);
 
     // ---
 
@@ -36,14 +36,14 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Accesses a multiple-valued child.
      * Throws if there is no such child. ### TODO: return empty list instead
      */
-    List<? extends RelatedTopicModel> getTopics(String assocDefUri);
+    List<? extends RelatedTopicModel> getTopics(String compDefUri);
 
     /**
      * Accesses a multiple-valued child.
      * Returns <code>null</code> if there is no such child.
      * ### TODO: drop this method
      */
-    List<? extends RelatedTopicModel> getTopicsOrNull(String assocDefUri);
+    List<? extends RelatedTopicModel> getTopicsOrNull(String compDefUri);
 
     // ---
 
@@ -53,7 +53,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  A RelatedTopicModel or List<RelatedTopicModel>, or null if there is no such child.
      */
-    Object get(String assocDefUri);
+    Object get(String compDefUri);
 
 
 
@@ -65,13 +65,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    String getString(String assocDefUri);
+    String getString(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    String getString(String assocDefUri, String defaultValue);
+    String getString(String compDefUri, String defaultValue);
 
     // ---
 
@@ -79,13 +79,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    int getInt(String assocDefUri);
+    int getInt(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    int getInt(String assocDefUri, int defaultValue);
+    int getInt(String compDefUri, int defaultValue);
 
     // ---
 
@@ -93,13 +93,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    long getLong(String assocDefUri);
+    long getLong(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    long getLong(String assocDefUri, long defaultValue);
+    long getLong(String compDefUri, long defaultValue);
 
     // ---
 
@@ -107,13 +107,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    double getDouble(String assocDefUri);
+    double getDouble(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    double getDouble(String assocDefUri, double defaultValue);
+    double getDouble(String compDefUri, double defaultValue);
 
     // ---
 
@@ -121,13 +121,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    boolean getBoolean(String assocDefUri);
+    boolean getBoolean(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    boolean getBoolean(String assocDefUri, boolean defaultValue);
+    boolean getBoolean(String compDefUri, boolean defaultValue);
 
     // ---
 
@@ -135,13 +135,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    Object getObject(String assocDefUri);
+    Object getObject(String compDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    Object getObject(String assocDefUri, Object defaultValue);
+    Object getObject(String compDefUri, Object defaultValue);
 
     // ---
 
@@ -149,13 +149,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    ChildTopicsModel getChildTopicsModel(String assocDefUri);
+    ChildTopicsModel getChildTopicsModel(String compDefUri);
 
     /**
      * Convenience accessor for the *composite* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue);
+    ChildTopicsModel getChildTopicsModel(String compDefUri, ChildTopicsModel defaultValue);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
@@ -171,9 +171,9 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel put(String assocDefUri, RelatedTopicModel value);
+    ChildTopicsModel put(String compDefUri, RelatedTopicModel value);
 
-    ChildTopicsModel put(String assocDefUri, TopicModel value);
+    ChildTopicsModel put(String compDefUri, TopicModel value);
 
     /**
      * Convenience method to put a *simple* value in a single-valued child.
@@ -184,7 +184,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    ChildTopicsModel put(String assocDefUri, Object value);
+    ChildTopicsModel put(String compDefUri, Object value);
 
     /**
      * Convenience method to put a *composite* value in a single-valued child.
@@ -192,7 +192,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    ChildTopicsModel put(String assocDefUri, ChildTopicsModel value);
+    ChildTopicsModel put(String compDefUri, ChildTopicsModel value);
 
     // ---
 
@@ -200,13 +200,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a by-ID topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    ChildTopicsModel putRef(String assocDefUri, long refTopicId);
+    ChildTopicsModel putRef(String compDefUri, long refTopicId);
 
     /**
      * Puts a by-URI topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    ChildTopicsModel putRef(String assocDefUri, String refTopicUri);
+    ChildTopicsModel putRef(String compDefUri, String refTopicUri);
 
     // ---
 
@@ -214,29 +214,29 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a by-ID topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId);
+    ChildTopicsModel putDeletionRef(String compDefUri, long refTopicId);
 
     /**
      * Puts a by-URI topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri);
+    ChildTopicsModel putDeletionRef(String compDefUri, String refTopicUri);
 
     // ---
 
     /**
      * Removes a single-valued child.
      */
-    ChildTopicsModel remove(String assocDefUri);
+    ChildTopicsModel remove(String compDefUri);
 
     // --- Multiple-valued Childs ---
 
     /**
      * Adds a value to a multiple-valued child.
      */
-    ChildTopicsModel add(String assocDefUri, RelatedTopicModel value);
+    ChildTopicsModel add(String compDefUri, RelatedTopicModel value);
 
-    ChildTopicsModel add(String assocDefUri, TopicModel value);
+    ChildTopicsModel add(String compDefUri, TopicModel value);
 
     /**
      * Convenience method to add a *simple* value to a multiple-valued child.
@@ -246,42 +246,42 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    ChildTopicsModel add(String assocDefUri, Object value);
+    ChildTopicsModel add(String compDefUri, Object value);
 
     /**
      * Sets the values of a multiple-valued child.
      * Existing values are overwritten.
      */
-    ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values);
+    ChildTopicsModel put(String compDefUri, List<RelatedTopicModel> values);
 
     /**
      * Removes a value from a multiple-valued child.
      */
-    ChildTopicsModel remove(String assocDefUri, TopicModel value);
+    ChildTopicsModel remove(String compDefUri, TopicModel value);
 
     // ---
 
     /**
      * Adds a by-ID topic reference to a multiple-valued child.
      */
-    ChildTopicsModel addRef(String assocDefUri, long refTopicId);
+    ChildTopicsModel addRef(String compDefUri, long refTopicId);
 
     /**
      * Adds a by-URI topic reference to a multiple-valued child.
      */
-    ChildTopicsModel addRef(String assocDefUri, String refTopicUri);
+    ChildTopicsModel addRef(String compDefUri, String refTopicUri);
 
     // ---
 
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      */
-    ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId);
+    ChildTopicsModel addDeletionRef(String compDefUri, long refTopicId);
 
     /**
      * Adds a by-URI topic deletion reference to a multiple-valued child.
      */
-    ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri);
+    ChildTopicsModel addDeletionRef(String compDefUri, String refTopicUri);
 
 
 

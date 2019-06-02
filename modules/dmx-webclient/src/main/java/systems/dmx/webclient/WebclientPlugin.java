@@ -196,8 +196,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // type
         setViewConfigLabel(type.getViewConfig());
         // assoc defs
-        for (String assocDefUri : type) {
-            setViewConfigLabel(type.getCompDef(assocDefUri).getViewConfig());
+        for (String compDefUri : type) {
+            setViewConfigLabel(type.getCompDef(compDefUri).getViewConfig());
         }
     }
 
@@ -223,8 +223,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // type
         addDefaultViewConfigTopic(typeModel.getViewConfig());
         // assoc defs
-        for (String assocDefUri : typeModel) {
-            addDefaultViewConfigTopic(typeModel.getCompDef(assocDefUri).getViewConfig());
+        for (String compDefUri : typeModel) {
+            addDefaultViewConfigTopic(typeModel.getCompDef(compDefUri).getViewConfig());
         }
     }
 

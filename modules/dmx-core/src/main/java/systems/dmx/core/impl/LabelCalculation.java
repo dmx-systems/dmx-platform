@@ -44,9 +44,9 @@ class LabelCalculation {
     void calculate() {
         try {
             StringBuilder builder = new StringBuilder();
-            for (String assocDefUri : labelCompDefUris) {
-                comp.loadChildTopics(assocDefUri, false);   // deep=false, FIXME?
-                appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
+            for (String compDefUri : labelCompDefUris) {
+                comp.loadChildTopics(compDefUri, false);   // deep=false, FIXME?
+                appendLabel(calculateChildLabel(compDefUri), builder, LABEL_CHILD_SEPARATOR);
             }
             //
             comp._updateSimpleValue(new SimpleValue(builder.toString()));
@@ -58,8 +58,8 @@ class LabelCalculation {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private String calculateChildLabel(String assocDefUri) {
-        Object value = comp.getChildTopicsModel().get(assocDefUri);
+    private String calculateChildLabel(String compDefUri) {
+        Object value = comp.getChildTopicsModel().get(compDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return "";

@@ -38,7 +38,7 @@ public interface Topic extends DMXObject {
     Topic loadChildTopics();
 
     @Override
-    Topic loadChildTopics(String assocDefUri);
+    Topic loadChildTopics(String compDefUri);
 
     // ---
 
