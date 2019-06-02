@@ -33,7 +33,7 @@
       "value":       "Enabled Sharing Modes",
       "uri":         "dmx.workspaces.enabled_sharing_modes",
       "dataTypeUri": "dmx.core.value",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.workspaces.private.enabled",
           "childCardinalityUri": "dmx.core.one",

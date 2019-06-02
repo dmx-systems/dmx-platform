@@ -20,7 +20,7 @@
             "value":       "Date",
             "uri":         "dmx.datetime.date",
             "dataTypeUri": "dmx.core.value",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.datetime.month",
                     "childCardinalityUri": "dmx.core.one",
@@ -53,7 +53,7 @@
             "value":       "Time",
             "uri":         "dmx.datetime.time",
             "dataTypeUri": "dmx.core.value",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.datetime.hour",
                     "childCardinalityUri": "dmx.core.one",
@@ -71,7 +71,7 @@
             "value":       "Date/Time",
             "uri":         "dmx.datetime",
             "dataTypeUri": "dmx.core.value",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.datetime.date",
                     "childCardinalityUri": "dmx.core.one",

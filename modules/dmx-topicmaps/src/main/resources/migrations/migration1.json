@@ -27,7 +27,7 @@
       "value":       "Topicmap",
       "uri":         "dmx.topicmaps.topicmap",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.topicmaps.topicmap_name",
           "childCardinalityUri": "dmx.core.one"

@@ -33,7 +33,7 @@
       "value":       "File",
       "uri":         "dmx.files.file",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.files.file_content",
           "childCardinalityUri": "dmx.core.one"
@@ -80,7 +80,7 @@
       "value":       "Folder",
       "uri":         "dmx.files.folder",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.files.folder_name",
           "childCardinalityUri": "dmx.core.one"

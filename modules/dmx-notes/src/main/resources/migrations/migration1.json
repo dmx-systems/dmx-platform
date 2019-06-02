@@ -14,7 +14,7 @@
             "value":       "Note",
             "uri":         "dmx.notes.note",
             "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.notes.title",
                     "childCardinalityUri": "dmx.core.one"

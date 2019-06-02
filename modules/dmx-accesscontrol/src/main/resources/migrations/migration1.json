@@ -18,7 +18,7 @@
       "value":       "User Account",
       "uri":         "dmx.accesscontrol.user_account",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.accesscontrol.username",
           "childCardinalityUri": "dmx.core.one"

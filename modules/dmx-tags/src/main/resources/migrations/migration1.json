@@ -9,7 +9,7 @@
       "value":       "Tag",
       "uri":         "dmx.tags.tag",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.tags.tag_name",
           "childCardinalityUri": "dmx.core.one",

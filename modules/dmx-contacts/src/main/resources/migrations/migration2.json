@@ -14,7 +14,7 @@
       "value":       "Organization Involvement",
       "uri":         "dmx.contacts.organization_involvement",
       "dataTypeUri": "dmx.core.composite",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.contacts.organizational_role",
           "childCardinalityUri": "dmx.core.one",

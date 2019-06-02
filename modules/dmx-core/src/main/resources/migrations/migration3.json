@@ -19,7 +19,7 @@
             "value":       "Plugin",
             "uri":         "dmx.core.plugin",
             "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.core.plugin_name",
                     "childCardinalityUri": "dmx.core.one"

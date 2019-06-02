@@ -18,7 +18,7 @@
       "value":       "Event",
       "uri":         "dmx.events.event",
       "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.events.event_name",
           "childCardinalityUri": "dmx.core.one",
@@ -69,7 +69,7 @@
       "value":       "Event Involvement",
       "uri":         "dmx.events.event_involvement",
       "dataTypeUri": "dmx.core.composite",
-      "assocDefs": [
+      "compDefs": [
         {
           "childTypeUri":        "dmx.events.role",
           "childCardinalityUri": "dmx.core.one",

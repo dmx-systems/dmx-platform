@@ -22,7 +22,7 @@
             "value":       "Composition Definition",
             "uri":         "dmx.core.composition_def",
             "dataTypeUri": "dmx.core.composite",
-            "assocDefs": [
+            "compDefs": [
                 {
                     "childTypeUri":        "dmx.core.cardinality",
                     "childCardinalityUri": "dmx.core.one",
