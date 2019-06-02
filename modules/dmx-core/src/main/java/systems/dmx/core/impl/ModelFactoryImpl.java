@@ -657,7 +657,7 @@ public class ModelFactoryImpl implements ModelFactory {
             for (int i = 0; i < assocDefs.length(); i++) {
                 JSONObject assocDef = assocDefs.getJSONObject(i)
                     .put("parentTypeUri", parentTypeUri);
-                _assocDefs.add(newAssociationDefinitionModel(assocDef));
+                _assocDefs.add(newCompDefModel(assocDef));
             }
         }
         return _assocDefs;
@@ -668,29 +668,25 @@ public class ModelFactoryImpl implements ModelFactory {
     // === CompDefModel ===
 
     @Override
-    public CompDefModelImpl newAssociationDefinitionModel(
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, null, false, false, parentTypeUri, childTypeUri,
-            childCardinalityUri, null);
+    public CompDefModelImpl newCompDefModel(String parentTypeUri, String childTypeUri,
+                                            String childCardinalityUri) {
+        return newCompDefModel(-1, null, null, false, false, parentTypeUri, childTypeUri, childCardinalityUri, null);
     }
 
     @Override
-    public CompDefModelImpl newAssociationDefinitionModel(
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfig) {
-        return newAssociationDefinitionModel(-1, null, null, false, false, parentTypeUri, childTypeUri,
-            childCardinalityUri, viewConfig);
+    public CompDefModelImpl newCompDefModel(String parentTypeUri, String childTypeUri,
+                                            String childCardinalityUri,
+                                            ViewConfigurationModel viewConfig) {
+        return newCompDefModel(-1, null, null, false, false, parentTypeUri, childTypeUri, childCardinalityUri,
+            viewConfig);
     }
 
     @Override
-    public CompDefModelImpl newAssociationDefinitionModel(
-                                                    String customAssocTypeUri,
-                                                    boolean isIdentityAttr, boolean includeInLabel,
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, customAssocTypeUri, isIdentityAttr, includeInLabel,
+    public CompDefModelImpl newCompDefModel(String customAssocTypeUri,
+                                            boolean isIdentityAttr, boolean includeInLabel,
+                                            String parentTypeUri, String childTypeUri,
+                                            String childCardinalityUri) {
+        return newCompDefModel(-1, null, customAssocTypeUri, isIdentityAttr, includeInLabel,
             parentTypeUri, childTypeUri, childCardinalityUri, null);
     }
 
@@ -699,12 +695,12 @@ public class ModelFactoryImpl implements ModelFactory {
      *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID). ### still true?
      */
     @Override
-    public CompDefModelImpl newAssociationDefinitionModel(AssociationModel assoc, ViewConfigurationModel viewConfig) {
+    public CompDefModelImpl newCompDefModel(AssociationModel assoc, ViewConfigurationModel viewConfig) {
         return new CompDefModelImpl((AssociationModelImpl) assoc, (ViewConfigurationModelImpl) viewConfig);
     }
 
     @Override
-    public CompDefModelImpl newAssociationDefinitionModel(JSONObject assocDef) {
+    public CompDefModelImpl newCompDefModel(JSONObject assocDef) {
         try {
             RoleModel role1 = parseRole1(assocDef);     // may be null
             RoleModel role2 = parseRole2(assocDef);     // may be null
@@ -729,11 +725,11 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
-    CompDefModelImpl newAssociationDefinitionModel(long id, String uri, String customAssocTypeUri,
-                                                   boolean isIdentityAttr, boolean includeInLabel,
-                                                   String parentTypeUri, String childTypeUri,
-                                                   String childCardinalityUri,
-                                                   ViewConfigurationModel viewConfig) {
+    CompDefModelImpl newCompDefModel(long id, String uri, String customAssocTypeUri,
+                                     boolean isIdentityAttr, boolean includeInLabel,
+                                     String parentTypeUri, String childTypeUri,
+                                     String childCardinalityUri,
+                                     ViewConfigurationModel viewConfig) {
         return new CompDefModelImpl(
             newAssociationModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
@@ -745,7 +741,7 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
-    CompDefModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
+    CompDefModelImpl newCompDefModel(ChildTopicsModel childTopics) {
         return new CompDefModelImpl(newAssociationModel(TYPE_COMP_DEF, childTopics));
     }
 

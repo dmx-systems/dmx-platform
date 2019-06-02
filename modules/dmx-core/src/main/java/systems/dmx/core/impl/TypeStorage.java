@@ -103,7 +103,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            List<CompDefModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<CompDefModel> assocDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
             TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, assocDefs, null);
@@ -134,7 +134,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            List<CompDefModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<CompDefModel> assocDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
             AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, assocDefs, null);
@@ -236,8 +236,8 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private List<CompDefModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
-        Map<Long, CompDefModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
+    private List<CompDefModel> fetchCompDefs(TopicModelImpl typeTopic) {
+        Map<Long, CompDefModel> assocDefs = fetchCompDefsUnsorted(typeTopic);
         List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (assocDefs.size() != sequence.size()) {
@@ -248,7 +248,7 @@ class TypeStorage {
         return sortAssocDefs(assocDefs, DMXUtils.idList(sequence));
     }
 
-    private Map<Long, CompDefModel> fetchAssociationDefinitionsUnsorted(TopicModelImpl typeTopic) {
+    private Map<Long, CompDefModel> fetchCompDefsUnsorted(TopicModelImpl typeTopic) {
         Map<Long, CompDefModel> assocDefs = new HashMap();
         //
         // 1) fetch child topic types
@@ -265,8 +265,8 @@ class TypeStorage {
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
-            CompDefModel assocDef = fetchAssociationDefinition(childType.getRelatingAssociation(),
-                typeTopic.getUri(), childType.getUri());
+            CompDefModel assocDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
+                childType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
         }
         return assocDefs;
@@ -283,8 +283,8 @@ class TypeStorage {
      *
      * @param   assoc   an assoc whose players are ref'd by-ID
      */
-    CompDefModelImpl newAssociationDefinitionModel(AssociationModelImpl assoc) {
-        return mf.newAssociationDefinitionModel(
+    CompDefModelImpl newCompDefModel(AssociationModelImpl assoc) {
+        return mf.newCompDefModel(
             addPlayerUris(assoc, fetchParentTypeTopic(assoc).uri, fetchChildTypeTopic(assoc).uri),
             mf.newViewConfigurationModel().addConfigTopic(
                 // FIXME: the Core must not know about the Webclient
@@ -314,8 +314,7 @@ class TypeStorage {
      *                  1) players are ref'd by-ID
      *                  2) childs are not retrieved
      */
-    private CompDefModel fetchAssociationDefinition(AssociationModelImpl assoc, String parentTypeUri,
-                                                                                              String childTypeUri) {
+    private CompDefModel fetchCompDef(AssociationModelImpl assoc, String parentTypeUri, String childTypeUri) {
         try {
             // 2 roles
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
@@ -339,7 +338,7 @@ class TypeStorage {
             if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
                 childTopics.put("dmx.core.include_in_label", includeInLabel);
             }
-            return mf.newAssociationDefinitionModel(assoc, null);   // viewConfig=null
+            return mf.newCompDefModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
                 "\", childTypeUri=\"" + childTypeUri + "\", " + assoc + ")", e);
@@ -399,12 +398,12 @@ class TypeStorage {
 
     private void storeAssocDefs(long typeId, Collection<CompDefModelImpl> assocDefs) {
         for (CompDefModelImpl assocDef : assocDefs) {
-            storeAssociationDefinition(assocDef);
+            storeCompDef(assocDef);
         }
         storeSequence(typeId, assocDefs);
     }
 
-    void storeAssociationDefinition(CompDefModelImpl assocDef) {
+    void storeCompDef(CompDefModelImpl assocDef) {
         try {
             // 1) create association
             pl.createAssociation(addPlayerIds(assocDef));

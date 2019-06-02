@@ -207,21 +207,17 @@ public interface ModelFactory {
 
     // === CompDefModel ===
 
-    CompDefModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
-                                                             String childCardinalityUri);
+    CompDefModel newCompDefModel(String parentTypeUri, String childTypeUri, String childCardinalityUri);
 
-    CompDefModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
-                                                             String childCardinalityUri,
-                                                             ViewConfigurationModel viewConfig);
+    CompDefModel newCompDefModel(String parentTypeUri, String childTypeUri, String childCardinalityUri,
+                                 ViewConfigurationModel viewConfig);
 
-    CompDefModel newAssociationDefinitionModel(String customAssocTypeUri,
-                                                             boolean isIdentityAttr, boolean includeInLabel,
-                                                             String parentTypeUri, String childTypeUri,
-                                                             String childCardinalityUri);
+    CompDefModel newCompDefModel(String customAssocTypeUri, boolean isIdentityAttr, boolean includeInLabel,
+                                 String parentTypeUri, String childTypeUri, String childCardinalityUri);
 
-    CompDefModel newAssociationDefinitionModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
+    CompDefModel newCompDefModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
 
-    CompDefModel newAssociationDefinitionModel(JSONObject assocDef);
+    CompDefModel newCompDefModel(JSONObject assocDef);
 
 
 

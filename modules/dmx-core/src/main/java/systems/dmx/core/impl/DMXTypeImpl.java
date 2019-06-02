@@ -71,7 +71,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     @Override
     public final DMXType addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri) {
         CompDefModelImpl _assocDef = (CompDefModelImpl) assocDef;
-        pl.typeStorage.storeAssociationDefinition(_assocDef);
+        pl.typeStorage.storeCompDef(_assocDef);
         _getModel()._addAssocDefBefore(_assocDef, beforeAssocDefUri);
         return this;
     }

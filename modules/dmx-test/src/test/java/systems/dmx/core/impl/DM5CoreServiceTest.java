@@ -252,7 +252,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.identity")
-            .addAssocDef(mf.newAssociationDefinitionModel(
+            .addAssocDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
         );
@@ -261,7 +261,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineValueLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
-            .addAssocDef(mf.newAssociationDefinitionModel(
+            .addAssocDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
         );
@@ -270,7 +270,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineSimpleNameIdentityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
-            .addAssocDef(mf.newAssociationDefinitionModel(
+            .addAssocDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.one"
             ))
         );
@@ -279,7 +279,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineManyNamesIdentityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
-            .addAssocDef(mf.newAssociationDefinitionModel(
+            .addAssocDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.many"
             ))
         );

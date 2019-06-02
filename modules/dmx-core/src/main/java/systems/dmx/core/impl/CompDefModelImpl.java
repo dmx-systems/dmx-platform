@@ -115,7 +115,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
 
     @Override
     CompDefModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newAssociationDefinitionModel(childTopics);
+        return mf.newCompDefModel(childTopics);
     }
 
 

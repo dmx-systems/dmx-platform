@@ -338,7 +338,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // 3 methods to bridge between assoc and assoc def
 
     final void _addAssocDef(AssociationModelImpl assoc) {
-        CompDefModelImpl assocDef = pl.typeStorage.newAssociationDefinitionModel(assoc);
+        CompDefModelImpl assocDef = pl.typeStorage.newCompDefModel(assoc);
         pl.typeStorage.storeViewConfig(assocDef);
         _addAssocDefBefore(assocDef, null);      // beforeAssocDefUri=null
         // FIXME: move addUpdateTypeDirective() call to _addAssocDefBefore()? At the moment when adding ab assoc def via
