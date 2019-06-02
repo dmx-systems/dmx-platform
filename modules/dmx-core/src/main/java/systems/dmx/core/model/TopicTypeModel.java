@@ -10,5 +10,5 @@ package systems.dmx.core.model;
 public interface TopicTypeModel extends TypeModel {
 
     @Override
-    TopicTypeModel addAssocDef(CompDefModel assocDef);
+    TopicTypeModel addCompDef(CompDefModel assocDef);
 }

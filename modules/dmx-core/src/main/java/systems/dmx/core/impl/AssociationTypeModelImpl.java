@@ -29,8 +29,8 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationTypeModel addAssocDef(CompDefModel assocDef) {
-        return (AssociationTypeModel) super.addAssocDef(assocDef);
+    public AssociationTypeModel addCompDef(CompDefModel assocDef) {
+        return (AssociationTypeModel) super.addCompDef(assocDef);
     }
 
     // ---
@@ -54,7 +54,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     @Override
     AssociationTypeImpl instantiate() {
         // Note: declaration and assignment is required for type inference to work (at least in Java 6)
-        AssociationTypeModelImpl type = clone().filterReadableAssocDefs();
+        AssociationTypeModelImpl type = clone().filterReadableCompDefs();
         return new AssociationTypeImpl(type, pl);
     }
 

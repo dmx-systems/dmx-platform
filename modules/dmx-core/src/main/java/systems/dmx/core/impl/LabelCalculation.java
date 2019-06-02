@@ -21,7 +21,7 @@ class LabelCalculation {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DMXObjectModelImpl comp;
-    private List<String> labelAssocDefUris;
+    private List<String> labelCompDefUris;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -36,7 +36,7 @@ class LabelCalculation {
      */
     LabelCalculation(DMXObjectModelImpl comp) {
         this.comp = comp;
-        this.labelAssocDefUris = comp.getType().getLabelAssocDefUris();
+        this.labelCompDefUris = comp.getType().getLabelCompDefUris();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -44,7 +44,7 @@ class LabelCalculation {
     void calculate() {
         try {
             StringBuilder builder = new StringBuilder();
-            for (String assocDefUri : labelAssocDefUris) {
+            for (String assocDefUri : labelCompDefUris) {
                 comp.loadChildTopics(assocDefUri, false);   // deep=false, FIXME?
                 appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
             }
@@ -52,7 +52,7 @@ class LabelCalculation {
             comp._updateSimpleValue(new SimpleValue(builder.toString()));
         } catch (Exception e) {
             throw new RuntimeException("Calculating and updating label of " + comp.objectInfo() +
-                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
+                " failed (assoc defs involved: " + labelCompDefUris + ")", e);
         }
     }
 

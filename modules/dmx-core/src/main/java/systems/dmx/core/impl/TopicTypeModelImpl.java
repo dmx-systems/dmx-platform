@@ -29,8 +29,8 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public TopicTypeModel addAssocDef(CompDefModel assocDef) {
-        return (TopicTypeModel) super.addAssocDef(assocDef);
+    public TopicTypeModel addCompDef(CompDefModel assocDef) {
+        return (TopicTypeModel) super.addCompDef(assocDef);
     }
 
     // ---
@@ -54,7 +54,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     @Override
     TopicTypeImpl instantiate() {
         // Note: declaration and assignment is required for type inference to work (at least in Java 6)
-        TopicTypeModelImpl type = clone().filterReadableAssocDefs();
+        TopicTypeModelImpl type = clone().filterReadableCompDefs();
         return new TopicTypeImpl(type, pl);
     }
 

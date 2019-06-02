@@ -38,7 +38,7 @@ class ChildTopicsFetcher {
         try {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
-            String assocDefUri    = assocDef.getAssocDefUri();
+            String assocDefUri    = assocDef.getCompDefUri();
             if (cardinalityUri.equals("dmx.core.one")) {
                 RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), assocDef);
                 // Note: topics just created have no child topics yet
@@ -59,7 +59,7 @@ class ChildTopicsFetcher {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the \"" + assocDef.getAssocDefUri() + "\" child topics of object " +
+            throw new RuntimeException("Fetching the \"" + assocDef.getCompDefUri() + "\" child topics of object " +
                 object.getId() + " failed", e);
         }
     }
@@ -72,7 +72,7 @@ class ChildTopicsFetcher {
      * overhead in others (e.g. when updating composite structures).
      */
     private void fetchChildTopics(DMXObjectModelImpl object, boolean deep) {
-        for (CompDefModel assocDef : object.getType().getAssocDefs()) {
+        for (CompDefModel assocDef : object.getType().getCompDefs()) {
             fetch(object, assocDef, deep);
         }
     }

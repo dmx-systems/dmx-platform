@@ -29,8 +29,8 @@ class CompDefImpl extends AssociationImpl implements CompDef {
 
 
     @Override
-    public String getAssocDefUri() {
-        return getModel().getAssocDefUri();
+    public String getCompDefUri() {
+        return getModel().getCompDefUri();
     }
 
     // ---
@@ -73,7 +73,7 @@ class CompDefImpl extends AssociationImpl implements CompDef {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        RoleModel configurable = pl.typeStorage.newAssocDefRole(getId());   // ### ID is uninitialized
+        RoleModel configurable = pl.typeStorage.newCompDefRole(getId());   // ### ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 

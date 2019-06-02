@@ -185,7 +185,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         if (assocDefId == -1) {
             vcm = type.getViewConfig();
         } else {
-            vcm = getAssocDef(type, assocDefId).getViewConfig();
+            vcm = getCompDef(type, assocDefId).getViewConfig();
         }
         vcm.updateConfigTopic(viewConfigTopic);
     }
@@ -197,7 +197,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         setViewConfigLabel(type.getViewConfig());
         // assoc defs
         for (String assocDefUri : type) {
-            setViewConfigLabel(type.getAssocDef(assocDefUri).getViewConfig());
+            setViewConfigLabel(type.getCompDef(assocDefUri).getViewConfig());
         }
     }
 
@@ -224,7 +224,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         addDefaultViewConfigTopic(typeModel.getViewConfig());
         // assoc defs
         for (String assocDefUri : typeModel) {
-            addDefaultViewConfigTopic(typeModel.getAssocDef(assocDefUri).getViewConfig());
+            addDefaultViewConfigTopic(typeModel.getCompDef(assocDefUri).getViewConfig());
         }
     }
 
@@ -259,8 +259,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Looks up an assoc def by ID.
      */
-    private CompDefModel getAssocDef(TypeModel type, long assocDefId) {
-        for (CompDefModel assocDef : type.getAssocDefs()) {
+    private CompDefModel getCompDef(TypeModel type, long assocDefId) {
+        for (CompDefModel assocDef : type.getCompDefs()) {
             if (assocDef.getId() == assocDefId) {
                 return assocDef;
             }

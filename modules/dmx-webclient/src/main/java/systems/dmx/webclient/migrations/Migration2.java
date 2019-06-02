@@ -36,10 +36,10 @@ public class Migration2 extends Migration {
         addBackgroundColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 96%)");
         //
         AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
-        compDef.getAssocDef("dmx.core.cardinality")
+        compDef.getCompDef("dmx.core.cardinality")
             .getViewConfig()
                 .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");
-        compDef.getAssocDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
+        compDef.getCompDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
             .getViewConfig()
                 .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select")
                 .setConfigValue("dmx.webclient.view_config", "dmx.webclient.clearable", true);

@@ -38,7 +38,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public String getAssocDefUri() {
+    public String getCompDefUri() {
         String customAssocTypeUri = getCustomAssocTypeUri();
         return getChildTypeUri() + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
     }
@@ -140,7 +140,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModelImpl cardinality = getChildTopicsModel().getTopicOrNull("dmx.core.cardinality");
         if (cardinality == null) {
             // ### TODO: should a cardinality topic always exist?
-            throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Cardinality\" topic");
+            throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Cardinality\" topic");
             // return false;
         }
         return cardinality.uri;
@@ -150,7 +150,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dmx.core.identity_attr");
         if (isIdentityAttr == null) {
             // ### TODO: should a isIdentityAttr topic always exist?
-            // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Identity Attribute\" topic");
+            // throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Identity Attribute\" topic");
             return false;
         }
         return isIdentityAttr.getSimpleValue().booleanValue();
@@ -160,7 +160,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dmx.core.include_in_label");
         if (includeInLabel == null) {
             // ### TODO: should a includeInLabel topic always exist?
-            // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
+            // throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Include in Label\" topic");
             return false;
         }
         return includeInLabel.getSimpleValue().booleanValue();
@@ -174,7 +174,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         try {
             // 1) check assoc def
             if (!pl.hasReadAccess(this)) {
-                logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable");
+                logger.info("### Assoc def \"" + getCompDefUri() + "\" not READable");
                 return false;
             }
             // Note: there is no need to explicitly check READability for the assoc def's child type.
@@ -183,7 +183,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
             // 2) check custom assoc type, if set
             TopicModelImpl assocType = getCustomAssocType();
             if (assocType != null && !pl.hasReadAccess(assocType)) {
-                logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable (custom assoc type not READable)");
+                logger.info("### Assoc def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
                 return false;
             }
             //

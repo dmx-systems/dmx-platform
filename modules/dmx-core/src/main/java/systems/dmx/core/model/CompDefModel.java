@@ -12,7 +12,7 @@ package systems.dmx.core.model;
  */
 public interface CompDefModel extends AssociationModel {
 
-    String getAssocDefUri();
+    String getCompDefUri();
 
     /**
      * @return  the URI of the Custom Association Type set for this association definition,

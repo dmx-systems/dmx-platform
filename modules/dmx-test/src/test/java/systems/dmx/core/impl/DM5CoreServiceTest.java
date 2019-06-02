@@ -191,18 +191,18 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineSimpleNameIdentityModel();
-            String fullAssocDefUriToBeUpdated = "simple.name";
+            String fullCompDefUriToBeUpdated = "simple.name";
             // create composite topic
-            ChildTopicsModel cm1 = mf.newChildTopicsModel().put(fullAssocDefUriToBeUpdated, "Test");
+            ChildTopicsModel cm1 = mf.newChildTopicsModel().put(fullCompDefUriToBeUpdated, "Test");
             Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", cm1));
             assertTrue("Test".equals(topic.getSimpleValue().toString()));
             // updating simple child text topic
             TopicType parentType = dmx.getTopicType(topic.getTypeUri());
-            CompDef typeRelation = parentType.getAssocDef(fullAssocDefUriToBeUpdated);
-            ChildTopicsModel cm2 = mf.newChildTopicsModel().put(fullAssocDefUriToBeUpdated, "Test Studio");
+            CompDef typeRelation = parentType.getCompDef(fullCompDefUriToBeUpdated);
+            ChildTopicsModel cm2 = mf.newChildTopicsModel().put(fullCompDefUriToBeUpdated, "Test Studio");
             topic.updateChildTopics(cm2, typeRelation);
             // assert child topic value and parent value update
-            assertTrue("Test Studio".equals(topic.getChildTopics().getString(fullAssocDefUriToBeUpdated)));
+            assertTrue("Test Studio".equals(topic.getChildTopics().getString(fullCompDefUriToBeUpdated)));
             assertTrue("Test Studio".equals(topic.getSimpleValue().toString()));
         } finally {
             tx.finish();
@@ -215,12 +215,12 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineManyNamesIdentityModel();
-            String fullAssocDefUriToBeUpdated = "simple.name";
-            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullAssocDefUriToBeUpdated,
+            String fullCompDefUriToBeUpdated = "simple.name";
+            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullCompDefUriToBeUpdated,
                     mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
             Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
             Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
-            topic.getChildTopics().add(fullAssocDefUriToBeUpdated, futureChild.getModel());
+            topic.getChildTopics().add(fullCompDefUriToBeUpdated, futureChild.getModel());
         } finally {
             tx.finish();
         }
@@ -232,13 +232,13 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineManyNamesIdentityModel();
-            String fullAssocDefUriToBeUpdated = "simple.name";
-            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullAssocDefUriToBeUpdated,
+            String fullCompDefUriToBeUpdated = "simple.name";
+            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullCompDefUriToBeUpdated,
                     mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
             Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
             Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
-            topic.getChildTopics().addRef(fullAssocDefUriToBeUpdated, futureChild.getId());
-            List<RelatedTopic> childs = topic.getChildTopics().getTopics(fullAssocDefUriToBeUpdated);
+            topic.getChildTopics().addRef(fullCompDefUriToBeUpdated, futureChild.getId());
+            List<RelatedTopic> childs = topic.getChildTopics().getTopics(fullCompDefUriToBeUpdated);
             assertSame(2, childs.size());
             assertEquals("Text 1", childs.get(0).getSimpleValue().toString());
             assertEquals("Text 2", childs.get(1).getSimpleValue().toString());
@@ -252,7 +252,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.identity")
-            .addAssocDef(mf.newCompDefModel(
+            .addCompDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
         );
@@ -261,7 +261,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineValueLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
-            .addAssocDef(mf.newCompDefModel(
+            .addCompDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
         );
@@ -270,7 +270,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineSimpleNameIdentityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
-            .addAssocDef(mf.newCompDefModel(
+            .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.one"
             ))
         );
@@ -279,7 +279,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineManyNamesIdentityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
-            .addAssocDef(mf.newCompDefModel(
+            .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.many"
             ))
         );

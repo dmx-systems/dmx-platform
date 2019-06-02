@@ -301,8 +301,8 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     @Override
     void postCreate() {
-        if (isAssocDef(this)) {
-            createAssocDef();
+        if (isCompDef(this)) {
+            createCompDef();
         }
     }
 
@@ -314,26 +314,26 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
         duplicateCheck();
         //
         // Type Editor Support
-        if (isAssocDef(this)) {
-            if (isAssocDef((AssociationModel) oldObject)) {
-                updateAssocDef((AssociationModel) oldObject);
+        if (isCompDef(this)) {
+            if (isCompDef((AssociationModel) oldObject)) {
+                updateCompDef((AssociationModel) oldObject);
             } else {
-                createAssocDef();
+                createCompDef();
             }
-        } else if (isAssocDef((AssociationModel) oldObject)) {
-            removeAssocDef();
+        } else if (isCompDef((AssociationModel) oldObject)) {
+            removeCompDef();
         }
     }
 
     @Override
     void preDelete() {
         // Type Editor Support
-        if (isAssocDef(this)) {
+        if (isCompDef(this)) {
             // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
             // interrupted, which would result in a corrupted sequence once rebuild. (Due to the interruption, while
             // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
             // ### FIXDOC
-            removeAssocDef();
+            removeCompDef();
         }
     }
 
@@ -495,30 +495,30 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
      * Preconditions:
      *   - The association is stored in DB
      */
-    private void createAssocDef() {
+    private void createCompDef() {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");
         //
-        parentType._addAssocDef(this);
+        parentType._addCompDef(this);
     }
 
-    private void updateAssocDef(AssociationModel oldAssoc) {
+    private void updateCompDef(AssociationModel oldAssoc) {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
         //
-        parentType._updateAssocDef(this, oldAssoc);
+        parentType._updateCompDef(this, oldAssoc);
     }
 
-    private void removeAssocDef() {
+    private void removeCompDef() {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Removing association definition " + id + " from type \"" + parentType.getUri() + "\"");
         //
-        parentType._removeAssocDefFromMemoryAndRebuildSequence(this);
+        parentType._removeCompDefFromMemoryAndRebuildSequence(this);
     }
 
     // ---
 
-    private boolean isAssocDef(AssociationModel assoc) {
+    private boolean isCompDef(AssociationModel assoc) {
         String typeUri = assoc.getTypeUri();
         if (!typeUri.equals("dmx.core.composition_def")) {
             return false;

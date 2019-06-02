@@ -645,13 +645,13 @@ public class ModelFactoryImpl implements ModelFactory {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
-            parseAssocDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),    // optJSONArray may return null
+            parseCompDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),     // optJSONArray may return null
             newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null
     }
 
     // ---
 
-    private List<CompDefModel> parseAssocDefs(JSONArray assocDefs, String parentTypeUri) throws JSONException {
+    private List<CompDefModel> parseCompDefs(JSONArray assocDefs, String parentTypeUri) throws JSONException {
         List<CompDefModel> _assocDefs = new ArrayList();
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {

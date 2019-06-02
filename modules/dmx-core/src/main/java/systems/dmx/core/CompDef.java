@@ -12,7 +12,7 @@ import systems.dmx.core.model.CompDefModel;
  */
 public interface CompDef extends Association {
 
-    String getAssocDefUri();
+    String getCompDefUri();
 
     // ---
 

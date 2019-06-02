@@ -66,8 +66,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.plugin",     topicType.getUri());
         assertEquals("dmx.core.topic_type", topicType.getTypeUri());
         assertEquals("dmx.core.composite",  topicType.getDataTypeUri());
-        assertEquals(3,                     topicType.getAssocDefs().size());
-        CompDef assocDef =    topicType.getAssocDef("dmx.core.plugin_migration_nr");
+        assertEquals(3,                     topicType.getCompDefs().size());
+        CompDef assocDef =    topicType.getCompDef("dmx.core.plugin_migration_nr");
         assertEquals("dmx.core.composition_def",     assocDef.getTypeUri());
         assertEquals("dmx.core.plugin",              assocDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", assocDef.getChildTypeUri());
@@ -272,7 +272,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", "dmx.core.text"));
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
@@ -305,16 +305,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.last_name",  "Last Name",  "dmx.core.text"));
             // "Person Name" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(null, false, true,
+                .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one"
                 ))
-                .addAssocDef(mf.newCompDefModel(null, false, true,
+                .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one"
                 ))
             );
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
@@ -350,16 +350,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.last_name",  "Last Name",  "dmx.core.text"));
             // "Person Name" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(null, false, true,
+                .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one"
                 ))
-                .addAssocDef(mf.newCompDefModel(null, false, true,
+                .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one"
                 ))
             );
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
@@ -385,18 +385,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void hasIncludeInLabel() {
         // Note: the assoc def is created while migration
         RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
-            .getAssocDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
+            .getCompDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
         assertNotNull(includeInLabel);
         assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
     }
 
     @Test
-    public void hasIncludeInLabelForAddedAssocDef() {
+    public void hasIncludeInLabelForAddedCompDef() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // add assoc def programmatically
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", "dmx.core.text"));
-            dmx.getTopicType("dmx.core.plugin").addAssocDef(
+            dmx.getTopicType("dmx.core.plugin").addCompDef(
                 mf.newCompDefModel(
                     "dmx.core.plugin", "dmx.test.date", "dmx.core.one"
                 ));
@@ -404,7 +404,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the added assoc def
             RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
-                .getAssocDef("dmx.test.date").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
+                .getCompDef("dmx.test.date").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
             assertNotNull(includeInLabel);
             assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
             //
@@ -423,7 +423,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             TopicTypeImpl tt = dmx.getTopicType("dmx.core.plugin");
             //
             // set "Include in Label" flag
-            ChildTopics ct = tt.getAssocDef("dmx.core.plugin_name").getChildTopics()
+            ChildTopics ct = tt.getCompDef("dmx.core.plugin_name").getChildTopics()
                 .set("dmx.core.include_in_label", true);
             //
             assertEquals(true, ct.getBoolean("dmx.core.include_in_label"));
@@ -446,11 +446,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", "dmx.core.text"));
             dmx.createAssociationType(mf.newAssociationTypeModel("dmx.test.birthday", "Birthday", "dmx.core.text"));
             TopicTypeImpl tt = dmx.createTopicType(
-                mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addAssocDef(
+                mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addCompDef(
                     mf.newCompDefModel("dmx.test.birthday", false, false,
                         "dmx.test.person", "dmx.test.date", "dmx.core.one")));
             // test assoc def childs *before* set
-            ChildTopics ct = tt.getAssocDef("dmx.test.date#dmx.test.birthday").getChildTopics();
+            ChildTopics ct = tt.getCompDef("dmx.test.date#dmx.test.birthday").getChildTopics();
             assertEquals(false, ct.getBoolean("dmx.core.include_in_label"));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
@@ -474,22 +474,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void editAssocDefViaAssoc() {
+    public void editCompDefViaAssoc() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set "Include in Label" flag
-            long assocDefId = dmx.getTopicType("dmx.core.plugin").getAssocDef("dmx.core.plugin_name").getId();
+            long assocDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
             dmx.getAssociation(assocDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
             // assoc def order must not have changed
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated assoc defs
             assertEquals(3, assocDefs.size());
             Iterator<CompDef> i = assocDefs.iterator();
-            assertEquals("dmx.core.plugin_name",          i.next().getAssocDefUri());
-            assertEquals("dmx.core.plugin_symbolic_name", i.next().getAssocDefUri());
-            assertEquals("dmx.core.plugin_migration_nr",  i.next().getAssocDefUri());
+            assertEquals("dmx.core.plugin_name",          i.next().getCompDefUri());
+            assertEquals("dmx.core.plugin_symbolic_name", i.next().getCompDefUri());
+            assertEquals("dmx.core.plugin_migration_nr",  i.next().getCompDefUri());
             //
             tx.success();
         } finally {
@@ -498,16 +498,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void editAssocDefSetCustomAssocType() {
+    public void editCompDefSetCustomAssocType() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Association Type (via assoc def)
-            dmx.getTopicType("dmx.core.plugin").getAssocDef("dmx.core.plugin_name").getChildTopics()
+            dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
             // get Custom Association Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
-                .getAssocDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
+                .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated assoc defs
@@ -520,17 +520,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void editAssocDefViaAssocSetCustomAssocType() {
+    public void editCompDefViaAssocSetCustomAssocType() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Association Type (via association)
-            long assocDefId = dmx.getTopicType("dmx.core.plugin").getAssocDef("dmx.core.plugin_name").getId();
+            long assocDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
             dmx.getAssociation(assocDefId).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
             // get Custom Association Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
-                .getAssocDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
+                .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated assoc defs
@@ -646,22 +646,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void insertAssocDefAtPos0() {
+    public void insertCompDefAtPos0() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
             // insert assoc def at pos 0
-            dmx.getTopicType("dmx.core.plugin").addAssocDefBefore(
+            dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
                 mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", "dmx.core.one"),
                 "dmx.core.plugin_name"
             );
             //
-            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
-            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // Note: the type manipulators (here: addCompDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<CompDef> i = assocDefs.iterator();
@@ -675,22 +675,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void insertAssocDefAtPos1() {
+    public void insertCompDefAtPos1() {
         DMXTransaction tx = dmx.beginTx();
         try {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
             // insert assoc def at pos 1
-            dmx.getTopicType("dmx.core.plugin").addAssocDefBefore(
+            dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
                 mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", "dmx.core.one"),
                 "dmx.core.plugin_symbolic_name"
             );
             //
-            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
-            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // Note: the type manipulators (here: addCompDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getAssocDefs();
+            Collection<CompDef> assocDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<CompDef> i = assocDefs.iterator();
@@ -929,10 +929,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item", "Item", "dmx.core.text"));
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.composite", "Composite", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.composite", "dmx.test.name", "dmx.core.one"
                 ))
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.composite", "dmx.test.item", "dmx.core.one"
                 ))
             );
@@ -999,7 +999,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 1) define facet
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item", "Item", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item_facet", "Item Facet", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.item_facet", "dmx.test.item", "dmx.core.one"
                 ))
             );
@@ -1015,7 +1015,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         //
-        CompDef assocDef = dmx.getTopicType("dmx.test.item_facet").getAssocDef("dmx.test.item");
+        CompDef assocDef = dmx.getTopicType("dmx.test.item_facet").getCompDef("dmx.test.item");
         //
         // update facet
         tx = dmx.beginTx();
@@ -1066,7 +1066,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
@@ -1095,7 +1095,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 1) define parent type (with Aggregation-Many child definition)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
@@ -1124,7 +1124,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
@@ -1149,7 +1149,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 1) define parent type (with Aggregation-One child definition)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );
@@ -1179,7 +1179,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 1) define composite type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );
@@ -1205,7 +1205,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 1) define composite type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
-                .addAssocDef(mf.newCompDefModel(
+                .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );

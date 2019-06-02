@@ -22,21 +22,21 @@ public interface DMXType extends Topic, Iterable<String> {
     // === Association Definitions ===
 
     // TODO: drop it? We're Iterable meanwhile
-    Collection<CompDef> getAssocDefs();
+    Collection<CompDef> getCompDefs();
 
-    CompDef getAssocDef(String assocDefUri);
+    CompDef getCompDef(String assocDefUri);
 
-    boolean hasAssocDef(String assocDefUri);
+    boolean hasCompDef(String assocDefUri);
 
-    DMXType addAssocDef(CompDefModel assocDef);
+    DMXType addCompDef(CompDefModel assocDef);
 
     /**
-     * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
+     * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    DMXType addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri);
+    DMXType addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri);
 
-    DMXType removeAssocDef(String assocDefUri);
+    DMXType removeCompDef(String assocDefUri);
 
 
 

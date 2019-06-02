@@ -511,7 +511,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics which are not loaded already.
      */
     final DMXObjectModel loadChildTopics(boolean deep) {
-        for (CompDefModel assocDef : getType().getAssocDefs()) {
+        for (CompDefModel assocDef : getType().getCompDefs()) {
             loadChildTopics(assocDef, deep);
         }
         return this;
@@ -530,7 +530,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      */
     final DMXObjectModel loadChildTopics(String assocDefUri, boolean deep) {
         try {
-            return loadChildTopics(getAssocDef(assocDefUri), deep);
+            return loadChildTopics(getCompDef(assocDefUri), deep);
         } catch (Exception e) {
             throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
                 e);
@@ -549,7 +549,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      *                      type definition. It may originate from a facet type as well.
      */
     final DMXObjectModel loadChildTopics(CompDefModel assocDef, boolean deep) {
-        String assocDefUri = assocDef.getAssocDefUri();
+        String assocDefUri = assocDef.getCompDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Loading \"" + assocDefUri + "\" child topics of " + objectInfo());
             new ChildTopicsFetcher(pl).fetch(this, assocDef, deep);
@@ -625,8 +625,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // === Helper ===
 
     // Note: doesn't work for facets
-    private CompDefModel getAssocDef(String assocDefUri) {
-        return getType().getAssocDef(assocDefUri);
+    private CompDefModel getCompDef(String assocDefUri) {
+        return getType().getCompDef(assocDefUri);
     }
 
     // ### TODO: drop it?

@@ -445,11 +445,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (authorizationMethods.containsKey(name)) {
             throw new RuntimeException("Authorization method \"" + name + "\" already registered");
         }
+        logger.info("Registering authorization method \"" + name + "\"");
         authorizationMethods.put(name, am);
     }
 
     @Override
     public void unregisterAuthorizationMethod(String name) {
+        logger.info("Unregistering authorization method \"" + name + "\"");
         authorizationMethods.remove(name);
     }
 

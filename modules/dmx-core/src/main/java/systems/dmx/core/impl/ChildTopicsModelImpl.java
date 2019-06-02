@@ -421,7 +421,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID. ### FIXDOC
      */
     RelatedTopicModelImpl findChildTopicById(long childTopicId, CompDefModel assocDef) {
-        List<RelatedTopicModelImpl> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
+        List<RelatedTopicModelImpl> childTopics = getTopicsOrNull(assocDef.getCompDefUri());
         if (childTopics != null) {
             for (RelatedTopicModelImpl childTopic : childTopics) {
                 if (childTopic.getId() == childTopicId) {
@@ -439,7 +439,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * @param   assocDef    the child topics according to this association definition are considered.
      */
     RelatedTopicModelImpl findChildTopicByRef(TopicReferenceModelImpl topicRef, CompDefModel assocDef) {
-        List<? extends RelatedTopicModel> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
+        List<? extends RelatedTopicModel> childTopics = getTopicsOrNull(assocDef.getCompDefUri());
         if (childTopics != null) {
             return topicRef.findReferencedTopic(childTopics);
         }
@@ -469,28 +469,28 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * For single-valued childs
      */
     void putInChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
-        put(assocDef.getAssocDefUri(), childTopic);
+        put(assocDef.getCompDefUri(), childTopic);
     }
 
     /**
      * For single-valued childs
      */
     void removeChildTopic(CompDefModel assocDef) {
-        remove(assocDef.getAssocDefUri());
+        remove(assocDef.getCompDefUri());
     }
 
     /**
      * For multiple-valued childs
      */
     void addToChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
-        add(assocDef.getAssocDefUri(), childTopic);
+        add(assocDef.getCompDefUri(), childTopic);
     }
 
     /**
      * For multiple-valued childs
      */
     void removeFromChildTopics(RelatedTopicModel childTopic, CompDefModel assocDef) {
-        remove(assocDef.getAssocDefUri(), childTopic);
+        remove(assocDef.getCompDefUri(), childTopic);
     }
 
 

@@ -264,7 +264,7 @@ class ValueIntegrator {
     }
 
     private Iterable<String> assocDefUris() {
-        return !isFacetUpdate ? type : asList(assocDef.getAssocDefUri());
+        return !isFacetUpdate ? type : asList(assocDef.getCompDefUri());
     }
 
     /**
@@ -331,11 +331,10 @@ class ValueIntegrator {
             return mf.newAssociationModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
                                                                                           _newValues.roleModel2);
         } else {
-            List<String> identityAssocDefUris = type.getIdentityAttrs();
-            if (identityAssocDefUris.size() > 0) {
+            List<String> identityCompDefUris = type.getIdentityAttrs();
+            if (identityCompDefUris.size() > 0) {
                 return !childValues.isEmpty() ?
-                    unifyChildTopics(identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris) :
-                    null;
+                    unifyChildTopics(identityChildTopics(childValues, identityCompDefUris), identityCompDefUris) : null;
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
                 // Note: for value-types this is fixed meanwhile, but not for identity-types.
@@ -353,17 +352,17 @@ class ValueIntegrator {
      * @param   childValues             the map of the child topics to select from; not empty
      *                                      key: assocDefUri
      *                                      value: UnifiedValue or List<UnifiedValue>
-     * @param   identityAssocDefUris    not empty
+     * @param   identityCompDefUris     not empty
      *
      * @return  A map of the identity child topics; not empty
      *              key: assocDefUri
      *              value: UnifiedValue
      */
     private Map<String, Object> identityChildTopics(Map<String, Object> childValues,
-                                                    List<String> identityAssocDefUris) {
+                                                    List<String> identityCompDefUris) {
         try {
             Map<String, Object> identityChildTopics = new HashMap();
-            for (String assocDefUri : identityAssocDefUris) {
+            for (String assocDefUri : identityCompDefUris) {
                 if (!isOne(assocDefUri)) {
                     throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
                 }
@@ -382,7 +381,7 @@ class ValueIntegrator {
             // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
             return identityChildTopics;
         } catch (Exception e) {
-            throw new RuntimeException("Selecting identity childs " + identityAssocDefUris + " failed, childValues=" +
+            throw new RuntimeException("Selecting identity childs " + identityCompDefUris + " failed, childValues=" +
                 childValues, e);
         }
     }
@@ -807,12 +806,12 @@ class ValueIntegrator {
 
     private CompDefModel assocDef(String assocDefUri) {
         if (!isFacetUpdate) {
-            return type.getAssocDef(assocDefUri);
+            return type.getCompDef(assocDefUri);
         } else {
             // sanity check
-            if (!assocDefUri.equals(assocDef.getAssocDefUri())) {
+            if (!assocDefUri.equals(assocDef.getCompDefUri())) {
                 throw new RuntimeException("URI mismatch: assocDefUri=\"" + assocDefUri + "\", facet assocDefUri=\"" +
-                    assocDef.getAssocDefUri() + "\"");
+                    assocDef.getCompDefUri() + "\"");
             }
             //
             return assocDef;

@@ -49,36 +49,36 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     // === Association Definitions ===
 
     @Override
-    public final Collection<CompDef> getAssocDefs() {
-        return pl.instantiate(getModel().getAssocDefs());
+    public final Collection<CompDef> getCompDefs() {
+        return pl.instantiate(getModel().getCompDefs());
     }
 
     @Override
-    public final CompDef getAssocDef(String assocDefUri) {
-        return getModel().getAssocDef(assocDefUri).instantiate();
+    public final CompDef getCompDef(String assocDefUri) {
+        return getModel().getCompDef(assocDefUri).instantiate();
     }
 
     @Override
-    public final boolean hasAssocDef(String assocDefUri) {
-        return getModel().hasAssocDef(assocDefUri);
+    public final boolean hasCompDef(String assocDefUri) {
+        return getModel().hasCompDef(assocDefUri);
     }
 
     @Override
-    public final DMXType addAssocDef(CompDefModel assocDef) {
-        return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
+    public final DMXType addCompDef(CompDefModel assocDef) {
+        return addCompDefBefore(assocDef, null);   // beforeCompDefUri=null
     }
 
     @Override
-    public final DMXType addAssocDefBefore(CompDefModel assocDef, String beforeAssocDefUri) {
+    public final DMXType addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri) {
         CompDefModelImpl _assocDef = (CompDefModelImpl) assocDef;
         pl.typeStorage.storeCompDef(_assocDef);
-        _getModel()._addAssocDefBefore(_assocDef, beforeAssocDefUri);
+        _getModel()._addCompDefBefore(_assocDef, beforeCompDefUri);
         return this;
     }
 
     @Override
-    public final DMXType removeAssocDef(String assocDefUri) {
-        _getModel()._removeAssocDef(assocDefUri);
+    public final DMXType removeCompDef(String assocDefUri) {
+        _getModel()._removeCompDef(assocDefUri);
         return this;
     }
 
