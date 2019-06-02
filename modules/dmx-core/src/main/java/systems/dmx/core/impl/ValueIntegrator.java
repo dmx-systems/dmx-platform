@@ -36,7 +36,7 @@ class ValueIntegrator {
 
     private DMXObjectModelImpl newValues;
     private DMXObjectModelImpl targetObject;        // may null
-    private CompDefModel assocDef;    // may null
+    private CompDefModel compDef;                   // may null
     private TypeModelImpl type;
     private boolean isAssoc;
     private boolean isType;
@@ -67,20 +67,19 @@ class ValueIntegrator {
      *
      * @param   newValues       the "update model": the values to be integrated.
      * @param   targetObject    may be null. TODO: explain
-     * @param   assocDef        for facet value updates: the facet type's assoc def.
+     * @param   compDef         for facet value updates: the facet type's assoc def.
      *                          <code>null</code> for non-facet updates.
      *
      * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
-    <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject,
-                                                             CompDefModel assocDef) {
+    <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject, CompDefModel compDef) {
         try {
             this.newValues = newValues;
             this.targetObject = targetObject;
-            this.assocDef = assocDef;
+            this.compDef = compDef;
             this.isAssoc = newValues instanceof AssociationModel;
             this.isType  = newValues instanceof TypeModel;
-            this.isFacetUpdate = assocDef != null;
+            this.isFacetUpdate = compDef != null;
             //
             // process refs
             if (newValues instanceof TopicReferenceModel) {
@@ -110,7 +109,7 @@ class ValueIntegrator {
             return value;
         } catch (Exception e) {
             throw new RuntimeException("Value integration failed, newValues=" + newValues + ", targetObject=" +
-                targetObject + ", assocDef=" + assocDef, e);
+                targetObject + ", compDef=" + compDef, e);
         }
     }
 
@@ -264,7 +263,7 @@ class ValueIntegrator {
     }
 
     private Iterable<String> assocDefUris() {
-        return !isFacetUpdate ? type : asList(assocDef.getCompDefUri());
+        return !isFacetUpdate ? type : asList(compDef.getCompDefUri());
     }
 
     /**
@@ -289,8 +288,8 @@ class ValueIntegrator {
     /**
      * Preconditions:
      *   - this.newValues is composite
-     *   - assocDef's parent type is this.type
-     *   - childTopic's type is assocDef's child type
+     *   - compDef's parent type is this.type
+     *   - childTopic's type is compDef's child type
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
@@ -393,8 +392,8 @@ class ValueIntegrator {
      *   - this.newValues is composite
      *   - this.type is an identity type OR this is a facet update
      *   - parent's type is this.type
-     *   - assocDef's parent type is this.type
-     *   - newChildTopic's type is assocDef's child type
+     *   - compDef's parent type is this.type
+     *   - newChildTopic's type is compDef's child type
      *
      * @param   parent          to parent to be updated; not null
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
@@ -413,7 +412,7 @@ class ValueIntegrator {
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
             // levels) as it is build bottom-up (starting from the simple values at the leaves).
-            parent.loadChildTopics(assocDef(compDefUri), true);    // deep=true
+            parent.loadChildTopics(compDef(compDefUri), true);    // deep=true
             Object childTopic = childValues.get(compDefUri);
             if (isOne(compDefUri)) {
                 TopicModel _childTopic = (TopicModel) (childTopic != null ? ((UnifiedValue) childTopic).value : null);
@@ -570,8 +569,8 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
-     *   - assocDef's parent type is this.type
-     *   - childTopic's type is assocDef's child type
+     *   - compDef's parent type is this.type
+     *   - childTopic's type is compDef's child type
      *
      * @param   childValues     Child topics to unify; not empty
      *                              key: compDefUri
@@ -617,8 +616,8 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
-     *   - assocDef's parent type is this.type
-     *   - childTopic's type is assocDef's child type
+     *   - compDef's parent type is this.type
+     *   - childTopic's type is compDef's child type
      *
      * @param   childValues     Child topics to unify; not empty
      *                              key: compDefUri
@@ -629,9 +628,9 @@ class ValueIntegrator {
         String compDefUri = childValues.keySet().iterator().next();
         // logger.fine("### compDefUri=\"" + compDefUri + "\", childValues=" + childValues);
         // sanity check
-        if (!type.getUri().equals(assocDef(compDefUri).getParentTypeUri())) {
+        if (!type.getUri().equals(compDef(compDefUri).getParentTypeUri())) {
             throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", assoc def's parent type=\"" +
-                assocDef(compDefUri).getParentTypeUri() + "\"");
+                compDef(compDefUri).getParentTypeUri() + "\"");
         }
         //
         DMXObjectModel childTopic;
@@ -640,7 +639,7 @@ class ValueIntegrator {
         } else {
             childTopic = ((List<UnifiedValue>) childValues.get(compDefUri)).get(0).value;
         }
-        return pl.getTopicRelatedTopics(childTopic.getId(), assocDef(compDefUri).getInstanceLevelAssocTypeUri(),
+        return pl.getTopicRelatedTopics(childTopic.getId(), compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             "dmx.core.child", "dmx.core.parent", type.getUri());
     }
 
@@ -649,15 +648,15 @@ class ValueIntegrator {
      *
      * @param   candidates      the parent candidates; non-matching candidates are removed in-place.
      * @param   childTopic      the child topic to check; may be null
-     * @param   compDefUri     the assoc def underlying the child topic
+     * @param   compDefUri      the assoc def underlying the child topic
      */
     private void eliminateParentCandidates(List<? extends TopicModelImpl> candidates, TopicModelImpl childTopic,
                                                                                       String compDefUri) {
-        CompDefModel assocDef = assocDef(compDefUri);
+        CompDefModel compDef = compDef(compDefUri);
         Iterator<? extends TopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
             TopicModelImpl parent = i.next();
-            String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
+            String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
                 AssociationImpl assoc = pl.getAssociation(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
@@ -675,7 +674,7 @@ class ValueIntegrator {
             } else {
                 // TODO: assoc parents?
                 if (!pl.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
-                        assocDef.getChildTypeUri()).isEmpty()) {
+                        compDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (childs exist)");
                     i.remove();
                 }
@@ -755,7 +754,7 @@ class ValueIntegrator {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(
-            assocDef(compDefUri).getInstanceLevelAssocTypeUri(),
+            compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dmx.core.parent"),
             child.createRoleModel("dmx.core.child")
         ).getModel();
@@ -804,22 +803,22 @@ class ValueIntegrator {
 
     // ---
 
-    private CompDefModel assocDef(String compDefUri) {
+    private CompDefModel compDef(String compDefUri) {
         if (!isFacetUpdate) {
             return type.getCompDef(compDefUri);
         } else {
             // sanity check
-            if (!compDefUri.equals(assocDef.getCompDefUri())) {
+            if (!compDefUri.equals(compDef.getCompDefUri())) {
                 throw new RuntimeException("URI mismatch: compDefUri=\"" + compDefUri + "\", facet compDefUri=\"" +
-                    assocDef.getCompDefUri() + "\"");
+                    compDef.getCompDefUri() + "\"");
             }
             //
-            return assocDef;
+            return compDef;
         }
     }
 
     private boolean isOne(String compDefUri) {
-        return assocDef(compDefUri).getChildCardinalityUri().equals("dmx.core.one");
+        return compDef(compDefUri).getChildCardinalityUri().equals("dmx.core.one");
     }
 
     private boolean isValueType() {

@@ -265,9 +265,9 @@ class TypeStorage {
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
-            CompDefModel assocDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
+            CompDefModel compDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
                 childType.getUri());
-            assocDefs.put(assocDef.getId(), assocDef);
+            assocDefs.put(compDef.getId(), compDef);
         }
         return assocDefs;
     }
@@ -371,10 +371,10 @@ class TypeStorage {
         return assoc;
     }
 
-    private CompDefModelImpl addPlayerIds(CompDefModelImpl assocDef) {
-        assocDef.getRoleModel("dmx.core.parent_type").playerId = assocDef.getParentType().id;
-        assocDef.getRoleModel("dmx.core.child_type").playerId  = assocDef.getChildType().id;
-        return assocDef;
+    private CompDefModelImpl addPlayerIds(CompDefModelImpl compDef) {
+        compDef.getRoleModel("dmx.core.parent_type").playerId = compDef.getParentType().id;
+        compDef.getRoleModel("dmx.core.child_type").playerId  = compDef.getChildType().id;
+        return compDef;
     }
 
     // ---
@@ -382,13 +382,13 @@ class TypeStorage {
     private List<CompDefModel> sortCompDefs(Map<Long, CompDefModel> assocDefs, List<Long> sequence) {
         List<CompDefModel> sortedCompDefs = new ArrayList();
         for (long assocDefId : sequence) {
-            CompDefModel assocDef = assocDefs.get(assocDefId);
+            CompDefModel compDef = assocDefs.get(assocDefId);
             // error check
-            if (assocDef == null) {
+            if (compDef == null) {
                 throw new RuntimeException("DB inconsistency: ID " + assocDefId +
                     " is in sequence but not in the type's association definitions");
             }
-            sortedCompDefs.add(assocDef);
+            sortedCompDefs.add(compDef);
         }
         return sortedCompDefs;
     }
@@ -396,28 +396,28 @@ class TypeStorage {
     // --- Store ---
 
     private void storeCompDefs(long typeId, Collection<CompDefModelImpl> assocDefs) {
-        for (CompDefModelImpl assocDef : assocDefs) {
-            storeCompDef(assocDef);
+        for (CompDefModelImpl compDef : assocDefs) {
+            storeCompDef(compDef);
         }
         storeSequence(typeId, assocDefs);
     }
 
-    void storeCompDef(CompDefModelImpl assocDef) {
+    void storeCompDef(CompDefModelImpl compDef) {
         try {
             // 1) create association
-            pl.createAssociation(addPlayerIds(assocDef));
+            pl.createAssociation(addPlayerIds(compDef));
             //
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
             // assignments already. These must be removed before assigning new cardinality. ### TODO?
             // ### removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
-            // ### associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
+            // ### associateCardinality(assocDefId, CHILD_CARDINALITY,  compDef.getChildCardinalityUri());
             //
             // 3) view config
-            storeViewConfig(assocDef);
+            storeViewConfig(compDef);
         } catch (Exception e) {
-            throw new RuntimeException("Storing assoc def \"" + assocDef.getCompDefUri() + "\" failed (parent type \"" +
-                assocDef.getParentTypeUri() + "\")", e);
+            throw new RuntimeException("Storing assoc def \"" + compDef.getCompDefUri() + "\" failed (parent type \"" +
+                compDef.getParentTypeUri() + "\")", e);
         }
     }
 
@@ -520,11 +520,11 @@ class TypeStorage {
         try {
             List<RelatedAssociationModelImpl> sequence = new ArrayList();
             //
-            RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeTopic.getId());
-            if (assocDef != null) {
-                sequence.add(assocDef);
-                while ((assocDef = fetchSuccessor(assocDef.getId())) != null) {
-                    sequence.add(assocDef);
+            RelatedAssociationModelImpl compDef = fetchSequenceStart(typeTopic.getId());
+            if (compDef != null) {
+                sequence.add(compDef);
+                while ((compDef = fetchSuccessor(compDef.getId())) != null) {
+                    sequence.add(compDef);
                 }
             }
             //
@@ -556,9 +556,9 @@ class TypeStorage {
     private void storeSequence(long typeId, Collection<CompDefModelImpl> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
         long predCompDefId = -1;
-        for (CompDefModel assocDef : assocDefs) {
-            addCompDefToSequence(typeId, assocDef.getId(), -1, -1, predCompDefId);
-            predCompDefId = assocDef.getId();
+        for (CompDefModel compDef : assocDefs) {
+            addCompDefToSequence(typeId, compDef.getId(), -1, -1, predCompDefId);
+            predCompDefId = compDef.getId();
         }
     }
 
@@ -597,19 +597,19 @@ class TypeStorage {
 
     private void insertAtSequenceStart(long typeId, long assocDefId) {
         // delete sequence start
-        RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeId);
-        assocDef.getRelatingAssociation().delete();
+        RelatedAssociationModelImpl compDef = fetchSequenceStart(typeId);
+        compDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceStart(typeId, assocDefId);
-        storeSequenceSegment(assocDefId, assocDef.getId());
+        storeSequenceSegment(assocDefId, compDef.getId());
     }
 
     private void insertIntoSequence(long assocDefId, long beforeCompDefId) {
         // delete sequence segment
-        RelatedAssociationModelImpl assocDef = fetchPredecessor(beforeCompDefId);
-        assocDef.getRelatingAssociation().delete();
+        RelatedAssociationModelImpl compDef = fetchPredecessor(beforeCompDefId);
+        compDef.getRelatingAssociation().delete();
         // reconnect
-        storeSequenceSegment(assocDef.getId(), assocDefId);
+        storeSequenceSegment(compDef.getId(), assocDefId);
         storeSequenceSegment(assocDefId, beforeCompDefId);
     }
 
@@ -651,8 +651,8 @@ class TypeStorage {
     // --- Fetch ---
 
     private void fetchViewConfigOfCompDefs(List<CompDefModel> assocDefs) {
-        for (CompDefModel assocDef : assocDefs) {
-            assocDef.setViewConfig(fetchViewConfigOfCompDef(assocDef));
+        for (CompDefModel compDef : assocDefs) {
+            compDef.setViewConfig(fetchViewConfigOfCompDef(compDef));
         }
     }
 
@@ -667,12 +667,12 @@ class TypeStorage {
         }
     }
 
-    private ViewConfigurationModel fetchViewConfigOfCompDef(AssociationModel assocDef) {
+    private ViewConfigurationModel fetchViewConfigOfCompDef(AssociationModel compDef) {
         try {
-            return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dmx.core.composition",
+            return viewConfigModel(pl.fetchAssociationRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view config of assoc def " + assocDef.getId() + " failed", e);
+            throw new RuntimeException("Fetching view config of assoc def " + compDef.getId() + " failed", e);
         }
     }
 
@@ -699,9 +699,9 @@ class TypeStorage {
         }
     }
 
-    void storeViewConfig(CompDefModelImpl assocDef) {
-        ViewConfigurationModelImpl viewConfig = assocDef.viewConfig;
-        TopicModel configTopic = _storeViewConfig(newCompDefRole(assocDef.id), viewConfig);
+    void storeViewConfig(CompDefModelImpl compDef) {
+        ViewConfigurationModelImpl viewConfig = compDef.viewConfig;
+        TopicModel configTopic = _storeViewConfig(newCompDefRole(compDef.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
         // would be missing on a cold start. Subsequent migrations operating on them would fail.
         if (configTopic != null) {

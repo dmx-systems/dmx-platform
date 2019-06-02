@@ -29,8 +29,8 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public TopicTypeModel addCompDef(CompDefModel assocDef) {
-        return (TopicTypeModel) super.addCompDef(assocDef);
+    public TopicTypeModel addCompDef(CompDefModel compDef) {
+        return (TopicTypeModel) super.addCompDef(compDef);
     }
 
     // ---

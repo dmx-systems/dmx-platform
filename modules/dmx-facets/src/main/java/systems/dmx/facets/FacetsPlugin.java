@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 
 // ### TODO: support custom assoc types also for facets.
-// Some assocDef.getChildTypeUri() calls must be replaced by assocDef.getCompDefUri().
+// Some compDef.getChildTypeUri() calls must be replaced by compDef.getCompDefUri().
 @Path("/facet")
 @Consumes("application/json")
 @Produces("application/json")
@@ -144,7 +144,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     // ---
 
     // Note: there is a similar private method in DMXObjectImpl:
-    // fetchChildTopic(CompDef assocDef, long childTopicId)
+    // fetchChildTopic(CompDef compDef, long childTopicId)
     // ### TODO: Extend DMXObject interface by hasChildTopic()?
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
@@ -165,9 +165,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private RelatedTopic fetchChildTopic(DMXObject object, CompDef assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getChildTypeUri();
+    private RelatedTopic fetchChildTopic(DMXObject object, CompDef compDef) {
+        String assocTypeUri  = compDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = compDef.getChildTypeUri();
         return object.getRelatedTopic(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
     }
 
@@ -178,9 +178,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private List<RelatedTopic> fetchChildTopics(DMXObject object, CompDef assocDef) {
-        String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
-        String othersTypeUri = assocDef.getChildTypeUri();
+    private List<RelatedTopic> fetchChildTopics(DMXObject object, CompDef compDef) {
+        String assocTypeUri  = compDef.getInstanceLevelAssocTypeUri();
+        String othersTypeUri = compDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
     }
 

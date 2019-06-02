@@ -163,8 +163,8 @@ abstract class DMXObjectImpl implements DMXObject {
     // === Updating ===
 
     @Override
-    public final void updateChildTopics(ChildTopicsModel updateModel, CompDef assocDef) {
-        model.updateChildTopics(updateModel, assocDef.getModel());
+    public final void updateChildTopics(ChildTopicsModel updateModel, CompDef compDef) {
+        model.updateChildTopics(updateModel, compDef.getModel());
     }
 
 

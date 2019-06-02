@@ -190,9 +190,9 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
                 return this;
             }
             //
-            for (CompDefModel assocDef : getType().getCompDefs()) {
-                String compDefUri     = assocDef.getCompDefUri();
-                String cardinalityUri = assocDef.getChildCardinalityUri();
+            for (CompDefModel compDef : getType().getCompDefs()) {
+                String compDefUri     = compDef.getCompDefUri();
+                String cardinalityUri = compDef.getChildCardinalityUri();
                 TopicModelImpl childTopic = null;
                 if (cardinalityUri.equals("dmx.core.one")) {
                     childTopic = childTopics.getTopicOrNull(compDefUri);                                 // no DB access

@@ -381,11 +381,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
         update(createModelWithChildTopics(childTopics));
     }
 
-    final void updateChildTopics(ChildTopicsModel updateModel, CompDefModel assocDef) {
+    final void updateChildTopics(ChildTopicsModel updateModel, CompDefModel compDef) {
         // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
         // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
         // Compare to update() method.
-        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, assocDef);
+        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, compDef);
     }
 
     // ---
@@ -511,8 +511,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics which are not loaded already.
      */
     final DMXObjectModel loadChildTopics(boolean deep) {
-        for (CompDefModel assocDef : getType().getCompDefs()) {
-            loadChildTopics(assocDef, deep);
+        for (CompDefModel compDef : getType().getCompDefs()) {
+            loadChildTopics(compDef, deep);
         }
         return this;
     }
@@ -542,16 +542,16 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * <p>
      * Can be used to load facet values.
      *
-     * @param   assocDef    the child topics according to this association definition are loaded.
+     * @param   compDef     the child topics according to this association definition are loaded.
      *                      <p>
      *                      Note: the association definition must not necessarily originate from this object's
      *                      type definition. It may originate from a facet type as well.
      */
-    final DMXObjectModel loadChildTopics(CompDefModel assocDef, boolean deep) {
-        String compDefUri = assocDef.getCompDefUri();
+    final DMXObjectModel loadChildTopics(CompDefModel compDef, boolean deep) {
+        String compDefUri = compDef.getCompDefUri();
         if (!childTopics.has(compDefUri)) {
             logger.fine("### Loading \"" + compDefUri + "\" child topics of " + objectInfo());
-            new ChildTopicsFetcher(pl).fetch(this, assocDef, deep);
+            new ChildTopicsFetcher(pl).fetch(this, compDef, deep);
         }
         return this;
     }

@@ -655,9 +655,9 @@ public class ModelFactoryImpl implements ModelFactory {
         List<CompDefModel> _assocDefs = new ArrayList();
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
-                JSONObject assocDef = assocDefs.getJSONObject(i)
+                JSONObject compDef = assocDefs.getJSONObject(i)
                     .put("parentTypeUri", parentTypeUri);
-                _assocDefs.add(newCompDefModel(assocDef));
+                _assocDefs.add(newCompDefModel(compDef));
             }
         }
         return _assocDefs;
@@ -700,25 +700,25 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public CompDefModelImpl newCompDefModel(JSONObject assocDef) {
+    public CompDefModelImpl newCompDefModel(JSONObject compDef) {
         try {
-            RoleModel role1 = parseRole1(assocDef);     // may be null
-            RoleModel role2 = parseRole2(assocDef);     // may be null
+            RoleModel role1 = parseRole1(compDef);     // may be null
+            RoleModel role2 = parseRole2(compDef);     // may be null
             // Note: the canonic assoc def JSON format does not require explicit assoc roles. Assoc defs declared in
             // JSON migrations support a simplified format. In contrast assoc defs contained in a request may include
             // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(
-                newAssociationModel(assocDef.optLong("id", -1), null,
+                newAssociationModel(compDef.optLong("id", -1), null,
                     TYPE_COMP_DEF,
-                    role1 != null ? role1 : parentRole(assocDef.getString("parentTypeUri")),
-                    role2 != null ? role2 : childRole(assocDef.getString("childTypeUri")),
-                    null, childTopics(assocDef)
+                    role1 != null ? role1 : parentRole(compDef.getString("parentTypeUri")),
+                    role2 != null ? role2 : childRole(compDef.getString("childTypeUri")),
+                    null, childTopics(compDef)
                 ),
-                newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
+                newViewConfigurationModel(compDef.optJSONArray("viewConfigTopics"))
             );
         } catch (Exception e) {
-            throw parsingFailed(assocDef, e, "CompDefModelImpl");
+            throw parsingFailed(compDef, e, "CompDefModelImpl");
         }
     }
 
@@ -757,13 +757,13 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
+    private ChildTopicsModel childTopics(JSONObject compDef) throws JSONException {
         return childTopics(
-            assocDef.getString("childCardinalityUri"),
+            compDef.getString("childCardinalityUri"),
             // Note: getString()/optString() on a key with JSON null value would return the string "null"
-            assocDef.isNull("customAssocTypeUri") ? null : assocDef.getString("customAssocTypeUri"),
-            assocDef.optBoolean("isIdentityAttr"),
-            assocDef.optBoolean("includeInLabel")
+            compDef.isNull("customAssocTypeUri") ? null : compDef.getString("customAssocTypeUri"),
+            compDef.optBoolean("isIdentityAttr"),
+            compDef.optBoolean("includeInLabel")
         );
     }
 

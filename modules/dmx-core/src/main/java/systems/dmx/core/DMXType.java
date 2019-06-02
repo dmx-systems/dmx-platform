@@ -28,13 +28,13 @@ public interface DMXType extends Topic, Iterable<String> {
 
     boolean hasCompDef(String compDefUri);
 
-    DMXType addCompDef(CompDefModel assocDef);
+    DMXType addCompDef(CompDefModel compDef);
 
     /**
      * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    DMXType addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri);
+    DMXType addCompDefBefore(CompDefModel compDef, String beforeCompDefUri);
 
     DMXType removeCompDef(String compDefUri);
 

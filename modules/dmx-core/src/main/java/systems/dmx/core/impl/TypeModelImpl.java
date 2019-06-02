@@ -84,46 +84,46 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * @param   assocDef    the assoc def to add.
+     * @param   compDef     the assoc def to add.
      *                      Note: its ID might be uninitialized (-1).
      */
     @Override
-    public TypeModel addCompDef(CompDefModel assocDef) {
-        return addCompDefBefore(assocDef, null);   // beforeCompDefUri=null
+    public TypeModel addCompDef(CompDefModel compDef) {
+        return addCompDefBefore(compDef, null);   // beforeCompDefUri=null
     }
 
     /**
-     * @param   assocDef            the assoc def to add.
+     * @param   compDef             the assoc def to add.
      *                              Note: its ID might be uninitialized (-1).
      * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
     @Override
-    public TypeModel addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri) {
+    public TypeModel addCompDefBefore(CompDefModel compDef, String beforeCompDefUri) {
         try {
-            String compDefUri = assocDef.getCompDefUri();
+            String compDefUri = compDef.getCompDefUri();
             // error check
             CompDefModel existing = _getCompDef(compDefUri);
             if (existing != null) {
                 throw new RuntimeException("Type \"" + uri + "\" has a \"" + compDefUri + "\" assoc def already");
             }
             //
-            assocDefs.putBefore(compDefUri, (CompDefModelImpl) assocDef, beforeCompDefUri);
+            assocDefs.putBefore(compDefUri, (CompDefModelImpl) compDef, beforeCompDefUri);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Adding assoc def \"" + assocDef.getCompDefUri() + "\" to type \"" + uri +
-                "\" failed (assocDef=" + assocDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
+            throw new RuntimeException("Adding assoc def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
+                "\" failed (compDef=" + compDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
         }
     }
 
     @Override
     public CompDefModel removeCompDef(String compDefUri) {
         try {
-            CompDefModel assocDef = assocDefs.remove(compDefUri);
-            if (assocDef == null) {
+            CompDefModel compDef = assocDefs.remove(compDefUri);
+            if (compDef == null) {
                 throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
             }
-            return assocDef;
+            return compDef;
         } catch (Exception e) {
             throw new RuntimeException("Removing assoc def \"" + compDefUri + "\" from type \"" + uri + "\" failed", e);
         }
@@ -298,7 +298,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      * - The underlying assoc exists in DB already
      * - The assoc def's view config is stored in DB already
      */
-    final void _addCompDefBefore(CompDefModelImpl assocDef, String beforeCompDefUri) {
+    final void _addCompDefBefore(CompDefModelImpl compDef, String beforeCompDefUri) {
         try {
             long lastCompDefId = lastCompDefId();     // must be determined *before* memory is updated
             //
@@ -309,15 +309,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // model driven and the (meta) model doesn't know about custom associations as this very concept is
             // introduced only by the assoc def being added here. So, the model must be updated (in-memory) *before* the
             // assoc def is stored.
-            addCompDefBefore(assocDef, beforeCompDefUri);
+            addCompDefBefore(compDef, beforeCompDefUri);
             //
             // 2) update DB
             long beforeCompDefId = beforeCompDefUri != null ? getCompDef(beforeCompDefUri).getId() : -1;
             long firstCompDefId = firstCompDefId();   // must be determined *after* memory is updated
-            pl.typeStorage.addCompDefToSequence(id, assocDef.id, beforeCompDefId, firstCompDefId, lastCompDefId);
+            pl.typeStorage.addCompDefToSequence(id, compDef.id, beforeCompDefId, firstCompDefId, lastCompDefId);
         } catch (Exception e) {
-            throw new RuntimeException("Adding assoc def \"" + assocDef.getCompDefUri() + "\" to type \"" + uri +
-                "\" failed (assocDef=" + assocDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
+            throw new RuntimeException("Adding assoc def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
+                "\" failed (compDef=" + compDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
         }
     }
 
@@ -337,9 +337,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // 3 methods to bridge between assoc and assoc def
 
     final void _addCompDef(AssociationModelImpl assoc) {
-        CompDefModelImpl assocDef = pl.typeStorage.newCompDefModel(assoc);
-        pl.typeStorage.storeViewConfig(assocDef);
-        _addCompDefBefore(assocDef, null);      // beforeCompDefUri=null
+        CompDefModelImpl compDef = pl.typeStorage.newCompDefModel(assoc);
+        pl.typeStorage.storeViewConfig(compDef);
+        _addCompDefBefore(compDef, null);      // beforeCompDefUri=null
         // FIXME: move addUpdateTypeDirective() call to _addCompDefBefore()? At the moment when adding ab assoc def via
         // TypeImpl no directives are added.
         // (TypeImpl addCompDef() and addCompDefBefore() calls _addCompDefBefore() directly.)
@@ -356,21 +356,21 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      */
     final void _updateCompDef(AssociationModel assoc, AssociationModel oldAssoc) {
         String[] assocDefUris = findCompDefUris(assoc.getId());
-        CompDefModel assocDef = getCompDef(assocDefUris[0]);
+        CompDefModel compDef = getCompDef(assocDefUris[0]);
         String oldCompDefUri;
-        if (assoc == assocDef) {
+        if (assoc == compDef) {
             // updated "via assoc def"
             oldCompDefUri = ((CompDefModel) oldAssoc).getCompDefUri();
         } else {
             // updated "via assoc"
-            oldCompDefUri = assocDef.getCompDefUri();
+            oldCompDefUri = compDef.getCompDefUri();
             // transfer assoc model to assoc def model
-            assocDef.setTypeUri(assoc.getTypeUri());
-            assocDef.setSimpleValue(assoc.getSimpleValue());
-            assocDef.setChildTopicsModel(assoc.getChildTopicsModel());
+            compDef.setTypeUri(assoc.getTypeUri());
+            compDef.setSimpleValue(assoc.getSimpleValue());
+            compDef.setChildTopicsModel(assoc.getChildTopicsModel());
         }
         // rehash if assoc def URI has changed (due to changed custom assoc type)
-        if (!assocDef.getCompDefUri().equals(oldCompDefUri)) {
+        if (!compDef.getCompDefUri().equals(oldCompDefUri)) {
             rehashCompDef(oldCompDefUri, assocDefUris[1]);
         }
         //
@@ -500,12 +500,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     private void _updateCompDefs(Collection<CompDefModelImpl> newCompDefs) {
-        for (CompDefModelImpl assocDef : newCompDefs) {
+        for (CompDefModelImpl compDef : newCompDefs) {
             // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
             // So we must identify the assoc def to update **by ID**.
             // ### TODO: drop updateCompDef() and rehash here (that is remove + add).
-            String[] assocDefUris = findCompDefUris(assocDef.getId());
-            getCompDef(assocDefUris[0]).update(assocDef);
+            String[] assocDefUris = findCompDefUris(compDef.getId());
+            getCompDef(assocDefUris[0]).update(compDef);
         }
     }
 
@@ -576,10 +576,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         //
         Iterator<? extends CompDefModel> i = assocDefs.iterator();
         for (CompDefModel _assocDef : _assocDefs) {
-            CompDefModel assocDef = i.next();
+            CompDefModel compDef = i.next();
             // Note: if the assoc def's custom association type changed the assoc def URI changes as well.
             // So we must identify the assoc defs to compare **by ID**.
-            long assocDefId  = checkCompDefId(assocDef);
+            long assocDefId  = checkCompDefId(compDef);
             long _assocDefId = checkCompDefId(_assocDef);
             if (assocDefId != _assocDefId) {
                 return false;
@@ -592,26 +592,26 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---
 
     private void rehashCompDefs(Collection<CompDefModelImpl> newCompDefs) {
-        for (CompDefModel assocDef : newCompDefs) {
-            rehashCompDef(assocDef.getCompDefUri(), null);
+        for (CompDefModel compDef : newCompDefs) {
+            rehashCompDef(compDef.getCompDefUri(), null);
         }
     }
 
     private void rehashCompDef(String compDefUri, String beforeCompDefUri) {
-        CompDefModel assocDef = removeCompDef(compDefUri);
-        logger.info("Rehashing assoc def \"" + compDefUri + "\" -> \"" + assocDef.getCompDefUri() + "\" (put " +
+        CompDefModel compDef = removeCompDef(compDefUri);
+        logger.info("Rehashing assoc def \"" + compDefUri + "\" -> \"" + compDef.getCompDefUri() + "\" (put " +
             (beforeCompDefUri != null ? "before \"" + beforeCompDefUri + "\"" : "at end") + ")");
-        addCompDefBefore(assocDef, beforeCompDefUri);
+        addCompDefBefore(compDef, beforeCompDefUri);
     }
 
     // ---
 
     private CompDefModelImpl getCompDefOrThrow(String compDefUri) {
-        CompDefModelImpl assocDef = _getCompDef(compDefUri);
-        if (assocDef == null) {
+        CompDefModelImpl compDef = _getCompDef(compDefUri);
+        if (compDef == null) {
             throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + assocDefs.keySet());
         }
-        return assocDef;
+        return compDef;
     }
 
     private CompDefModelImpl _getCompDef(String compDefUri) {
@@ -626,8 +626,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      */
     private long lastCompDefId() {
         long lastCompDefId = -1;
-        for (CompDefModel assocDef : getCompDefs()) {
-            lastCompDefId = assocDef.getId();
+        for (CompDefModel compDef : getCompDefs()) {
+            lastCompDefId = compDef.getId();
         }
         return lastCompDefId;
     }
@@ -643,10 +643,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private long checkCompDefId(CompDefModel assocDef) {
-        long assocDefId = assocDef.getId();
+    private long checkCompDefId(CompDefModel compDef) {
+        long assocDefId = compDef.getId();
         if (assocDefId == -1) {
-            throw new RuntimeException("The assoc def ID is uninitialized (-1): " + assocDef);
+            throw new RuntimeException("The assoc def ID is uninitialized (-1): " + compDef);
         }
         return assocDefId;
     }
@@ -656,8 +656,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private SequencedHashMap<String, CompDefModelImpl> toMap(
                                                            Collection<? extends CompDefModel> assocDefs) {
         SequencedHashMap<String, CompDefModelImpl> _assocDefs = new SequencedHashMap();
-        for (CompDefModel assocDef : assocDefs) {
-            _assocDefs.put(assocDef.getCompDefUri(), (CompDefModelImpl) assocDef);
+        for (CompDefModel compDef : assocDefs) {
+            _assocDefs.put(compDef.getCompDefUri(), (CompDefModelImpl) compDef);
         }
         return _assocDefs;
     }
@@ -686,8 +686,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private JSONArray toJSONArray(Collection<? extends CompDefModel> assocDefs) {
         JSONArray _assocDefs = new JSONArray();
-        for (CompDefModel assocDef : assocDefs) {
-            _assocDefs.put(assocDef.toJSON());
+        for (CompDefModel compDef : assocDefs) {
+            _assocDefs.put(compDef.toJSON());
         }
         return _assocDefs;
     }

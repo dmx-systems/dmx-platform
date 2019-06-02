@@ -29,8 +29,8 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationTypeModel addCompDef(CompDefModel assocDef) {
-        return (AssociationTypeModel) super.addCompDef(assocDef);
+    public AssociationTypeModel addCompDef(CompDefModel compDef) {
+        return (AssociationTypeModel) super.addCompDef(compDef);
     }
 
     // ---

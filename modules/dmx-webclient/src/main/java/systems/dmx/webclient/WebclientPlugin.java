@@ -145,13 +145,13 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // ID of the assoc def to be updated. -1 if the update does not target an assoc def (but a type).
         long assocDefId = -1;
         if (type == null) {
-            Association assocDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
+            Association compDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
                 "dmx.core.parent", "dmx.core.composition_def");
-            if (assocDef == null) {
+            if (compDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }
-            type = (Topic) assocDef.getPlayer("dmx.core.parent_type");
-            assocDefId = assocDef.getId();
+            type = (Topic) compDef.getPlayer("dmx.core.parent_type");
+            assocDefId = compDef.getId();
         }
         //
         String typeUri = type.getTypeUri();
@@ -260,9 +260,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Looks up an assoc def by ID.
      */
     private CompDefModel getCompDef(TypeModel type, long assocDefId) {
-        for (CompDefModel assocDef : type.getCompDefs()) {
-            if (assocDef.getId() == assocDefId) {
-                return assocDef;
+        for (CompDefModel compDef : type.getCompDefs()) {
+            if (compDef.getId() == assocDefId) {
+                return compDef;
             }
         }
         throw new RuntimeException("Assoc def " + assocDefId + " not found in type \"" + type.getUri() + "\"");

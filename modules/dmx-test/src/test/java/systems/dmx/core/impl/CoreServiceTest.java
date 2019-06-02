@@ -67,13 +67,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.topic_type", topicType.getTypeUri());
         assertEquals("dmx.core.composite",  topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getCompDefs().size());
-        CompDef assocDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
-        assertEquals("dmx.core.composition_def",     assocDef.getTypeUri());
-        assertEquals("dmx.core.plugin",              assocDef.getParentTypeUri());
-        assertEquals("dmx.core.plugin_migration_nr", assocDef.getChildTypeUri());
-        assertEquals("dmx.core.one",                 assocDef.getChildCardinalityUri());
-        DMXObject t1 = assocDef.getPlayer("dmx.core.parent_type");
-        DMXObject t2 = assocDef.getPlayer("dmx.core.child_type");
+        CompDef compDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
+        assertEquals("dmx.core.composition_def",     compDef.getTypeUri());
+        assertEquals("dmx.core.plugin",              compDef.getParentTypeUri());
+        assertEquals("dmx.core.plugin_migration_nr", compDef.getChildTypeUri());
+        assertEquals("dmx.core.one",                 compDef.getChildCardinalityUri());
+        DMXObject t1 = compDef.getPlayer("dmx.core.parent_type");
+        DMXObject t2 = compDef.getPlayer("dmx.core.child_type");
         assertEquals("dmx.core.plugin",              t1.getUri());
         assertEquals("dmx.core.topic_type",          t1.getTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", t2.getUri());
@@ -617,30 +617,30 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
         // find assoc def 1/3
-        RelatedAssociation assocDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
+        RelatedAssociation compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
-        logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
+        logger.info("### assoc def ID 1/3 = " + compDef.getId() +
+            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+        assertNotNull(compDef);
         //
         // find assoc def 2/3
-        assocDef = assocDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
+        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 2/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
+        logger.info("### assoc def ID 2/3 = " + compDef.getId() +
+            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+        assertNotNull(compDef);
         //
         // find assoc def 3/3
-        assocDef = assocDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
+        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 3/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
+        logger.info("### assoc def ID 3/3 = " + compDef.getId() +
+            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+        assertNotNull(compDef);
         //
         // there is no other
-        assocDef = assocDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
+        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
-        assertNull(assocDef);
+        assertNull(compDef);
     }
 
     // ---
@@ -1015,14 +1015,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         //
-        CompDef assocDef = dmx.getTopicType("dmx.test.item_facet").getCompDef("dmx.test.item");
+        CompDef compDef = dmx.getTopicType("dmx.test.item_facet").getCompDef("dmx.test.item");
         //
         // update facet
         tx = dmx.beginTx();
         try {
             name.updateChildTopics(
                 mf.newChildTopicsModel().putRef("dmx.test.item", item1.getId()),
-                assocDef
+                compDef
             );
             tx.success();
         } finally {
@@ -1040,7 +1040,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             name.updateChildTopics(
                 mf.newChildTopicsModel().putRef("dmx.test.item", item2.getId()),
-                assocDef
+                compDef
             );
             tx.success();
         } finally {

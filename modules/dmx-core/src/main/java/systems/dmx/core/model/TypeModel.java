@@ -27,18 +27,18 @@ public interface TypeModel extends TopicModel, Iterable<String> {
     boolean hasCompDef(String compDefUri);
 
     /**
-     * @param   assocDef    the assoc def to add.
+     * @param   compDef     the assoc def to add.
      *                      Note: its ID might be uninitialized (-1).
      */
-    TypeModel addCompDef(CompDefModel assocDef);
+    TypeModel addCompDef(CompDefModel compDef);
 
     /**
-     * @param   assocDef            the assoc def to add.
+     * @param   compDef             the assoc def to add.
      *                              Note: its ID might be uninitialized (-1).
      * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    TypeModel addCompDefBefore(CompDefModel assocDef, String beforeCompDefUri);
+    TypeModel addCompDefBefore(CompDefModel compDef, String beforeCompDefUri);
 
     CompDefModel removeCompDef(String compDefUri);
 

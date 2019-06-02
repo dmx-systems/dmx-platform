@@ -217,7 +217,7 @@ public interface ModelFactory {
 
     CompDefModel newCompDefModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
 
-    CompDefModel newCompDefModel(JSONObject assocDef);
+    CompDefModel newCompDefModel(JSONObject compDef);
 
 
 

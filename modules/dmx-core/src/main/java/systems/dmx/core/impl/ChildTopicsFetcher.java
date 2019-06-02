@@ -32,15 +32,15 @@ class ChildTopicsFetcher {
      * <p>
      * Works for both, "one" and "many" association definitions.
      *
-     * @param   assocDef    The child topic models according to this association definition are fetched.
+     * @param   compDef     The child topic models according to this association definition are fetched.
      */
-    void fetch(DMXObjectModel object, CompDefModel assocDef, boolean deep) {
+    void fetch(DMXObjectModel object, CompDefModel compDef, boolean deep) {
         try {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
-            String cardinalityUri = assocDef.getChildCardinalityUri();
-            String compDefUri     = assocDef.getCompDefUri();
+            String cardinalityUri = compDef.getChildCardinalityUri();
+            String compDefUri     = compDef.getCompDefUri();
             if (cardinalityUri.equals("dmx.core.one")) {
-                RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), assocDef);
+                RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), compDef);
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
                     childTopics.put(compDefUri, childTopic);
@@ -49,7 +49,7 @@ class ChildTopicsFetcher {
                     }
                 }
             } else if (cardinalityUri.equals("dmx.core.many")) {
-                for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), assocDef)) {
+                for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), compDef)) {
                     childTopics.add(compDefUri, childTopic);
                     if (deep) {
                         fetchChildTopics(childTopic, deep);    // recursion
@@ -59,7 +59,7 @@ class ChildTopicsFetcher {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the \"" + assocDef.getCompDefUri() + "\" child topics of object " +
+            throw new RuntimeException("Fetching the \"" + compDef.getCompDefUri() + "\" child topics of object " +
                 object.getId() + " failed", e);
         }
     }
@@ -72,8 +72,8 @@ class ChildTopicsFetcher {
      * overhead in others (e.g. when updating composite structures).
      */
     private void fetchChildTopics(DMXObjectModelImpl object, boolean deep) {
-        for (CompDefModel assocDef : object.getType().getCompDefs()) {
-            fetch(object, assocDef, deep);
+        for (CompDefModel compDef : object.getType().getCompDefs()) {
+            fetch(object, compDef, deep);
         }
     }
 
@@ -82,21 +82,21 @@ class ChildTopicsFetcher {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
-    private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel assocDef) {
+    private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel compDef) {
         return pl.fetchRelatedTopic(
             objectId,
-            assocDef.getInstanceLevelAssocTypeUri(),
+            compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",
-            assocDef.getChildTypeUri()
+            compDef.getChildTypeUri()
         );
     }
 
-    private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel assocDef) {
+    private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
         return pl.fetchRelatedTopics(
             objectId,
-            assocDef.getInstanceLevelAssocTypeUri(),
+            compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",
-            assocDef.getChildTypeUri()
+            compDef.getChildTypeUri()
         );
     }
 }
