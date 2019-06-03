@@ -55,7 +55,7 @@ export default {
     },
 
     assocDefs () {
-      return this.type.assocDefs
+      return this.type.compDefs
     }
   },
 
