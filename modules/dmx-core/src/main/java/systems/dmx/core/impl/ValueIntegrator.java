@@ -227,7 +227,7 @@ class ValueIntegrator {
         ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
         // Iterate through type, not through newValues.
         // newValues might contain childs not contained in the type def, e.g. "dmx.timestamps.modified".
-        for (String compDefUri : assocDefUris()) {
+        for (String compDefUri : compDefUris()) {
             Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
             if (isOne(compDefUri)) {
                 newChildValue = _childTopics.getTopicOrNull(compDefUri);
@@ -262,7 +262,7 @@ class ValueIntegrator {
         return value;
     }
 
-    private Iterable<String> assocDefUris() {
+    private Iterable<String> compDefUris() {
         return !isFacetUpdate ? type : asList(compDef.getCompDefUri());
     }
 
@@ -407,7 +407,7 @@ class ValueIntegrator {
                 parent.getTypeUri() + "\"");
         }
         //
-        for (String compDefUri : assocDefUris()) {
+        for (String compDefUri : compDefUris()) {
             // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
@@ -576,14 +576,14 @@ class ValueIntegrator {
      *                              key: compDefUri
      *                              value: UnifiedValue or List<UnifiedValue>
      *
-     * @param   assocDefUris    only these child topics are respected
+     * @param   compDefUris     only these child topics are respected
      *
      * @return  the found (or created) parent topic; never null.
      */
-    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
+    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> compDefUris) {
         List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
         // logger.info("### " + candidates.size() + " candidates " + DMXUtils.idList(candidates));
-        for (String compDefUri : assocDefUris) {
+        for (String compDefUri : compDefUris) {
             if (isOne(compDefUri)) {
                 UnifiedValue<TopicModelImpl> value = (UnifiedValue) childValues.get(compDefUri);
                 // Note: value is null if added to emptyValues (see integrateComposite())

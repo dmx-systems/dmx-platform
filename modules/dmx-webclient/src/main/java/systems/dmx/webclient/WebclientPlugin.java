@@ -143,7 +143,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // type to be updated (topic type or assoc type)
         Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
         // ID of the assoc def to be updated. -1 if the update does not target an assoc def (but a type).
-        long assocDefId = -1;
+        long compDefId = -1;
         if (type == null) {
             Association compDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
                 "dmx.core.parent", "dmx.core.composition_def");
@@ -151,41 +151,41 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }
             type = (Topic) compDef.getPlayer("dmx.core.parent_type");
-            assocDefId = compDef.getId();
+            compDefId = compDef.getId();
         }
         //
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
             _updateTypeCacheAndAddDirective(
                 dmx.getTopicType(type.getUri()),
-                assocDefId, viewConfigTopic, Directive.UPDATE_TOPIC_TYPE
+                compDefId, viewConfigTopic, Directive.UPDATE_TOPIC_TYPE
             );
         } else if (typeUri.equals("dmx.core.assoc_type")) {
             _updateTypeCacheAndAddDirective(
                 dmx.getAssociationType(type.getUri()),
-                assocDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
+                compDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
             );
         } else {
             throw new RuntimeException("View config " + viewConfigTopic.getId() + " is associated unexpectedly, type=" +
-                type + ", assocDefId=" + assocDefId + ", viewConfigTopic=" + viewConfigTopic);
+                type + ", compDefId=" + compDefId + ", viewConfigTopic=" + viewConfigTopic);
         }
     }
 
-    private void _updateTypeCacheAndAddDirective(DMXType type, long assocDefId, Topic viewConfigTopic, Directive dir) {
-        logger.info("### Updating view config of type \"" + type.getUri() + "\" (assocDefId=" + assocDefId + ")");
-        updateTypeCache(type.getModel(), assocDefId, viewConfigTopic.getModel());
+    private void _updateTypeCacheAndAddDirective(DMXType type, long compDefId, Topic viewConfigTopic, Directive dir) {
+        logger.info("### Updating view config of type \"" + type.getUri() + "\" (compDefId=" + compDefId + ")");
+        updateTypeCache(type.getModel(), compDefId, viewConfigTopic.getModel());
         Directives.get().add(dir, type);        // ### TODO: should be implicit
     }
 
     /**
      * Overrides the cached view config topic for the given type/assoc def with the given view config topic.
      */
-    private void updateTypeCache(TypeModel type, long assocDefId, TopicModel viewConfigTopic) {
+    private void updateTypeCache(TypeModel type, long compDefId, TopicModel viewConfigTopic) {
         ViewConfigurationModel vcm;
-        if (assocDefId == -1) {
+        if (compDefId == -1) {
             vcm = type.getViewConfig();
         } else {
-            vcm = getCompDef(type, assocDefId).getViewConfig();
+            vcm = getCompDef(type, compDefId).getViewConfig();
         }
         vcm.updateConfigTopic(viewConfigTopic);
     }
@@ -259,12 +259,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Looks up an assoc def by ID.
      */
-    private CompDefModel getCompDef(TypeModel type, long assocDefId) {
+    private CompDefModel getCompDef(TypeModel type, long compDefId) {
         for (CompDefModel compDef : type.getCompDefs()) {
-            if (compDef.getId() == assocDefId) {
+            if (compDef.getId() == compDefId) {
                 return compDef;
             }
         }
-        throw new RuntimeException("Assoc def " + assocDefId + " not found in type \"" + type.getUri() + "\"");
+        throw new RuntimeException("Assoc def " + compDefId + " not found in type \"" + type.getUri() + "\"");
     }
 }

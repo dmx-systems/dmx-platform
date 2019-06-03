@@ -651,15 +651,15 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private List<CompDefModel> parseCompDefs(JSONArray compDefs, String parentTypeUri) throws JSONException {
-        List<CompDefModel> _assocDefs = new ArrayList();
+        List<CompDefModel> _compDefs = new ArrayList();
         if (compDefs != null) {
             for (int i = 0; i < compDefs.length(); i++) {
                 JSONObject compDef = compDefs.getJSONObject(i)
                     .put("parentTypeUri", parentTypeUri);
-                _assocDefs.add(newCompDefModel(compDef));
+                _compDefs.add(newCompDefModel(compDef));
             }
         }
-        return _assocDefs;
+        return _compDefs;
     }
 
 

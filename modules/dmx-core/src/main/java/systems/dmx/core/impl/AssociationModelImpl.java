@@ -329,7 +329,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     void preDelete() {
         // Type Editor Support
         if (isCompDef(this)) {
-            // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
+            // Note: we listen to the PRE event here, not the POST event. At POST time the compdef sequence might be
             // interrupted, which would result in a corrupted sequence once rebuild. (Due to the interruption, while
             // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
             // ### FIXDOC

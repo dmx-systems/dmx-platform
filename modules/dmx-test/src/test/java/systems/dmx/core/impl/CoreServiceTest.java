@@ -478,8 +478,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set "Include in Label" flag
-            long assocDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
-            dmx.getAssociation(assocDefId).getChildTopics().set("dmx.core.include_in_label", false);
+            long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
+            dmx.getAssociation(compDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
             // assoc def order must not have changed
             Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
@@ -524,8 +524,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Association Type (via association)
-            long assocDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
-            dmx.getAssociation(assocDefId).getChildTopics()
+            long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
+            dmx.getAssociation(compDefId).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
             // get Custom Association Type
@@ -613,7 +613,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void assocDefSequence() {
+    public void compDefSequence() {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
         // find assoc def 1/3

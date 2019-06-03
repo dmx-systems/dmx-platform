@@ -381,11 +381,11 @@ class TypeStorage {
 
     private List<CompDefModel> sortCompDefs(Map<Long, CompDefModel> compDefs, List<Long> sequence) {
         List<CompDefModel> sortedCompDefs = new ArrayList();
-        for (long assocDefId : sequence) {
-            CompDefModel compDef = compDefs.get(assocDefId);
+        for (long compDefId : sequence) {
+            CompDefModel compDef = compDefs.get(compDefId);
             // error check
             if (compDef == null) {
-                throw new RuntimeException("DB inconsistency: ID " + assocDefId +
+                throw new RuntimeException("DB inconsistency: ID " + compDefId +
                     " is in sequence but not in the type's association definitions");
             }
             sortedCompDefs.add(compDef);
@@ -410,8 +410,8 @@ class TypeStorage {
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
             // assignments already. These must be removed before assigning new cardinality. ### TODO?
-            // ### removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
-            // ### associateCardinality(assocDefId, CHILD_CARDINALITY, compDef.getChildCardinalityUri());
+            // ### removeCardinalityAssignmentIfExists(compDefId, CHILD_CARDINALITY);
+            // ### associateCardinality(compDefId, CHILD_CARDINALITY, compDef.getChildCardinalityUri());
             //
             // 3) view config
             storeViewConfig(compDef);
@@ -541,13 +541,13 @@ class TypeStorage {
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
-    private RelatedAssociationModelImpl fetchSuccessor(long assocDefId) {
-        return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.predecessor",
+    private RelatedAssociationModelImpl fetchSuccessor(long compDefId) {
+        return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
             "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
-    private RelatedAssociationModelImpl fetchPredecessor(long assocDefId) {
-        return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.successor",
+    private RelatedAssociationModelImpl fetchPredecessor(long compDefId) {
+        return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.successor",
             "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
@@ -573,52 +573,52 @@ class TypeStorage {
      * @param   firstCompDefId      Identifies the first assoc def. If this equals the ID of the assoc def to add
      *                              the assoc def is <b>inserted at start</b>.
      */
-    void addCompDefToSequence(long typeId, long assocDefId, long beforeCompDefId, long firstCompDefId,
-                                                                                  long lastCompDefId) {
+    void addCompDefToSequence(long typeId, long compDefId, long beforeCompDefId, long firstCompDefId,
+                                                                                 long lastCompDefId) {
         if (beforeCompDefId == -1) {
             // append at end
-            appendToSequence(typeId, assocDefId, lastCompDefId);
-        } else if (firstCompDefId == assocDefId) {
+            appendToSequence(typeId, compDefId, lastCompDefId);
+        } else if (firstCompDefId == compDefId) {
             // insert at start
-            insertAtSequenceStart(typeId, assocDefId);
+            insertAtSequenceStart(typeId, compDefId);
         } else {
             // insert in the middle
-            insertIntoSequence(assocDefId, beforeCompDefId);
+            insertIntoSequence(compDefId, beforeCompDefId);
         }
     }
 
-    private void appendToSequence(long typeId, long assocDefId, long predCompDefId) {
+    private void appendToSequence(long typeId, long compDefId, long predCompDefId) {
         if (predCompDefId == -1) {
-            storeSequenceStart(typeId, assocDefId);
+            storeSequenceStart(typeId, compDefId);
         } else {
-            storeSequenceSegment(predCompDefId, assocDefId);
+            storeSequenceSegment(predCompDefId, compDefId);
         }
     }
 
-    private void insertAtSequenceStart(long typeId, long assocDefId) {
+    private void insertAtSequenceStart(long typeId, long compDefId) {
         // delete sequence start
         RelatedAssociationModelImpl compDef = fetchSequenceStart(typeId);
         compDef.getRelatingAssociation().delete();
         // reconnect
-        storeSequenceStart(typeId, assocDefId);
-        storeSequenceSegment(assocDefId, compDef.getId());
+        storeSequenceStart(typeId, compDefId);
+        storeSequenceSegment(compDefId, compDef.getId());
     }
 
-    private void insertIntoSequence(long assocDefId, long beforeCompDefId) {
+    private void insertIntoSequence(long compDefId, long beforeCompDefId) {
         // delete sequence segment
         RelatedAssociationModelImpl compDef = fetchPredecessor(beforeCompDefId);
         compDef.getRelatingAssociation().delete();
         // reconnect
-        storeSequenceSegment(compDef.getId(), assocDefId);
-        storeSequenceSegment(assocDefId, beforeCompDefId);
+        storeSequenceSegment(compDef.getId(), compDefId);
+        storeSequenceSegment(compDefId, beforeCompDefId);
     }
 
     // ---
 
-    private void storeSequenceStart(long typeId, long assocDefId) {
+    private void storeSequenceStart(long typeId, long compDefId) {
         pl.createAssociation("dmx.core.composition",
             mf.newTopicRoleModel(typeId, "dmx.core.type"),
-            mf.newAssociationRoleModel(assocDefId, "dmx.core.sequence_start")
+            mf.newAssociationRoleModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
@@ -752,8 +752,8 @@ class TypeStorage {
         return mf.newTopicRoleModel(typeId, "dmx.core.parent");
     }
 
-    RoleModel newCompDefRole(long assocDefId) {
-        return mf.newAssociationRoleModel(assocDefId, "dmx.core.parent");
+    RoleModel newCompDefRole(long compDefId) {
+        return mf.newAssociationRoleModel(compDefId, "dmx.core.parent");
     }
 
 
