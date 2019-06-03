@@ -42,7 +42,7 @@ class ValueIntegrator {
     private boolean isType;
     private boolean isFacetUpdate;
 
-    // For composites: assoc def URIs of empty child topics.
+    // For composites: comp def URIs of empty child topics.
     // Evaluated when deleting child-assignments, see updateAssignments().
     // Not having null entries in the unified child topics simplifies candidate determination.
     // ### TODO: to be dropped?
@@ -67,7 +67,7 @@ class ValueIntegrator {
      *
      * @param   newValues       the "update model": the values to be integrated.
      * @param   targetObject    may be null. TODO: explain
-     * @param   compDef         for facet value updates: the facet type's assoc def.
+     * @param   compDef         for facet value updates: the facet type's comp def.
      *                          <code>null</code> for non-facet updates.
      *
      * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
@@ -629,7 +629,7 @@ class ValueIntegrator {
         // logger.fine("### compDefUri=\"" + compDefUri + "\", childValues=" + childValues);
         // sanity check
         if (!type.getUri().equals(compDef(compDefUri).getParentTypeUri())) {
-            throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", assoc def's parent type=\"" +
+            throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", comp def's parent type=\"" +
                 compDef(compDefUri).getParentTypeUri() + "\"");
         }
         //
@@ -648,7 +648,7 @@ class ValueIntegrator {
      *
      * @param   candidates      the parent candidates; non-matching candidates are removed in-place.
      * @param   childTopic      the child topic to check; may be null
-     * @param   compDefUri      the assoc def underlying the child topic
+     * @param   compDefUri      the comp def underlying the child topic
      */
     private void eliminateParentCandidates(List<? extends TopicModelImpl> candidates, TopicModelImpl childTopic,
                                                                                       String compDefUri) {

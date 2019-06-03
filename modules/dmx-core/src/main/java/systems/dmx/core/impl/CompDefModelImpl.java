@@ -126,9 +126,9 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
     void postCreate() {
         // Note: defining an empty postCreate() hook suppresses Type Editor Support as invoked by the superclass's
         // postCreate() hook.
-        // - When an assoc def is created *programmatically* (through a migration) a full CompDefModel
-        //   is instantiated, and no further Type Editor Support must be executed.
-        // - When an assoc def is created *interactively* (by creating an association in conjunction with auto-typing)
+        // - When an comp def is created *programmatically* (through a migration) a full CompDefModel is instantiated,
+        //   and no further Type Editor Support must be executed.
+        // - When an comp def is created *interactively* (by creating an association in conjunction with auto-typing)
         //   a sole AssociationModel is instantiated, and Type editor support is required.
     }
 
@@ -140,7 +140,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModelImpl cardinality = getChildTopicsModel().getTopicOrNull("dmx.core.cardinality");
         if (cardinality == null) {
             // ### TODO: should a cardinality topic always exist?
-            throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Cardinality\" topic");
+            throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Cardinality\" topic");
             // return false;
         }
         return cardinality.uri;
@@ -150,7 +150,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dmx.core.identity_attr");
         if (isIdentityAttr == null) {
             // ### TODO: should a isIdentityAttr topic always exist?
-            // throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Identity Attribute\" topic");
+            // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Identity Attribute\" topic");
             return false;
         }
         return isIdentityAttr.getSimpleValue().booleanValue();
@@ -160,7 +160,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dmx.core.include_in_label");
         if (includeInLabel == null) {
             // ### TODO: should a includeInLabel topic always exist?
-            // throw new RuntimeException("Assoc def \"" + getCompDefUri() + "\" has no \"Include in Label\" topic");
+            // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Include in Label\" topic");
             return false;
         }
         return includeInLabel.getSimpleValue().booleanValue();
@@ -172,24 +172,24 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
 
     boolean isReadable() {
         try {
-            // 1) check assoc def
+            // 1) check comp def
             if (!pl.hasReadAccess(this)) {
-                logger.info("### Assoc def \"" + getCompDefUri() + "\" not READable");
+                logger.info("### Comp def \"" + getCompDefUri() + "\" not READable");
                 return false;
             }
-            // Note: there is no need to explicitly check READability for the assoc def's child type.
-            // If the child type is not READable the entire assoc def is not READable as well.
+            // Note: there is no need to explicitly check READability for the comp def's child type.
+            // If the child type is not READable the entire comp def is not READable as well.
             //
             // 2) check custom assoc type, if set
             TopicModelImpl assocType = getCustomAssocType();
             if (assocType != null && !pl.hasReadAccess(assocType)) {
-                logger.info("### Assoc def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
+                logger.info("### Comp def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
                 return false;
             }
             //
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Checking assoc def READability failed (" + this + ")", e);
+            throw new RuntimeException("Checking comp def READability failed (" + this + ")", e);
         }
     }
 

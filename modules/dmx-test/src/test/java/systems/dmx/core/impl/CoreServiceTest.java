@@ -383,7 +383,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void hasIncludeInLabel() {
-        // Note: the assoc def is created while migration
+        // Note: the comp def is created while migration
         RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
             .getCompDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
         assertNotNull(includeInLabel);
@@ -394,7 +394,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void hasIncludeInLabelForAddedCompDef() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            // add assoc def programmatically
+            // add comp def programmatically
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", "dmx.core.text"));
             dmx.getTopicType("dmx.core.plugin").addCompDef(
                 mf.newCompDefModel(
@@ -402,7 +402,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 ));
             //
             // Note: the topic type must be re-get as getTopicType() creates
-            // a cloned model that doesn't contain the added assoc def
+            // a cloned model that doesn't contain the added comp def
             RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
                 .getCompDef("dmx.test.date").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
             assertNotNull(includeInLabel);
@@ -449,7 +449,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addCompDef(
                     mf.newCompDefModel("dmx.test.birthday", false, false,
                         "dmx.test.person", "dmx.test.date", "dmx.core.one")));
-            // test assoc def childs *before* set
+            // test comp def childs *before* set
             ChildTopics ct = tt.getCompDef("dmx.test.date#dmx.test.birthday").getChildTopics();
             assertEquals(false, ct.getBoolean("dmx.core.include_in_label"));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
@@ -457,7 +457,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 2) set "Include in Label" flag
             ct.set("dmx.core.include_in_label", true);
             //
-            // test assoc def childs *after* set (custom assoc type must not change)
+            // test comp def childs *after* set (custom assoc type must not change)
             assertEquals(true, ct.getBoolean("dmx.core.include_in_label"));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
@@ -481,10 +481,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
             dmx.getAssociation(compDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
-            // assoc def order must not have changed
+            // comp def order must not have changed
             Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
             // Note: the topic type must be re-get as getTopicType() creates
-            // a cloned model that doesn't contain the manipulated assoc defs
+            // a cloned model that doesn't contain the manipulated comp defs
             assertEquals(3, compDefs.size());
             Iterator<CompDef> i = compDefs.iterator();
             assertEquals("dmx.core.plugin_name",          i.next().getCompDefUri());
@@ -501,7 +501,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void editCompDefSetCustomAssocType() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            // set Custom Association Type (via assoc def)
+            // set Custom Association Type (via comp def)
             dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
@@ -510,7 +510,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
-            // a cloned model that doesn't contain the manipulated assoc defs
+            // a cloned model that doesn't contain the manipulated comp defs
             assertEquals("dmx.core.association", assocType.getUri());
             //
             tx.success();
@@ -533,7 +533,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
-            // a cloned model that doesn't contain the manipulated assoc defs
+            // a cloned model that doesn't contain the manipulated comp defs
             assertEquals("dmx.core.association", assocType.getUri());
             //
             tx.success();
@@ -616,24 +616,24 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void compDefSequence() {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
-        // find assoc def 1/3
+        // find comp def 1/3
         RelatedAssociation compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
-        logger.info("### assoc def ID 1/3 = " + compDef.getId() +
+        logger.info("### comp def ID 1/3 = " + compDef.getId() +
             ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
         assertNotNull(compDef);
         //
-        // find assoc def 2/3
+        // find comp def 2/3
         compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 2/3 = " + compDef.getId() +
+        logger.info("### comp def ID 2/3 = " + compDef.getId() +
             ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
         assertNotNull(compDef);
         //
-        // find assoc def 3/3
+        // find comp def 3/3
         compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 3/3 = " + compDef.getId() +
+        logger.info("### comp def ID 3/3 = " + compDef.getId() +
             ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
         assertNotNull(compDef);
         //
@@ -651,7 +651,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
-            // insert assoc def at pos 0
+            // insert comp def at pos 0
             dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
                 mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", "dmx.core.one"),
                 "dmx.core.plugin_name"
@@ -665,7 +665,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertSame(4, compDefs.size());
             //
             Iterator<CompDef> i = compDefs.iterator();
-            assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new assoc def is at pos 0
+            assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new comp def is at pos 0
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
             //
             tx.success();
@@ -680,7 +680,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
-            // insert assoc def at pos 1
+            // insert comp def at pos 1
             dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
                 mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", "dmx.core.one"),
                 "dmx.core.plugin_symbolic_name"
@@ -695,7 +695,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             Iterator<CompDef> i = compDefs.iterator();
             assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());           // pos 0 is unchanged
-            assertEquals("dmx.test.name", i.next().getChildTypeUri());                  // new assoc def is at pos 1
+            assertEquals("dmx.test.name", i.next().getChildTypeUri());                  // new comp def is at pos 1
             assertEquals("dmx.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2
             //
             tx.success();

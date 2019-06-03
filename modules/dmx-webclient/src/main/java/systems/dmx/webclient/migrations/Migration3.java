@@ -48,7 +48,7 @@ public class Migration3 extends Migration {
             // Note: no View Config can be associated to the type "View Configuration" itself as this would cause an
             // endless recursion while fetching that type. Fetching a type involves fetching its view config, that is
             // all its view config topics, including their child topics. Fetching child topics is driven by the topic's
-            // type (its assoc defs), here: "View Configuration" -- the one we're fetching just now.
+            // type (its comp defs), here: "View Configuration" -- the one we're fetching just now.
             if (type.getUri().equals("dmx.webclient.view_config")) {
                 continue;
             }

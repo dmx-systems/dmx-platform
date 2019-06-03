@@ -288,7 +288,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     @Override
     void preCreate() {
         // Note: auto-typing only works for generic assocs (of type "Association") and for by-ID players.
-        // That's why auto-typing does not interfere with assoc defs created programmatically (through migration).
+        // That's why auto-typing does not interfere with comp defs created programmatically (through migration).
         if (DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
                 "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null ||
             DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.assoc_type",
@@ -486,10 +486,10 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // === Type Editor Support ===
 
-    // 3 methods to bridge between assoc and assoc def
+    // 3 methods to bridge between assoc and comp def
 
     /**
-     * Creates an assoc def model based on this assoc model, and 1) puts it in the type cache, and 2) updates the
+     * Creates an comp def model based on this assoc model, and 1) puts it in the type cache, and 2) updates the
      * DB sequence, and 3) adds an UPDATE_TYPE directive.
      *
      * Preconditions:

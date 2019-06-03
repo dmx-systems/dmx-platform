@@ -263,7 +263,7 @@ class TypeStorage {
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
-        // subsequently build from it by sorting the assoc def's according to the sequence IDs.
+        // subsequently build from it by sorting the comp def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
             CompDefModel compDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
                 childType.getUri());
@@ -275,11 +275,11 @@ class TypeStorage {
     // ---
 
     /**
-     * Creates an assoc def model from an assoc model. Determines the parent/child type URIs and adds them in-place.
-     * Note: the assoc may or may not have been an assoc def before.
+     * Creates an comp def model from an assoc model. Determines the parent/child type URIs and adds them in-place.
+     * Note: the assoc may or may not have been an comp def before.
      *
      * Part of "Type Editor Support". See TypeModelImpl.
-     * Called when the user creates an assoc def interactively.
+     * Called when the user creates an comp def interactively.
      *
      * @param   assoc   an assoc whose players are ref'd by-ID
      */
@@ -295,11 +295,11 @@ class TypeStorage {
     }
 
     /**
-     * Creates an assoc def model from an assoc model as retrieved from DB.
+     * Creates an comp def model from an assoc model as retrieved from DB.
      *
      * In-place sets the given type URIs as the player URIs.
      *
-     * Fetches the assoc def's child topics and manipulates the given assoc model in-place:
+     * Fetches the comp def's child topics and manipulates the given assoc model in-place:
      *   - cardinality
      *   - custom assoc type
      *   - identity-attr flag
@@ -307,8 +307,8 @@ class TypeStorage {
      *
      * Called when a type is loaded from DB.
      *
-     * Note: we can't use model-driven assoc def retrieval. Fetching assoc type "Composition Definition" would run into
-     * an endless recursion while fetching its "Custom Association Type" assoc def.
+     * Note: we can't use model-driven comp def retrieval. Fetching assoc type "Composition Definition" would run into
+     * an endless recursion while fetching its "Custom Association Type" comp def.
      *
      * @param   assoc   the underlying assoc as retrieved from DB, that is
      *                  1) players are ref'd by-ID
@@ -340,7 +340,7 @@ class TypeStorage {
             }
             return mf.newCompDefModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
-            throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
+            throw new RuntimeException("Fetching comp def failed (parentTypeUri=\"" + parentTypeUri +
                 "\", childTypeUri=\"" + childTypeUri + "\", " + assoc + ")", e);
         }
     }
@@ -416,7 +416,7 @@ class TypeStorage {
             // 3) view config
             storeViewConfig(compDef);
         } catch (Exception e) {
-            throw new RuntimeException("Storing assoc def \"" + compDef.getCompDefUri() + "\" failed (parent type \"" +
+            throw new RuntimeException("Storing comp def \"" + compDef.getCompDefUri() + "\" failed (parent type \"" +
                 compDef.getParentTypeUri() + "\")", e);
         }
     }
@@ -481,7 +481,7 @@ class TypeStorage {
         RelatedTopicModelImpl cardinality = fetchCardinalityIfExists(assoc);
         // error check
         if (cardinality == null) {
-            throw new RuntimeException("DB inconsistency: assoc def " + assoc.id + " has no cardinality");
+            throw new RuntimeException("DB inconsistency: comp def " + assoc.id + " has no cardinality");
         }
         //
         return cardinality;
@@ -493,7 +493,7 @@ class TypeStorage {
             "dmx.core.cardinality");
     }
 
-    // Note: if the assoc was an assoc def before it has a cardinality assignment already.
+    // Note: if the assoc was an comp def before it has a cardinality assignment already.
     // The assignment is restored. Otherwise "One" is used as default.
     //
     // ### TODO: drop it (dead code)
@@ -563,15 +563,15 @@ class TypeStorage {
     }
 
     /**
-     * Adds an assoc def to the sequence. Depending on the last 3 arguments either appends it at end, inserts it at
+     * Adds an comp def to the sequence. Depending on the last 3 arguments either appends it at end, inserts it at
      * start, or inserts it in the middle.
      *
-     * @param   beforeCompDefId     the ID of the assoc def <i>before</i> the assoc def is added
-     *                              If <code>-1</code> the assoc def is <b>appended at end</b>.
+     * @param   beforeCompDefId     the ID of the comp def <i>before</i> the comp def is added
+     *                              If <code>-1</code> the comp def is <b>appended at end</b>.
      *                              In this case <code>lastCompDefId</code> must identify the end.
      *                              (<code>firstCompDefId</code> is not relevant in this case.)
-     * @param   firstCompDefId      Identifies the first assoc def. If this equals the ID of the assoc def to add
-     *                              the assoc def is <b>inserted at start</b>.
+     * @param   firstCompDefId      Identifies the first comp def. If this equals the ID of the comp def to add
+     *                              the comp def is <b>inserted at start</b>.
      */
     void addCompDefToSequence(long typeId, long compDefId, long beforeCompDefId, long firstCompDefId,
                                                                                  long lastCompDefId) {
@@ -672,7 +672,7 @@ class TypeStorage {
             return viewConfigModel(pl.fetchAssociationRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view config of assoc def " + compDef.getId() + " failed", e);
+            throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);
         }
     }
 

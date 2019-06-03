@@ -137,12 +137,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Updates type cache according to the given view config topic, and adds an UPDATE-TYPE directive.
      * Called once a view config topic has been updated.
      *
-     * Determines the type and possibly the assoc def the given view config topic belongs to.
+     * Determines the type and possibly the comp def the given view config topic belongs to.
      */
     private void updateTypeCacheAndAddDirective(Topic viewConfigTopic) {
         // type to be updated (topic type or assoc type)
         Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
-        // ID of the assoc def to be updated. -1 if the update does not target an assoc def (but a type).
+        // ID of the comp def to be updated. -1 if the update does not target an comp def (but a type).
         long compDefId = -1;
         if (type == null) {
             Association compDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
@@ -178,7 +178,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     /**
-     * Overrides the cached view config topic for the given type/assoc def with the given view config topic.
+     * Overrides the cached view config topic for the given type/comp def with the given view config topic.
      */
     private void updateTypeCache(TypeModel type, long compDefId, TopicModel viewConfigTopic) {
         ViewConfigurationModel vcm;
@@ -195,7 +195,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void setViewConfigLabel(DMXType type) {
         // type
         setViewConfigLabel(type.getViewConfig());
-        // assoc defs
+        // comp defs
         for (String compDefUri : type) {
             setViewConfigLabel(type.getCompDef(compDefUri).getViewConfig());
         }
@@ -214,7 +214,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // --- Default Config Topic ---
 
     /**
-     * Adds a default view config topic to the given type (and its assoc defs) in case no one is set already.
+     * Adds a default view config topic to the given type (and its comp defs) in case no one is set already.
      * <p>
      * This ensures a programmatically created type (through a migration) will
      * have a view config in any case, for being edited interactively afterwards.
@@ -222,7 +222,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void addDefaultViewConfig(TypeModel typeModel) {
         // type
         addDefaultViewConfigTopic(typeModel.getViewConfig());
-        // assoc defs
+        // comp defs
         for (String compDefUri : typeModel) {
             addDefaultViewConfigTopic(typeModel.getCompDef(compDefUri).getViewConfig());
         }
@@ -257,7 +257,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Misc ===
 
     /**
-     * Looks up an assoc def by ID.
+     * Looks up an comp def by ID.
      */
     private CompDefModel getCompDef(TypeModel type, long compDefId) {
         for (CompDefModel compDef : type.getCompDefs()) {
@@ -265,6 +265,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 return compDef;
             }
         }
-        throw new RuntimeException("Assoc def " + compDefId + " not found in type \"" + type.getUri() + "\"");
+        throw new RuntimeException("Comp def " + compDefId + " not found in type \"" + type.getUri() + "\"");
     }
 }

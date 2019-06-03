@@ -703,8 +703,8 @@ public class ModelFactoryImpl implements ModelFactory {
         try {
             RoleModel role1 = parseRole1(compDef);     // may be null
             RoleModel role2 = parseRole2(compDef);     // may be null
-            // Note: the canonic assoc def JSON format does not require explicit assoc roles. Assoc defs declared in
-            // JSON migrations support a simplified format. In contrast assoc defs contained in a request may include
+            // Note: the canonic comp def JSON format does not require explicit assoc roles. Comp defs declared in
+            // JSON migrations support a simplified format. In contrast comp defs contained in a request may include
             // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(

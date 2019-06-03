@@ -84,7 +84,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * @param   compDef     the assoc def to add.
+     * @param   compDef     the comp def to add.
      *                      Note: its ID might be uninitialized (-1).
      */
     @Override
@@ -93,10 +93,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * @param   compDef             the assoc def to add.
+     * @param   compDef             the comp def to add.
      *                              Note: its ID might be uninitialized (-1).
-     * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
-     *                              If <code>null</code> the assoc def is appended at the end.
+     * @param   beforeCompDefUri    the URI of the comp def <i>before</i> the given comp def is inserted.
+     *                              If <code>null</code> the comp def is appended at the end.
      */
     @Override
     public TypeModel addCompDefBefore(CompDefModel compDef, String beforeCompDefUri) {
@@ -105,13 +105,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // error check
             CompDefModel existing = _getCompDef(compDefUri);
             if (existing != null) {
-                throw new RuntimeException("Type \"" + uri + "\" has a \"" + compDefUri + "\" assoc def already");
+                throw new RuntimeException("Type \"" + uri + "\" has a \"" + compDefUri + "\" comp def already");
             }
             //
             compDefs.putBefore(compDefUri, (CompDefModelImpl) compDef, beforeCompDefUri);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Adding assoc def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
+            throw new RuntimeException("Adding comp def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
                 "\" failed (compDef=" + compDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
         }
     }
@@ -121,11 +121,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             CompDefModel compDef = compDefs.remove(compDefUri);
             if (compDef == null) {
-                throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + compDefs.keySet());
+                throw new RuntimeException("Comp def \"" + compDefUri + "\" not found in " + compDefs.keySet());
             }
             return compDef;
         } catch (Exception e) {
-            throw new RuntimeException("Removing assoc def \"" + compDefUri + "\" from type \"" + uri + "\" failed", e);
+            throw new RuntimeException("Removing comp def \"" + compDefUri + "\" from type \"" + uri + "\" failed", e);
         }
     }
 
@@ -153,7 +153,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Iterable Implementation ===
 
     /**
-     * Returns an interator which iterates this TypeModel's assoc def URIs.
+     * Returns an interator which iterates this TypeModel's comp def URIs.
      */
     @Override
     public Iterator<String> iterator() {
@@ -258,16 +258,16 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         if (size > 0) {
             throw new RuntimeException(size + " \"" + value + "\" instances still exist");
         }
-        // 2) delete all assoc defs
+        // 2) delete all comp defs
         //
-        // Note 1: we use the preDelete() hook to delete the assoc defs *before* they would get deleted by the generic
+        // Note 1: we use the preDelete() hook to delete the comp defs *before* they would get deleted by the generic
         // deletion logic (see "delete direct associations" in DMXObjectModelImpl.delete()). The generic deletion
         // logic deletes the direct associations in an *arbitrary* order. The "Sequence Start" association might get
-        // deleted *before* any other assoc def. When subsequently deleting an assoc def the sequence can't be rebuild
+        // deleted *before* any other comp def. When subsequently deleting an comp def the sequence can't be rebuild
         // as it is corrupted.
-        // Note 2: iterating with a for-loop here would cause ConcurrentModificationException. Deleting an assoc def
+        // Note 2: iterating with a for-loop here would cause ConcurrentModificationException. Deleting an comp def
         // implies rebuilding the sequence and that iterates with a for-loop already. Instead we must create a new
-        // iterator for every single assoc def.
+        // iterator for every single comp def.
         String compDefUri;
         while ((compDefUri = getFirstCompDefUri()) != null) {
             _getCompDef(compDefUri).delete();
@@ -292,23 +292,23 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---
 
     /**
-     * Adds an assoc def to this type model and to the DB sequence.
+     * Adds an comp def to this type model and to the DB sequence.
      *
      * Preconditions:
      * - The underlying assoc exists in DB already
-     * - The assoc def's view config is stored in DB already
+     * - The comp def's view config is stored in DB already
      */
     final void _addCompDefBefore(CompDefModelImpl compDef, String beforeCompDefUri) {
         try {
             long lastCompDefId = lastCompDefId();     // must be determined *before* memory is updated
             //
             // 1) update memory
-            // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
+            // Note: the comp def's custom association type is stored as a child topic. The meta model extension that
             // adds "Association Type" as a child to the "Composition Definition" association type has itself a custom
             // association type (named "Custom Association Type"), see migration 5. It would not be stored as storage is
             // model driven and the (meta) model doesn't know about custom associations as this very concept is
-            // introduced only by the assoc def being added here. So, the model must be updated (in-memory) *before* the
-            // assoc def is stored.
+            // introduced only by the comp def being added here. So, the model must be updated (in-memory) *before* the
+            // comp def is stored.
             addCompDefBefore(compDef, beforeCompDefUri);
             //
             // 2) update DB
@@ -316,7 +316,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             long firstCompDefId = firstCompDefId();   // must be determined *after* memory is updated
             pl.typeStorage.addCompDefToSequence(id, compDef.id, beforeCompDefId, firstCompDefId, lastCompDefId);
         } catch (Exception e) {
-            throw new RuntimeException("Adding assoc def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
+            throw new RuntimeException("Adding comp def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
                 "\" failed (compDef=" + compDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
         }
     }
@@ -334,13 +334,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Type Editor Support ===
 
-    // 3 methods to bridge between assoc and assoc def
+    // 3 methods to bridge between assoc and comp def
 
     final void _addCompDef(AssociationModelImpl assoc) {
         CompDefModelImpl compDef = pl.typeStorage.newCompDefModel(assoc);
         pl.typeStorage.storeViewConfig(compDef);
         _addCompDefBefore(compDef, null);      // beforeCompDefUri=null
-        // FIXME: move addUpdateTypeDirective() call to _addCompDefBefore()? At the moment when adding ab assoc def via
+        // FIXME: move addUpdateTypeDirective() call to _addCompDefBefore()? At the moment when adding ab comp def via
         // TypeImpl no directives are added.
         // (TypeImpl addCompDef() and addCompDefBefore() calls _addCompDefBefore() directly.)
         addUpdateTypeDirective();
@@ -349,27 +349,27 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     /**
      * Adjusts the type cache on post-update-assoc.
      * Called from ApplicationModel's core internal postUpdate() hook, in 2 situations:
-     *   - An assoc def has been updated.
-     *   - An assoc def's underlying assoc has been updated.
+     *   - An comp def has been updated.
+     *   - An comp def's underlying assoc has been updated.
      *
-     * @param   assoc       the updated generic association. ### FIXDOC: might be an assoc def as well
+     * @param   assoc       the updated generic association. ### FIXDOC: might be an comp def as well
      */
     final void _updateCompDef(AssociationModel assoc, AssociationModel oldAssoc) {
         String[] compDefUris = findCompDefUris(assoc.getId());
         CompDefModel compDef = getCompDef(compDefUris[0]);
         String oldCompDefUri;
         if (assoc == compDef) {
-            // updated "via assoc def"
+            // updated "via comp def"
             oldCompDefUri = ((CompDefModel) oldAssoc).getCompDefUri();
         } else {
             // updated "via assoc"
             oldCompDefUri = compDef.getCompDefUri();
-            // transfer assoc model to assoc def model
+            // transfer assoc model to comp def model
             compDef.setTypeUri(assoc.getTypeUri());
             compDef.setSimpleValue(assoc.getSimpleValue());
             compDef.setChildTopicsModel(assoc.getChildTopicsModel());
         }
-        // rehash if assoc def URI has changed (due to changed custom assoc type)
+        // rehash if comp def URI has changed (due to changed custom assoc type)
         if (!compDef.getCompDefUri().equals(oldCompDefUri)) {
             rehashCompDef(oldCompDefUri, compDefUris[1]);
         }
@@ -463,7 +463,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             }
             return (M) this;
         } catch (Exception e) {
-            throw new RuntimeException("Filtering readable assoc defs of type \"" + uri + "\" failed", e);
+            throw new RuntimeException("Filtering readable comp defs of type \"" + uri + "\" failed", e);
         }
     }
 
@@ -501,8 +501,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void _updateCompDefs(Collection<CompDefModelImpl> newCompDefs) {
         for (CompDefModelImpl compDef : newCompDefs) {
-            // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
-            // So we must identify the assoc def to update **by ID**.
+            // Note: if the comp def's custom association type was changed the comp def URI changes as well.
+            // So we must identify the comp def to update **by ID**.
             // ### TODO: drop updateCompDef() and rehash here (that is remove + add).
             String[] compDefUris = findCompDefUris(compDef.getId());
             getCompDef(compDefUris[0]).update(compDef);
@@ -514,12 +514,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // ### TODO: only update sequence if there is a change request
             //
             // update memory
-            logger.info("##### Updating sequence (" + newCompDefs.size() + "/" + getCompDefs().size() + " assoc defs)");
+            logger.info("##### Updating sequence (" + newCompDefs.size() + "/" + getCompDefs().size() + " comp defs)");
             rehashCompDefs(newCompDefs);
             // update DB
             pl.typeStorage.rebuildSequence(this);
         } catch (Exception e) {
-            throw new RuntimeException("Updating the assoc def sequence failed", e);
+            throw new RuntimeException("Updating the comp def sequence failed", e);
         }
     }
 
@@ -540,8 +540,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Association Definitions (memory access) ===
 
     /**
-     * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
-     * assoc def as well (at index 1), or null if the found assoc def is the last one.
+     * Finds an comp def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
+     * comp def as well (at index 1), or null if the found comp def is the last one.
      */
     private String[] findCompDefUris(long compDefId) {
         if (compDefId == -1) {
@@ -561,7 +561,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             }
         }
         if (compDefUris[0] == null) {
-            throw new RuntimeException("Assoc def " + compDefId + " not found in assoc defs of type \"" + uri +
+            throw new RuntimeException("Comp def " + compDefId + " not found in comp defs of type \"" + uri +
                 "\" (" + compDefs.keySet() + ")");
         }
         return compDefUris;
@@ -577,8 +577,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         Iterator<? extends CompDefModel> i = compDefs.iterator();
         for (CompDefModel _compDef : _compDefs) {
             CompDefModel compDef = i.next();
-            // Note: if the assoc def's custom association type changed the assoc def URI changes as well.
-            // So we must identify the assoc defs to compare **by ID**.
+            // Note: if the comp def's custom association type changed the comp def URI changes as well.
+            // So we must identify the comp defs to compare **by ID**.
             long compDefId  = checkCompDefId(compDef);
             long _compDefId = checkCompDefId(_compDef);
             if (compDefId != _compDefId) {
@@ -599,7 +599,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void rehashCompDef(String compDefUri, String beforeCompDefUri) {
         CompDefModel compDef = removeCompDef(compDefUri);
-        logger.info("Rehashing assoc def \"" + compDefUri + "\" -> \"" + compDef.getCompDefUri() + "\" (put " +
+        logger.info("Rehashing comp def \"" + compDefUri + "\" -> \"" + compDef.getCompDefUri() + "\" (put " +
             (beforeCompDefUri != null ? "before \"" + beforeCompDefUri + "\"" : "at end") + ")");
         addCompDefBefore(compDef, beforeCompDefUri);
     }
@@ -609,7 +609,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private CompDefModelImpl getCompDefOrThrow(String compDefUri) {
         CompDefModelImpl compDef = _getCompDef(compDefUri);
         if (compDef == null) {
-            throw new RuntimeException("Assoc def \"" + compDefUri + "\" not found in " + compDefs.keySet());
+            throw new RuntimeException("Comp def \"" + compDefUri + "\" not found in " + compDefs.keySet());
         }
         return compDef;
     }
@@ -646,7 +646,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private long checkCompDefId(CompDefModel compDef) {
         long compDefId = compDef.getId();
         if (compDefId == -1) {
-            throw new RuntimeException("The assoc def ID is uninitialized (-1): " + compDef);
+            throw new RuntimeException("The comp def ID is uninitialized (-1): " + compDef);
         }
         return compDefId;
     }

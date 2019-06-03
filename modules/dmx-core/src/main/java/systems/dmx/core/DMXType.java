@@ -31,8 +31,8 @@ public interface DMXType extends Topic, Iterable<String> {
     DMXType addCompDef(CompDefModel compDef);
 
     /**
-     * @param   beforeCompDefUri    the URI of the assoc def <i>before</i> the given assoc def is inserted.
-     *                              If <code>null</code> the assoc def is appended at the end.
+     * @param   beforeCompDefUri    the URI of the comp def <i>before</i> the given comp def is inserted.
+     *                              If <code>null</code> the comp def is appended at the end.
      */
     DMXType addCompDefBefore(CompDefModel compDef, String beforeCompDefUri);
 

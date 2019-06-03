@@ -52,7 +52,7 @@ class LabelCalculation {
             comp._updateSimpleValue(new SimpleValue(builder.toString()));
         } catch (Exception e) {
             throw new RuntimeException("Calculating and updating label of " + comp.objectInfo() +
-                " failed (assoc defs involved: " + labelCompDefUris + ")", e);
+                " failed (comp defs involved: " + labelCompDefUris + ")", e);
         }
     }
 

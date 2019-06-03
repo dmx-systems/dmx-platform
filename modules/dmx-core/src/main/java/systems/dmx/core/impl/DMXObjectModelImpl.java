@@ -505,7 +505,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // All 3 loadChildTopics() methods use this object itself as a cache.
     // Child topics are fetched from DB only when not fetched already.
-    // Caching is done on a per assoc def basis.
+    // Caching is done on a per comp def basis.
 
     /**
      * Recursively loads this object's child topics which are not loaded already.
@@ -518,15 +518,14 @@ class DMXObjectModelImpl implements DMXObjectModel {
     }
 
     /**
-     * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
+     * Recursively loads this object's child topics for the given comp def, provided they are not loaded already.
      * If the child topics are loaded already nothing is performed.
      * <p>
      * Implemented on top of {@link #loadChildTopics(CompDefModel, boolean)}.
-     * The assoc def is get from this object's type definition.
+     * The comp def is get from this object's type definition.
      * <p>
      * Can <i>not</i> be used to load facet values.
-     * To load facet values use {@link #loadChildTopics(CompDefModel, boolean)} and pass the facet type's
-     * assoc def.
+     * To load facet values use {@link #loadChildTopics(CompDefModel, boolean)} and pass the facet type's comp def.
      */
     final DMXObjectModel loadChildTopics(String compDefUri, boolean deep) {
         try {
@@ -537,7 +536,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     }
 
     /**
-     * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
+     * Recursively loads this object's child topics for the given comp def, provided they are not loaded already.
      * If the child topics are loaded already nothing is performed.
      * <p>
      * Can be used to load facet values.

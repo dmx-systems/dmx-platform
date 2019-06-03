@@ -24,7 +24,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     /**
      * Internal representation.
-     * Key: assoc def URI (String), value: RelatedTopicModel or List<RelatedTopicModel>
+     * Key: comp def URI (String), value: RelatedTopicModel or List<RelatedTopicModel>
      */
     private Map<String, Object> childTopics;
     // Note: it must be List<RelatedTopicModel>, not Set<RelatedTopicModel>.
@@ -58,7 +58,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         RelatedTopicModelImpl topic = getTopicOrNull(compDefUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Assoc Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Comp Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topic;
@@ -81,7 +81,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(compDefUri);
         // error check
         if (topics == null) {
-            throw new RuntimeException("Assoc Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Comp Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topics;
@@ -351,7 +351,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // === Iterable Implementation ===
 
     /**
-     * Returns an interator which iterates this ChildTopicsModel's assoc def URIs.
+     * Returns an interator which iterates this ChildTopicsModel's comp def URIs.
      */
     @Override
     public final Iterator<String> iterator() {
