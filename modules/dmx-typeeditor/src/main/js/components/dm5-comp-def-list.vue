@@ -1,6 +1,6 @@
 <template>
   <div :class="['dm5-comp-def-list', mode]">
-    <div class="field-label">Child Types ({{size}})</div>
+    <div class="field-label">Composition Definitions ({{compDefs.length}})</div>
     <template v-if="infoMode">
       <dm5-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
         :key="compDef.compDefUri" @click.native="click(compDef)">
@@ -31,12 +31,6 @@ export default {
 
   props: {
     compDefs: {type: Array, required: true}
-  },
-
-  computed: {
-    size () {
-      return this.compDefs.length
-    }
   },
 
   methods: {
