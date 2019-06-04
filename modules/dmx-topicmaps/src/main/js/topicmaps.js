@@ -472,7 +472,7 @@ const getters = {
 
   visibleAssocIds (state) {
     // console.log('visibleAssocIds getter', state.topicmap)
-    return state.topicmap && state.topicmap.assocs.map(assoc => assoc.id)   // FIXME: filter visible?
+    return state.topicmap && state.topicmap.assocs.filter(assoc => assoc.isVisible()).map(assoc => assoc.id)
   }
 }
 
