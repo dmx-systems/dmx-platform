@@ -8,7 +8,7 @@ import systems.dmx.core.model.RoleModel;
 
 
 /**
- * An association definition that is attached to the {@link CoreService}.
+ * A comp def that is attached to the {@link CoreService}.
  */
 class CompDefImpl extends AssociationImpl implements CompDef {
 

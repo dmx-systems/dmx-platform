@@ -4,7 +4,7 @@ package systems.dmx.core.model;
 
 /**
  * Definition of an association between a parent type and a child type -- part of DMX's type system;
- * like a composition or an aggregation in an UML class diagram.
+ * like a composition/aggregation in an UML class diagram.
  * <p>
  * The child type is a topic type. The parent type is either a topic type or an association type.
  *
@@ -15,13 +15,13 @@ public interface CompDefModel extends AssociationModel {
     String getCompDefUri();
 
     /**
-     * @return  the URI of the Custom Association Type set for this association definition,
+     * @return  the URI of the Custom Association Type set for this comp def,
      *          or <code>null</code> if no Custom Association Type is set.
      */
     String getCustomAssocTypeUri();
 
     /**
-     * @return  the type to be used to create an association instance based on this association definition.
+     * @return  the type to be used to create an association instance based on this comp def.
      */
     String getInstanceLevelAssocTypeUri();
 

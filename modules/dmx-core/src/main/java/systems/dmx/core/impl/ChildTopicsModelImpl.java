@@ -436,7 +436,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * For multiple-valued childs: looks in the attached object cache for the child topic the given reference refers to.
      * ### FIXDOC
      *
-     * @param   compDef     the child topics according to this association definition are considered.
+     * @param   compDef     the child topics according to this comp def are considered.
      */
     RelatedTopicModelImpl findChildTopicByRef(TopicReferenceModelImpl topicRef, CompDefModel compDef) {
         List<? extends RelatedTopicModel> childTopics = getTopicsOrNull(compDef.getCompDefUri());

@@ -19,7 +19,7 @@ public interface DMXType extends Topic, Iterable<String> {
 
 
 
-    // === Association Definitions ===
+    // === Composition Definitions ===
 
     // TODO: drop it? We're Iterable meanwhile
     Collection<CompDef> getCompDefs();

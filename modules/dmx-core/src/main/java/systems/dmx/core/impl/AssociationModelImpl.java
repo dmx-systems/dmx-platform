@@ -497,21 +497,21 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
      */
     private void createCompDef() {
         TypeModelImpl parentType = fetchParentType();
-        logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");
+        logger.info("##### Adding comp def " + id + " to type \"" + parentType.getUri() + "\"");
         //
         parentType._addCompDef(this);
     }
 
     private void updateCompDef(AssociationModel oldAssoc) {
         TypeModelImpl parentType = fetchParentType();
-        logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
+        logger.info("##### Updating comp def " + id + " of type \"" + parentType.getUri() + "\"");
         //
         parentType._updateCompDef(this, oldAssoc);
     }
 
     private void removeCompDef() {
         TypeModelImpl parentType = fetchParentType();
-        logger.info("##### Removing association definition " + id + " from type \"" + parentType.getUri() + "\"");
+        logger.info("##### Removing comp def " + id + " from type \"" + parentType.getUri() + "\"");
         //
         parentType._removeCompDefFromMemoryAndRebuildSequence(this);
     }

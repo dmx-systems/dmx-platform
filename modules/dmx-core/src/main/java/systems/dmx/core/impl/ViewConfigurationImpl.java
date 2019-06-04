@@ -23,7 +23,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     /**
      * A role that points to the object this view configuration applies to.
-     * This is either a type (topic role) or an association definition (association role).
+     * This is either a type (topic role) or a comp def (association role).
      */
     private RoleModel configurable;
 

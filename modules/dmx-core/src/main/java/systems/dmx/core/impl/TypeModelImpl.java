@@ -66,7 +66,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Association Definitions ===
+    // === Composition Definitions ===
 
     @Override
     public Collection<CompDefModelImpl> getCompDefs() {
@@ -322,11 +322,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     final void _removeCompDef(String compDefUri) {
-        // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
-        // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
-        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
-        // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
-        // deletes an association), and 2) programmatical deletion (e.g. from a migration).
+        // We trigger deleting a comp def by deleting the underlying association. This mimics deleting a comp def
+        // interactively in the webclient. Updating this type definition's memory and DB sequence is triggered then
+        // by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
+        // This way deleting a comp def works for both cases: 1) interactive deletion (when the user deletes an
+        // association), and 2) programmatical deletion (e.g. from a migration).
         getCompDef(compDefUri).delete();
     }
 
@@ -381,7 +381,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      * Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
      * association is *not* removed from DB.
      * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
-     * deletion of an association that represents an association definition is imminent. ### FIXDOC
+     * deletion of an association that represents a comp def is imminent. ### FIXDOC
      */
     final void _removeCompDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
         String[] compDefUris = findCompDefUris(assoc.getId());
@@ -537,7 +537,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Association Definitions (memory access) ===
+    // === Composition Definitions (memory access) ===
 
     /**
      * Finds an comp def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
@@ -621,8 +621,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---
 
     /**
-     * Returns the ID of the last association definition of this type or
-     * <code>-1</code> if there are no association definitions.
+     * Returns the ID of the last comp def of this type or <code>-1</code> if there are no comp defs.
      */
     private long lastCompDefId() {
         long lastCompDefId = -1;

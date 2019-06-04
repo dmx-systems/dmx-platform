@@ -199,10 +199,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
                 _assignToWorkspace(configTopic, workspaceId);
             }
-            // association definitions
+            // comp defs
             for (CompDef compDef : type.getCompDefs()) {
                 _assignToWorkspace(compDef, workspaceId);
-                // view config topics (of association definition)
+                // view config topics (of comp def)
                 for (Topic configTopic : compDef.getViewConfig().getConfigTopics()) {
                     _assignToWorkspace(configTopic, workspaceId);
                 }

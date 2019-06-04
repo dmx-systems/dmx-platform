@@ -162,7 +162,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      * <p>
      * Note: There is a principal copy in DMXObjectImpl but here the precondition is different:
-     * The given association definition must not necessarily originate from the given object's type definition.
+     * The given comp def must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
     private RelatedTopic fetchChildTopic(DMXObject object, CompDef compDef) {
@@ -175,7 +175,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * Fetches and returns child topics.
      * <p>
      * Note: There is a principal copy in DMXObjectImpl but here the precondition is different:
-     * The given association definition must not necessarily originate from the given object's type definition.
+     * The given comp def must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
     private List<RelatedTopic> fetchChildTopics(DMXObject object, CompDef compDef) {
@@ -195,7 +195,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     private CompDef getCompDef(String facetTypeUri) {
-        // Note: a facet type has exactly *one* association definition
+        // Note: a facet type has exactly *one* comp def
         return dmx.getTopicType(facetTypeUri).getCompDefs().iterator().next();
     }
 }

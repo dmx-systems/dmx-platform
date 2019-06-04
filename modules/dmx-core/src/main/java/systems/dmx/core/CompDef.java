@@ -28,7 +28,7 @@ public interface CompDef extends Association {
     String getCustomAssocTypeUri();
 
     /**
-     * @return  The type to be used to create an association instance based on this association definition.
+     * @return  The type to be used to create an association instance based on this comp def.
      *          That is the custom association type if set, otherwise <code>dmx.core.composition</code>.
      *          Is never <code>null</code>.
      */

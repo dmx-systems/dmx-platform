@@ -185,8 +185,8 @@ class TypeStorage {
      */
     void storeType(TypeModelImpl type) {
         // 1) put in type cache
-        // Note: an association type must be put in type cache *before* storing its association definitions.
-        // Consider creation of association type "Composition Definition": it has a composition definition itself.
+        // Note: an association type must be put in type cache *before* storing its comp defs. Consider creation
+        // of association type "Composition Definition": it has a composition definition itself.
         putInTypeCache(type);
         //
         // 2) store type-specific parts
@@ -232,7 +232,7 @@ class TypeStorage {
 
 
 
-    // === Association Definitions ===
+    // === Composition Definitions ===
 
     // --- Fetch ---
 
@@ -241,8 +241,8 @@ class TypeStorage {
         List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (compDefs.size() != sequence.size()) {
-            throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " +
-                compDefs.size() + " association definitions but in sequence are " + sequence.size());
+            throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " + compDefs.size() +
+                " comp defs but in sequence are " + sequence.size());
         }
         //
         return sortCompDefs(compDefs, DMXUtils.idList(sequence));
@@ -261,7 +261,7 @@ class TypeStorage {
         List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics("dmx.core.composition_def",
             "dmx.core.parent_type", "dmx.core.child_type", null);   // othersTopicTypeUri=null
         //
-        // 2) create association definitions
+        // 2) create comp defs
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the comp def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
@@ -386,7 +386,7 @@ class TypeStorage {
             // error check
             if (compDef == null) {
                 throw new RuntimeException("DB inconsistency: ID " + compDefId +
-                    " is in sequence but not in the type's association definitions");
+                    " is in sequence but not in the type's comp defs");
             }
             sortedCompDefs.add(compDef);
         }
@@ -408,8 +408,8 @@ class TypeStorage {
             pl.createAssociation(addPlayerIds(compDef));
             //
             // 2) cardinality
-            // Note: if the underlying association was an association definition before it has cardinality
-            // assignments already. These must be removed before assigning new cardinality. ### TODO?
+            // Note: if the underlying association was a comp def before it has cardinality assignments already.
+            // These must be removed before assigning new cardinality. ### TODO?
             // ### removeCardinalityAssignmentIfExists(compDefId, CHILD_CARDINALITY);
             // ### associateCardinality(compDefId, CHILD_CARDINALITY, compDef.getChildCardinalityUri());
             //
@@ -428,7 +428,7 @@ class TypeStorage {
     // --- Fetch ---
 
     /**
-     * @param   assoc   an association representing an association definition
+     * @param   assoc   an association representing a comp def
      *
      * @return  the parent type topic.
      *          A topic representing either a topic type or an association type.
@@ -444,7 +444,7 @@ class TypeStorage {
     }
 
     /**
-     * @param   assoc   an association representing an association definition
+     * @param   assoc   an association representing a comp def
      *
      * @return  the child type topic.
      *          A topic representing a topic type.
@@ -513,7 +513,7 @@ class TypeStorage {
     // --- Fetch ---
 
     // Note: the sequence is fetched in 2 situations:
-    // 1) When fetching a type's association definitions.
+    // 1) When fetching a type's comp defs.
     //    In this situation we don't have a DMXType object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
     private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {

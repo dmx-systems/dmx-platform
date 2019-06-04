@@ -30,9 +30,9 @@ class ChildTopicsFetcher {
      * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
      * overhead in others (e.g. when updating composite structures).
      * <p>
-     * Works for both, "one" and "many" association definitions.
+     * Works for both, "one" and "many" comp defs.
      *
-     * @param   compDef     The child topic models according to this association definition are fetched.
+     * @param   compDef     The child topic models according to this comp def are fetched.
      */
     void fetch(DMXObjectModel object, CompDefModel compDef, boolean deep) {
         try {

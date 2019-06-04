@@ -171,7 +171,7 @@ const getters = {
   // The detail panel updates when a type is renamed.
   object: state => {
     // console.log('object getter', state.object, state.object && state.typeCache.topicTypes[state.object.uri])
-    // ### FIXME: the asCompDef() approach does not work at the moment. Editing an assoc def would send an
+    // ### FIXME: the asCompDef() approach does not work at the moment. Editing an comp def would send an
     // update model with by-URI players while the server expects by-ID players.
     return state.object && (state.object.isType()    ? state.object.asType() :
                             state.object.isCompDef() ? state.object.asCompDef() :

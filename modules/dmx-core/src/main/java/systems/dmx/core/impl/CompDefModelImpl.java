@@ -105,7 +105,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
 
     @Override
     String className() {
-        return "association definition";
+        return "comp def";
     }
 
     @Override

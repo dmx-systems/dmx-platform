@@ -541,10 +541,10 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * <p>
      * Can be used to load facet values.
      *
-     * @param   compDef     the child topics according to this association definition are loaded.
+     * @param   compDef     the child topics according to this comp def are loaded.
      *                      <p>
-     *                      Note: the association definition must not necessarily originate from this object's
-     *                      type definition. It may originate from a facet type as well.
+     *                      Note: the comp def must not necessarily originate from this object's type definition.
+     *                      It may originate from a facet type as well.
      */
     final DMXObjectModel loadChildTopics(CompDefModel compDef, boolean deep) {
         String compDefUri = compDef.getCompDefUri();

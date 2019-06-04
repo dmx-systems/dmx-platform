@@ -46,7 +46,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
 
 
-    // === Association Definitions ===
+    // === Composition Definitions ===
 
     @Override
     public final Collection<CompDef> getCompDefs() {

@@ -14,7 +14,7 @@
       <div v-if="infoMode">{{dataType.value}}</div>
       <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
     </div>
-    <!-- Assoc Defs -->
+    <!-- Comp Defs -->
     <dm5-comp-def-list :comp-defs="compDefs" :mode="mode" @comp-def-click="click"></dm5-comp-def-list>
   </div>
 </template>

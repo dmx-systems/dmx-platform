@@ -17,7 +17,7 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
 
 
-    // === Association Definitions ===
+    // === Composition Definitions ===
 
     // TODO: drop it? We're Iterable meanwhile
     Collection<? extends CompDefModel> getCompDefs();
