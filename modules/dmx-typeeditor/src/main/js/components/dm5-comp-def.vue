@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-assoc-def">
+  <div class="dm5-comp-def">
     <div class="card label">{{card}}</div>
     <span class="fa icon">{{childType.icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
   </div>
@@ -11,21 +11,21 @@ import dm5 from 'dm5'
 export default {
 
   props: {
-    assocDef: {type: dm5.AssocDef, required: true}
+    compDef: {type: dm5.CompDef, required: true}
   },
 
   computed: {
 
     card () {
-      return this.assocDef.isOne() ? "One" : "Many"     // TODO: do not hardcode labels?
+      return this.compDef.isOne() ? "One" : "Many"     // TODO: do not hardcode labels?
     },
 
     childType () {
-      return this.assocDef.getChildType()
+      return this.compDef.getChildType()
     },
 
     info () {
-      const type = this.assocDef.getCustomAssocType()
+      const type = this.compDef.getCustomAssocType()
       return type && `(${type.value})`
     }
   }
@@ -33,20 +33,20 @@ export default {
 </script>
 
 <style>
-.dm5-assoc-def .card {
+.dm5-comp-def .card {
   margin-bottom: 6px;
 }
 
-.dm5-assoc-def .icon {
+.dm5-comp-def .icon {
   color: var(--color-topic-icon);
   margin-right: var(--icon-spacing);
 }
 
-.dm5-assoc-def .type {
+.dm5-comp-def .type {
   line-height: var(--line-height);
 }
 
-.dm5-assoc-def .info {
+.dm5-comp-def .info {
   color: var(--label-color);
   margin-left: 7px;
 }

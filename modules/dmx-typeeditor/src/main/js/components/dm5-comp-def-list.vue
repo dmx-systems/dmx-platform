@@ -1,16 +1,16 @@
 <template>
-  <div :class="['dm5-assoc-def-list', mode]">
+  <div :class="['dm5-comp-def-list', mode]">
     <div class="field-label">Child Types ({{size}})</div>
     <template v-if="infoMode">
-      <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
-        :key="assocDef.assocDefUri" @click.native="click(assocDef)">
-      </dm5-assoc-def>
+      <dm5-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
+        :key="compDef.compDefUri" @click.native="click(compDef)">
+      </dm5-comp-def>
     </template>
-    <draggable v-else :list="assocDefs" :animation="300">
+    <draggable v-else :list="compDefs" :animation="300">
       <!-- 3 lines duplicated in favor of code splitting; TODO: avoid -->
-      <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
-        :key="assocDef.assocDefUri" @click.native="click(assocDef)">
-      </dm5-assoc-def>
+      <dm5-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
+        :key="compDef.compDefUri" @click.native="click(compDef)">
+      </dm5-comp-def>
     </draggable>
   </div>
 </template>
@@ -21,7 +21,7 @@ import dm5 from 'dm5'
 export default {
 
   created () {
-    // console.log('dm5-assoc-def-list created')
+    // console.log('dm5-comp-def-list created')
   },
 
   mixins: [
@@ -30,28 +30,28 @@ export default {
   ],
 
   props: {
-    assocDefs: {type: Array, required: true}
+    compDefs: {type: Array, required: true}
   },
 
   computed: {
     size () {
-      return this.assocDefs.length
+      return this.compDefs.length
     }
   },
 
   methods: {
 
-    marked (assocDef) {
-      return this.$store.getters.visibleAssocIds.includes(assocDef.id)
+    marked (compDef) {
+      return this.$store.getters.visibleAssocIds.includes(compDef.id)
     },
 
-    click (assocDef) {
-      this.$emit('assoc-def-click', assocDef)
+    click (compDef) {
+      this.$emit('comp-def-click', compDef)
     }
   },
 
   components: {
-    'dm5-assoc-def': require('./dm5-assoc-def').default,
+    'dm5-comp-def': require('./dm5-comp-def').default,
     draggable: () => ({
       component: import('vuedraggable' /* webpackChunkName: "vuedraggable" */),
       loading: require('modules/dmx-webclient/src/main/js/components/dm5-spinner')
@@ -62,7 +62,7 @@ export default {
 
 <style>
 /* copy in dm5-topic-list.vue */
-.dm5-assoc-def-list .dm5-assoc-def {
+.dm5-comp-def-list .dm5-comp-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);
   border-right:  3px solid var(--border-color);
@@ -71,19 +71,19 @@ export default {
   padding: var(--object-item-padding);
 }
 
-.dm5-assoc-def-list .dm5-assoc-def:nth-child(1) {
+.dm5-comp-def-list .dm5-comp-def:nth-child(1) {
   border-top: 1px solid var(--border-color);
 }
 
-.dm5-assoc-def-list .dm5-assoc-def.marked {
+.dm5-comp-def-list .dm5-comp-def.marked {
   border-right-color: var(--color-topic-icon);
 }
 
-.dm5-assoc-def-list.info .dm5-assoc-def:hover {
+.dm5-comp-def-list.info .dm5-comp-def:hover {
   background-color: var(--background-color-darker);
 }
 
-.dm5-assoc-def-list.form .dm5-assoc-def:hover {
+.dm5-comp-def-list.form .dm5-comp-def:hover {
   cursor: ns-resize;
 }
 </style>

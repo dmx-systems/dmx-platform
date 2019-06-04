@@ -10,13 +10,13 @@
 export default {
 
   created () {
-    // console.log('dm5-date-picker created', this.assocDef)
+    // console.log('dm5-date-picker created', this.compDef)
   },
 
   mixins: [
     require('./mixins/object').default,       // object to render
     require('./mixins/info-mode').default,
-    require('./mixins/assoc-def').default,    // undefined for top-level object
+    require('./mixins/comp-def').default,     // undefined for top-level object
     require('./mixins/context').default
   ],
 
@@ -28,7 +28,7 @@ export default {
 
     // TODO: copy in dm5-value-renderer.vue
     fieldLabel () {
-      const customAssocType = this.assocDef && this.assocDef.getCustomAssocType()
+      const customAssocType = this.compDef && this.compDef.getCustomAssocType()
       return customAssocType && customAssocType.isSimple() ? customAssocType.value : this.type.value
     },
 

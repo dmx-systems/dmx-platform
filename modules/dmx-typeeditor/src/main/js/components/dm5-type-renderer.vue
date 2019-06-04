@@ -15,7 +15,7 @@
       <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
     </div>
     <!-- Assoc Defs -->
-    <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode" @assoc-def-click="click"></dm5-assoc-def-list>
+    <dm5-comp-def-list :comp-defs="compDefs" :mode="mode" @comp-def-click="click"></dm5-comp-def-list>
   </div>
 </template>
 
@@ -54,29 +54,29 @@ export default {
       return this.type.getDataType()
     },
 
-    assocDefs () {
+    compDefs () {
       return this.type.compDefs
     }
   },
 
   methods: {
-    click (assocDef) {
-      const childType = assocDef.getChildType()
-      childType.assoc = assocDef    // type cache side effect ### FIXME
+    click (compDef) {
+      const childType = compDef.getChildType()
+      childType.assoc = compDef    // type cache side effect ### FIXME
       this.$store.dispatch('revealRelatedTopic', {relTopic: childType})
     }
   },
 
   components: {
     'dm5-data-type-select': require('./dm5-data-type-select').default,
-    'dm5-assoc-def-list':   require('./dm5-assoc-def-list').default
+    'dm5-comp-def-list':    require('./dm5-comp-def-list').default
   }
 }
 </script>
 
 <style>
 .dm5-type-renderer > .field,
-.dm5-type-renderer .dm5-assoc-def-list {
+.dm5-type-renderer .dm5-comp-def-list {
   margin-top: var(--field-spacing);
 }
 </style>
