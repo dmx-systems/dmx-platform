@@ -1,17 +1,17 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Player;
-import systems.dmx.core.model.AssociationRoleModel;
+import systems.dmx.core.model.AssocPlayerModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
 
 
-class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleModel {
+class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleModelImpl(long assocId, String roleTypeUri, PersistenceLayer pl) {
+    AssocPlayerModelImpl(long assocId, String roleTypeUri, PersistenceLayer pl) {
         super(assocId, roleTypeUri,  pl);
     }
 
@@ -19,7 +19,7 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
 
 
-    // === Implementation of abstract RoleModel methods ===
+    // === Implementation of abstract PlayerModel methods ===
 
     @Override
     public JSONObject toJSON() {
@@ -36,7 +36,7 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
 
 
-    // === Implementation of abstract RoleModelImpl methods ===
+    // === Implementation of abstract PlayerModelImpl methods ===
 
     @Override
     Player instantiate(AssocModelImpl assoc) {

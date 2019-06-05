@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -57,12 +57,12 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     @Override
     public String getParentTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dmx.core.parent_type")).getTopicUri();
+        return ((TopicPlayerModel) getRoleModel("dmx.core.parent_type")).getTopicUri();
     }
 
     @Override
     public String getChildTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dmx.core.child_type")).getTopicUri();
+        return ((TopicPlayerModel) getRoleModel("dmx.core.child_type")).getTopicUri();
     }
 
     @Override

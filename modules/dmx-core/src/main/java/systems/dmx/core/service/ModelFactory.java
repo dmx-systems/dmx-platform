@@ -1,19 +1,19 @@
 package systems.dmx.core.service;
 
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationRoleModel;
+import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicDeletionModel;
+import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.TopicReferenceModel;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigurationModel;
@@ -66,12 +66,12 @@ public interface ModelFactory {
 
     // === AssocModel ===
 
-    AssocModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+    AssocModel newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
                                    SimpleValue value, ChildTopicsModel childTopics);
 
-    AssocModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2);
+    AssocModel newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
 
-    AssocModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+    AssocModel newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
                                    ChildTopicsModel childTopics);
 
     // ### TODO: Refactoring needed. See comments in impl.
@@ -83,7 +83,7 @@ public interface ModelFactory {
     // ### TODO: Refactoring needed. See comments in impl.
     AssocModel newAssociationModel(String typeUri, ChildTopicsModel childTopics);
 
-    AssocModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2);
+    AssocModel newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
 
     AssocModel newAssociationModel(AssocModel assoc);
 
@@ -104,23 +104,23 @@ public interface ModelFactory {
 
 
 
-    // === TopicRoleModel ===
+    // === TopicPlayerModel ===
     
-    TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri);
+    TopicPlayerModel newTopicRoleModel(long topicId, String roleTypeUri);
 
-    TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri);
+    TopicPlayerModel newTopicRoleModel(String topicUri, String roleTypeUri);
 
-    TopicRoleModel newTopicRoleModel(long topicId, String topicUri, String roleTypeUri);
+    TopicPlayerModel newTopicRoleModel(long topicId, String topicUri, String roleTypeUri);
 
-    TopicRoleModel newTopicRoleModel(JSONObject topicRoleModel);
+    TopicPlayerModel newTopicRoleModel(JSONObject topicRoleModel);
 
 
 
-    // === AssociationRoleModel ===
+    // === AssocPlayerModel ===
 
-    AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri);
+    AssocPlayerModel newAssociationRoleModel(long assocId, String roleTypeUri);
 
-    AssociationRoleModel newAssociationRoleModel(JSONObject assocRoleModel);
+    AssocPlayerModel newAssociationRoleModel(JSONObject assocRoleModel);
 
 
 

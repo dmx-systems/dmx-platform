@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.Topic;
 import systems.dmx.core.ViewConfiguration;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 
@@ -25,14 +25,14 @@ class ViewConfigurationImpl implements ViewConfiguration {
      * A role that points to the object this view configuration applies to.
      * This is either a type (topic role) or a comp def (association role).
      */
-    private RoleModel configurable;
+    private PlayerModel configurable;
 
     private PersistenceLayer pl;
     private ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationImpl(RoleModel configurable, ViewConfigurationModelImpl model, PersistenceLayer pl) {
+    ViewConfigurationImpl(PlayerModel configurable, ViewConfigurationModelImpl model, PersistenceLayer pl) {
         this.configurable = configurable;
         this.model = model;
         this.pl = pl;

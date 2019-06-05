@@ -9,8 +9,8 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicPlayer;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.TopicPlayerModel;
 
 import java.util.List;
 
@@ -105,7 +105,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ### TODO: make use of model's getRole()
     @Override
-    public final Player getRole(RoleModel roleModel) {
+    public final Player getRole(PlayerModel roleModel) {
         if (getRole1().getModel().refsSameObject(roleModel)) {
             return getRole1();
         } else if (getRole2().getModel().refsSameObject(roleModel)) {
@@ -115,7 +115,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     }
 
     @Override
-    public final boolean isPlayer(TopicRoleModel roleModel) {
+    public final boolean isPlayer(TopicPlayerModel roleModel) {
         return filterRole(getRole1(), roleModel) != null || filterRole(getRole2(), roleModel) != null;
     }
 
@@ -201,7 +201,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: move to model
-    private final TopicPlayer filterRole(Player role, TopicRoleModel roleModel) {
+    private final TopicPlayer filterRole(Player role, TopicPlayerModel roleModel) {
         return role instanceof TopicPlayer && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
             role.getPlayerId() == roleModel.getPlayerId() ? (TopicPlayer) role : null;
     }

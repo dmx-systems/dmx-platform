@@ -4,7 +4,7 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
@@ -163,7 +163,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // ---
 
     @Override
-    public RoleModel createRoleModel(String roleTypeUri) {
+    public PlayerModel createRoleModel(String roleTypeUri) {
         throw new RuntimeException("Not implemented");  // only implemented in subclasses
         // Note: technically this class is not abstract. It is instantiated by the ModelFactory.
     }

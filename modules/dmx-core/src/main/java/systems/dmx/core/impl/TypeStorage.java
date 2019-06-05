@@ -4,7 +4,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.ViewConfigurationModel;
@@ -366,8 +366,8 @@ class TypeStorage {
     // ---
 
     private AssocModel addPlayerUris(AssocModel assoc, String parentTypeUri, String childTypeUri) {
-        ((TopicRoleModelImpl) assoc.getRoleModel("dmx.core.parent_type")).topicUri = parentTypeUri;
-        ((TopicRoleModelImpl) assoc.getRoleModel("dmx.core.child_type")).topicUri  = childTypeUri;
+        ((TopicPlayerModelImpl) assoc.getRoleModel("dmx.core.parent_type")).topicUri = parentTypeUri;
+        ((TopicPlayerModelImpl) assoc.getRoleModel("dmx.core.child_type")).topicUri  = childTypeUri;
         return assoc;
     }
 
@@ -712,7 +712,7 @@ class TypeStorage {
     /**
      * @return      may be null
      */
-    private TopicModel _storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
+    private TopicModel _storeViewConfig(PlayerModel configurable, ViewConfigurationModelImpl viewConfig) {
         try {
             TopicModel topic = null;
             for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {
@@ -728,7 +728,7 @@ class TypeStorage {
         }
     }
 
-    TopicModel storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
+    TopicModel storeViewConfigTopic(PlayerModel configurable, TopicModelImpl configTopic) {
         TopicImpl topic = pl.createTopic(configTopic);
         pl.createAssociation(
             "dmx.core.composition",
@@ -748,11 +748,11 @@ class TypeStorage {
 
     // ---
 
-    RoleModel newTypeRole(long typeId) {
+    PlayerModel newTypeRole(long typeId) {
         return mf.newTopicRoleModel(typeId, "dmx.core.parent");
     }
 
-    RoleModel newCompDefRole(long compDefId) {
+    PlayerModel newCompDefRole(long compDefId) {
         return mf.newAssociationRoleModel(compDefId, "dmx.core.parent");
     }
 

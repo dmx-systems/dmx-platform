@@ -3,8 +3,8 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.RoleModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
@@ -25,12 +25,12 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    RoleModelImpl roleModel1;   // may be null in update models
-    RoleModelImpl roleModel2;   // may be null in update models
+    PlayerModelImpl roleModel1;   // may be null in update models
+    PlayerModelImpl roleModel2;   // may be null in update models
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocModelImpl(DMXObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
+    AssocModelImpl(DMXObjectModelImpl object, PlayerModelImpl roleModel1, PlayerModelImpl roleModel2) {
         super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
@@ -45,31 +45,31 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public RoleModelImpl getRoleModel1() {
+    public PlayerModelImpl getRoleModel1() {
         return roleModel1;
     }
 
     @Override
-    public RoleModelImpl getRoleModel2() {
+    public PlayerModelImpl getRoleModel2() {
         return roleModel2;
     }
 
     // ---
 
     @Override
-    public void setRoleModel1(RoleModel roleModel1) {
-        this.roleModel1 = (RoleModelImpl) roleModel1;
+    public void setRoleModel1(PlayerModel roleModel1) {
+        this.roleModel1 = (PlayerModelImpl) roleModel1;
     }
 
     @Override
-    public void setRoleModel2(RoleModel roleModel2) {
-        this.roleModel2 = (RoleModelImpl) roleModel2;
+    public void setRoleModel2(PlayerModel roleModel2) {
+        this.roleModel2 = (PlayerModelImpl) roleModel2;
     }
 
     // --- Convenience Methods ---
 
     @Override
-    public RoleModelImpl getRoleModel(String roleTypeUri) {
+    public PlayerModelImpl getRoleModel(String roleTypeUri) {
         boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);
         if (rm1 && rm2) {
@@ -91,8 +91,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                 roleTypeUri1 + "\")");
         }
         if (!hasSameRoleTypeUris()) {
-            RoleModel r1 = getRoleModel(roleTypeUri1);
-            RoleModel r2 = getRoleModel(roleTypeUri2);
+            PlayerModel r1 = getRoleModel(roleTypeUri1);
+            PlayerModel r2 = getRoleModel(roleTypeUri2);
             if (r1 != null && r1.getPlayerId() == playerId1 &&
                 r2 != null && r2.getPlayerId() == playerId2) {
                 return true;
@@ -119,7 +119,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // === Implementation of the abstract methods ===
 
     @Override
-    public RoleModel createRoleModel(String roleTypeUri) {
+    public PlayerModel createRoleModel(String roleTypeUri) {
         return mf.newAssociationRoleModel(id, roleTypeUri);
     }
 
@@ -348,7 +348,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      *          If there are 2 such players an exception is thrown.
      */
     DMXObjectModelImpl getPlayer(String roleTypeUri) {
-        RoleModelImpl role = getRoleModel(roleTypeUri);
+        PlayerModelImpl role = getRoleModel(roleTypeUri);
         return role != null ? role.getPlayer(this) : null;
     }
 
@@ -364,7 +364,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---
 
-    void updateRoleTypeUri(RoleModelImpl role, String roleTypeUri) {
+    void updateRoleTypeUri(PlayerModelImpl role, String roleTypeUri) {
         role.setRoleTypeUri(roleTypeUri);                           // update memory
         pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
     }
@@ -378,7 +378,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
         // Compare to DMXUtils.associationAutoTyping()
-        if (!(roleModel1 instanceof TopicRoleModel) || !(roleModel2 instanceof TopicRoleModel)) {
+        if (!(roleModel1 instanceof TopicPlayerModel) || !(roleModel2 instanceof TopicPlayerModel)) {
             return;
         }
         // Note: only readable assocs (access control) are considered
@@ -408,12 +408,12 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     /**
      * @param   nr      used only for logging
      */
-    private void updateRole(RoleModel updateModel, int nr) {
+    private void updateRole(PlayerModel updateModel, int nr) {
         try {
             if (updateModel != null) {     // abort if no update is requested
                 // Note: We must lookup the roles individually.
                 // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-                RoleModelImpl role = getRole(updateModel);
+                PlayerModelImpl role = getRole(updateModel);
                 String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
                 String roleTypeUri = role.getRoleTypeUri();             // current value
                 if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
@@ -439,7 +439,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      * <p>
      * If the object refered by the given role model is not a player in this association an exception is thrown.
      */
-    private RoleModelImpl getRole(RoleModel roleModel) {
+    private PlayerModelImpl getRole(PlayerModel roleModel) {
         if (roleModel1.refsSameObject(roleModel)) {
             return roleModel1;
         } else if (roleModel2.refsSameObject(roleModel)) {
@@ -450,9 +450,9 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---
 
-    private TopicModelImpl filterTopic(RoleModelImpl role, String topicTypeUri) {
-        if (role instanceof TopicRoleModel) {
-            TopicModelImpl topic = ((TopicRoleModelImpl) role).getPlayer(this);
+    private TopicModelImpl filterTopic(PlayerModelImpl role, String topicTypeUri) {
+        if (role instanceof TopicPlayerModel) {
+            TopicModelImpl topic = ((TopicPlayerModelImpl) role).getPlayer(this);
             if (topic.getTypeUri().equals(topicTypeUri)) {
                 return topic;
             }

@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Player;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -12,13 +12,13 @@ abstract class PlayerImpl implements Player {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    RoleModelImpl model;        // underlying model
+    PlayerModelImpl model;      // underlying model
 
     AssocModelImpl assoc;       // the association this role is involved in
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    PlayerImpl(RoleModelImpl model, AssocModelImpl assoc) {
+    PlayerImpl(PlayerModelImpl model, AssocModelImpl assoc) {
         this.model = model;
         this.assoc = assoc;
     }
@@ -54,7 +54,7 @@ abstract class PlayerImpl implements Player {
     // ---
 
     @Override
-    public RoleModel getModel() {
+    public PlayerModel getModel() {
         return model;
     }
 

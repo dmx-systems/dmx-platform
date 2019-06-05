@@ -4,7 +4,7 @@ import systems.dmx.core.JSONEnabled;
 
 
 
-public interface RoleModel extends JSONEnabled, Cloneable {
+public interface PlayerModel extends JSONEnabled, Cloneable {
 
     long getPlayerId();
 
@@ -27,9 +27,9 @@ public interface RoleModel extends JSONEnabled, Cloneable {
      *
      * @return  true if the given role model refers to the same object as this role model.
      */
-    boolean refsSameObject(RoleModel model);
+    boolean refsSameObject(PlayerModel model);
 
     // ---
 
-    RoleModel clone();
+    PlayerModel clone();
 }

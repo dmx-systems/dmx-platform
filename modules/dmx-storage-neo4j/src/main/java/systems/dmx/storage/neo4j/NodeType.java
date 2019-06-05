@@ -1,6 +1,6 @@
 package systems.dmx.storage.neo4j;
 
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.service.ModelFactory;
 
 import org.neo4j.graphdb.Node;
@@ -11,7 +11,7 @@ enum NodeType {
 
     TOPIC {
         @Override
-        RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+        PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
             return mf.newTopicRoleModel(node.getId(), roleTypeUri);
         }
 
@@ -22,7 +22,7 @@ enum NodeType {
     },
     ASSOC {
         @Override
-        RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+        PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
             return mf.newAssociationRoleModel(node.getId(), roleTypeUri);
         }
 
@@ -34,7 +34,7 @@ enum NodeType {
 
     // ---
 
-    abstract RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf);
+    abstract PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf);
 
     abstract String error(Node node);
 

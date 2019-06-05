@@ -9,15 +9,15 @@ package systems.dmx.core.model;
  */
 public interface AssocModel extends DMXObjectModel {
 
-    RoleModel getRoleModel1();
+    PlayerModel getRoleModel1();
 
-    RoleModel getRoleModel2();
+    PlayerModel getRoleModel2();
 
     // ---
 
-    void setRoleModel1(RoleModel roleModel1);
+    void setRoleModel1(PlayerModel roleModel1);
 
-    void setRoleModel2(RoleModel roleModel2);
+    void setRoleModel2(PlayerModel roleModel2);
 
     // --- Convenience Methods ---
 
@@ -26,7 +26,7 @@ public interface AssocModel extends DMXObjectModel {
      *          If no role matches, null is returned.
      *          If both roles are matching an exception is thrown.
      */
-    RoleModel getRoleModel(String roleTypeUri);
+    PlayerModel getRoleModel(String roleTypeUri);
 
     boolean hasSameRoleTypeUris();
 

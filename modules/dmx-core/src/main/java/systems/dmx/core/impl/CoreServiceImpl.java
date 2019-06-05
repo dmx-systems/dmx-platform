@@ -7,7 +7,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -184,7 +184,7 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<RoleModel> getRoleModels(long assocId) {
+    public List<PlayerModel> getRoleModels(long assocId) {
         return pl.getRoleModels(assocId);
     }
 
@@ -447,7 +447,7 @@ public class CoreServiceImpl implements CoreService {
     /**
      * Convenience method.
      */
-    Assoc createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    Assoc createAssociation(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 

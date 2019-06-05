@@ -1,13 +1,13 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Player;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.TopicPlayerModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
 
 
-class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
+class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -15,15 +15,15 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleModelImpl(long topicId, String roleTypeUri, PersistenceLayer pl) {
+    TopicPlayerModelImpl(long topicId, String roleTypeUri, PersistenceLayer pl) {
         this(topicId, null, roleTypeUri, pl);
     }
 
-    TopicRoleModelImpl(String topicUri, String roleTypeUri, PersistenceLayer pl) {
+    TopicPlayerModelImpl(String topicUri, String roleTypeUri, PersistenceLayer pl) {
         this(-1, topicUri, roleTypeUri, pl);
     }
 
-    TopicRoleModelImpl(long topicId, String topicUri, String roleTypeUri, PersistenceLayer pl) {
+    TopicPlayerModelImpl(long topicId, String topicUri, String roleTypeUri, PersistenceLayer pl) {
         super(topicId, roleTypeUri, pl);
         this.topicUri = topicUri;
     }
@@ -45,7 +45,7 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
 
 
-    // === Implementation of abstract RoleModel methods ===
+    // === Implementation of abstract PlayerModel methods ===
 
     @Override
     public JSONObject toJSON() {
@@ -63,7 +63,7 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
 
 
-    // === Implementation of abstract RoleModelImpl methods ===
+    // === Implementation of abstract PlayerModelImpl methods ===
 
     @Override
     Player instantiate(AssocModelImpl assoc) {

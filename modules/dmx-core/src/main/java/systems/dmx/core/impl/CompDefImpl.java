@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.ViewConfiguration;
 import systems.dmx.core.model.CompDefModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 
 
 
@@ -73,7 +73,7 @@ class CompDefImpl extends AssocImpl implements CompDef {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        RoleModel configurable = pl.typeStorage.newCompDefRole(getId());   // ### ID is uninitialized
+        PlayerModel configurable = pl.typeStorage.newCompDefRole(getId());   // ### ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 

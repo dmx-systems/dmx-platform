@@ -9,7 +9,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -167,7 +167,7 @@ public interface CoreService {
 
     Iterable<Assoc> getAllAssociations();
 
-    List<RoleModel> getRoleModels(long assocId);
+    List<PlayerModel> getRoleModels(long assocId);
 
     // ---
 

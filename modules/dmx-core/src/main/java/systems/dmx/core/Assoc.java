@@ -1,8 +1,8 @@
 package systems.dmx.core;
 
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.TopicPlayerModel;
 
 import java.util.List;
 
@@ -81,12 +81,12 @@ public interface Assoc extends DMXObject {
      * <p>
      * If the object refered by the given role model is not a player in this association an exception is thrown.
      */
-    Player getRole(RoleModel roleModel);
+    Player getRole(PlayerModel roleModel);
 
     /**
      * ### TODO: drop it
      */
-    boolean isPlayer(TopicRoleModel roleModel);
+    boolean isPlayer(TopicPlayerModel roleModel);
 
     // ---
 

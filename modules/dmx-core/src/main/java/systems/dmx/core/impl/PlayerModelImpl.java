@@ -1,11 +1,11 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Player;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 
 
 
-abstract class RoleModelImpl implements RoleModel {
+abstract class PlayerModelImpl implements PlayerModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -18,10 +18,10 @@ abstract class RoleModelImpl implements RoleModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     // ### TODO: drop this?
-    RoleModelImpl() {
+    PlayerModelImpl() {
     }
 
-    RoleModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
+    PlayerModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
         setPlayerId(playerId);
         setRoleTypeUri(roleTypeUri);
         this.pl = pl;
@@ -63,7 +63,7 @@ abstract class RoleModelImpl implements RoleModel {
     // ---
 
     @Override
-    public boolean refsSameObject(RoleModel model) {
+    public boolean refsSameObject(PlayerModel model) {
         return getPlayerId() == model.getPlayerId();
     }
 
@@ -72,11 +72,11 @@ abstract class RoleModelImpl implements RoleModel {
     // === Java API ===
 
     @Override
-    public RoleModel clone() {
+    public PlayerModel clone() {
         try {
-            return (RoleModel) super.clone();
+            return (PlayerModel) super.clone();
         } catch (Exception e) {
-            throw new RuntimeException("Cloning a RoleModel failed", e);
+            throw new RuntimeException("Cloning a PlayerModel failed", e);
         }
     }
 

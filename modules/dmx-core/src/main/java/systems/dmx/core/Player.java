@@ -1,7 +1,7 @@
 package systems.dmx.core;
 
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 
 
 
@@ -19,5 +19,5 @@ public interface Player extends JSONEnabled {
 
     // ---
 
-    RoleModel getModel();
+    PlayerModel getModel();
 }

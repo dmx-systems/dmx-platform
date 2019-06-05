@@ -1,14 +1,14 @@
 package systems.dmx.storage.neo4j;
 
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationRoleModel;
+import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.DMXObjectModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -264,7 +264,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<RoleModel> fetchRoleModels(long assocId) {
+    public List<PlayerModel> fetchRoleModels(long assocId) {
         return buildRoleModels(fetchAssociationNode(assocId));
     }
 
@@ -281,8 +281,8 @@ public class Neo4jStorage implements DMXStorage {
         storeAndIndexAssociationUri(assocNode, assocModel.getUri());
         storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
         //
-        RoleModel role1 = assocModel.getRoleModel1();
-        RoleModel role2 = assocModel.getRoleModel2();
+        PlayerModel role1 = assocModel.getRoleModel1();
+        PlayerModel role2 = assocModel.getRoleModel2();
         Node playerNode1 = storePlayerRelationship(assocNode, role1);
         Node playerNode2 = storePlayerRelationship(assocNode, role2);
         //
@@ -933,7 +933,7 @@ public class Neo4jStorage implements DMXStorage {
 
     AssocModel buildAssociation(Node assocNode) {
         try {
-            List<RoleModel> roleModels = buildRoleModels(assocNode);
+            List<PlayerModel> roleModels = buildRoleModels(assocNode);
             return mf.newAssociationModel(
                 assocNode.getId(),
                 uri(assocNode),
@@ -956,12 +956,12 @@ public class Neo4jStorage implements DMXStorage {
         return assocs;
     }
 
-    private List<RoleModel> buildRoleModels(Node assocNode) {
-        List<RoleModel> roleModels = new ArrayList();
+    private List<PlayerModel> buildRoleModels(Node assocNode) {
+        List<PlayerModel> roleModels = new ArrayList();
         for (Relationship rel : fetchRelationships(assocNode)) {
             Node node = rel.getEndNode();
             String roleTypeUri = rel.getType().name();
-            RoleModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri, mf);
+            PlayerModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri, mf);
             roleModels.add(roleModel);
         }
         return roleModels;
@@ -971,7 +971,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // --- DMX -> Neo4j Bridge ---
 
-    private Node storePlayerRelationship(Node assocNode, RoleModel roleModel) {
+    private Node storePlayerRelationship(Node assocNode, PlayerModel roleModel) {
         Node playerNode = fetchPlayerNode(roleModel);
         assocNode.createRelationshipTo(
             playerNode,
@@ -980,17 +980,17 @@ public class Neo4jStorage implements DMXStorage {
         return playerNode;
     }
 
-    private Node fetchPlayerNode(RoleModel roleModel) {
-        if (roleModel instanceof TopicRoleModel) {
-            return fetchTopicPlayerNode((TopicRoleModel) roleModel);
-        } else if (roleModel instanceof AssociationRoleModel) {
+    private Node fetchPlayerNode(PlayerModel roleModel) {
+        if (roleModel instanceof TopicPlayerModel) {
+            return fetchTopicPlayerNode((TopicPlayerModel) roleModel);
+        } else if (roleModel instanceof AssocPlayerModel) {
             return fetchAssociationNode(roleModel.getPlayerId());
         } else {
             throw new RuntimeException("Unexpected role model: " + roleModel);
         }
     }
 
-    private Node fetchTopicPlayerNode(TopicRoleModel roleModel) {
+    private Node fetchTopicPlayerNode(TopicPlayerModel roleModel) {
         if (roleModel.topicIdentifiedByUri()) {
             return fetchTopicNodeByUri(roleModel.getTopicUri());
         } else {

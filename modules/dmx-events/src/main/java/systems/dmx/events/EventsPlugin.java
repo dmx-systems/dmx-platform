@@ -3,7 +3,7 @@ package systems.dmx.events;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.event.PreCreateAssociationListener;
@@ -77,7 +77,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
             "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
         //
         // Event -> Address
-        RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
+        PlayerModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
             "dmx.core.composition", "dmx.core.parent", "dmx.core.child");
         if (roles != null) {
             long eventId = roles[0].getPlayerId();

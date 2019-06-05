@@ -7,8 +7,8 @@ import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
-import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
 
@@ -196,16 +196,16 @@ public class DMXUtils {
      * <p>Auto-typing is supported only for topic players, and only if they are identified by-ID. If the given assoc has
      * at least one assoc player, or if a topic player is identfied by-URI, no retyping takes place (null is returned).
      *
-     * @return  a 2-element {@link systems.dmx.core.model.RoleModel} array if auto-typing took place, <code>null</code>
-     *          otherwise. Convenience to access the assoc's roles after retyping. Element 0 is the role of the
-     *          "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
+     * @return  a 2-element {@link systems.dmx.core.model.PlayerModel} array if auto-typing took place,
+     *          <code>null</code> otherwise. Convenience to access the assoc's roles after retyping. Element 0 is the
+     *          role of the "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
      */
-    public static RoleModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                    String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
+    public static PlayerModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
+                                                      String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2);
+        PlayerModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -217,11 +217,11 @@ public class DMXUtils {
         return roles;
     }
 
-    public static RoleModel[] getRoleModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
-        RoleModel r1 = assoc.getRoleModel1();
-        RoleModel r2 = assoc.getRoleModel2();
+    public static PlayerModel[] getRoleModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
+        PlayerModel r1 = assoc.getRoleModel1();
+        PlayerModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
-        if (!(r1 instanceof TopicRoleModel) || !(r2 instanceof TopicRoleModel)) {
+        if (!(r1 instanceof TopicPlayerModel) || !(r2 instanceof TopicPlayerModel)) {
             return null;
         }
         CoreService dmx = CoreActivator.getCoreService();
@@ -230,20 +230,20 @@ public class DMXUtils {
         // Compare to AssocModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
         String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
-        RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
-        RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
+        PlayerModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
+        PlayerModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         // Note: if topicTypeUri1 equals topicTypeUri2 and in the assoc only *one* player matches this type
         // both getRoleModel() calls return the *same* player. Auto-typing must not be performed.
         if (roleModel1 != null && roleModel2 != null && roleModel1 != roleModel2) {
-            return new RoleModel[] {roleModel1, roleModel2};
+            return new PlayerModel[] {roleModel1, roleModel2};
         }
         return null;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private static RoleModel getRoleModel(RoleModel r1, RoleModel r2, String t1, String t2, String topicTypeUri,
-                                                                                            int nr) {
+    private static PlayerModel getRoleModel(PlayerModel r1, PlayerModel r2, String t1, String t2, String topicTypeUri,
+                                            int nr) {
         boolean m1 = t1.equals(topicTypeUri);
         boolean m2 = t2.equals(topicTypeUri);
         if (m1 && m2) {

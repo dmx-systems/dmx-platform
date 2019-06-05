@@ -13,8 +13,8 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationRoleModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.AssocPlayerModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -530,7 +530,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkAssociationReadAccess(long assocId) {
         checkReadAccess(assocId);
         //
-        List<RoleModel> roles = dmx.getRoleModels(assocId);
+        List<PlayerModel> roles = dmx.getRoleModels(assocId);
         checkReadAccess(roles.get(0));
         checkReadAccess(roles.get(1));
     }
@@ -892,9 +892,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Calculate Permissions ===
 
-    private void checkReadAccess(RoleModel role) {
+    private void checkReadAccess(PlayerModel role) {
         long id = role.getPlayerId();
-        if (role instanceof AssociationRoleModel) {
+        if (role instanceof AssocPlayerModel) {
             checkAssociationReadAccess(id);     // recursion
         } else {
             checkReadAccess(id);

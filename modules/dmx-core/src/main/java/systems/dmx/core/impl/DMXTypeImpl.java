@@ -4,7 +4,7 @@ import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.ViewConfiguration;
 import systems.dmx.core.model.CompDefModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TypeModel;
 
 import java.util.Collection;
@@ -88,7 +88,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     @Override
     public final ViewConfiguration getViewConfig() {
-        RoleModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
+        PlayerModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 

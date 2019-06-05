@@ -4,12 +4,12 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicDeletionModel;
+import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.TopicReferenceModel;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
@@ -125,19 +125,19 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocModel ===
 
     @Override
-    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                              RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1,
+                                              PlayerModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
         return new AssocModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
-            (RoleModelImpl) roleModel1, (RoleModelImpl) roleModel2);
+            (PlayerModelImpl) roleModel1, (PlayerModelImpl) roleModel2);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    public AssocModelImpl newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+    public AssocModelImpl newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
                                               ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
@@ -164,8 +164,8 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                                                                   RoleModel roleModel2) {
+    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1,
+                                                                                   PlayerModel roleModel2) {
         return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
@@ -188,22 +188,22 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * @return  maybe null
      */
-    private RoleModelImpl parseRole1(JSONObject assoc) throws JSONException {
+    private PlayerModelImpl parseRole1(JSONObject assoc) throws JSONException {
         return parseRole(assoc, "role1");
     }
 
     /**
      * @return  maybe null
      */
-    private RoleModelImpl parseRole2(JSONObject assoc) throws JSONException {
+    private PlayerModelImpl parseRole2(JSONObject assoc) throws JSONException {
         return parseRole(assoc, "role2");
     }
 
-    private RoleModelImpl parseRole(JSONObject assoc, String key) throws JSONException {
+    private PlayerModelImpl parseRole(JSONObject assoc, String key) throws JSONException {
         return assoc.has(key) ? _parseRole(assoc.getJSONObject(key)) : null;
     }
 
-    private RoleModelImpl _parseRole(JSONObject roleModel) {
+    private PlayerModelImpl _parseRole(JSONObject roleModel) {
         if (roleModel.has("topicId") || roleModel.has("topicUri")) {
             return newTopicRoleModel(roleModel);
         } else if (roleModel.has("assocId")) {
@@ -399,25 +399,25 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === TopicRoleModel ===
+    // === TopicPlayerModel ===
 
     @Override
-    public TopicRoleModelImpl newTopicRoleModel(long topicId, String roleTypeUri) {
-        return new TopicRoleModelImpl(topicId, roleTypeUri, pl());
+    public TopicPlayerModelImpl newTopicRoleModel(long topicId, String roleTypeUri) {
+        return new TopicPlayerModelImpl(topicId, roleTypeUri, pl());
     }
 
     @Override
-    public TopicRoleModelImpl newTopicRoleModel(String topicUri, String roleTypeUri) {
-        return new TopicRoleModelImpl(topicUri, roleTypeUri, pl());
+    public TopicPlayerModelImpl newTopicRoleModel(String topicUri, String roleTypeUri) {
+        return new TopicPlayerModelImpl(topicUri, roleTypeUri, pl());
     }
 
     @Override
-    public TopicRoleModelImpl newTopicRoleModel(long topicId, String topicUri, String roleTypeUri) {
-        return new TopicRoleModelImpl(topicId, topicUri, roleTypeUri, pl());
+    public TopicPlayerModelImpl newTopicRoleModel(long topicId, String topicUri, String roleTypeUri) {
+        return new TopicPlayerModelImpl(topicId, topicUri, roleTypeUri, pl());
     }
 
     @Override
-    public TopicRoleModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
+    public TopicPlayerModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
         try {
             long topicId       = topicRoleModel.optLong("topicId", -1);
             String topicUri    = topicRoleModel.optString("topicUri", null);
@@ -428,27 +428,27 @@ public class ModelFactoryImpl implements ModelFactory {
             }
             return newTopicRoleModel(topicId, topicUri, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(topicRoleModel, e, "TopicRoleModelImpl");
+            throw parsingFailed(topicRoleModel, e, "TopicPlayerModelImpl");
         }
     }
 
 
 
-    // === AssociationRoleModel ===
+    // === AssocPlayerModel ===
 
     @Override
-    public AssociationRoleModelImpl newAssociationRoleModel(long assocId, String roleTypeUri) {
-        return new AssociationRoleModelImpl(assocId, roleTypeUri, pl());
+    public AssocPlayerModelImpl newAssociationRoleModel(long assocId, String roleTypeUri) {
+        return new AssocPlayerModelImpl(assocId, roleTypeUri, pl());
     }    
 
     @Override
-    public AssociationRoleModelImpl newAssociationRoleModel(JSONObject assocRoleModel) {
+    public AssocPlayerModelImpl newAssociationRoleModel(JSONObject assocRoleModel) {
         try {
             long assocId       = assocRoleModel.getLong("assocId");
             String roleTypeUri = assocRoleModel.getString("roleTypeUri");
             return newAssociationRoleModel(assocId, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(assocRoleModel, e, "AssociationRoleModelImpl");
+            throw parsingFailed(assocRoleModel, e, "AssocPlayerModelImpl");
         }
     }    
 
@@ -700,8 +700,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public CompDefModelImpl newCompDefModel(JSONObject compDef) {
         try {
-            RoleModel role1 = parseRole1(compDef);     // may be null
-            RoleModel role2 = parseRole2(compDef);     // may be null
+            PlayerModel role1 = parseRole1(compDef);     // may be null
+            PlayerModel role2 = parseRole2(compDef);     // may be null
             // Note: the canonic comp def JSON format does not require explicit assoc roles. Comp defs declared in
             // JSON migrations support a simplified format. In contrast comp defs contained in a request may include
             // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
@@ -745,11 +745,11 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private TopicRoleModel parentRole(String parentTypeUri) {
+    private TopicPlayerModel parentRole(String parentTypeUri) {
         return newTopicRoleModel(parentTypeUri, "dmx.core.parent_type");
     }
 
-    private TopicRoleModel childRole(String childTypeUri) {
+    private TopicPlayerModel childRole(String childTypeUri) {
         return newTopicRoleModel(childTypeUri, "dmx.core.child_type");
     }
 

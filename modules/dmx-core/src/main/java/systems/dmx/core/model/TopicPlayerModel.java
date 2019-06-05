@@ -5,7 +5,7 @@ package systems.dmx.core.model;
 /**
  * The role a topic plays in an association.
  * <p>
- * A TopicRoleModel object is a pair of a topic reference and a role type reference.
+ * A TopicPlayerModel object is a pair of a topic reference and a role type reference.
  * The topic is refered to either by its ID or URI.
  * The role type is refered to by its URI.
  * <p>
@@ -13,7 +13,7 @@ package systems.dmx.core.model;
  * <p>
  * In the database a role type is represented by a topic of type "dmx.core.role_type".
  */
-public interface TopicRoleModel extends RoleModel {
+public interface TopicPlayerModel extends PlayerModel {
 
     String getTopicUri();
 

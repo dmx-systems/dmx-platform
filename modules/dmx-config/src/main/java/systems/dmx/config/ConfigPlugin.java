@@ -3,7 +3,6 @@ package systems.dmx.config;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.AccessControl;

@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
@@ -26,7 +26,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     // === Implementation of the abstract methods ===
 
     @Override
-    public RoleModel createRoleModel(String roleTypeUri) {
+    public PlayerModel createRoleModel(String roleTypeUri) {
         return mf.newTopicRoleModel(id, roleTypeUri);
     }
 

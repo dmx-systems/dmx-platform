@@ -3,12 +3,11 @@ package systems.dmx.storage.neo4j;
 import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.PersistenceLayer;
 import systems.dmx.core.model.AssocModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -64,10 +63,10 @@ public class Neo4jStorageTest {
         AssocModel assoc = storage.fetchAssociation(assocId);
         assertNotNull(assoc);
         //
-        RoleModel roleModel1 = assoc.getRoleModel("dmx.core.type");
+        PlayerModel roleModel1 = assoc.getRoleModel("dmx.core.type");
         assertNotNull(roleModel1);
         //
-        RoleModel roleModel2 = assoc.getRoleModel("dmx.core.instance");
+        PlayerModel roleModel2 = assoc.getRoleModel("dmx.core.instance");
         assertNotNull(roleModel2);
     }
 

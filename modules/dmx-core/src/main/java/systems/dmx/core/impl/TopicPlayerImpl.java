@@ -12,7 +12,7 @@ class TopicPlayerImpl extends PlayerImpl implements TopicPlayer {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicPlayerImpl(TopicRoleModelImpl model, AssocModelImpl assoc) {
+    TopicPlayerImpl(TopicPlayerModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 
@@ -37,7 +37,7 @@ class TopicPlayerImpl extends PlayerImpl implements TopicPlayer {
     // === PlayerImpl Overrides ===
 
     @Override
-    public TopicRoleModelImpl getModel() {
-        return (TopicRoleModelImpl) model;
+    public TopicPlayerModelImpl getModel() {
+        return (TopicPlayerModelImpl) model;
     }
 }

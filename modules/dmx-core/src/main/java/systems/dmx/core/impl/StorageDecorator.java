@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -230,7 +230,7 @@ class StorageDecorator {
         return (Iterator<AssocModelImpl>) storage.fetchAllAssociations();
     }
 
-    final List<RoleModel> fetchRoleModels(long assocId) {
+    final List<PlayerModel> fetchRoleModels(long assocId) {
         return storage.fetchRoleModels(assocId);
     }
 

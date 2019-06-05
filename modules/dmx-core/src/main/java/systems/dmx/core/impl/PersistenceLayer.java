@@ -6,7 +6,7 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.accesscontrol.AccessControlException;
@@ -331,7 +331,7 @@ public final class PersistenceLayer extends StorageDecorator {
         return new AssociationIterable(this);
     }
 
-    List<RoleModel> getRoleModels(long assocId) {
+    List<PlayerModel> getRoleModels(long assocId) {
         return fetchRoleModels(assocId);
     }
 
@@ -340,7 +340,7 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssocImpl createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    AssocImpl createAssociation(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 

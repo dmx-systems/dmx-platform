@@ -12,7 +12,7 @@ class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocPlayerImpl(AssociationRoleModelImpl model, AssocModelImpl assoc) {
+    AssocPlayerImpl(AssocPlayerModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 
@@ -32,7 +32,7 @@ class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
     // === PlayerImpl Overrides ===
 
     @Override
-    public AssociationRoleModelImpl getModel() {
-        return (AssociationRoleModelImpl) model;
+    public AssocPlayerModelImpl getModel() {
+        return (AssocPlayerModelImpl) model;
     }
 }
