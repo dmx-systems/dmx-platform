@@ -96,10 +96,10 @@ abstract class RoleModelImpl implements RoleModel {
     /**
      * @param   assoc   the association this role is involved in
      */
-    abstract Role instantiate(AssociationModelImpl assoc);
+    abstract Role instantiate(AssocModelImpl assoc);
 
     /**
      * @param   assoc   the association this role is involved in
      */
-    abstract DMXObjectModelImpl getPlayer(AssociationModelImpl assoc);
+    abstract DMXObjectModelImpl getPlayer(AssocModelImpl assoc);
 }

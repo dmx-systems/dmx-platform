@@ -1,6 +1,6 @@
 package systems.dmx.core.storage.spi;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -71,25 +71,25 @@ public interface DMXStorage {
 
     // === Associations ===
 
-    AssociationModel fetchAssociation(long assocId);
+    AssocModel fetchAssociation(long assocId);
 
-    AssociationModel fetchAssociation(String key, Object value);
+    AssocModel fetchAssociation(String key, Object value);
 
-    List<? extends AssociationModel> fetchAssociations(String key, Object value);
+    List<? extends AssocModel> fetchAssociations(String key, Object value);
 
-    List<? extends AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                                            String roleTypeUri1, String roleTypeUri2);
+    List<? extends AssocModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                 String roleTypeUri1, String roleTypeUri2);
 
-    List<? extends AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+    List<? extends AssocModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                         long assocId, String topicRoleTypeUri, String assocRoleTypeUri);
 
-    Iterator<? extends AssociationModel> fetchAllAssociations();
+    Iterator<? extends AssocModel> fetchAllAssociations();
 
     List<RoleModel> fetchRoleModels(long assocId);
 
     // ---
 
-    void storeAssociation(AssociationModel assocModel);
+    void storeAssociation(AssocModel assocModel);
 
     void storeAssociationUri(long assocId, String uri);
 
@@ -119,9 +119,9 @@ public interface DMXStorage {
 
     // === Traversal ===
 
-    List<? extends AssociationModel> fetchTopicAssociations(long topicId);
+    List<? extends AssocModel> fetchTopicAssociations(long topicId);
 
-    List<? extends AssociationModel> fetchAssociationAssociations(long assocId);
+    List<? extends AssocModel> fetchAssociationAssociations(long assocId);
 
     // ---
 
@@ -205,9 +205,9 @@ public interface DMXStorage {
 
     List<? extends TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<? extends AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
+    List<? extends AssocModel> fetchAssociationsByProperty(String propUri, Object propValue);
 
-    List<? extends AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<? extends AssocModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

@@ -1,6 +1,6 @@
 package systems.dmx.core.service;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
@@ -64,31 +64,30 @@ public interface ModelFactory {
 
 
 
-    // === AssociationModel ===
+    // === AssocModel ===
 
-    AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                         RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics);
+    AssocModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+                                   SimpleValue value, ChildTopicsModel childTopics);
 
-    AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2);
+    AssocModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2);
 
-    AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
-                                                                               ChildTopicsModel childTopics);
-
-    // ### TODO: Refactoring needed. See comments in impl.
-    AssociationModel newAssociationModel();
+    AssocModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+                                   ChildTopicsModel childTopics);
 
     // ### TODO: Refactoring needed. See comments in impl.
-    AssociationModel newAssociationModel(ChildTopicsModel childTopics);
+    AssocModel newAssociationModel();
 
     // ### TODO: Refactoring needed. See comments in impl.
-    AssociationModel newAssociationModel(String typeUri, ChildTopicsModel childTopics);
+    AssocModel newAssociationModel(ChildTopicsModel childTopics);
 
-    AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                                                              RoleModel roleModel2);
+    // ### TODO: Refactoring needed. See comments in impl.
+    AssocModel newAssociationModel(String typeUri, ChildTopicsModel childTopics);
 
-    AssociationModel newAssociationModel(AssociationModel assoc);
+    AssocModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2);
 
-    AssociationModel newAssociationModel(JSONObject assoc);
+    AssocModel newAssociationModel(AssocModel assoc);
+
+    AssocModel newAssociationModel(JSONObject assoc);
 
 
 
@@ -129,11 +128,11 @@ public interface ModelFactory {
 
     RelatedTopicModel newRelatedTopicModel(long topicId);
 
-    RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc);
+    RelatedTopicModel newRelatedTopicModel(long topicId, AssocModel relatingAssoc);
 
     RelatedTopicModel newRelatedTopicModel(String topicUri);
 
-    RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc);
+    RelatedTopicModel newRelatedTopicModel(String topicUri, AssocModel relatingAssoc);
 
     RelatedTopicModel newRelatedTopicModel(String topicTypeUri, SimpleValue value);
 
@@ -141,13 +140,13 @@ public interface ModelFactory {
 
     RelatedTopicModel newRelatedTopicModel(TopicModel topic);
 
-    RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc);
+    RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssocModel relatingAssoc);
 
 
 
     // === RelatedAssociationModel ===
 
-    RelatedAssociationModel newRelatedAssociationModel(AssociationModel assoc, AssociationModel relatingAssoc);
+    RelatedAssociationModel newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc);
 
 
 
@@ -157,11 +156,11 @@ public interface ModelFactory {
 
     TopicReferenceModel newTopicReferenceModel(long topicId);
 
-    TopicReferenceModel newTopicReferenceModel(long topicId, AssociationModel relatingAssoc);
+    TopicReferenceModel newTopicReferenceModel(long topicId, AssocModel relatingAssoc);
 
     TopicReferenceModel newTopicReferenceModel(String topicUri);
 
-    TopicReferenceModel newTopicReferenceModel(String topicUri, AssociationModel relatingAssoc);
+    TopicReferenceModel newTopicReferenceModel(String topicUri, AssocModel relatingAssoc);
 
     TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics);
 
@@ -213,7 +212,7 @@ public interface ModelFactory {
     CompDefModel newCompDefModel(String customAssocTypeUri, boolean isIdentityAttr, boolean includeInLabel,
                                  String parentTypeUri, String childTypeUri, String childCardinalityUri);
 
-    CompDefModel newCompDefModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
+    CompDefModel newCompDefModel(AssocModel assoc, ViewConfigurationModel viewConfig);
 
     CompDefModel newCompDefModel(JSONObject compDef);
 
@@ -233,7 +232,7 @@ public interface ModelFactory {
 
     ViewTopic newViewTopic(TopicModel topic, ViewProps viewProps);
 
-    ViewAssoc newViewAssoc(AssociationModel assoc, ViewProps viewProps);
+    ViewAssoc newViewAssoc(AssocModel assoc, ViewProps viewProps);
 
     ViewProps newViewProps();
 

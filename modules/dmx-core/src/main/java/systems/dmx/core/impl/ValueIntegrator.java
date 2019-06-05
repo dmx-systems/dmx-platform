@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -77,7 +77,7 @@ class ValueIntegrator {
             this.newValues = newValues;
             this.targetObject = targetObject;
             this.compDef = compDef;
-            this.isAssoc = newValues instanceof AssociationModel;
+            this.isAssoc = newValues instanceof AssocModel;
             this.isType  = newValues instanceof TypeModel;
             this.isFacetUpdate = compDef != null;
             //
@@ -326,7 +326,7 @@ class ValueIntegrator {
                 throw new RuntimeException("newValues has no ID set");
             }
             // TODO: partial updates. URI and role models must not expected to be part of the update model.
-            AssociationModelImpl _newValues = (AssociationModelImpl) newValues;
+            AssocModelImpl _newValues = (AssocModelImpl) newValues;
             return mf.newAssociationModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
                                                                                           _newValues.roleModel2);
         } else {
@@ -456,7 +456,7 @@ class ValueIntegrator {
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
             //
-            AssociationModelImpl assoc = null;
+            AssocModelImpl assoc = null;
             if (childTopic != null && (oldValue == null || !oldValue.equals(childTopic))) {
                 // update DB
                 assoc = createChildAssociation(parent, childTopic, compDefUri, deleted);
@@ -515,7 +515,7 @@ class ValueIntegrator {
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
             //
-            AssociationModelImpl assoc = null;
+            AssocModelImpl assoc = null;
             if (newId != -1 && (originalId == -1 || originalId != newId)) {
                 // update DB
                 assoc = createChildAssociation(parent, childTopic, compDefUri, deleted);
@@ -535,12 +535,11 @@ class ValueIntegrator {
         }
     }
 
-    private void updateRelatingAssociation(AssociationModelImpl assoc, String compDefUri,
-                                           RelatedTopicModelImpl newValues) {
+    private void updateRelatingAssociation(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
         try {
             // Note: for partial create/update requests newValues might be null
             if (newValues != null) {
-                AssociationModelImpl _newValues = newValues.getRelatingAssociation();
+                AssocModelImpl _newValues = newValues.getRelatingAssociation();
                 // Note: the roles must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
@@ -707,14 +706,14 @@ class ValueIntegrator {
             if (isOne(compDefUri)) {
                 TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
                 // update DB
-                AssociationModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
+                AssocModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
                 // update memory
                 childTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             } else {
                 for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
                     TopicModel childTopic = value.value;
                     // update DB
-                    AssociationModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
+                    AssocModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
                     // update memory
                     childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
                 }
@@ -744,13 +743,12 @@ class ValueIntegrator {
     /**
      * Convenience
      */
-    private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
-                                                                               String compDefUri) {
+    private AssocModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child, String compDefUri) {
         return createChildAssociation(parent, child, compDefUri, false);
     }
 
-    private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
-                                                                               String compDefUri, boolean deleted) {
+    private AssocModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
+                                                  boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(

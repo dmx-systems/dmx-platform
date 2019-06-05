@@ -7,7 +7,7 @@ package systems.dmx.core.model;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface AssociationModel extends DMXObjectModel {
+public interface AssocModel extends DMXObjectModel {
 
     RoleModel getRoleModel1();
 
@@ -45,5 +45,5 @@ public interface AssociationModel extends DMXObjectModel {
 
     // ---
 
-    AssociationModel clone();
+    AssocModel clone();
 }

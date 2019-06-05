@@ -5,7 +5,6 @@ import systems.dmx.facets.FacetsService;
 
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.topicmaps.ViewProps;

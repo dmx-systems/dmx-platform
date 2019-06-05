@@ -5,7 +5,7 @@ import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -191,13 +191,13 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssocImpl createAssociation(AssociationModel model) {
-        return pl.createAssociation((AssociationModelImpl) model);
+    public AssocImpl createAssociation(AssocModel model) {
+        return pl.createAssociation((AssocModelImpl) model);
     }
 
     @Override
-    public void updateAssociation(AssociationModel updateModel) {
-        pl.updateAssociation((AssociationModelImpl) updateModel);
+    public void updateAssociation(AssocModel updateModel) {
+        pl.updateAssociation((AssocModelImpl) updateModel);
     }
 
     @Override
@@ -571,7 +571,7 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.composition",
+        AssocModelImpl assoc = mf.newAssociationModel("dmx.core.composition",
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
             mf.newTopicRoleModel(dataTypeUri, "dmx.core.default"));
         pl.storeAssociation(assoc);

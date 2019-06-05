@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 
 
-class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
+class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,14 +22,14 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    CompDefModelImpl(AssociationModelImpl assoc) {
+    CompDefModelImpl(AssocModelImpl assoc) {
         this(assoc, null);
     }
 
     /**
      * @param   assoc   the underlying association.
      */
-    CompDefModelImpl(AssociationModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
+    CompDefModelImpl(AssocModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
         super(assoc);
         this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
         // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
@@ -129,7 +129,7 @@ class CompDefModelImpl extends AssociationModelImpl implements CompDefModel {
         // - When an comp def is created *programmatically* (through a migration) a full CompDefModel is instantiated,
         //   and no further Type Editor Support must be executed.
         // - When an comp def is created *interactively* (by creating an association in conjunction with auto-typing)
-        //   a sole AssociationModel is instantiated, and Type editor support is required.
+        //   a sole AssocModel is instantiated, and Type editor support is required.
     }
 
 

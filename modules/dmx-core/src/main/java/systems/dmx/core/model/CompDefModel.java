@@ -10,7 +10,7 @@ package systems.dmx.core.model;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface CompDefModel extends AssociationModel {
+public interface CompDefModel extends AssocModel {
 
     String getCompDefUri();
 

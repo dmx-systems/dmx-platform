@@ -12,7 +12,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleImpl(AssociationRoleModelImpl model, AssociationModelImpl assoc) {
+    AssociationRoleImpl(AssociationRoleModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 

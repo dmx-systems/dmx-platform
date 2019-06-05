@@ -12,7 +12,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModelImpl model, AssociationModelImpl assoc) {
+    TopicRoleImpl(TopicRoleModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 

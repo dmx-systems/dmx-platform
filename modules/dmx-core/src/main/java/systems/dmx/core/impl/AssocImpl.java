@@ -8,7 +8,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Role;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicRole;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
 
@@ -29,7 +29,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocImpl(AssociationModelImpl model, PersistenceLayer pl) {
+    AssocImpl(AssocModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -122,8 +122,8 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ---
 
     @Override
-    public final void update(AssociationModel updateModel) {
-        pl.updateAssociation(getModel(), (AssociationModelImpl) updateModel);
+    public final void update(AssocModel updateModel) {
+        pl.updateAssociation(getModel(), (AssocModelImpl) updateModel);
     }
 
     @Override
@@ -149,8 +149,8 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // Note: overridden by RelatedAssociationImpl
     @Override
-    public AssociationModelImpl getModel() {
-        return (AssociationModelImpl) model;
+    public AssocModelImpl getModel() {
+        return (AssocModelImpl) model;
     }
 
 

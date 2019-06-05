@@ -1,6 +1,6 @@
 package systems.dmx.core;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
 
@@ -90,7 +90,7 @@ public interface Assoc extends DMXObject {
 
     // ---
 
-    void update(AssociationModel model);
+    void update(AssocModel model);
 
     // ---
 
@@ -103,5 +103,5 @@ public interface Assoc extends DMXObject {
     // ---
 
     @Override
-    AssociationModel getModel();
+    AssocModel getModel();
 }

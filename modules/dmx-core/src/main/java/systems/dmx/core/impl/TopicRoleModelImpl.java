@@ -66,12 +66,12 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     // === Implementation of abstract RoleModelImpl methods ===
 
     @Override
-    Role instantiate(AssociationModelImpl assoc) {
+    Role instantiate(AssocModelImpl assoc) {
         return new TopicRoleImpl(this, assoc);
     }
 
     @Override
-    RelatedTopicModelImpl getPlayer(AssociationModelImpl assoc) {
+    RelatedTopicModelImpl getPlayer(AssocModelImpl assoc) {
         return mf.newRelatedTopicModel(pl.fetchTopic(getPlayerId()), assoc);
     }
 }

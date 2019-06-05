@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -283,7 +283,7 @@ class TypeStorage {
      *
      * @param   assoc   an assoc whose players are ref'd by-ID
      */
-    CompDefModelImpl newCompDefModel(AssociationModelImpl assoc) {
+    CompDefModelImpl newCompDefModel(AssocModelImpl assoc) {
         return mf.newCompDefModel(
             addPlayerUris(assoc, fetchParentTypeTopic(assoc).uri, fetchChildTypeTopic(assoc).uri),
             mf.newViewConfigurationModel().addConfigTopic(
@@ -308,13 +308,13 @@ class TypeStorage {
      * Called when a type is loaded from DB.
      *
      * Note: we can't use model-driven comp def retrieval. Fetching assoc type "Composition Definition" would run into
-     * an endless recursion while fetching its "Custom Assoc Type" comp def.
+     * an endless recursion while fetching its "Custom Association Type" comp def.
      *
      * @param   assoc   the underlying assoc as retrieved from DB, that is
      *                  1) players are ref'd by-ID
      *                  2) childs are not retrieved
      */
-    private CompDefModel fetchCompDef(AssociationModelImpl assoc, String parentTypeUri, String childTypeUri) {
+    private CompDefModel fetchCompDef(AssocModelImpl assoc, String parentTypeUri, String childTypeUri) {
         try {
             // 2 roles
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
@@ -345,19 +345,19 @@ class TypeStorage {
         }
     }
 
-    private RelatedTopicModel fetchCustomAssocType(AssociationModelImpl assoc) {
+    private RelatedTopicModel fetchCustomAssocType(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
         return assoc.getRelatedTopic("dmx.core.custom_assoc_type", "dmx.core.parent", "dmx.core.child",
             "dmx.core.assoc_type");
     }
 
-    private RelatedTopicModel fetchIsIdentityAttr(AssociationModelImpl assoc) {
+    private RelatedTopicModel fetchIsIdentityAttr(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
         return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
             "dmx.core.identity_attr");
     }
 
-    private RelatedTopicModel fetchIncludeInLabel(AssociationModelImpl assoc) {
+    private RelatedTopicModel fetchIncludeInLabel(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
         return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
             "dmx.core.include_in_label");
@@ -365,7 +365,7 @@ class TypeStorage {
 
     // ---
 
-    private AssociationModel addPlayerUris(AssociationModel assoc, String parentTypeUri, String childTypeUri) {
+    private AssocModel addPlayerUris(AssocModel assoc, String parentTypeUri, String childTypeUri) {
         ((TopicRoleModelImpl) assoc.getRoleModel("dmx.core.parent_type")).topicUri = parentTypeUri;
         ((TopicRoleModelImpl) assoc.getRoleModel("dmx.core.child_type")).topicUri  = childTypeUri;
         return assoc;
@@ -433,7 +433,7 @@ class TypeStorage {
      * @return  the parent type topic.
      *          A topic representing either a topic type or an association type.
      */
-    private TopicModelImpl fetchParentTypeTopic(AssociationModelImpl assoc) {
+    private TopicModelImpl fetchParentTypeTopic(AssocModelImpl assoc) {
         TopicModelImpl parentType = (TopicModelImpl) assoc.getPlayer("dmx.core.parent_type");
         // error check
         if (parentType == null) {
@@ -449,7 +449,7 @@ class TypeStorage {
      * @return  the child type topic.
      *          A topic representing a topic type.
      */
-    private TopicModelImpl fetchChildTypeTopic(AssociationModelImpl assoc) {
+    private TopicModelImpl fetchChildTypeTopic(AssocModelImpl assoc) {
         TopicModelImpl childType = (TopicModelImpl) assoc.getPlayer("dmx.core.child_type");
         // error check
         if (childType == null) {
@@ -461,7 +461,7 @@ class TypeStorage {
 
     // ---
 
-    TypeModelImpl fetchParentType(AssociationModelImpl assoc) {
+    TypeModelImpl fetchParentType(AssocModelImpl assoc) {
         TopicModelImpl type = fetchParentTypeTopic(assoc);
         if (type.typeUri.equals("dmx.core.topic_type")) {
             return getTopicType(type.uri);
@@ -477,7 +477,7 @@ class TypeStorage {
 
     // === Cardinality ===
 
-    private RelatedTopicModelImpl fetchCardinality(AssociationModelImpl assoc) {
+    private RelatedTopicModelImpl fetchCardinality(AssocModelImpl assoc) {
         RelatedTopicModelImpl cardinality = fetchCardinalityIfExists(assoc);
         // error check
         if (cardinality == null) {
@@ -487,7 +487,7 @@ class TypeStorage {
         return cardinality;
     }
 
-    private RelatedTopicModelImpl fetchCardinalityIfExists(AssociationModelImpl assoc) {
+    private RelatedTopicModelImpl fetchCardinalityIfExists(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval -> Endless recursion while loading type "dmx.core.composition_def"
         return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
             "dmx.core.cardinality");
@@ -497,7 +497,7 @@ class TypeStorage {
     // The assignment is restored. Otherwise "One" is used as default.
     //
     // ### TODO: drop it (dead code)
-    private RelatedTopicModel defaultCardinality(AssociationModelImpl assoc) {
+    private RelatedTopicModel defaultCardinality(AssocModelImpl assoc) {
         RelatedTopicModel cardinality = fetchCardinalityIfExists(assoc);
         if (cardinality != null) {
             return cardinality;
@@ -667,7 +667,7 @@ class TypeStorage {
         }
     }
 
-    private ViewConfigurationModel fetchViewConfigOfCompDef(AssociationModel compDef) {
+    private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
             return viewConfigModel(pl.fetchAssociationRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));

@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RoleModel;
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-class AssociationModelImpl extends DMXObjectModelImpl implements AssociationModel {
+class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,13 +30,13 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationModelImpl(DMXObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
+    AssocModelImpl(DMXObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
         super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }
 
-    AssociationModelImpl(AssociationModelImpl assoc) {
+    AssocModelImpl(AssocModelImpl assoc) {
         super(assoc);
         this.roleModel1 = assoc.roleModel1;
         this.roleModel2 = assoc.roleModel2;
@@ -143,14 +143,14 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     // === Java API ===
 
     @Override
-    public AssociationModel clone() {
+    public AssocModel clone() {
         try {
-            AssociationModel model = (AssociationModel) super.clone();
+            AssocModel model = (AssocModel) super.clone();
             model.setRoleModel1(roleModel1.clone());
             model.setRoleModel2(roleModel2.clone());
             return model;
         } catch (Exception e) {
-            throw new RuntimeException("Cloning an AssociationModel failed", e);
+            throw new RuntimeException("Cloning an AssocModel failed", e);
         }
     }
 
@@ -167,7 +167,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     }
 
     @Override
-    AssociationModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+    AssocModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
         return mf.newAssociationModel(typeUri, childTopics);
     }
 
@@ -179,7 +179,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     }
 
     @Override
-    final List<AssociationModelImpl> getAssociations() {
+    final List<AssocModelImpl> getAssociations() {
         return pl.fetchAssociationAssociations(id);
     }
 
@@ -309,18 +309,18 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     @Override
     void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
         // update association specific parts: the 2 roles
-        updateRoles((AssociationModel) updateModel);
+        updateRoles((AssocModel) updateModel);
         //
         duplicateCheck();
         //
         // Type Editor Support
         if (isCompDef(this)) {
-            if (isCompDef((AssociationModel) oldObject)) {
-                updateCompDef((AssociationModel) oldObject);
+            if (isCompDef((AssocModel) oldObject)) {
+                updateCompDef((AssocModel) oldObject);
             } else {
                 createCompDef();
             }
-        } else if (isCompDef((AssociationModel) oldObject)) {
+        } else if (isCompDef((AssocModel) oldObject)) {
             removeCompDef();
         }
     }
@@ -382,7 +382,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
             return;
         }
         // Note: only readable assocs (access control) are considered
-        for (AssociationModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+        for (AssocModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
             if (assoc.id != id && assoc.value.equals(value)) {
                 throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
@@ -400,7 +400,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
      *                          If role 1 is <code>null</code> it is not updated.
      *                          If role 2 is <code>null</code> it is not updated.
      */
-    private void updateRoles(AssociationModel updateModel) {
+    private void updateRoles(AssocModel updateModel) {
         updateRole(updateModel.getRoleModel1(), 1);
         updateRole(updateModel.getRoleModel2(), 2);
     }
@@ -471,7 +471,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
         pl.createAssociationInstantiation(id, typeUri);
     }
 
-    private AssociationModelImpl fetchInstantiation() {
+    private AssocModelImpl fetchInstantiation() {
         RelatedTopicModelImpl assocType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
             "dmx.core.type", "dmx.core.assoc_type");
         //
@@ -502,7 +502,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
         parentType._addCompDef(this);
     }
 
-    private void updateCompDef(AssociationModel oldAssoc) {
+    private void updateCompDef(AssocModel oldAssoc) {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Updating comp def " + id + " of type \"" + parentType.getUri() + "\"");
         //
@@ -518,7 +518,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // ---
 
-    private boolean isCompDef(AssociationModel assoc) {
+    private boolean isCompDef(AssocModel assoc) {
         String typeUri = assoc.getTypeUri();
         if (!typeUri.equals("dmx.core.composition_def")) {
             return false;

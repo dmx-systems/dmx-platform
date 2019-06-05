@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TypeModel;
@@ -304,8 +304,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             //
             // 1) update memory
             // Note: the comp def's custom association type is stored as a child topic. The meta model extension that
-            // adds "Assoc Type" as a child to the "Composition Definition" association type has itself a custom
-            // association type (named "Custom Assoc Type"), see migration 5. It would not be stored as storage is
+            // adds "Association Type" as a child to the "Composition Definition" association type has itself a custom
+            // association type (named "Custom Association Type"), see migration 2. It would not be stored as storage is
             // model driven and the (meta) model doesn't know about custom associations as this very concept is
             // introduced only by the comp def being added here. So, the model must be updated (in-memory) *before* the
             // comp def is stored.
@@ -336,7 +336,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // 3 methods to bridge between assoc and comp def
 
-    final void _addCompDef(AssociationModelImpl assoc) {
+    final void _addCompDef(AssocModelImpl assoc) {
         CompDefModelImpl compDef = pl.typeStorage.newCompDefModel(assoc);
         pl.typeStorage.storeViewConfig(compDef);
         _addCompDefBefore(compDef, null);      // beforeCompDefUri=null
@@ -354,7 +354,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      *
      * @param   assoc       the updated generic association. ### FIXDOC: might be an comp def as well
      */
-    final void _updateCompDef(AssociationModel assoc, AssociationModel oldAssoc) {
+    final void _updateCompDef(AssocModel assoc, AssocModel oldAssoc) {
         String[] compDefUris = findCompDefUris(assoc.getId());
         CompDefModel compDef = getCompDef(compDefUris[0]);
         String oldCompDefUri;
@@ -383,7 +383,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
      * deletion of an association that represents a comp def is imminent. ### FIXDOC
      */
-    final void _removeCompDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
+    final void _removeCompDefFromMemoryAndRebuildSequence(AssocModel assoc) {
         String[] compDefUris = findCompDefUris(assoc.getId());
         String compDefUri = getCompDef(compDefUris[0]).getCompDefUri();
         // update memory

@@ -6,7 +6,6 @@ import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;

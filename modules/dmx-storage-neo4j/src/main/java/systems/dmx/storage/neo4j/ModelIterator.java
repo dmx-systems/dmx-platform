@@ -1,6 +1,6 @@
 package systems.dmx.storage.neo4j;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TopicModel;
 
@@ -26,14 +26,14 @@ class TopicModelIterator extends ModelIterator<TopicModel> {
 
 
 
-class AssociationModelIterator extends ModelIterator<AssociationModel> {
+class AssociationModelIterator extends ModelIterator<AssocModel> {
 
     AssociationModelIterator(Neo4jStorage storage) {
         super(storage, NodeType.ASSOC);
     }
 
     @Override
-    AssociationModel buildModel(Node node) {
+    AssocModel buildModel(Node node) {
         return storage.buildAssociation(node);
     }
 }

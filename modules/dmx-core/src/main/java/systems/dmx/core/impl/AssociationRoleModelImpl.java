@@ -39,12 +39,12 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     // === Implementation of abstract RoleModelImpl methods ===
 
     @Override
-    Role instantiate(AssociationModelImpl assoc) {
+    Role instantiate(AssocModelImpl assoc) {
         return new AssociationRoleImpl(this, assoc);
     }
 
     @Override
-    RelatedAssociationModelImpl getPlayer(AssociationModelImpl assoc) {
+    RelatedAssociationModelImpl getPlayer(AssocModelImpl assoc) {
         return mf.newRelatedAssociationModel(pl.fetchAssociation(getPlayerId()), assoc);
     }
 }

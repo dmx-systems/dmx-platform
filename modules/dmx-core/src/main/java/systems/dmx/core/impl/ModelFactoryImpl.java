@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -122,64 +122,64 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === AssociationModel ===
+    // === AssocModel ===
 
     @Override
-    public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                                RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
-        return new AssociationModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
+    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
+                                              RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
+        return new AssocModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
             (RoleModelImpl) roleModel1, (RoleModelImpl) roleModel2);
     }
 
     @Override
-    public AssociationModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    public AssocModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssociationModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
-                                                                                         ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+                                              ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     // ### TODO: make internal?
     @Override
-    public AssociationModelImpl newAssociationModel() {
+    public AssocModelImpl newAssociationModel() {
         return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     // ### TODO: make internal?
     @Override
-    public AssociationModelImpl newAssociationModel(ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssociationModel(ChildTopicsModel childTopics) {
         return newAssociationModel(null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     // ### TODO: make internal?
     @Override
-    public AssociationModelImpl newAssociationModel(String typeUri, ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssociationModel(String typeUri, ChildTopicsModel childTopics) {
         return newAssociationModel(typeUri, null, null, childTopics);
     }
 
     @Override
-    public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                                                                         RoleModel roleModel2) {
+    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
+                                                                                   RoleModel roleModel2) {
         return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssociationModelImpl newAssociationModel(AssociationModel assoc) {
-        return new AssociationModelImpl((AssociationModelImpl) assoc);
+    public AssocModelImpl newAssociationModel(AssocModel assoc) {
+        return new AssocModelImpl((AssocModelImpl) assoc);
     }
 
     @Override
-    public AssociationModelImpl newAssociationModel(JSONObject assoc) {
+    public AssocModelImpl newAssociationModel(JSONObject assoc) {
         try {
-            return new AssociationModelImpl(newDMXObjectModel(assoc), parseRole1(assoc), parseRole2(assoc));
+            return new AssocModelImpl(newDMXObjectModel(assoc), parseRole1(assoc), parseRole2(assoc));
         } catch (Exception e) {
-            throw parsingFailed(assoc, e, "AssociationModelImpl");
+            throw parsingFailed(assoc, e, "AssocModelImpl");
         }
     }
 
@@ -300,7 +300,7 @@ public class ModelFactoryImpl implements ModelFactory {
             // we detect the canonic format by checking for mandatory topic properties
             if (val.has("value") || val.has("childs")) {
                 // canonic format (topic or topic reference)
-                AssociationModel relatingAssoc = null;
+                AssocModel relatingAssoc = null;
                 if (val.has("assoc")) {
                     JSONObject assoc = val.getJSONObject("assoc");
                     initTypeUri(assoc, assocTypeUri(compDefUri));
@@ -338,7 +338,7 @@ public class ModelFactoryImpl implements ModelFactory {
         }
     }
 
-    private RelatedTopicModel createReferenceModel(Object value, AssociationModel relatingAssoc) {
+    private RelatedTopicModel createReferenceModel(Object value, AssocModel relatingAssoc) {
         if (value instanceof String) {
             String val = (String) value;
             if (val.startsWith(REF_ID_PREFIX)) {
@@ -462,20 +462,20 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public RelatedTopicModelImpl newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl(newTopicModel(topicId), (AssociationModelImpl) relatingAssoc);
+    public RelatedTopicModelImpl newRelatedTopicModel(long topicId, AssocModel relatingAssoc) {
+        return new RelatedTopicModelImpl(newTopicModel(topicId), (AssocModelImpl) relatingAssoc);
     }
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(String topicUri) {
         return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), newAssociationModel());
-                                                          // topicTypeUri=null
+                                                                 // topicTypeUri=null
     }
 
     @Override
-    public RelatedTopicModelImpl newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), (AssociationModelImpl) relatingAssoc);
-                                                          // topicTypeUri=null
+    public RelatedTopicModelImpl newRelatedTopicModel(String topicUri, AssocModel relatingAssoc) {
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), (AssocModelImpl) relatingAssoc);
+                                                                 // topicTypeUri=null
     }
 
     @Override
@@ -494,8 +494,8 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl((TopicModelImpl) topic, (AssociationModelImpl) relatingAssoc);
+    public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic, AssocModel relatingAssoc) {
+        return new RelatedTopicModelImpl((TopicModelImpl) topic, (AssocModelImpl) relatingAssoc);
     }
 
 
@@ -503,9 +503,8 @@ public class ModelFactoryImpl implements ModelFactory {
     // === RelatedAssociationModel ===
 
     @Override
-    public RelatedAssociationModelImpl newRelatedAssociationModel(AssociationModel assoc,
-                                                                  AssociationModel relatingAssoc) {
-        return new RelatedAssociationModelImpl((AssociationModelImpl) assoc, (AssociationModelImpl) relatingAssoc);
+    public RelatedAssociationModelImpl newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc) {
+        return new RelatedAssociationModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc);
     }
 
 
@@ -518,7 +517,7 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public TopicReferenceModel newTopicReferenceModel(long topicId, AssociationModel relatingAssoc) {
+    public TopicReferenceModel newTopicReferenceModel(long topicId, AssocModel relatingAssoc) {
         return new TopicReferenceModelImpl(newRelatedTopicModel(topicId, relatingAssoc));
     }
 
@@ -528,7 +527,7 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public TopicReferenceModel newTopicReferenceModel(String topicUri, AssociationModel relatingAssoc) {
+    public TopicReferenceModel newTopicReferenceModel(String topicUri, AssocModel relatingAssoc) {
         return new TopicReferenceModelImpl(newRelatedTopicModel(topicUri, relatingAssoc));
     }
 
@@ -694,8 +693,8 @@ public class ModelFactoryImpl implements ModelFactory {
      *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID). ### still true?
      */
     @Override
-    public CompDefModelImpl newCompDefModel(AssociationModel assoc, ViewConfigurationModel viewConfig) {
-        return new CompDefModelImpl((AssociationModelImpl) assoc, (ViewConfigurationModelImpl) viewConfig);
+    public CompDefModelImpl newCompDefModel(AssocModel assoc, ViewConfigurationModel viewConfig) {
+        return new CompDefModelImpl((AssocModelImpl) assoc, (ViewConfigurationModelImpl) viewConfig);
     }
 
     @Override
@@ -832,8 +831,8 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public ViewAssoc newViewAssoc(AssociationModel assoc, ViewProps viewProps) {
-        return new ViewAssocImpl((AssociationModelImpl) assoc, viewProps);
+    public ViewAssoc newViewAssoc(AssocModel assoc, ViewProps viewProps) {
+        return new ViewAssocImpl((AssocModelImpl) assoc, viewProps);
     }
 
     @Override

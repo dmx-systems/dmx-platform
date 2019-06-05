@@ -251,7 +251,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    List<AssociationModelImpl> getAssociations() {
+    List<AssocModelImpl> getAssociations() {
         throw new UnsupportedOperationException();
     }
 
@@ -459,7 +459,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             preDelete();
             //
             // delete direct associations
-            for (AssociationModelImpl assoc : getAssociations()) {
+            for (AssocModelImpl assoc : getAssociations()) {
                 assoc.delete();
             }
             // delete object itself

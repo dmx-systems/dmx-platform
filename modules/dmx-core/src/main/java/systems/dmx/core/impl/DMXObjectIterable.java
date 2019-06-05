@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TopicModel;
 
@@ -70,19 +70,19 @@ class TopicIterator extends ObjectIterator<Topic, TopicModelImpl> {
 
 
 
-class AssociationIterator extends ObjectIterator<Assoc, AssociationModelImpl> {
+class AssociationIterator extends ObjectIterator<Assoc, AssocModelImpl> {
 
     AssociationIterator(PersistenceLayer pl) {
         super(pl);
     }
 
     @Override
-    Iterator<AssociationModelImpl> fetchObjects() {
+    Iterator<AssocModelImpl> fetchObjects() {
         return pl.fetchAllAssociations();
     }
 
     @Override
-    Assoc instantiateObject(AssociationModelImpl model) {
+    Assoc instantiateObject(AssocModelImpl model) {
         return pl.checkReadAccessAndInstantiate(model);
     }
 }

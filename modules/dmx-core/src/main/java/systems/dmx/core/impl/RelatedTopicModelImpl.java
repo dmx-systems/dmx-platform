@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.TopicModel;
 
@@ -13,11 +13,11 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModelImpl relatingAssoc;
+    private AssocModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicModelImpl(TopicModelImpl topic, AssociationModelImpl relatingAssoc) {
+    RelatedTopicModelImpl(TopicModelImpl topic, AssocModelImpl relatingAssoc) {
         super(topic);
         this.relatingAssoc = relatingAssoc;
     }
@@ -30,7 +30,7 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModelImpl getRelatingAssociation() {
+    public AssocModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 

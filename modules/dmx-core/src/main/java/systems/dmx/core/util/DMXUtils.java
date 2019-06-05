@@ -6,7 +6,7 @@ import systems.dmx.core.Identifiable;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.osgi.CoreActivator;
@@ -179,9 +179,9 @@ public class DMXUtils {
 
 
 
-    // *************************
-    // *** Assoc Auto-Typing ***
-    // *************************
+    // *******************************
+    // *** Association Auto-Typing ***
+    // *******************************
 
 
 
@@ -200,7 +200,7 @@ public class DMXUtils {
      *          otherwise. Convenience to access the assoc's roles after retyping. Element 0 is the role of the
      *          "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
      */
-    public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
+    public static RoleModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
                                                     String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
@@ -217,7 +217,7 @@ public class DMXUtils {
         return roles;
     }
 
-    public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2) {
+    public static RoleModel[] getRoleModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
@@ -227,7 +227,7 @@ public class DMXUtils {
         CoreService dmx = CoreActivator.getCoreService();
         // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
         // is not yet available in case the association is part of the player's composite structure.
-        // Compare to AssociationModelImpl.duplicateCheck()
+        // Compare to AssocModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
         String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
@@ -254,7 +254,7 @@ public class DMXUtils {
 
     // Note: this is experimental
     // ### TODO: do it only for simple assoc types? Drop it, and let the application do this?
-    private static void setAssocValue(AssociationModel assoc) {
+    private static void setAssocValue(AssocModel assoc) {
         AssociationType assocType = CoreActivator.getCoreService().getAssociationType(assoc.getTypeUri());
         assoc.setSimpleValue(assocType.getSimpleValue());
     }

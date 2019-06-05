@@ -12,13 +12,13 @@ abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    RoleModelImpl model;            // underlying model
+    RoleModelImpl model;        // underlying model
 
-    AssociationModelImpl assoc;     // the association this role is involved in
+    AssocModelImpl assoc;       // the association this role is involved in
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RoleImpl(RoleModelImpl model, AssociationModelImpl assoc) {
+    RoleImpl(RoleModelImpl model, AssocModelImpl assoc) {
         this.model = model;
         this.assoc = assoc;
     }

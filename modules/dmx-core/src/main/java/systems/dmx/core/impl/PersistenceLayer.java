@@ -5,7 +5,7 @@ import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -238,7 +238,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     Assoc getAssociationByValue(String key, SimpleValue value) {
         try {
-            AssociationModelImpl assoc = fetchAssociation(key, value);
+            AssocModelImpl assoc = fetchAssociation(key, value);
             return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
@@ -260,7 +260,7 @@ public final class PersistenceLayer extends StorageDecorator {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
-            AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            AssocModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
             return assoc != null ? this.<AssocImpl>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
@@ -274,7 +274,7 @@ public final class PersistenceLayer extends StorageDecorator {
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         logger.info(info);
         try {
-            AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            AssocModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
             return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
@@ -312,8 +312,8 @@ public final class PersistenceLayer extends StorageDecorator {
      *
      * ### TODO: drop this. Use the new traversal methods instead.
      */
-    Iterable<AssociationModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id,
-                                                    String roleTypeUri1, String roleTypeUri2) {
+    Iterable<AssocModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                                 String roleTypeUri2) {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
@@ -347,7 +347,7 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Creates a new association in the DB.
      */
-    AssocImpl createAssociation(AssociationModelImpl model) {
+    AssocImpl createAssociation(AssocModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -355,14 +355,14 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeAssociation(model);
-            AssociationModelImpl _model = updateValues(model, null);
+            AssocModelImpl _model = updateValues(model, null);
             createAssociationInstantiation(_model.getId(), _model.getTypeUri());
             // 2) instantiate
             AssocImpl assoc = _model.instantiate();
             //
             // Note 1: the postCreate() hook is invoked on the update model, *not* on the value integration result
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
-            // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssociationModel.
+            // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssocModel.
             // Note 2: postCreate() creates and caches the comp def based on "model". Cached comp defs need an
             // up-to-date value (as being displayed in webclient's type editor). The value is calculated while
             // value integration. We must transfer that value to "model".
@@ -379,9 +379,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModelImpl updateModel) {
+    void updateAssociation(AssocModelImpl updateModel) {
         try {
-            AssociationModelImpl model = fetchAssociation(updateModel.getId());
+            AssocModelImpl model = fetchAssociation(updateModel.getId());
             updateAssociation(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
@@ -392,7 +392,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void updateAssociation(AssociationModelImpl assoc, AssociationModelImpl updateModel) {
+    void updateAssociation(AssocModelImpl assoc, AssocModelImpl updateModel) {
         try {
             assoc.checkWriteAccess();
             assoc.update(updateModel);
@@ -427,7 +427,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void deleteAssociation(AssociationModelImpl assoc) {
+    void deleteAssociation(AssocModelImpl assoc) {
         try {
             assoc.checkWriteAccess();
             assoc.delete();
@@ -442,7 +442,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicRoleModel(topicId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
@@ -456,7 +456,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createAssociationInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssociationModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssociationRoleModel(assocId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
@@ -665,7 +665,7 @@ public final class PersistenceLayer extends StorageDecorator {
             othersAssocTypeUri));
     }
 
-    List<AssociationModelImpl> getTopicAssociations(long topicId) {
+    List<AssocModelImpl> getTopicAssociations(long topicId) {
         return filterReadables(fetchTopicAssociations(topicId));
     }
 
@@ -690,7 +690,7 @@ public final class PersistenceLayer extends StorageDecorator {
             othersRoleTypeUri, othersAssocTypeUri));
     }
 
-    List<AssociationModelImpl> getAssociationAssociations(long assocId) {
+    List<AssocModelImpl> getAssociationAssociations(long assocId) {
         return filterReadables(fetchAssociationAssociations(assocId));
     }
 

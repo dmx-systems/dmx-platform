@@ -1,7 +1,7 @@
 package systems.dmx.contacts;
 
 import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.event.PreCreateAssociationListener;
 import systems.dmx.core.util.DMXUtils;
@@ -54,7 +54,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
 
 
     @Override
-    public void preCreateAssociation(AssociationModel assoc) {
+    public void preCreateAssociation(AssocModel assoc) {
         // Person <-> Organization
         DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
             "dmx.contacts.organization_involvement", "dmx.core.default", "dmx.core.default");

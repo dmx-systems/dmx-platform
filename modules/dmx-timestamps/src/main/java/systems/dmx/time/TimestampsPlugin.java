@@ -3,7 +3,7 @@ package systems.dmx.timestamps;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -179,7 +179,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postUpdateAssociation(Assoc assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+    public void postUpdateAssociation(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
         storeTimestamp(assoc);
     }
 

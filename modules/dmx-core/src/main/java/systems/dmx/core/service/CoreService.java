@@ -7,7 +7,7 @@ import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -171,9 +171,9 @@ public interface CoreService {
 
     // ---
 
-    Assoc createAssociation(AssociationModel model);
+    Assoc createAssociation(AssocModel model);
 
-    void updateAssociation(AssociationModel updateModel);
+    void updateAssociation(AssocModel updateModel);
 
     void deleteAssociation(long assocId);
 

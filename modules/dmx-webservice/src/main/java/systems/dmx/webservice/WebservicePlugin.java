@@ -8,7 +8,7 @@ import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -198,14 +198,14 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/association")
     @Transactional
-    public DirectivesResponse createAssociation(AssociationModel model) {
+    public DirectivesResponse createAssociation(AssocModel model) {
         return new DirectivesResponse(dmx.createAssociation(model));
     }
 
     @PUT
     @Path("/association/{id}")
     @Transactional
-    public DirectivesResponse updateAssociation(@PathParam("id") long assocId, AssociationModel model) {
+    public DirectivesResponse updateAssociation(@PathParam("id") long assocId, AssocModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
@@ -374,9 +374,9 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // **********************
-    // *** Assoc REST API ***
-    // **********************
+    // ****************************
+    // *** Association REST API ***
+    // ****************************
 
 
 

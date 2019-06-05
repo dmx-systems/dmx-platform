@@ -2,7 +2,7 @@ package systems.dmx.events;
 
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
@@ -68,7 +68,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
 
 
     @Override
-    public void preCreateAssociation(AssociationModel assoc) {
+    public void preCreateAssociation(AssocModel assoc) {
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
             "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");

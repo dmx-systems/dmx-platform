@@ -12,7 +12,7 @@ import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -575,7 +575,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssociation(Assoc assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+    public void postUpdateAssociation(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
         if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
             assignMembershipToWorkspace(assoc);
         }
@@ -630,7 +630,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return usernameTopic;
     }
 
-    private boolean isMembership(AssociationModel assoc) {
+    private boolean isMembership(AssocModel assoc) {
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
     }
 

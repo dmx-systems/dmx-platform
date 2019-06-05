@@ -1,6 +1,6 @@
 package systems.dmx.storage.neo4j;
 
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedAssociationModel;
@@ -54,7 +54,7 @@ public class Neo4jStorage implements DMXStorage {
     private static final String KEY_TPYE_URI = "typeUri";                   // used as property key as well
     private static final String KEY_FULLTEXT = "fulltext";
 
-    // --- Assoc Metadata Index Keys ---
+    // --- Association Metadata Index Keys ---
     private static final String KEY_ASSOC_ID       = "assocId";
     private static final String KEY_ASSOC_TPYE_URI = "assocTypeUri";
     // role 1 & 2
@@ -223,24 +223,24 @@ public class Neo4jStorage implements DMXStorage {
     // === Associations ===
 
     @Override
-    public AssociationModel fetchAssociation(long assocId) {
+    public AssocModel fetchAssociation(long assocId) {
         return buildAssociation(fetchAssociationNode(assocId));
     }
 
     @Override
-    public AssociationModel fetchAssociation(String key, Object value) {
+    public AssocModel fetchAssociation(String key, Object value) {
         Node node = assocContentExact.get(key, value).getSingle();
         return node != null ? buildAssociation(node) : null;
     }
 
     @Override
-    public List<AssociationModel> fetchAssociations(String key, Object value) {
+    public List<AssocModel> fetchAssociations(String key, Object value) {
         return buildAssociations(assocContentExact.query(key, value));
     }
 
     @Override
-    public List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                                         String roleTypeUri1, String roleTypeUri2) {
+    public List<AssocModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                              String roleTypeUri1, String roleTypeUri2) {
         return queryAssociationIndex(
             assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
@@ -249,8 +249,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
-                                                       long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
+    public List<AssocModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                                     String topicRoleTypeUri, String assocRoleTypeUri) {
         return queryAssociationIndex(
             assocTypeUri,
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
@@ -259,7 +259,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterator<AssociationModel> fetchAllAssociations() {
+    public Iterator<AssocModel> fetchAllAssociations() {
         return new AssociationModelIterator(this);
     }
 
@@ -271,7 +271,7 @@ public class Neo4jStorage implements DMXStorage {
     // ---
 
     @Override
-    public void storeAssociation(AssociationModel assocModel) {
+    public void storeAssociation(AssocModel assocModel) {
         setDefaults(assocModel);
         //
         // 1) update DB
@@ -377,12 +377,12 @@ public class Neo4jStorage implements DMXStorage {
     // === Traversal ===
 
     @Override
-    public List<AssociationModel> fetchTopicAssociations(long topicId) {
+    public List<AssocModel> fetchTopicAssociations(long topicId) {
         return fetchAssociations(fetchTopicNode(topicId));
     }
 
     @Override
-    public List<AssociationModel> fetchAssociationAssociations(long assocId) {
+    public List<AssocModel> fetchAssociationAssociations(long assocId) {
         return fetchAssociations(fetchAssociationNode(assocId));
     }
 
@@ -479,12 +479,12 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
+    public List<AssocModel> fetchAssociationsByProperty(String propUri, Object propValue) {
         return buildAssociations(queryIndexByProperty(assocContentExact, propUri, propValue));
     }
 
     @Override
-    public List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    public List<AssocModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return buildAssociations(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
     }
 
@@ -798,7 +798,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private List<AssociationModel> queryAssociationIndex(String assocTypeUri,
+    private List<AssocModel> queryAssociationIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         return buildAssociations(assocMetadata.query(buildAssociationQuery(assocTypeUri,
@@ -931,7 +931,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    AssociationModel buildAssociation(Node assocNode) {
+    AssocModel buildAssociation(Node assocNode) {
         try {
             List<RoleModel> roleModels = buildRoleModels(assocNode);
             return mf.newAssociationModel(
@@ -943,13 +943,13 @@ public class Neo4jStorage implements DMXStorage {
                 null    // childTopics=null
             );
         } catch (Exception e) {
-            throw new RuntimeException("Building an AssociationModel failed (id=" + assocNode.getId() + ", typeUri=" +
+            throw new RuntimeException("Building an AssocModel failed (id=" + assocNode.getId() + ", typeUri=" +
                 typeUri(assocNode) + ")");
         }
     }
 
-    private List<AssociationModel> buildAssociations(Iterable<Node> assocNodes) {
-        List<AssociationModel> assocs = new ArrayList();
+    private List<AssocModel> buildAssociations(Iterable<Node> assocNodes) {
+        List<AssocModel> assocs = new ArrayList();
         for (Node assocNode : assocNodes) {
             assocs.add(buildAssociation(assocNode));
         }
@@ -1044,8 +1044,8 @@ public class Neo4jStorage implements DMXStorage {
      *
      * @param   node    a topic node or an association node.
      */
-    private List<AssociationModel> fetchAssociations(Node node) {
-        List<AssociationModel> assocs = new ArrayList();
+    private List<AssocModel> fetchAssociations(Node node) {
+        List<AssocModel> assocs = new ArrayList();
         for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
             Node assocNode = rel.getStartNode();
             // skip non-DM nodes stored by 3rd-party components (e.g. Neo4j Spatial)
@@ -1120,9 +1120,9 @@ public class Neo4jStorage implements DMXStorage {
     // --- DMX Helper ---
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private List<RelatedTopicModel> buildRelatedTopics(List<AssociationModel> assocs, long playerId) {
+    private List<RelatedTopicModel> buildRelatedTopics(List<AssocModel> assocs, long playerId) {
         List<RelatedTopicModel> relTopics = new ArrayList();
-        for (AssociationModel assoc : assocs) {
+        for (AssocModel assoc : assocs) {
             relTopics.add(mf.newRelatedTopicModel(
                 fetchTopic(
                     assoc.getOtherPlayerId(playerId)
@@ -1133,9 +1133,9 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private List<RelatedAssociationModel> buildRelatedAssociations(List<AssociationModel> assocs, long playerId) {
+    private List<RelatedAssociationModel> buildRelatedAssociations(List<AssocModel> assocs, long playerId) {
         List<RelatedAssociationModel> relAssocs = new ArrayList();
-        for (AssociationModel assoc : assocs) {
+        for (AssocModel assoc : assocs) {
             relAssocs.add(mf.newRelatedAssociationModel(
                 fetchAssociation(
                     assoc.getOtherPlayerId(playerId)

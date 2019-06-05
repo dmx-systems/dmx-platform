@@ -68,7 +68,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     }
 
     @Override
-    final List<AssociationModelImpl> getAssociations() {
+    final List<AssocModelImpl> getAssociations() {
         return pl.fetchTopicAssociations(id);
     }
 
@@ -233,7 +233,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     // Note: this method works only for instances, not for types.
     // This is because a type is not of type "dmx.core.topic_type" but of type "dmx.core.meta_type".
-    private AssociationModelImpl fetchInstantiation() {
+    private AssocModelImpl fetchInstantiation() {
         RelatedTopicModelImpl topicType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
             "dmx.core.type", "dmx.core.topic_type");
         //

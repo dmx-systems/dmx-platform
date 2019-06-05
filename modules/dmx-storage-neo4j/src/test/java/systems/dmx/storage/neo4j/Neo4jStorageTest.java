@@ -2,7 +2,7 @@ package systems.dmx.storage.neo4j;
 
 import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.PersistenceLayer;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
@@ -61,7 +61,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void fetchAssociation() {
-        AssociationModel assoc = storage.fetchAssociation(assocId);
+        AssocModel assoc = storage.fetchAssociation(assocId);
         assertNotNull(assoc);
         //
         RoleModel roleModel1 = assoc.getRoleModel("dmx.core.type");
@@ -120,7 +120,7 @@ public class Neo4jStorageTest {
                 "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
             assertEquals(1, topics.size());
             //
-            AssociationModel assoc = topics.get(0).getRelatingAssociation();
+            AssocModel assoc = topics.get(0).getRelatingAssociation();
             assertNotNull(assoc);
             //
             storage.deleteAssociation(assoc.getId());
@@ -139,7 +139,7 @@ public class Neo4jStorageTest {
     public void deleteAssociationAndFetchAgain() {
         DMXTransaction tx = storage.beginTx();
         try {
-            AssociationModel assoc = storage.fetchAssociation(assocId);
+            AssocModel assoc = storage.fetchAssociation(assocId);
             assertNotNull(assoc);
             //
             storage.deleteAssociation(assoc.getId());
@@ -297,7 +297,7 @@ public class Neo4jStorageTest {
 
     private long createAssociation(String typeUri, String topicUri1, String roleTypeUri1,
                                                    String topicUri2, String roleTypeUri2) {
-        AssociationModel assoc = mf.newAssociationModel(typeUri,
+        AssocModel assoc = mf.newAssociationModel(typeUri,
             mf.newTopicRoleModel(topicUri1, roleTypeUri1),
             mf.newTopicRoleModel(topicUri2, roleTypeUri2)
         );

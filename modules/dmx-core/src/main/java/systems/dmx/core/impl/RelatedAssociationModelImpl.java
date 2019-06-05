@@ -1,20 +1,20 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.RelatedAssociation;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 
 
 
-class RelatedAssociationModelImpl extends AssociationModelImpl implements RelatedAssociationModel {
+class RelatedAssociationModelImpl extends AssocModelImpl implements RelatedAssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModelImpl relatingAssoc;
+    private AssocModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationModelImpl(AssociationModelImpl assoc, AssociationModelImpl relatingAssoc) {
+    RelatedAssociationModelImpl(AssocModelImpl assoc, AssocModelImpl relatingAssoc) {
         super(assoc);
         this.relatingAssoc = relatingAssoc;
     }
@@ -22,7 +22,7 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModelImpl getRelatingAssociation() {
+    public AssocModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 

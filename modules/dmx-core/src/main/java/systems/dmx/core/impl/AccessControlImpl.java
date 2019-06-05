@@ -4,7 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -229,8 +229,8 @@ class AccessControlImpl implements AccessControl {
                 return false;
             }
             // Note: direct storage access is required here
-            AssociationModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP,
-                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dmx.core.default", "dmx.core.default");
+            AssocModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
+                workspaceId, "dmx.core.default", "dmx.core.default");
             return membership != null;
         } catch (Exception e) {
             throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +

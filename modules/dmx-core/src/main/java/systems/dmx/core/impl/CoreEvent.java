@@ -4,7 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -84,7 +84,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PreCreateAssociationListener) listener).preCreateAssociation(
-                (AssociationModel) params[0]
+                (AssocModel) params[0]
             );
         }
     };
@@ -142,7 +142,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PreUpdateAssociationListener) listener).preUpdateAssociation(
-                (Assoc) params[0], (AssociationModel) params[1]
+                (Assoc) params[0], (AssocModel) params[1]
             );
         }
     };
@@ -162,7 +162,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateAssociationListener) listener).postUpdateAssociation(
-                (Assoc) params[0], (AssociationModel) params[1], (AssociationModel) params[2]
+                (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2]
             );
         }
     };
@@ -202,7 +202,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostDeleteAssociationListener) listener).postDeleteAssociation(
-                (AssociationModel) params[0]
+                (AssocModel) params[0]
             );
         }
     };

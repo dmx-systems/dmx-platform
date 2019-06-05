@@ -2,7 +2,6 @@ package systems.dmx.config;
 
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.osgi.PluginActivator;
