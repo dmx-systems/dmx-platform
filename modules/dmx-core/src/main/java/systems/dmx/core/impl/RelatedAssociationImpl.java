@@ -1,14 +1,14 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedAssociation;
 
 
 
 /**
- * An Association-Association pair that is attached to the {@link PersistenceLayer}.
+ * An Assoc-Assoc pair that is attached to the {@link PersistenceLayer}.
  */
-class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociation {
+class RelatedAssociationImpl extends AssocImpl implements RelatedAssociation {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -19,7 +19,7 @@ class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociati
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Association getRelatingAssociation() {
+    public Assoc getRelatingAssociation() {
         return getModel().getRelatingAssociation().instantiate();
     }
 

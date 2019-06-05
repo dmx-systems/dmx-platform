@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Association extends DMXObject {
+public interface Assoc extends DMXObject {
 
     Role getRole1();
 
@@ -95,10 +95,10 @@ public interface Association extends DMXObject {
     // ---
 
     @Override
-    Association loadChildTopics();
+    Assoc loadChildTopics();
 
     @Override
-    Association loadChildTopics(String compDefUri);
+    Assoc loadChildTopics(String compDefUri);
 
     // ---
 

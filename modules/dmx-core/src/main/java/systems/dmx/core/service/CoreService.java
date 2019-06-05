@@ -1,6 +1,6 @@
 package systems.dmx.core.service;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssociation;
@@ -108,7 +108,7 @@ public interface CoreService {
 
     // === Associations ===
 
-    Association getAssociation(long assocId);
+    Assoc getAssociation(long assocId);
 
     /**
      * Looks up a single association by exact value.
@@ -123,7 +123,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If more than one association is found.
      */
-    Association getAssociationByValue(String key, SimpleValue value);
+    Assoc getAssociationByValue(String key, SimpleValue value);
 
     /**
      * Looks up associations by key and value.
@@ -133,46 +133,45 @@ public interface CoreService {
      * IMPORTANT: Looking up associations this way requires the corresponding type to be indexed with indexing mode
      * <code>dmx.core.key</code>.
      */
-    List<Association> getAssociationsByValue(String key, SimpleValue value);
+    List<Assoc> getAssociationsByValue(String key, SimpleValue value);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
      * If no such association exists <code>null</code> is returned.
      * If more than one association exist, a runtime exception is thrown.
      *
-     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                    String roleTypeUri1, String roleTypeUri2);
+    Assoc getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);
 
-    Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                         String topicRoleTypeUri, String assocRoleTypeUri);
+    Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                   String topicRoleTypeUri, String assocRoleTypeUri);
 
     // ---
 
-    List<Association> getAssociationsByType(String assocTypeUri);
+    List<Assoc> getAssociationsByType(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty list is returned.
      */
-    List<Association> getAssociations(long topic1Id, long topic2Id);
+    List<Assoc> getAssociations(long topic1Id, long topic2Id);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty list is returned.
      *
-     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+    List<Assoc> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
 
-    Iterable<Association> getAllAssociations();
+    Iterable<Assoc> getAllAssociations();
 
     List<RoleModel> getRoleModels(long assocId);
 
     // ---
 
-    Association createAssociation(AssociationModel model);
+    Assoc createAssociation(AssociationModel model);
 
     void updateAssociation(AssociationModel updateModel);
 
@@ -204,7 +203,7 @@ public interface CoreService {
 
 
 
-    // === Association Types ===
+    // === Assoc Types ===
 
     AssociationType getAssociationType(String assocTypeUri);
 
@@ -283,9 +282,9 @@ public interface CoreService {
 
     List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<Association> getAssociationsByProperty(String propUri, Object propValue);
+    List<Assoc> getAssociationsByProperty(String propUri, Object propValue);
 
-    List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

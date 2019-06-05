@@ -1,6 +1,6 @@
 package systems.dmx.core.service.accesscontrol;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -191,7 +191,7 @@ public interface AccessControl {
 
     // === Topicmaps ===
 
-    void deleteAssociationMapcontext(Association assoc);
+    void deleteAssociationMapcontext(Assoc assoc);
 
 
 

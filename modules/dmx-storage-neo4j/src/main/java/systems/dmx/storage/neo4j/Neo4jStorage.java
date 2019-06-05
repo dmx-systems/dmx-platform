@@ -54,7 +54,7 @@ public class Neo4jStorage implements DMXStorage {
     private static final String KEY_TPYE_URI = "typeUri";                   // used as property key as well
     private static final String KEY_FULLTEXT = "fulltext";
 
-    // --- Association Metadata Index Keys ---
+    // --- Assoc Metadata Index Keys ---
     private static final String KEY_ASSOC_ID       = "assocId";
     private static final String KEY_ASSOC_TPYE_URI = "assocTypeUri";
     // role 1 & 2
@@ -1026,7 +1026,7 @@ public class Neo4jStorage implements DMXStorage {
         }
         // sanity check
         if (rels.size() != 2) {
-            throw new RuntimeException("Association " + assocNode.getId() + " connects " + rels.size() +
+            throw new RuntimeException("Assoc " + assocNode.getId() + " connects " + rels.size() +
                 " player instead of 2");
         }
         //

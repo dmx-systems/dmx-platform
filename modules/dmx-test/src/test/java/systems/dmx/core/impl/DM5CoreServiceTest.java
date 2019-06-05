@@ -1,6 +1,5 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;

@@ -168,7 +168,7 @@ class TypeStorage {
 
     private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in DB");
+            throw new RuntimeException("Assoc type \"" + assocTypeUri + "\" not found in DB");
         } else if (!typeTopic.getTypeUri().equals("dmx.core.assoc_type")) {
             throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
                 "\" when the caller expects a \"dmx.core.assoc_type\"");
@@ -308,7 +308,7 @@ class TypeStorage {
      * Called when a type is loaded from DB.
      *
      * Note: we can't use model-driven comp def retrieval. Fetching assoc type "Composition Definition" would run into
-     * an endless recursion while fetching its "Custom Association Type" comp def.
+     * an endless recursion while fetching its "Custom Assoc Type" comp def.
      *
      * @param   assoc   the underlying assoc as retrieved from DB, that is
      *                  1) players are ref'd by-ID

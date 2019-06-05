@@ -1,6 +1,6 @@
 package systems.dmx.timestamps;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 
@@ -26,7 +26,7 @@ public interface TimestampsService {
 
     Collection<Topic> getTopicsByModificationTime(long from, long to);
 
-    Collection<Association> getAssociationsByCreationTime(long from, long to);
+    Collection<Assoc> getAssociationsByCreationTime(long from, long to);
 
-    Collection<Association> getAssociationsByModificationTime(long from, long to);
+    Collection<Assoc> getAssociationsByModificationTime(long from, long to);
 }

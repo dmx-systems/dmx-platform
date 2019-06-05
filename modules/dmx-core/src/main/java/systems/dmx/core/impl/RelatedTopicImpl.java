@@ -1,12 +1,12 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedTopic;
 
 
 
 /**
- * A Topic-Association pair that is attached to the {@link PersistenceLayer}.
+ * A Topic-Assoc pair that is attached to the {@link PersistenceLayer}.
  */
 class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
 
@@ -19,7 +19,7 @@ class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Association getRelatingAssociation() {
+    public Assoc getRelatingAssociation() {
         return getModel().getRelatingAssociation().instantiate();
     }
 

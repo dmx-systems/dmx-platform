@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -501,11 +501,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void editCompDefSetCustomAssocType() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            // set Custom Association Type (via comp def)
+            // set Custom Assoc Type (via comp def)
             dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
-            // get Custom Association Type
+            // get Custom Assoc Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
@@ -523,12 +523,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void editCompDefViaAssocSetCustomAssocType() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            // set Custom Association Type (via association)
+            // set Custom Assoc Type (via association)
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
             dmx.getAssociation(compDefId).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
-            // get Custom Association Type
+            // get Custom Assoc Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
@@ -740,7 +740,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.size());
             //
             // retype assoc
-            Association assoc = childTypes.get(0).getRelatingAssociation();
+            Assoc assoc = childTypes.get(0).getRelatingAssociation();
             assertEquals("dmx.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dmx.core.association");
             assertEquals("dmx.core.association", assoc.getTypeUri());
@@ -777,7 +777,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.size());
             //
             // retype assoc roles
-            Association assoc = childTypes.get(0).getRelatingAssociation();
+            Assoc assoc = childTypes.get(0).getRelatingAssociation();
             assoc.getRole1().setRoleTypeUri("dmx.core.default");
             assoc.getRole2().setRoleTypeUri("dmx.core.default");
             //
@@ -852,7 +852,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, assocs.size());  // we have 3 associations
             //
             // retype the first association
-            Association assoc = assocs.get(0);
+            Assoc assoc = assocs.get(0);
             assertEquals("dmx.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dmx.core.composition");
             assertEquals("dmx.core.composition", assoc.getTypeUri());
@@ -1272,7 +1272,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-            Association assoc = createAssociation(t1, t2);
+            Assoc assoc = createAssociation(t1, t2);
             //
             dmx.getAccessControl().assignToWorkspace(assoc, ws.getId());
             //
@@ -1325,9 +1325,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t3 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t4 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Association a1 = createAssociation(t1, t2);
-        Association a2 = createAssociation(t2, t3);
-        Association a3 = createAssociation(t3, t4);
+        Assoc a1 = createAssociation(t1, t2);
+        Assoc a2 = createAssociation(t2, t3);
+        Assoc a3 = createAssociation(t3, t4);
         createAssociation(t0, a1);
         createAssociation(t0, a2);
         createAssociation(t0, a3);
@@ -1335,14 +1335,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     // ---
 
-    private Association createAssociation(Topic topic1, Topic topic2) {
+    private Assoc createAssociation(Topic topic1, Topic topic2) {
         return dmx.createAssociation(mf.newAssociationModel("dmx.core.association",
             mf.newTopicRoleModel(topic1.getId(), "dmx.core.default"),
             mf.newTopicRoleModel(topic2.getId(), "dmx.core.default")
         ));
     }
 
-    private Association createAssociation(Topic topic, Association assoc) {
+    private Assoc createAssociation(Topic topic, Assoc assoc) {
         return dmx.createAssociation(mf.newAssociationModel("dmx.core.association",
             mf.newTopicRoleModel(topic.getId(), "dmx.core.default"),
             mf.newAssociationRoleModel(assoc.getId(), "dmx.core.default")

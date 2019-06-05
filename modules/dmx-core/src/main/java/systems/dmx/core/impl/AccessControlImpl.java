@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -366,12 +366,12 @@ class AccessControlImpl implements AccessControl {
     // === Topicmaps ===
 
     @Override
-    public void deleteAssociationMapcontext(Association assoc) {
+    public void deleteAssociationMapcontext(Assoc assoc) {
         if (!assoc.getTypeUri().equals(TOPICMAP_CONTEXT)) {
-            throw new RuntimeException("Association " + assoc.getId() + " not eligible for privileged deletion (" +
-                assoc + ")");
+            throw new RuntimeException("Assoc " + assoc.getId() + " not eligible for privileged deletion (" + assoc +
+                ")");
         }
-        ((AssociationImpl) assoc).getModel().delete();
+        ((AssocImpl) assoc).getModel().delete();
     }
 
 

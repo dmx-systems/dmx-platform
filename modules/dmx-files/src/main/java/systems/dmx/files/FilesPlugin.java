@@ -6,7 +6,7 @@ import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
@@ -642,9 +642,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             boolean exists = dmx.getAssociations(folderTopicId, topicId, "dmx.core.composition").size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
-                Association assoc = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
+                Assoc assoc = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Assoc>() {
                     @Override
-                    public Association call() {
+                    public Assoc call() {
                         return dmx.createAssociation(mf.newAssociationModel("dmx.core.composition",
                             mf.newTopicRoleModel(folderTopicId, "dmx.core.parent"),
                             mf.newTopicRoleModel(topicId,       "dmx.core.child")

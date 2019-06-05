@@ -1,6 +1,6 @@
 package systems.dmx.facets;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
@@ -149,8 +149,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getCompDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Association assoc = dmx.getAssociation(assocTypeUri, topicId, facetTopicId,
-            "dmx.core.parent", "dmx.core.child");
+        Assoc assoc = dmx.getAssociation(assocTypeUri, topicId, facetTopicId, "dmx.core.parent", "dmx.core.child");
         return assoc != null;
     }
 

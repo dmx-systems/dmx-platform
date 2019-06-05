@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationRole;
 
 
@@ -23,8 +23,8 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
     // === AssociationRole Implementation ===
 
     @Override
-    public Association getAssociation() {
-        return (Association) getPlayer();
+    public Assoc getAssociation() {
+        return (Assoc) getPlayer();
     }
 
 

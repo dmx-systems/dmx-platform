@@ -3,7 +3,7 @@ package systems.dmx.core.model;
 
 
 /**
- * Collection of the data that makes up an {@link Association}.
+ * Collection of the data that makes up an {@link Assoc}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

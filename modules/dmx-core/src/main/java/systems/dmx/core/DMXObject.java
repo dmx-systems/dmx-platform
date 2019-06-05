@@ -113,7 +113,7 @@ public interface DMXObject extends Identifiable, JSONEnabled {
     List<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                         String othersTopicTypeUri);
 
-    // --- Association Retrieval ---
+    // --- Assoc Retrieval ---
 
     /**
      * @param   assocTypeUri        may be null
@@ -137,12 +137,12 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
+    Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
 
     /**
      * Fetches all associations this object is a player in.
      */
-    List<Association> getAssociations();
+    List<Assoc> getAssociations();
 
 
 

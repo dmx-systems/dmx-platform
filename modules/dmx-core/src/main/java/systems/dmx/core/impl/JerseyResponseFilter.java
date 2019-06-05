@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.ChildTopics;
@@ -171,7 +171,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, object);
         } else if (object instanceof Topic) {
             em.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);
-        } else if (object instanceof Association) {
+        } else if (object instanceof Assoc) {
             em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, object);
         }
     }

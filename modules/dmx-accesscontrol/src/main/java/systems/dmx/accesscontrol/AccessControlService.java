@@ -1,6 +1,6 @@
 package systems.dmx.accesscontrol;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Permissions;
@@ -198,10 +198,10 @@ public interface AccessControlService {
     // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
     Collection<Topic> getTopicsByOwner(String username);
 
-    Collection<Association> getAssociationsByCreator(String username);
+    Collection<Assoc> getAssociationsByCreator(String username);
 
     // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
-    Collection<Association> getAssociationsByOwner(String username);
+    Collection<Assoc> getAssociationsByOwner(String username);
 
 
 

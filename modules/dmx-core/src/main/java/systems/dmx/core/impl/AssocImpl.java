@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedObject;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 /**
  * An association model that is attached to the DB.
  */
-class AssociationImpl extends DMXObjectImpl implements Association {
+class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -29,7 +29,7 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationImpl(AssociationModelImpl model, PersistenceLayer pl) {
+    AssocImpl(AssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -37,9 +37,9 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
 
 
-    // *******************
-    // *** Association ***
-    // *******************
+    // *************
+    // *** Assoc ***
+    // *************
 
 
 
@@ -134,13 +134,13 @@ class AssociationImpl extends DMXObjectImpl implements Association {
     // ---
 
     @Override
-    public final Association loadChildTopics() {
+    public final Assoc loadChildTopics() {
         super.loadChildTopics();
         return this;
     }
 
     @Override
-    public final Association loadChildTopics(String compDefUri) {
+    public final Assoc loadChildTopics(String compDefUri) {
         super.loadChildTopics(compDefUri);
         return this;
     }
@@ -165,7 +165,7 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
     // ### TODO: consider adding model convenience, would require model renamings (get -> fetch)
 
-    // --- Association Retrieval ---
+    // --- Assoc Retrieval ---
 
     @Override
     public final RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
@@ -185,14 +185,14 @@ class AssociationImpl extends DMXObjectImpl implements Association {
     // ---
 
     @Override
-    public final Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                       long othersTopicId) {
+    public final Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                 long othersTopicId) {
         return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
             myRoleTypeUri);
     }
 
     @Override
-    public final List<Association> getAssociations() {
+    public final List<Assoc> getAssociations() {
         return pl.instantiate(pl.getAssociationAssociations(getId()));
     }
 

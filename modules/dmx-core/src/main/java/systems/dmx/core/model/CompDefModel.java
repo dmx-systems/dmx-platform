@@ -15,8 +15,8 @@ public interface CompDefModel extends AssociationModel {
     String getCompDefUri();
 
     /**
-     * @return  the URI of the Custom Association Type set for this comp def,
-     *          or <code>null</code> if no Custom Association Type is set.
+     * @return  the URI of the Custom Assoc Type set for this comp def, or <code>null</code> if no
+     *          Custom Assoc Type is set.
      */
     String getCustomAssocTypeUri();
 

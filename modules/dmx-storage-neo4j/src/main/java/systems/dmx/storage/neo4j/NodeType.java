@@ -17,7 +17,7 @@ enum NodeType {
 
         @Override
         String error(Node node) {
-            return "ID " + node.getId() + " refers to an Association when the caller expects a Topic";
+            return "ID " + node.getId() + " refers to an Assoc when the caller expects a Topic";
         }
     },
     ASSOC {
@@ -28,7 +28,7 @@ enum NodeType {
 
         @Override
         String error(Node node) {
-            return "ID " + node.getId() + " refers to a Topic when the caller expects an Association";
+            return "ID " + node.getId() + " refers to a Topic when the caller expects an Assoc";
         }
     };
 

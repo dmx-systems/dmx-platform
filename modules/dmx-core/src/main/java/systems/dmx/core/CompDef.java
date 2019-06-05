@@ -10,7 +10,7 @@ import systems.dmx.core.model.CompDefModel;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface CompDef extends Association {
+public interface CompDef extends Assoc {
 
     String getCompDefUri();
 

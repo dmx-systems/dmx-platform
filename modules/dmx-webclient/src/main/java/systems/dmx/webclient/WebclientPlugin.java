@@ -1,6 +1,6 @@
 package systems.dmx.webclient;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
@@ -145,7 +145,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // ID of the comp def to be updated. -1 if the update does not target an comp def (but a type).
         long compDefId = -1;
         if (type == null) {
-            Association compDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
+            Assoc compDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
                 "dmx.core.parent", "dmx.core.composition_def");
             if (compDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);

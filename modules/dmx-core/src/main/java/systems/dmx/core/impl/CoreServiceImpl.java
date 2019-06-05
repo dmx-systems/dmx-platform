@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
@@ -132,29 +132,29 @@ public class CoreServiceImpl implements CoreService {
     // === Associations ===
 
     @Override
-    public Association getAssociation(long assocId) {
+    public Assoc getAssociation(long assocId) {
         return pl.getAssociation(assocId);
     }
 
     @Override
-    public Association getAssociationByValue(String key, SimpleValue value) {
+    public Assoc getAssociationByValue(String key, SimpleValue value) {
         return pl.getAssociationByValue(key, value);
     }
 
     @Override
-    public List<Association> getAssociationsByValue(String key, SimpleValue value) {
+    public List<Assoc> getAssociationsByValue(String key, SimpleValue value) {
         return pl.getAssociationsByValue(key, value);
     }
 
     @Override
-    public Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                           String roleTypeUri1, String roleTypeUri2) {
+    public Assoc getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
+                                                     String roleTypeUri1, String roleTypeUri2) {
         return pl.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     @Override
-    public Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                String topicRoleTypeUri, String assocRoleTypeUri) {
+    public Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                          String topicRoleTypeUri, String assocRoleTypeUri) {
         return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
             assocRoleTypeUri);
     }
@@ -162,24 +162,24 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public List<Association> getAssociationsByType(String assocTypeUri) {
+    public List<Assoc> getAssociationsByType(String assocTypeUri) {
         return pl.getAssociationsByType(assocTypeUri);
     }
 
     @Override
-    public List<Association> getAssociations(long topic1Id, long topic2Id) {
+    public List<Assoc> getAssociations(long topic1Id, long topic2Id) {
         return pl.getAssociations(topic1Id, topic2Id);
     }
 
     @Override
-    public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
+    public List<Assoc> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         return pl.getAssociations(assocTypeUri, topic1Id, topic2Id);
     }
 
     // ---
 
     @Override
-    public Iterable<Association> getAllAssociations() {
+    public Iterable<Assoc> getAllAssociations() {
         return pl.getAllAssociations();
     }
 
@@ -191,7 +191,7 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssociationImpl createAssociation(AssociationModel model) {
+    public AssocImpl createAssociation(AssociationModel model) {
         return pl.createAssociation((AssociationModelImpl) model);
     }
 
@@ -245,7 +245,7 @@ public class CoreServiceImpl implements CoreService {
 
 
 
-    // === Association Types ===
+    // === Assoc Types ===
 
     @Override
     public AssociationTypeImpl getAssociationType(String uri) {
@@ -354,12 +354,12 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Association> getAssociationsByProperty(String propUri, Object propValue) {
+    public List<Assoc> getAssociationsByProperty(String propUri, Object propValue) {
         return pl.getAssociationsByProperty(propUri, propValue);
     }
 
     @Override
-    public List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    public List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return pl.getAssociationsByPropertyRange(propUri, from, to);
     }
 
@@ -387,7 +387,7 @@ public class CoreServiceImpl implements CoreService {
         int assocs = 0;
         int added = 0;
         logger.info("########## Adding association property index for \"" + propUri + "\"");
-        for (Association assoc : getAllAssociations()) {
+        for (Assoc assoc : getAllAssociations()) {
             if (assoc.hasProperty(propUri)) {
                 Object value = assoc.getProperty(propUri);
                 pl.indexAssociationProperty(assoc.getId(), propUri, value);
@@ -447,7 +447,7 @@ public class CoreServiceImpl implements CoreService {
     /**
      * Convenience method.
      */
-    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    Assoc createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
@@ -487,8 +487,7 @@ public class CoreServiceImpl implements CoreService {
 
     private void setupBootstrapContent() {
         try {
-            // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and
-            // asscociation types
+            // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and assoc types
             TopicModelImpl t = mf.newTopicModel("dmx.core.topic_type", "dmx.core.meta_type",
                 new SimpleValue("Topic Type"));
             TopicModelImpl a = mf.newTopicModel("dmx.core.assoc_type", "dmx.core.meta_type",
@@ -533,8 +532,7 @@ public class CoreServiceImpl implements CoreService {
             // Note: at time of the first associateDataType() call the required association type (dmx.core.composition)
             // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
             // the data type assigning association is created *before* the association type is fetched.
-            // (see AssociationImpl.store(): storage.storeAssociation() is called before getType()
-            // in DMXObjectImpl.store().)
+            // (see AssocImpl.store(): storage.storeAssociation() is called before getType() in DMXObjectImpl.store().)
             // ### FIXDOC: not true anymore
             //
             // Important is that associateDataType("dmx.core.composition") is the first call here.

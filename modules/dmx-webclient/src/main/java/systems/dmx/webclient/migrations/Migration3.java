@@ -40,7 +40,7 @@ public class Migration3 extends Migration {
         //
         logger.info("########## Repairing types with missing \"View Config\" topic complete\n    " +
             "Topic types repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +
-            "Association types repaired: " + count[1][1] + "/" + count[1][0]);
+            "Assoc types repaired: " + count[1][1] + "/" + count[1][0]);
     }
 
     private void repair(List<? extends DMXType> types, int i) {

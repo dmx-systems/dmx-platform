@@ -194,7 +194,7 @@ abstract class DMXObjectImpl implements DMXObject {
         return pl.checkReadAccessAndInstantiate(topics);
     }
 
-    // --- Association Retrieval ---
+    // --- Assoc Retrieval ---
 
     @Override
     public final List<RelatedAssociation> getRelatedAssociations() {

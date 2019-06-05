@@ -5,9 +5,9 @@ import systems.dmx.core.model.RelatedAssociationModel;
 
 
 /**
- * An Association-Association pair.
+ * An Assoc-Assoc pair.
  */
-public interface RelatedAssociation extends RelatedObject, Association {
+public interface RelatedAssociation extends RelatedObject, Assoc {
 
     RelatedAssociationModel getModel();
 }

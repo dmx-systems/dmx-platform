@@ -7,7 +7,7 @@ import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
@@ -343,7 +343,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            Association assoc = dmx.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+            Assoc assoc = dmx.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dmx.core.default")
             ));
@@ -418,14 +418,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @GET
     @Path("/creator/{username}/assocs")
     @Override
-    public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
+    public Collection<Assoc> getAssociationsByCreator(@PathParam("username") String username) {
         return dmx.getAssociationsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
-    public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
+    public Collection<Assoc> getAssociationsByOwner(@PathParam("username") String username) {
         return dmx.getAssociationsByProperty(PROP_OWNER, username);
     }
 
@@ -551,7 +551,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postCreateAssociation(Association assoc) {
+    public void postCreateAssociation(Assoc assoc) {
         setCreatorAndModifier(assoc);
     }
 
@@ -575,7 +575,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+    public void postUpdateAssociation(Assoc assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
         if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
             assignMembershipToWorkspace(assoc);
         }
@@ -639,11 +639,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * @throws  RuntimeException    if the given assoc has no workspace player
      */
-    private void assignMembershipToWorkspace(Association assoc) {
+    private void assignMembershipToWorkspace(Assoc assoc) {
         try {
             Topic workspace = assoc.getTopicByType("dmx.workspaces.workspace");
             if (workspace == null) {
-                throw new RuntimeException("Association " + assoc.getId() + " has no workspace player");
+                throw new RuntimeException("Assoc " + assoc.getId() + " has no workspace player");
             }
             wsService.assignToWorkspace(assoc, workspace.getId());
         } catch (Exception e) {
@@ -980,7 +980,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
                 "\")";
-        } else if (object instanceof Association) {
+        } else if (object instanceof Assoc) {
             return "association " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\")";
         } else {
             throw new RuntimeException("Unexpected object: " + object);

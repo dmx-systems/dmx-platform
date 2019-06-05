@@ -1,6 +1,6 @@
 package systems.dmx.timestamps;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
@@ -125,16 +125,16 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @GET
     @Path("/from/{from}/to/{to}/assocs/created")
     @Override
-    public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
-                                                                 @PathParam("to") long to) {
+    public Collection<Assoc> getAssociationsByCreationTime(@PathParam("from") long from,
+                                                           @PathParam("to") long to) {
         return dmx.getAssociationsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/assocs/modified")
     @Override
-    public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
-                                                                     @PathParam("to") long to) {
+    public Collection<Assoc> getAssociationsByModificationTime(@PathParam("from") long from,
+                                                               @PathParam("to") long to) {
         return dmx.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
@@ -169,7 +169,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postCreateAssociation(Association assoc) {
+    public void postCreateAssociation(Assoc assoc) {
         storeTimestamps(assoc);
     }
 
@@ -179,7 +179,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+    public void postUpdateAssociation(Assoc assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
         storeTimestamp(assoc);
     }
 
@@ -191,7 +191,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void preSendAssociation(Association assoc) {
+    public void preSendAssociation(Assoc assoc) {
         enrichWithTimestamp(assoc);
     }
 

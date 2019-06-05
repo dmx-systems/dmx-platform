@@ -10,7 +10,7 @@ import systems.dmx.core.model.RoleModel;
 /**
  * A comp def that is attached to the {@link CoreService}.
  */
-class CompDefImpl extends AssociationImpl implements CompDef {
+class CompDefImpl extends AssocImpl implements CompDef {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

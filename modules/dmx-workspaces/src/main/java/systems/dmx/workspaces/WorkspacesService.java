@@ -1,6 +1,6 @@
 package systems.dmx.workspaces;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
@@ -75,7 +75,7 @@ public interface WorkspacesService {
     /**
      * Returns all associations assigned to the given workspace.
      */
-    List<Association> getAssignedAssociations(long workspaceId);
+    List<Assoc> getAssignedAssociations(long workspaceId);
 
     // ---
 
@@ -87,5 +87,5 @@ public interface WorkspacesService {
     /**
      * Returns all associations of the given type that are assigned to the given workspace.
      */
-    List<Association> getAssignedAssociations(long workspaceId, String assocTypeUri);
+    List<Assoc> getAssignedAssociations(long workspaceId, String assocTypeUri);
 }

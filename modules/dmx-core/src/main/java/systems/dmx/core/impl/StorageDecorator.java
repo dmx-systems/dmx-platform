@@ -168,7 +168,7 @@ class StorageDecorator {
      * If no such association exists <code>null</code> is returned.
      * If more than one association exist, a runtime exception is thrown.
      *
-     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
     final AssociationModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2,
@@ -190,7 +190,7 @@ class StorageDecorator {
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *
-     * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
     final List<AssociationModelImpl> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                             String roleTypeUri1, String roleTypeUri2) {
@@ -374,7 +374,7 @@ class StorageDecorator {
         return (List<AssociationModelImpl>) storage.fetchTopicAssociations(topicId);
     }
 
-    // --- Association Source ---
+    // --- Assoc Source ---
 
     /**
      * Convenience method (checks singularity).

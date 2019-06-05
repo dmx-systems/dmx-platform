@@ -5,7 +5,7 @@ import systems.dmx.core.model.RelatedTopicModel;
 
 
 /**
- * A Topic-Association pair.
+ * A Topic-Assoc pair.
  */
 public interface RelatedTopic extends RelatedObject, Topic {
 

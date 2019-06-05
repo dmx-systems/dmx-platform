@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -88,7 +88,7 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
     // ### TODO: consider adding model convenience, would require model renamings (get -> fetch)
 
-    // --- Association Retrieval ---
+    // --- Assoc Retrieval ---
 
     @Override
     public final RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
@@ -108,13 +108,13 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     // ---
 
     @Override
-    public final Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                       long othersTopicId) {
+    public final Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                 long othersTopicId) {
         return pl.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
     }
 
     @Override
-    public final List<Association> getAssociations() {
+    public final List<Assoc> getAssociations() {
         return pl.instantiate(pl.getTopicAssociations(getId()));
     }
 }

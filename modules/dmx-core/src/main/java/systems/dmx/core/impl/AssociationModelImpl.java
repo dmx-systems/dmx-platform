@@ -17,7 +17,7 @@ import java.util.List;
 
 
 /**
- * Collection of the data that makes up an {@link Association}.
+ * Collection of the data that makes up an {@link Assoc}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -162,8 +162,8 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     }
 
     @Override
-    AssociationImpl instantiate() {
-        return new AssociationImpl(this, pl);
+    AssocImpl instantiate() {
+        return new AssocImpl(this, pl);
     }
 
     @Override
@@ -476,7 +476,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
             "dmx.core.type", "dmx.core.assoc_type");
         //
         if (assocType == null) {
-            throw new RuntimeException("Association " + id + " is not associated to an association type");
+            throw new RuntimeException("Assoc " + id + " is not associated to an association type");
         }
         //
         return assocType.getRelatingAssociation();

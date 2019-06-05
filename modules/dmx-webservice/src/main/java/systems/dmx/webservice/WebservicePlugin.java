@@ -1,6 +1,6 @@
 package systems.dmx.webservice;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.JSONEnabled;
@@ -144,7 +144,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}")
-    public Association getAssociation(@PathParam("id") long assocId) {
+    public Assoc getAssociation(@PathParam("id") long assocId) {
         return dmx.getAssociation(assocId);
     }
 
@@ -152,7 +152,7 @@ public class WebservicePlugin extends PluginActivator {
     // ### TODO: change URI template
     @GET
     @Path("/assoc/by_value/{key}/{value}")
-    public Association getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+    public Assoc getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.getAssociationByValue(key, value);
     }
 
@@ -160,15 +160,15 @@ public class WebservicePlugin extends PluginActivator {
     // ### TODO: change URI template
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
-    public List<Association> getAssociationsByValue(@PathParam("key") String key,
-                                                    @PathParam("value") SimpleValue value) {
+    public List<Assoc> getAssociationsByValue(@PathParam("key") String key,
+                                              @PathParam("value") SimpleValue value) {
         return dmx.getAssociationsByValue(key, value);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
-    public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
+    public Assoc getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
         return dmx.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
@@ -179,17 +179,17 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
-    public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                             @PathParam("topic2_id") long topic2Id) {
+    public List<Assoc> getAssociations(@PathParam("topic1_id") long topic1Id,
+                                       @PathParam("topic2_id") long topic2Id) {
         return dmx.getAssociations(topic1Id, topic2Id);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
-    public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                             @PathParam("topic2_id") long topic2Id,
-                                             @PathParam("assoc_type_uri") String assocTypeUri) {
+    public List<Assoc> getAssociations(@PathParam("topic1_id") long topic1Id,
+                                       @PathParam("topic2_id") long topic2Id,
+                                       @PathParam("assoc_type_uri") String assocTypeUri) {
         return dmx.getAssociations(topic1Id, topic2Id, assocTypeUri);
     }
 
@@ -271,7 +271,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // === Association Types ===
+    // === Assoc Types ===
 
     @GET
     @Path("/assoctype/{uri}")
@@ -374,9 +374,9 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // ****************************
-    // *** Association REST API ***
-    // ****************************
+    // **********************
+    // *** Assoc REST API ***
+    // **********************
 
 
 
@@ -388,7 +388,7 @@ public class WebservicePlugin extends PluginActivator {
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                        @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
-        Association assoc = dmx.getAssociation(assocId);
+        Assoc assoc = dmx.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
@@ -401,7 +401,7 @@ public class WebservicePlugin extends PluginActivator {
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                        @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
-        Association assoc = dmx.getAssociation(assocId);
+        Assoc assoc = dmx.getAssociation(assocId);
         return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }

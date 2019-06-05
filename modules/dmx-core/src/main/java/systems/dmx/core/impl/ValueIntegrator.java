@@ -659,7 +659,7 @@ class ValueIntegrator {
             String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                AssociationImpl assoc = pl.getAssociation(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
+                AssocImpl assoc = pl.getAssociation(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
                     "dmx.core.child");
                 if (assoc != null) {
                     // update memory

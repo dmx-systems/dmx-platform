@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
@@ -31,16 +31,16 @@ class TopicIterable implements Iterable<Topic> {
 /**
  * An iterable over all associations stored in the DB.
  */
-class AssociationIterable implements Iterable<Association> {
+class AssociationIterable implements Iterable<Assoc> {
 
-    private Iterator<Association> assocs;
+    private Iterator<Assoc> assocs;
 
     AssociationIterable(PersistenceLayer pl) {
         this.assocs = new AssociationIterator(pl);
     }
 
     @Override
-    public Iterator<Association> iterator() {
+    public Iterator<Assoc> iterator() {
         return assocs;
     }
 }
@@ -70,7 +70,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModelImpl> {
 
 
 
-class AssociationIterator extends ObjectIterator<Association, AssociationModelImpl> {
+class AssociationIterator extends ObjectIterator<Assoc, AssociationModelImpl> {
 
     AssociationIterator(PersistenceLayer pl) {
         super(pl);
@@ -82,7 +82,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModelIm
     }
 
     @Override
-    Association instantiateObject(AssociationModelImpl model) {
+    Assoc instantiateObject(AssociationModelImpl model) {
         return pl.checkReadAccessAndInstantiate(model);
     }
 }

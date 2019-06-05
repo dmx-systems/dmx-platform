@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
@@ -228,7 +228,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Associations ===
 
-    Association getAssociation(long assocId) {
+    Assoc getAssociation(long assocId) {
         try {
             return checkReadAccessAndInstantiate(fetchAssociation(assocId));
         } catch (Exception e) {
@@ -236,47 +236,47 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Association getAssociationByValue(String key, SimpleValue value) {
+    Assoc getAssociationByValue(String key, SimpleValue value) {
         try {
             AssociationModelImpl assoc = fetchAssociation(key, value);
-            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
     }
 
-    List<Association> getAssociationsByValue(String key, SimpleValue value) {
+    List<Assoc> getAssociationsByValue(String key, SimpleValue value) {
         try {
             return checkReadAccessAndInstantiate(fetchAssociations(key, value));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
+            throw new RuntimeException("Fetching associations failed (key=\"" + key + "\", value=\"" + value + "\")",
                 e);
         }
     }
 
-    AssociationImpl getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                      String roleTypeUri2) {
+    AssocImpl getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? this.<AssociationImpl>checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? this.<AssocImpl>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
     }
 
-    Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                         String topicRoleTypeUri, String assocRoleTypeUri) {
+    Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                   String topicRoleTypeUri, String assocRoleTypeUri) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         logger.info(info);
         try {
             AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
             // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
@@ -285,7 +285,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    List<Association> getAssociationsByType(String assocTypeUri) {
+    List<Assoc> getAssociationsByType(String assocTypeUri) {
         try {
             return checkReadAccessAndInstantiate(_getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
@@ -294,16 +294,16 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Association> getAssociations(long topic1Id, long topic2Id) {
+    List<Assoc> getAssociations(long topic1Id, long topic2Id) {
         return getAssociations(null, topic1Id, topic2Id);   // assocTypeUri=null
     }
 
-    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id) {
+    List<Assoc> getAssociations(String assocTypeUri, long topic1Id, long topic2Id) {
         return getAssociations(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
     }
 
-    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                         String roleTypeUri2) {
+    List<Assoc> getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                   String roleTypeUri2) {
         return instantiate(_getAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
     }
 
@@ -327,7 +327,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Iterable<Association> getAllAssociations() {
+    Iterable<Assoc> getAllAssociations() {
         return new AssociationIterable(this);
     }
 
@@ -340,14 +340,14 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssociationImpl createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    AssocImpl createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
     /**
      * Creates a new association in the DB.
      */
-    AssociationImpl createAssociation(AssociationModelImpl model) {
+    AssocImpl createAssociation(AssociationModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -358,7 +358,7 @@ public final class PersistenceLayer extends StorageDecorator {
             AssociationModelImpl _model = updateValues(model, null);
             createAssociationInstantiation(_model.getId(), _model.getTypeUri());
             // 2) instantiate
-            AssociationImpl assoc = _model.instantiate();
+            AssocImpl assoc = _model.instantiate();
             //
             // Note 1: the postCreate() hook is invoked on the update model, *not* on the value integration result
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
@@ -417,7 +417,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // Compare to DMXObjectModelImpl.delete()
             // TODO: introduce storage-vendor neutral DM exception.
             if (e.getMessage().equals("Node[" + assocId + "] has been deleted in this tx")) {
-                logger.info("### Association " + assocId + " has already been deleted in this transaction. " +
+                logger.info("### Assoc " + assocId + " has already been deleted in this transaction. " +
                     "This can happen while delete-multi.");
             } else {
                 throw e;
@@ -669,7 +669,7 @@ public final class PersistenceLayer extends StorageDecorator {
         return filterReadables(fetchTopicAssociations(topicId));
     }
 
-    // --- Association Source ---
+    // --- Assoc Source ---
 
     List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
@@ -721,11 +721,11 @@ public final class PersistenceLayer extends StorageDecorator {
         return checkReadAccessAndInstantiate(fetchTopicsByPropertyRange(propUri, from, to));
     }
 
-    List<Association> getAssociationsByProperty(String propUri, Object propValue) {
+    List<Assoc> getAssociationsByProperty(String propUri, Object propValue) {
         return checkReadAccessAndInstantiate(fetchAssociationsByProperty(propUri, propValue));
     }
 
-    List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 

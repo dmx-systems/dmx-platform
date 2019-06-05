@@ -1,6 +1,6 @@
 package systems.dmx.topicmaps;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewProps;
@@ -33,9 +33,9 @@ public interface TopicmapsService extends TopicmapsConstants {
      */
     Topicmap getTopicmap(long topicmapId, boolean includeChilds);
 
-    Association getTopicMapcontext(long topicmapId, long topicId);
+    Assoc getTopicMapcontext(long topicmapId, long topicId);
 
-    Association getAssocMapcontext(long topicmapId, long assocId);
+    Assoc getAssocMapcontext(long topicmapId, long assocId);
 
     /**
      * Returns all topicmaps which contain the given topic/assoc.

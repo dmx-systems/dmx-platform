@@ -489,8 +489,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
             // TODO: introduce storage-vendor neutral DM exception.
             //
             if (e.getMessage().equals("Node[" + id + "] has been deleted in this tx")) {
-                logger.info("### Association " + id + " has already been deleted in this transaction. This can " +
-                    "happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" + this + ")");
+                logger.info("### Assoc " + id + " has already been deleted in this transaction. This can happen " +
+                    "while deleting a topic with associations A1 and A2 while A2 points to A1 (" + this + ")");
             } else {
                 throw e;
             }

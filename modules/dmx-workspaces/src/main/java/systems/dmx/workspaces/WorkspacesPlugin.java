@@ -7,7 +7,7 @@ import systems.dmx.config.ConfigTarget;
 import systems.dmx.facets.FacetsService;
 import systems.dmx.topicmaps.TopicmapsService;
 
-import systems.dmx.core.Association;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -226,7 +226,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/assocs")
     @Override
-    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId) {
+    public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId) {
         return dmx.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
@@ -248,9 +248,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/assocs/{assoc_type_uri}")
     @Override
-    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId,
-                                                     @PathParam("assoc_type_uri") String assocTypeUri) {
-        List<Association> assocs = dmx.getAssociationsByType(assocTypeUri);
+    public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId,
+                                               @PathParam("assoc_type_uri") String assocTypeUri) {
+        List<Assoc> assocs = dmx.getAssociationsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
     }
@@ -375,7 +375,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created association to the current workspace.
      */
     @Override
-    public void postCreateAssociation(Association assoc) {
+    public void postCreateAssociation(Assoc assoc) {
         if (workspaceAssignmentIsSuppressed(assoc)) {
             return;
         }
@@ -462,7 +462,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             }
             for (Topic assocType : getAssignedTopics(workspaceId, "dmx.core.assoc_type")) {
                 String typeUri = assocType.getUri();
-                for (Association assoc : dmx.getAssociationsByType(typeUri)) {
+                for (Assoc assoc : dmx.getAssociationsByType(typeUri)) {
                     assoc.delete();
                 }
                 dmx.getAssociationType(typeUri).delete();
@@ -471,7 +471,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             for (Topic topic : getAssignedTopics(workspaceId)) {
                 topic.delete();
             }
-            for (Association assoc : getAssignedAssociations(workspaceId)) {
+            for (Assoc assoc : getAssignedAssociations(workspaceId)) {
                 assoc.delete();
             }
         } catch (Exception e) {
@@ -491,7 +491,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                typeUri.equals("dmx.workspaces.workspace_description");
     }
 
-    private boolean isWorkspaceAssignment(Association assoc) {
+    private boolean isWorkspaceAssignment(Assoc assoc) {
         return assoc.getTypeUri().equals("dmx.workspaces.workspace_assignment");
     }
 
@@ -549,7 +549,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
                 "\")";
-        } else if (object instanceof Association) {
+        } else if (object instanceof Assoc) {
             return "association " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\")";
         } else {
             throw new RuntimeException("Unexpected object: " + object);
