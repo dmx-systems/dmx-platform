@@ -2,7 +2,7 @@ package systems.dmx.core;
 
 
 
-public interface TopicRole extends Role {
+public interface TopicPlayer extends Player {
 
     Topic getTopic();
 

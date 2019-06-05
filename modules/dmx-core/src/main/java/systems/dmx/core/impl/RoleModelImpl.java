@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Role;
+import systems.dmx.core.Player;
 import systems.dmx.core.model.RoleModel;
 
 
@@ -96,7 +96,7 @@ abstract class RoleModelImpl implements RoleModel {
     /**
      * @param   assoc   the association this role is involved in
      */
-    abstract Role instantiate(AssocModelImpl assoc);
+    abstract Player instantiate(AssocModelImpl assoc);
 
     /**
      * @param   assoc   the association this role is involved in

@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Role;
+import systems.dmx.core.Player;
 import systems.dmx.core.model.AssociationRoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -39,8 +39,8 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     // === Implementation of abstract RoleModelImpl methods ===
 
     @Override
-    Role instantiate(AssocModelImpl assoc) {
-        return new AssociationRoleImpl(this, assoc);
+    Player instantiate(AssocModelImpl assoc) {
+        return new AssocPlayerImpl(this, assoc);
     }
 
     @Override

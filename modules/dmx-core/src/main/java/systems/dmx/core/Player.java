@@ -5,7 +5,7 @@ import systems.dmx.core.model.RoleModel;
 
 
 
-public interface Role extends JSONEnabled {
+public interface Player extends JSONEnabled {
 
     String getRoleTypeUri();
 

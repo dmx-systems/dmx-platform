@@ -2,12 +2,12 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.Player;
 import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.Role;
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicRole;
+import systems.dmx.core.TopicPlayer;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
@@ -44,12 +44,12 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
 
     @Override
-    public final Role getRole1() {
+    public final Player getRole1() {
         return getModel().getRoleModel1().instantiate(getModel());
     }
 
     @Override
-    public final Role getRole2() {
+    public final Player getRole2() {
         return getModel().getRoleModel2().instantiate(getModel());
     }
 
@@ -68,7 +68,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // --- Convenience Methods ---
 
     @Override
-    public final Role getRole(String roleTypeUri) {
+    public final Player getRole(String roleTypeUri) {
         return getModel().getRoleModel(roleTypeUri).instantiate(getModel());
     }
 
@@ -105,13 +105,13 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ### TODO: make use of model's getRole()
     @Override
-    public final Role getRole(RoleModel roleModel) {
+    public final Player getRole(RoleModel roleModel) {
         if (getRole1().getModel().refsSameObject(roleModel)) {
             return getRole1();
         } else if (getRole2().getModel().refsSameObject(roleModel)) {
             return getRole2();
         }
-        throw new RuntimeException("Role is not part of association (role=" + roleModel + ", association=" + this);
+        throw new RuntimeException("Player is not part of association (role=" + roleModel + ", association=" + this);
     }
 
     @Override
@@ -201,8 +201,8 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: move to model
-    private final TopicRole filterRole(Role role, TopicRoleModel roleModel) {
-        return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
-            role.getPlayerId() == roleModel.getPlayerId() ? (TopicRole) role : null;
+    private final TopicPlayer filterRole(Player role, TopicRoleModel roleModel) {
+        return role instanceof TopicPlayer && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
+            role.getPlayerId() == roleModel.getPlayerId() ? (TopicPlayer) role : null;
     }
 }

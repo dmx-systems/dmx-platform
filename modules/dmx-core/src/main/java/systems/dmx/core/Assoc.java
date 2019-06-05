@@ -15,9 +15,9 @@ import java.util.List;
  */
 public interface Assoc extends DMXObject {
 
-    Role getRole1();
+    Player getRole1();
 
-    Role getRole2();
+    Player getRole2();
 
     // ---
 
@@ -32,7 +32,7 @@ public interface Assoc extends DMXObject {
      *          If no role matches, null is returned.
      *          If both roles are matching an exception is thrown.
      */
-    Role getRole(String roleTypeUri);
+    Player getRole(String roleTypeUri);
 
     boolean hasSameRoleTypeUris();
 
@@ -81,7 +81,7 @@ public interface Assoc extends DMXObject {
      * <p>
      * If the object refered by the given role model is not a player in this association an exception is thrown.
      */
-    Role getRole(RoleModel roleModel);
+    Player getRole(RoleModel roleModel);
 
     /**
      * ### TODO: drop it

@@ -2,7 +2,7 @@ package systems.dmx.core;
 
 
 
-public interface AssociationRole extends Role {
+public interface AssocPlayer extends Player {
 
     Assoc getAssociation();
 }

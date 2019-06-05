@@ -1,6 +1,5 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewProps;
 

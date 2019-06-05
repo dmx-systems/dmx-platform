@@ -1,18 +1,18 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicRole;
+import systems.dmx.core.TopicPlayer;
 
 
 
 /**
  * A topic role that is attached to the {@link PersistenceLayer}.
  */
-class TopicRoleImpl extends RoleImpl implements TopicRole {
+class TopicPlayerImpl extends PlayerImpl implements TopicPlayer {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModelImpl model, AssocModelImpl assoc) {
+    TopicPlayerImpl(TopicRoleModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 
@@ -20,7 +20,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
 
 
-    // === TopicRole Implementation ===
+    // === TopicPlayer Implementation ===
 
     @Override
     public Topic getTopic() {
@@ -34,7 +34,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
 
 
-    // === RoleImpl Overrides ===
+    // === PlayerImpl Overrides ===
 
     @Override
     public TopicRoleModelImpl getModel() {

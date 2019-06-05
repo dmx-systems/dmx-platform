@@ -1,14 +1,14 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.Role;
+import systems.dmx.core.Player;
 import systems.dmx.core.model.RoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
 
 
-abstract class RoleImpl implements Role {
+abstract class PlayerImpl implements Player {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -18,7 +18,7 @@ abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RoleImpl(RoleModelImpl model, AssocModelImpl assoc) {
+    PlayerImpl(RoleModelImpl model, AssocModelImpl assoc) {
         this.model = model;
         this.assoc = assoc;
     }
@@ -27,7 +27,7 @@ abstract class RoleImpl implements Role {
 
 
 
-    // === Role Implementation ===
+    // === Player Implementation ===
 
     @Override
     public String getRoleTypeUri() {

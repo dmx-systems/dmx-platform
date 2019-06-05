@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Role;
+import systems.dmx.core.Player;
 import systems.dmx.core.model.TopicRoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -66,8 +66,8 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     // === Implementation of abstract RoleModelImpl methods ===
 
     @Override
-    Role instantiate(AssocModelImpl assoc) {
-        return new TopicRoleImpl(this, assoc);
+    Player instantiate(AssocModelImpl assoc) {
+        return new TopicPlayerImpl(this, assoc);
     }
 
     @Override

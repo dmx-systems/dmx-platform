@@ -1,18 +1,18 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationRole;
+import systems.dmx.core.AssocPlayer;
 
 
 
 /**
  * An association role that is attached to the {@link PersistenceLayer}.
  */
-class AssociationRoleImpl extends RoleImpl implements AssociationRole {
+class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleImpl(AssociationRoleModelImpl model, AssocModelImpl assoc) {
+    AssocPlayerImpl(AssociationRoleModelImpl model, AssocModelImpl assoc) {
         super(model, assoc);
     }
 
@@ -20,7 +20,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
 
 
-    // === AssociationRole Implementation ===
+    // === AssocPlayer Implementation ===
 
     @Override
     public Assoc getAssociation() {
@@ -29,7 +29,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
 
 
-    // === RoleImpl Overrides ===
+    // === PlayerImpl Overrides ===
 
     @Override
     public AssociationRoleModelImpl getModel() {
