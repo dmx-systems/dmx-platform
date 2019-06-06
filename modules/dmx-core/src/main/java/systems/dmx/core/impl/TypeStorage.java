@@ -220,7 +220,7 @@ class TypeStorage {
     // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
-            pl.createAssociation("dmx.core.composition",
+            pl.createAssoc("dmx.core.composition",
                 mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
                 mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
             );
@@ -405,7 +405,7 @@ class TypeStorage {
     void storeCompDef(CompDefModelImpl compDef) {
         try {
             // 1) create association
-            pl.createAssociation(addPlayerIds(compDef));
+            pl.createAssoc(addPlayerIds(compDef));
             //
             // 2) cardinality
             // Note: if the underlying association was a comp def before it has cardinality assignments already.
@@ -616,14 +616,14 @@ class TypeStorage {
     // ---
 
     private void storeSequenceStart(long typeId, long compDefId) {
-        pl.createAssociation("dmx.core.composition",
+        pl.createAssoc("dmx.core.composition",
             mf.newTopicRoleModel(typeId, "dmx.core.type"),
             mf.newAssociationRoleModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predCompDefId, long succCompDefId) {
-        pl.createAssociation("dmx.core.sequence",
+        pl.createAssoc("dmx.core.sequence",
             mf.newAssociationRoleModel(predCompDefId, "dmx.core.predecessor"),
             mf.newAssociationRoleModel(succCompDefId, "dmx.core.successor")
         );
@@ -730,8 +730,7 @@ class TypeStorage {
 
     TopicModel storeViewConfigTopic(PlayerModel configurable, TopicModelImpl configTopic) {
         TopicImpl topic = pl.createTopic(configTopic);
-        pl.createAssociation(
-            "dmx.core.composition",
+        pl.createAssoc("dmx.core.composition",
             configurable,
             mf.newTopicRoleModel(configTopic.id, "dmx.core.child")
         );

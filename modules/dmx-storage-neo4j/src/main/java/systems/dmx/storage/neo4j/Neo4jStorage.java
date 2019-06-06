@@ -934,7 +934,7 @@ public class Neo4jStorage implements DMXStorage {
     AssocModel buildAssociation(Node assocNode) {
         try {
             List<PlayerModel> roleModels = buildRoleModels(assocNode);
-            return mf.newAssociationModel(
+            return mf.newAssocModel(
                 assocNode.getId(),
                 uri(assocNode),
                 typeUri(assocNode),

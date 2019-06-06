@@ -246,7 +246,7 @@ class MigrationManager {
 
     private void createAssociations(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            dmx.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
+            dmx.createAssoc(mf.newAssocModel(assocs.getJSONObject(i)));
         }
     }
 

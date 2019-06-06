@@ -109,33 +109,29 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @GET
     @Path("/from/{from}/to/{to}/topics/created")
     @Override
-    public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
-                                                     @PathParam("to") long to) {
+    public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from, @PathParam("to") long to) {
         return dmx.getTopicsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/topics/modified")
     @Override
-    public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
-                                                         @PathParam("to") long to) {
+    public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from, @PathParam("to") long to) {
         return dmx.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/assocs/created")
     @Override
-    public Collection<Assoc> getAssociationsByCreationTime(@PathParam("from") long from,
-                                                           @PathParam("to") long to) {
-        return dmx.getAssociationsByPropertyRange(PROP_CREATED, from, to);
+    public Collection<Assoc> getAssocsByCreationTime(@PathParam("from") long from, @PathParam("to") long to) {
+        return dmx.getAssocsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/assocs/modified")
     @Override
-    public Collection<Assoc> getAssociationsByModificationTime(@PathParam("from") long from,
-                                                               @PathParam("to") long to) {
-        return dmx.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
+    public Collection<Assoc> getAssocsByModificationTime(@PathParam("from") long from, @PathParam("to") long to) {
+        return dmx.getAssocsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
 

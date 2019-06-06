@@ -168,7 +168,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     AssocModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newAssociationModel(typeUri, childTopics);
+        return mf.newAssocModel(typeUri, childTopics);
     }
 
     // ---
@@ -179,7 +179,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     }
 
     @Override
-    final List<AssocModelImpl> getAssociations() {
+    final List<AssocModelImpl> getAssocs() {
         return pl.fetchAssociationAssociations(id);
     }
 
@@ -382,7 +382,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             return;
         }
         // Note: only readable assocs (access control) are considered
-        for (AssocModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+        for (AssocModelImpl assoc : pl._getAssocs(typeUri, roleModel1.playerId, roleModel2.playerId,
                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
             if (assoc.id != id && assoc.value.equals(value)) {
                 throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +

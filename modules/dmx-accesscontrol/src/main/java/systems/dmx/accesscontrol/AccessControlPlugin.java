@@ -343,7 +343,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            Assoc assoc = dmx.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+            Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP_TYPE,
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dmx.core.default")
             ));
@@ -373,7 +373,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @GET
     @Path("/association/{id}")
     @Override
-    public Permissions getAssociationPermissions(@PathParam("id") long assocId) {
+    public Permissions getAssocPermissions(@PathParam("id") long assocId) {
         return getPermissions(assocId);
     }
 
@@ -418,15 +418,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @GET
     @Path("/creator/{username}/assocs")
     @Override
-    public Collection<Assoc> getAssociationsByCreator(@PathParam("username") String username) {
-        return dmx.getAssociationsByProperty(PROP_CREATOR, username);
+    public Collection<Assoc> getAssocsByCreator(@PathParam("username") String username) {
+        return dmx.getAssocsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
-    public Collection<Assoc> getAssociationsByOwner(@PathParam("username") String username) {
-        return dmx.getAssociationsByProperty(PROP_OWNER, username);
+    public Collection<Assoc> getAssocsByOwner(@PathParam("username") String username) {
+        return dmx.getAssocsByProperty(PROP_OWNER, username);
     }
 
 

@@ -114,7 +114,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
-        dmx.createAssociation(mf.newAssociationModel("dmx.core.instantiation",
+        dmx.createAssoc(mf.newAssocModel("dmx.core.instantiation",
             mf.newTopicRoleModel(topicId,      "dmx.core.instance"),
             mf.newTopicRoleModel(facetTypeUri, "dmx.facets.facet")
         ));
@@ -149,7 +149,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getCompDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Assoc assoc = dmx.getAssociation(assocTypeUri, topicId, facetTopicId, "dmx.core.parent", "dmx.core.child");
+        Assoc assoc = dmx.getAssoc(assocTypeUri, topicId, facetTopicId, "dmx.core.parent", "dmx.core.child");
         return assoc != null;
     }
 

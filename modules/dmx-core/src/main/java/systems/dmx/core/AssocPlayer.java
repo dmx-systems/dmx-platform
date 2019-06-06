@@ -4,5 +4,5 @@ package systems.dmx.core;
 
 public interface AssocPlayer extends Player {
 
-    Assoc getAssociation();
+    Assoc getAssoc();
 }

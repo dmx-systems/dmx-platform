@@ -23,7 +23,7 @@ class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
     // === AssocPlayer Implementation ===
 
     @Override
-    public Assoc getAssociation() {
+    public Assoc getAssoc() {
         return (Assoc) getPlayer();
     }
 

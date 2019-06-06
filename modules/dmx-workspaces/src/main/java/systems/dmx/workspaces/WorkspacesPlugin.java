@@ -227,7 +227,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{id}/assocs")
     @Override
     public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId) {
-        return dmx.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
+        return dmx.getAssocsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
     // ---
@@ -250,7 +250,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId,
                                                @PathParam("assoc_type_uri") String assocTypeUri) {
-        List<Assoc> assocs = dmx.getAssociationsByType(assocTypeUri);
+        List<Assoc> assocs = dmx.getAssocsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
     }
@@ -462,7 +462,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             }
             for (Topic assocType : getAssignedTopics(workspaceId, "dmx.core.assoc_type")) {
                 String typeUri = assocType.getUri();
-                for (Assoc assoc : dmx.getAssociationsByType(typeUri)) {
+                for (Assoc assoc : dmx.getAssocsByType(typeUri)) {
                     assoc.delete();
                 }
                 dmx.getAssocType(typeUri).delete();

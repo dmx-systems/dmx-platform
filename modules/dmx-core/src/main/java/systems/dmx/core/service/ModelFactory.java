@@ -66,28 +66,28 @@ public interface ModelFactory {
 
     // === AssocModel ===
 
-    AssocModel newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
-                                   SimpleValue value, ChildTopicsModel childTopics);
+    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+                             SimpleValue value, ChildTopicsModel childTopics);
 
-    AssocModel newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
+    AssocModel newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
 
-    AssocModel newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
-                                   ChildTopicsModel childTopics);
-
-    // ### TODO: Refactoring needed. See comments in impl.
-    AssocModel newAssociationModel();
+    AssocModel newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+                             ChildTopicsModel childTopics);
 
     // ### TODO: Refactoring needed. See comments in impl.
-    AssocModel newAssociationModel(ChildTopicsModel childTopics);
+    AssocModel newAssocModel();
 
     // ### TODO: Refactoring needed. See comments in impl.
-    AssocModel newAssociationModel(String typeUri, ChildTopicsModel childTopics);
+    AssocModel newAssocModel(ChildTopicsModel childTopics);
 
-    AssocModel newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
+    // ### TODO: Refactoring needed. See comments in impl.
+    AssocModel newAssocModel(String typeUri, ChildTopicsModel childTopics);
 
-    AssocModel newAssociationModel(AssocModel assoc);
+    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
 
-    AssocModel newAssociationModel(JSONObject assoc);
+    AssocModel newAssocModel(AssocModel assoc);
+
+    AssocModel newAssocModel(JSONObject assoc);
 
 
 

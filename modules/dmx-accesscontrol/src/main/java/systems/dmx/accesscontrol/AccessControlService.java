@@ -169,7 +169,7 @@ public interface AccessControlService {
     /**
      * @return  A Permissions object with one entry: <code>dmx.accesscontrol.operation.write</code>.
      */
-    Permissions getAssociationPermissions(long assocId);
+    Permissions getAssocPermissions(long assocId);
 
 
 
@@ -198,10 +198,10 @@ public interface AccessControlService {
     // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
     Collection<Topic> getTopicsByOwner(String username);
 
-    Collection<Assoc> getAssociationsByCreator(String username);
+    Collection<Assoc> getAssocsByCreator(String username);
 
     // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
-    Collection<Assoc> getAssociationsByOwner(String username);
+    Collection<Assoc> getAssocsByOwner(String username);
 
 
 

@@ -125,57 +125,57 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocModel ===
 
     @Override
-    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1,
-                                              PlayerModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1,
+                                        PlayerModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
         return new AssocModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
             (PlayerModelImpl) roleModel1, (PlayerModelImpl) roleModel2);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
-        return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
+    public AssocModelImpl newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
+        return newAssocModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
-                                              ChildTopicsModel childTopics) {
-        return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
-    }
-
-    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    // ### TODO: make internal?
-    @Override
-    public AssocModelImpl newAssociationModel() {
-        return newAssociationModel(-1, null, null, null, null, null, null);
+    public AssocModelImpl newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+                                        ChildTopicsModel childTopics) {
+        return newAssocModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     // ### TODO: make internal?
     @Override
-    public AssocModelImpl newAssociationModel(ChildTopicsModel childTopics) {
-        return newAssociationModel(null, childTopics);
+    public AssocModelImpl newAssocModel() {
+        return newAssocModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     // ### TODO: make internal?
     @Override
-    public AssocModelImpl newAssociationModel(String typeUri, ChildTopicsModel childTopics) {
-        return newAssociationModel(typeUri, null, null, childTopics);
+    public AssocModelImpl newAssocModel(ChildTopicsModel childTopics) {
+        return newAssocModel(null, childTopics);
+    }
+
+    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make internal?
+    @Override
+    public AssocModelImpl newAssocModel(String typeUri, ChildTopicsModel childTopics) {
+        return newAssocModel(typeUri, null, null, childTopics);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(long id, String uri, String typeUri, PlayerModel roleModel1,
-                                                                                   PlayerModel roleModel2) {
-        return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
+    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1,
+                                                                             PlayerModel roleModel2) {
+        return newAssocModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(AssocModel assoc) {
+    public AssocModelImpl newAssocModel(AssocModel assoc) {
         return new AssocModelImpl((AssocModelImpl) assoc);
     }
 
     @Override
-    public AssocModelImpl newAssociationModel(JSONObject assoc) {
+    public AssocModelImpl newAssocModel(JSONObject assoc) {
         try {
             return new AssocModelImpl(newDMXObjectModel(assoc), parseRole1(assoc), parseRole2(assoc));
         } catch (Exception e) {
@@ -304,7 +304,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 if (val.has("assoc")) {
                     JSONObject assoc = val.getJSONObject("assoc");
                     initTypeUri(assoc, assocTypeUri(compDefUri));
-                    relatingAssoc = newAssociationModel(assoc);
+                    relatingAssoc = newAssocModel(assoc);
                 }
                 if (val.has("value")) {
                     RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
@@ -458,7 +458,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(long topicId) {
-        return new RelatedTopicModelImpl(newTopicModel(topicId), newAssociationModel());
+        return new RelatedTopicModelImpl(newTopicModel(topicId), newAssocModel());
     }
 
     @Override
@@ -468,7 +468,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(String topicUri) {
-        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), newAssociationModel());
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), newAssocModel());
                                                                  // topicTypeUri=null
     }
 
@@ -480,17 +480,17 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(String topicTypeUri, SimpleValue value) {
-        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, value), newAssociationModel());
+        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, value), newAssocModel());
     }
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics) {
-        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, childTopics), newAssociationModel());
+        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, childTopics), newAssocModel());
     }
 
     @Override
     public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic) {
-        return new RelatedTopicModelImpl((TopicModelImpl) topic, newAssociationModel());
+        return new RelatedTopicModelImpl((TopicModelImpl) topic, newAssocModel());
     }
 
     @Override
@@ -534,14 +534,14 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {
         return new TopicReferenceModelImpl(
-            newRelatedTopicModel(topicId, newAssociationModel(relatingAssocChildTopics))
+            newRelatedTopicModel(topicId, newAssocModel(relatingAssocChildTopics))
         );
     }
 
     @Override
     public TopicReferenceModel newTopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics) {
         return new TopicReferenceModelImpl(
-            newRelatedTopicModel(topicUri, newAssociationModel(relatingAssocChildTopics))
+            newRelatedTopicModel(topicUri, newAssocModel(relatingAssocChildTopics))
         );
     }
 
@@ -705,7 +705,7 @@ public class ModelFactoryImpl implements ModelFactory {
             // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(
-                newAssociationModel(compDef.optLong("id", -1), null,
+                newAssocModel(compDef.optLong("id", -1), null,
                     TYPE_COMP_DEF,
                     role1 != null ? role1 : parentRole(compDef.getString("parentTypeUri")),
                     role2 != null ? role2 : childRole(compDef.getString("childTypeUri")),
@@ -727,7 +727,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                      String childCardinalityUri,
                                      ViewConfigurationModel viewConfig) {
         return new CompDefModelImpl(
-            newAssociationModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
+            newAssocModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
             ),
             (ViewConfigurationModelImpl) viewConfig
@@ -738,7 +738,7 @@ public class ModelFactoryImpl implements ModelFactory {
      * Internal.
      */
     CompDefModelImpl newCompDefModel(ChildTopicsModel childTopics) {
-        return new CompDefModelImpl(newAssociationModel(TYPE_COMP_DEF, childTopics));
+        return new CompDefModelImpl(newAssocModel(TYPE_COMP_DEF, childTopics));
     }
 
     // ---

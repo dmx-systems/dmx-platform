@@ -137,12 +137,12 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
+    Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
 
     /**
      * Fetches all associations this object is a player in.
      */
-    List<Assoc> getAssociations();
+    List<Assoc> getAssocs();
 
 
 

@@ -132,48 +132,47 @@ public class CoreServiceImpl implements CoreService {
     // === Associations ===
 
     @Override
-    public Assoc getAssociation(long assocId) {
-        return pl.getAssociation(assocId);
+    public Assoc getAssoc(long assocId) {
+        return pl.getAssoc(assocId);
     }
 
     @Override
-    public Assoc getAssociationByValue(String key, SimpleValue value) {
-        return pl.getAssociationByValue(key, value);
+    public Assoc getAssocByValue(String key, SimpleValue value) {
+        return pl.getAssocByValue(key, value);
     }
 
     @Override
-    public List<Assoc> getAssociationsByValue(String key, SimpleValue value) {
-        return pl.getAssociationsByValue(key, value);
+    public List<Assoc> getAssocsByValue(String key, SimpleValue value) {
+        return pl.getAssocsByValue(key, value);
     }
 
     @Override
-    public Assoc getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                     String roleTypeUri1, String roleTypeUri2) {
-        return pl.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+    public Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
+        return pl.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     @Override
-    public Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                          String topicRoleTypeUri, String assocRoleTypeUri) {
-        return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+    public Assoc getAssocBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                    String topicRoleTypeUri, String assocRoleTypeUri) {
+        return pl.getAssocBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
             assocRoleTypeUri);
     }
 
     // ---
 
     @Override
-    public List<Assoc> getAssociationsByType(String assocTypeUri) {
-        return pl.getAssociationsByType(assocTypeUri);
+    public List<Assoc> getAssocsByType(String assocTypeUri) {
+        return pl.getAssocsByType(assocTypeUri);
     }
 
     @Override
-    public List<Assoc> getAssociations(long topic1Id, long topic2Id) {
-        return pl.getAssociations(topic1Id, topic2Id);
+    public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
+        return pl.getAssocs(topic1Id, topic2Id);
     }
 
     @Override
-    public List<Assoc> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        return pl.getAssociations(assocTypeUri, topic1Id, topic2Id);
+    public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
+        return pl.getAssocs(assocTypeUri, topic1Id, topic2Id);
     }
 
     // ---
@@ -191,8 +190,8 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssocImpl createAssociation(AssocModel model) {
-        return pl.createAssociation((AssocModelImpl) model);
+    public AssocImpl createAssoc(AssocModel model) {
+        return pl.createAssoc((AssocModelImpl) model);
     }
 
     @Override
@@ -354,13 +353,13 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Assoc> getAssociationsByProperty(String propUri, Object propValue) {
-        return pl.getAssociationsByProperty(propUri, propValue);
+    public List<Assoc> getAssocsByProperty(String propUri, Object propValue) {
+        return pl.getAssocsByProperty(propUri, propValue);
     }
 
     @Override
-    public List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.getAssociationsByPropertyRange(propUri, from, to);
+    public List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to) {
+        return pl.getAssocsByPropertyRange(propUri, from, to);
     }
 
     // ---
@@ -447,8 +446,8 @@ public class CoreServiceImpl implements CoreService {
     /**
      * Convenience method.
      */
-    Assoc createAssociation(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
-        return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
+    Assoc createAssoc(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
+        return createAssoc(mf.newAssocModel(typeUri, roleModel1, roleModel2));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -571,9 +570,10 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssocModelImpl assoc = mf.newAssociationModel("dmx.core.composition",
+        AssocModelImpl assoc = mf.newAssocModel("dmx.core.composition",
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
-            mf.newTopicRoleModel(dataTypeUri, "dmx.core.default"));
+            mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
+        );
         pl.storeAssociation(assoc);
         pl.storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
     }

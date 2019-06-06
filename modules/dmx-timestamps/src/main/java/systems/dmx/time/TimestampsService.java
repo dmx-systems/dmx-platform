@@ -26,7 +26,7 @@ public interface TimestampsService {
 
     Collection<Topic> getTopicsByModificationTime(long from, long to);
 
-    Collection<Assoc> getAssociationsByCreationTime(long from, long to);
+    Collection<Assoc> getAssocsByCreationTime(long from, long to);
 
-    Collection<Assoc> getAssociationsByModificationTime(long from, long to);
+    Collection<Assoc> getAssocsByModificationTime(long from, long to);
 }

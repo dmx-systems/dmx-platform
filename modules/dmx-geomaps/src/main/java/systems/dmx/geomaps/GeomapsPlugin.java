@@ -138,7 +138,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
-        dmx.createAssociation(mf.newAssociationModel(GEOMAP_CONTEXT,
+        dmx.createAssoc(mf.newAssocModel(GEOMAP_CONTEXT,
             mf.newTopicRoleModel(geomapId,   ROLE_TYPE_GEOMAP),
             mf.newTopicRoleModel(geoCoordId, ROLE_TYPE_CONTENT)
         ));

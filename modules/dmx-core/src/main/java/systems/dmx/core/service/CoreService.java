@@ -106,13 +106,13 @@ public interface CoreService {
 
     // === Associations ===
 
-    Assoc getAssociation(long assocId);
+    Assoc getAssoc(long assocId);
 
     /**
      * Looks up a single association by exact value.
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #getAssociationsByValue(String,SimpleValue)}
+     * Compare to {@link #getAssocsByValue(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
      * <code>dmx.core.key</code>.
@@ -121,7 +121,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If more than one association is found.
      */
-    Assoc getAssociationByValue(String key, SimpleValue value);
+    Assoc getAssocByValue(String key, SimpleValue value);
 
     /**
      * Looks up associations by key and value.
@@ -131,7 +131,7 @@ public interface CoreService {
      * IMPORTANT: Looking up associations this way requires the corresponding type to be indexed with indexing mode
      * <code>dmx.core.key</code>.
      */
-    List<Assoc> getAssociationsByValue(String key, SimpleValue value);
+    List<Assoc> getAssocsByValue(String key, SimpleValue value);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
@@ -140,26 +140,26 @@ public interface CoreService {
      *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    Assoc getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);
+    Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);
 
-    Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                   String topicRoleTypeUri, String assocRoleTypeUri);
+    Assoc getAssocBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
+                                             String assocRoleTypeUri);
 
     // ---
 
-    List<Assoc> getAssociationsByType(String assocTypeUri);
+    List<Assoc> getAssocsByType(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty list is returned.
      */
-    List<Assoc> getAssociations(long topic1Id, long topic2Id);
+    List<Assoc> getAssocs(long topic1Id, long topic2Id);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty list is returned.
      *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    List<Assoc> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+    List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
 
@@ -169,7 +169,7 @@ public interface CoreService {
 
     // ---
 
-    Assoc createAssociation(AssocModel model);
+    Assoc createAssoc(AssocModel model);
 
     void updateAssociation(AssocModel updateModel);
 
@@ -280,9 +280,9 @@ public interface CoreService {
 
     List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<Assoc> getAssociationsByProperty(String propUri, Object propValue);
+    List<Assoc> getAssocsByProperty(String propUri, Object propValue);
 
-    List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

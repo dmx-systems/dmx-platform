@@ -251,7 +251,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    List<AssocModelImpl> getAssociations() {
+    List<AssocModelImpl> getAssocs() {
         throw new UnsupportedOperationException();
     }
 
@@ -459,7 +459,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             preDelete();
             //
             // delete direct associations
-            for (AssocModelImpl assoc : getAssociations()) {
+            for (AssocModelImpl assoc : getAssocs()) {
                 assoc.delete();
             }
             // delete object itself
@@ -471,7 +471,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             Directives.get().add(getDeleteDirective(), this);
             em.fireEvent(getPostDeleteEvent(), this);
         } catch (IllegalStateException e) {
-            // Note: getAssociations() might throw IllegalStateException and is no problem.
+            // Note: getAssocs() might throw IllegalStateException and is no problem.
             // This can happen when this object is an association which is already deleted.
             //
             // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.

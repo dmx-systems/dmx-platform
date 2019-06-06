@@ -52,7 +52,7 @@ public class Topicmap implements JSONEnabled {
         return topics.values();
     }
 
-    public Iterable<ViewAssoc> getAssociations() {
+    public Iterable<ViewAssoc> getAssocs() {
         return assocs.values();
     }
 
@@ -62,7 +62,7 @@ public class Topicmap implements JSONEnabled {
         return topics.get(id);
     }
 
-    public ViewAssoc getAssociation(long id) {
+    public ViewAssoc getAssoc(long id) {
         return assocs.get(id);
     }
 

@@ -144,34 +144,33 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}")
-    public Assoc getAssociation(@PathParam("id") long assocId) {
-        return dmx.getAssociation(assocId);
+    public Assoc getAssoc(@PathParam("id") long assocId) {
+        return dmx.getAssoc(assocId);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
     @GET
     @Path("/assoc/by_value/{key}/{value}")
-    public Assoc getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.getAssociationByValue(key, value);
+    public Assoc getAssocByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dmx.getAssocByValue(key, value);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
-    public List<Assoc> getAssociationsByValue(@PathParam("key") String key,
-                                              @PathParam("value") SimpleValue value) {
-        return dmx.getAssociationsByValue(key, value);
+    public List<Assoc> getAssocsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dmx.getAssocsByValue(key, value);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
-    public Assoc getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
+    public Assoc getAssoc(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
-        return dmx.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        return dmx.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
@@ -179,18 +178,16 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
-    public List<Assoc> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                       @PathParam("topic2_id") long topic2Id) {
-        return dmx.getAssociations(topic1Id, topic2Id);
+    public List<Assoc> getAssocs(@PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id) {
+        return dmx.getAssocs(topic1Id, topic2Id);
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
-    public List<Assoc> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                       @PathParam("topic2_id") long topic2Id,
-                                       @PathParam("assoc_type_uri") String assocTypeUri) {
-        return dmx.getAssociations(topic1Id, topic2Id, assocTypeUri);
+    public List<Assoc> getAssocs(@PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
+                                 @PathParam("assoc_type_uri") String assocTypeUri) {
+        return dmx.getAssocs(topic1Id, topic2Id, assocTypeUri);
     }
 
     // ---
@@ -198,8 +195,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/association")
     @Transactional
-    public DirectivesResponse createAssociation(AssocModel model) {
-        return new DirectivesResponse(dmx.createAssociation(model));
+    public DirectivesResponse createAssoc(AssocModel model) {
+        return new DirectivesResponse(dmx.createAssoc(model));
     }
 
     @PUT
@@ -383,12 +380,12 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_topics")
-    public List<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")                  long assocId,
-                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                       @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
-        Assoc assoc = dmx.getAssociation(assocId);
+    public List<RelatedTopic> getAssocRelatedTopics(@PathParam("id")                     long assocId,
+                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                    @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
+        Assoc assoc = dmx.getAssoc(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
@@ -396,12 +393,12 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_assocs")
-    public List<RelatedAssoc> getAssociationRelatedAssociations(@PathParam("id")            long assocId,
-                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
-        Assoc assoc = dmx.getAssociation(assocId);
+    public List<RelatedAssoc> getAssocRelatedAssociations(@PathParam("id")                     long assocId,
+                                                          @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                          @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+        Assoc assoc = dmx.getAssoc(assocId);
         return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }

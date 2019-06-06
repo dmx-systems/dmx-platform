@@ -108,13 +108,13 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     // ---
 
     @Override
-    public final Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                 long othersTopicId) {
-        return pl.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
+    public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                long othersTopicId) {
+        return pl.getAssoc(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
     }
 
     @Override
-    public final List<Assoc> getAssociations() {
+    public final List<Assoc> getAssocs() {
         return pl.instantiate(pl.getTopicAssociations(getId()));
     }
 }

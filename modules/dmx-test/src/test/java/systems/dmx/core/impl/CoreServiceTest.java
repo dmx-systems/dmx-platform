@@ -479,7 +479,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set "Include in Label" flag
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
-            dmx.getAssociation(compDefId).getChildTopics().set("dmx.core.include_in_label", false);
+            dmx.getAssoc(compDefId).getChildTopics().set("dmx.core.include_in_label", false);
             //
             // comp def order must not have changed
             Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
@@ -525,7 +525,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set Custom Assoc Type (via association)
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
-            dmx.getAssociation(compDefId).getChildTopics()
+            dmx.getAssoc(compDefId).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
             //
             // get Custom Assoc Type
@@ -717,13 +717,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     // Note: when the meta model changes the values might need adjustment
     @Test
-    public void getAssociationsByType() {
+    public void getAssocsByType() {
         List<RelatedAssoc> assocs;
         //
-        assocs = getAssociationInstancesByTraversal("dmx.core.instantiation");
+        assocs = getAssocInstancesByTraversal("dmx.core.instantiation");
         assertEquals(66, assocs.size());
         //
-        assocs = getAssociationInstancesByTraversal("dmx.core.composition_def");
+        assocs = getAssocInstancesByTraversal("dmx.core.composition_def");
         assertEquals(5, assocs.size());
     }
 
@@ -744,7 +744,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dmx.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dmx.core.association");
             assertEquals("dmx.core.association", assoc.getTypeUri());
-            assoc = dmx.getAssociation(assoc.getId());
+            assoc = dmx.getAssoc(assoc.getId());
             assertEquals("dmx.core.association", assoc.getTypeUri());
             //
             // re-execute query
@@ -856,7 +856,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dmx.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dmx.core.composition");
             assertEquals("dmx.core.composition", assoc.getTypeUri());
-            assoc = dmx.getAssociation(assoc.getId());
+            assoc = dmx.getAssoc(assoc.getId());
             assertEquals("dmx.core.composition", assoc.getTypeUri());
             //
             // re-execute query
@@ -1272,7 +1272,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-            Assoc assoc = createAssociation(t1, t2);
+            Assoc assoc = createAssoc(t1, t2);
             //
             dmx.getAccessControl().assignToWorkspace(assoc, ws.getId());
             //
@@ -1296,7 +1296,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dmx.core.type", "dmx.core.instance", type.getUri());
     }
 
-    private List<RelatedAssoc> getAssociationInstancesByTraversal(String assocTypeUri) {
+    private List<RelatedAssoc> getAssocInstancesByTraversal(String assocTypeUri) {
         return dmx.getTopicByUri(assocTypeUri).getRelatedAssociations("dmx.core.instantiation",
             "dmx.core.type", "dmx.core.instance", assocTypeUri);
     }
@@ -1314,9 +1314,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t3 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        createAssociation(t0, t1);
-        createAssociation(t0, t2);
-        createAssociation(t0, t3);
+        createAssoc(t0, t1);
+        createAssoc(t0, t2);
+        createAssoc(t0, t3);
     }
 
     private void setupTestAssociations() {
@@ -1325,25 +1325,25 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t3 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t4 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Assoc a1 = createAssociation(t1, t2);
-        Assoc a2 = createAssociation(t2, t3);
-        Assoc a3 = createAssociation(t3, t4);
-        createAssociation(t0, a1);
-        createAssociation(t0, a2);
-        createAssociation(t0, a3);
+        Assoc a1 = createAssoc(t1, t2);
+        Assoc a2 = createAssoc(t2, t3);
+        Assoc a3 = createAssoc(t3, t4);
+        createAssoc(t0, a1);
+        createAssoc(t0, a2);
+        createAssoc(t0, a3);
     }
 
     // ---
 
-    private Assoc createAssociation(Topic topic1, Topic topic2) {
-        return dmx.createAssociation(mf.newAssociationModel("dmx.core.association",
+    private Assoc createAssoc(Topic topic1, Topic topic2) {
+        return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
             mf.newTopicRoleModel(topic1.getId(), "dmx.core.default"),
             mf.newTopicRoleModel(topic2.getId(), "dmx.core.default")
         ));
     }
 
-    private Assoc createAssociation(Topic topic, Assoc assoc) {
-        return dmx.createAssociation(mf.newAssociationModel("dmx.core.association",
+    private Assoc createAssoc(Topic topic, Assoc assoc) {
+        return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
             mf.newTopicRoleModel(topic.getId(), "dmx.core.default"),
             mf.newAssociationRoleModel(assoc.getId(), "dmx.core.default")
         ));

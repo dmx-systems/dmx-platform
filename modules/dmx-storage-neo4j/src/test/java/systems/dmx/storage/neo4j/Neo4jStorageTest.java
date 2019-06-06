@@ -237,7 +237,7 @@ public class Neo4jStorageTest {
             createTopic("dmx.core.topic_type", "dmx.core.meta_type",  "Topic Type");
             createTopic("dmx.core.data_type",  "dmx.core.topic_type", "Data Type");
             //
-            assocId = createAssociation("dmx.core.instantiation",
+            assocId = createAssoc("dmx.core.instantiation",
                 "dmx.core.topic_type", "dmx.core.type",
                 "dmx.core.data_type", "dmx.core.instance"
             );
@@ -293,9 +293,9 @@ public class Neo4jStorageTest {
 
     // ---
 
-    private long createAssociation(String typeUri, String topicUri1, String roleTypeUri1,
-                                                   String topicUri2, String roleTypeUri2) {
-        AssocModel assoc = mf.newAssociationModel(typeUri,
+    private long createAssoc(String typeUri, String topicUri1, String roleTypeUri1,
+                                             String topicUri2, String roleTypeUri2) {
+        AssocModel assoc = mf.newAssocModel(typeUri,
             mf.newTopicRoleModel(topicUri1, roleTypeUri1),
             mf.newTopicRoleModel(topicUri2, roleTypeUri2)
         );

@@ -327,8 +327,8 @@ class ValueIntegrator {
             }
             // TODO: partial updates. URI and role models must not expected to be part of the update model.
             AssocModelImpl _newValues = (AssocModelImpl) newValues;
-            return mf.newAssociationModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
-                                                                                          _newValues.roleModel2);
+            return mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
+                                                                                    _newValues.roleModel2);
         } else {
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {
@@ -658,7 +658,7 @@ class ValueIntegrator {
             String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                AssocImpl assoc = pl.getAssociation(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
+                AssocImpl assoc = pl.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
                     "dmx.core.child");
                 if (assoc != null) {
                     // update memory
@@ -751,8 +751,7 @@ class ValueIntegrator {
                                                   boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
-        return pl.createAssociation(
-            compDef(compDefUri).getInstanceLevelAssocTypeUri(),
+        return pl.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dmx.core.parent"),
             child.createRoleModel("dmx.core.child")
         ).getModel();

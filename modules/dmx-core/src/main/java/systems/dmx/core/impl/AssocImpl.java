@@ -170,7 +170,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final RelatedAssoc getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = pl.getAssociationRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
+        RelatedAssocModelImpl assoc = pl.getAssocRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
@@ -178,22 +178,22 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final List<RelatedAssoc> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
-        return pl.instantiate(pl.getAssociationRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
+        return pl.instantiate(pl.getAssocRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri));
     }
 
     // ---
 
     @Override
-    public final Assoc getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                 long othersTopicId) {
-        return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
+    public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                long othersTopicId) {
+        return pl.getAssocBetweenTopicAndAssociation(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
             myRoleTypeUri);
     }
 
     @Override
-    public final List<Assoc> getAssociations() {
-        return pl.instantiate(pl.getAssociationAssociations(getId()));
+    public final List<Assoc> getAssocs() {
+        return pl.instantiate(pl.getAssocAssociations(getId()));
     }
 
 

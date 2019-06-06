@@ -228,7 +228,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Associations ===
 
-    Assoc getAssociation(long assocId) {
+    Assoc getAssoc(long assocId) {
         try {
             return checkReadAccessAndInstantiate(fetchAssociation(assocId));
         } catch (Exception e) {
@@ -236,7 +236,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Assoc getAssociationByValue(String key, SimpleValue value) {
+    Assoc getAssocByValue(String key, SimpleValue value) {
         try {
             AssocModelImpl assoc = fetchAssociation(key, value);
             return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
@@ -246,7 +246,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Assoc> getAssociationsByValue(String key, SimpleValue value) {
+    List<Assoc> getAssocsByValue(String key, SimpleValue value) {
         try {
             return checkReadAccessAndInstantiate(fetchAssociations(key, value));
         } catch (Exception e) {
@@ -255,8 +255,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssocImpl getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                String roleTypeUri2) {
+    AssocImpl getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
@@ -268,8 +267,8 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Assoc getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                   String topicRoleTypeUri, String assocRoleTypeUri) {
+    Assoc getAssocBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
+                                             String assocRoleTypeUri) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         logger.info(info);
@@ -285,7 +284,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    List<Assoc> getAssociationsByType(String assocTypeUri) {
+    List<Assoc> getAssocsByType(String assocTypeUri) {
         try {
             return checkReadAccessAndInstantiate(_getAssocType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
@@ -294,17 +293,16 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Assoc> getAssociations(long topic1Id, long topic2Id) {
-        return getAssociations(null, topic1Id, topic2Id);   // assocTypeUri=null
+    List<Assoc> getAssocs(long topic1Id, long topic2Id) {
+        return getAssocs(null, topic1Id, topic2Id);   // assocTypeUri=null
     }
 
-    List<Assoc> getAssociations(String assocTypeUri, long topic1Id, long topic2Id) {
-        return getAssociations(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
+    List<Assoc> getAssocs(String assocTypeUri, long topic1Id, long topic2Id) {
+        return getAssocs(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
     }
 
-    List<Assoc> getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                   String roleTypeUri2) {
-        return instantiate(_getAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+    List<Assoc> getAssocs(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
+        return instantiate(_getAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
     }
 
     /**
@@ -312,8 +310,8 @@ public final class PersistenceLayer extends StorageDecorator {
      *
      * ### TODO: drop this. Use the new traversal methods instead.
      */
-    Iterable<AssocModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                                 String roleTypeUri2) {
+    Iterable<AssocModelImpl> _getAssocs(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                           String roleTypeUri2) {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
@@ -340,14 +338,14 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssocImpl createAssociation(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
-        return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
+    AssocImpl createAssoc(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
+        return createAssoc(mf.newAssocModel(typeUri, roleModel1, roleModel2));
     }
 
     /**
      * Creates a new association in the DB.
      */
-    AssocImpl createAssociation(AssocModelImpl model) {
+    AssocImpl createAssoc(AssocModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -442,9 +440,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssocModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
-                mf.newTopicRoleModel(topicId, "dmx.core.instance"));
+                mf.newTopicRoleModel(topicId, "dmx.core.instance")
+            );
             storeAssociation(assoc);   // direct storage calls used here ### explain
             storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
             createAssociationInstantiation(assoc.id, assoc.typeUri);
@@ -456,9 +455,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createAssociationInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssocModelImpl assoc = mf.newAssociationModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
-                mf.newAssociationRoleModel(assocId, "dmx.core.instance"));
+                mf.newAssociationRoleModel(assocId, "dmx.core.instance")
+            );
             storeAssociation(assoc);   // direct storage calls used here ### explain
             storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
         } catch (Exception e) {
@@ -671,26 +671,26 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // --- Assoc Source ---
 
-    List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
         return filterReadables(fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
-    RelatedAssocModelImpl getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
+    RelatedAssocModelImpl getAssocRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssocModelImpl assoc = fetchAssociationRelatedAssociation(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? checkReadAccess(assoc) : null;
     }
 
-    List<RelatedAssocModelImpl> getAssociationRelatedAssociations(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
+    List<RelatedAssocModelImpl> getAssocRelatedAssociations(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
         return filterReadables(fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri));
     }
 
-    List<AssocModelImpl> getAssociationAssociations(long assocId) {
+    List<AssocModelImpl> getAssocAssociations(long assocId) {
         return filterReadables(fetchAssociationAssociations(assocId));
     }
 
@@ -721,11 +721,11 @@ public final class PersistenceLayer extends StorageDecorator {
         return checkReadAccessAndInstantiate(fetchTopicsByPropertyRange(propUri, from, to));
     }
 
-    List<Assoc> getAssociationsByProperty(String propUri, Object propValue) {
+    List<Assoc> getAssocsByProperty(String propUri, Object propValue) {
         return checkReadAccessAndInstantiate(fetchAssociationsByProperty(propUri, propValue));
     }
 
-    List<Assoc> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to) {
         return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 

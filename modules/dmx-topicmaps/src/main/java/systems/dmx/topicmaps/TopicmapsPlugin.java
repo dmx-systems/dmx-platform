@@ -124,14 +124,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Assoc getTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssociation(TOPICMAP_CONTEXT, topicmapId, topicId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
+        return dmx.getAssoc(TOPICMAP_CONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     @Override
     public Assoc getAssocMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssociationBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
+        return dmx.getAssocBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId, ROLE_TYPE_TOPICMAP,
+            ROLE_TYPE_CONTENT);
     }
 
     @GET
@@ -537,7 +536,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void _setAssocVisibility(long topicmapId, long assocId, boolean visibility, Assoc topicmapContext) {
-        Assoc assoc = dmx.getAssociation(assocId);
+        Assoc assoc = dmx.getAssoc(assocId);
         // update DB
         if (visibility) {
             autoRevealAssocs(assoc, topicmapId);
@@ -574,7 +573,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void autoHideAssocs(DMXObject object, long topicmapId) {
-        for (Assoc assoc : object.getAssociations()) {
+        for (Assoc assoc : object.getAssocs()) {
             Assoc topicmapContext = getAssocMapcontext(topicmapId, assoc.getId());
             if (topicmapContext != null) {
                 // update DB
@@ -586,7 +585,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void deleteAllAssocMapcontexts(Assoc object, long topicmapId) {
-        for (Assoc assoc : object.getAssociations()) {
+        for (Assoc assoc : object.getAssocs()) {
             Assoc assocMapcontext = getAssocMapcontext(topicmapId, assoc.getId());
             if (assocMapcontext != null) {
                 deleteAssocMapcontext(assocMapcontext);
@@ -648,7 +647,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private void createTopicMapcontext(long topicmapId, long topicId, ViewProps viewProps) {
-        Assoc topicMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPICMAP_CONTEXT,
+        Assoc topicMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
             mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
             mf.newTopicRoleModel(topicId,    ROLE_TYPE_CONTENT)
         ));
@@ -659,13 +658,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void createAssociationMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
-        Assoc assocMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPICMAP_CONTEXT,
+        Assoc assocMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
             mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             mf.newAssociationRoleModel(assocId, ROLE_TYPE_CONTENT)
         ));
         viewProps.store(assocMapcontext);
         //
-        ViewAssoc assoc = mf.newViewAssoc(dmx.getAssociation(assocId).getModel(), viewProps);
+        ViewAssoc assoc = mf.newViewAssoc(dmx.getAssoc(assocId).getModel(), viewProps);
         me.addAssociationToTopicmap(topicmapId, assoc);
     }
 

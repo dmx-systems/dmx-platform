@@ -68,7 +68,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     }
 
     @Override
-    final List<AssocModelImpl> getAssociations() {
+    final List<AssocModelImpl> getAssocs() {
         return pl.fetchTopicAssociations(id);
     }
 
