@@ -71,17 +71,17 @@ public interface DMXStorage {
 
     // === Associations ===
 
-    AssocModel fetchAssociation(long assocId);
+    AssocModel fetchAssoc(long assocId);
 
-    AssocModel fetchAssociation(String key, Object value);
+    AssocModel fetchAssoc(String key, Object value);
 
-    List<? extends AssocModel> fetchAssociations(String key, Object value);
+    List<? extends AssocModel> fetchAssocs(String key, Object value);
 
-    List<? extends AssocModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                 String roleTypeUri1, String roleTypeUri2);
+    List<? extends AssocModel> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                              String roleTypeUri2);
 
-    List<? extends AssocModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
-                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri);
+    List<? extends AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                               String topicRoleTypeUri, String assocRoleTypeUri);
 
     Iterator<? extends AssocModel> fetchAllAssociations();
 
@@ -89,9 +89,9 @@ public interface DMXStorage {
 
     // ---
 
-    void storeAssociation(AssocModel assocModel);
+    void storeAssoc(AssocModel assocModel);
 
-    void storeAssociationUri(long assocId, String uri);
+    void storeAssocUri(long assocId, String uri);
 
     void storeAssocTypeUri(long assocId, String assocTypeUri);
 
@@ -101,7 +101,7 @@ public interface DMXStorage {
      * @param   indexKey    must not null
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used. ### FIXDOC
      */
-    void storeAssociationValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue);
+    void storeAssocValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 
@@ -121,7 +121,7 @@ public interface DMXStorage {
 
     List<? extends AssocModel> fetchTopicAssociations(long topicId);
 
-    List<? extends AssocModel> fetchAssociationAssociations(long assocId);
+    List<? extends AssocModel> fetchAssocAssociations(long assocId);
 
     // ---
 
@@ -131,8 +131,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
+    List<? extends RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -140,8 +140,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssocModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
+    List<? extends RelatedAssocModel> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                                   String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
@@ -151,8 +151,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
+    List<? extends RelatedTopicModel> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -160,8 +160,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssocModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
+    List<? extends RelatedAssocModel> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
@@ -172,8 +172,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
+    List<? extends RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
+                                                         String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
      * @param   objectId            id of a topic or an association
@@ -182,8 +182,8 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssocModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
-                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
+    List<? extends RelatedAssocModel> fetchRelatedAssocs(long objectId, String assocTypeUri, String myRoleTypeUri,
+                                                         String othersRoleTypeUri, String othersAssocTypeUri);
 
 
 
@@ -205,15 +205,15 @@ public interface DMXStorage {
 
     List<? extends TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<? extends AssocModel> fetchAssociationsByProperty(String propUri, Object propValue);
+    List<? extends AssocModel> fetchAssocsByProperty(String propUri, Object propValue);
 
-    List<? extends AssocModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<? extends AssocModel> fetchAssocsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 
     void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex);
 
-    void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
+    void storeAssocProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
 
     // ---
 

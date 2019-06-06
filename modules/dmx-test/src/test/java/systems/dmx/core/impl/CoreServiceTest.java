@@ -1297,7 +1297,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedAssoc> getAssocInstancesByTraversal(String assocTypeUri) {
-        return dmx.getTopicByUri(assocTypeUri).getRelatedAssociations("dmx.core.instantiation",
+        return dmx.getTopicByUri(assocTypeUri).getRelatedAssocs("dmx.core.instantiation",
             "dmx.core.type", "dmx.core.instance", assocTypeUri);
     }
 
@@ -1357,7 +1357,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedAssoc> getTestAssociations(Topic topic) {
-        return topic.getRelatedAssociations("dmx.core.association",
+        return topic.getRelatedAssocs("dmx.core.association",
             "dmx.core.default", "dmx.core.default", "dmx.core.association");
     }
 }

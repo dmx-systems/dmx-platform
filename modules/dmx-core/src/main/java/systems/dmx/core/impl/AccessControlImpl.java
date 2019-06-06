@@ -229,7 +229,7 @@ class AccessControlImpl implements AccessControl {
                 return false;
             }
             // Note: direct storage access is required here
-            AssocModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
+            AssocModel membership = pl.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
                 workspaceId, "dmx.core.default", "dmx.core.default");
             return membership != null;
         } catch (Exception e) {

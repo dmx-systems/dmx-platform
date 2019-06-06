@@ -542,12 +542,12 @@ class TypeStorage {
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
-        return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
+        return pl.fetchAssocRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
             "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
-        return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.successor",
+        return pl.fetchAssocRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.successor",
             "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
@@ -669,7 +669,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(pl.fetchAssociationRelatedTopics(compDef.getId(), "dmx.core.composition",
+            return viewConfigModel(pl.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);

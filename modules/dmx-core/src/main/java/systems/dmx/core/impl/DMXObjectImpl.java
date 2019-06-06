@@ -197,13 +197,13 @@ abstract class DMXObjectImpl implements DMXObject {
     // --- Assoc Retrieval ---
 
     @Override
-    public final List<RelatedAssoc> getRelatedAssociations() {
-        return getRelatedAssociations(null, null, null, null);
+    public final List<RelatedAssoc> getRelatedAssocs() {
+        return getRelatedAssocs(null, null, null, null);
     }
 
     // Note: these methods are implemented in the subclasses (this is an abstract class):
     //     getRelatedAssociation(...)
-    //     getRelatedAssociations(...)
+    //     getRelatedAssocs(...)
     //     getAssoc(...)
     //     getAssocs()
 

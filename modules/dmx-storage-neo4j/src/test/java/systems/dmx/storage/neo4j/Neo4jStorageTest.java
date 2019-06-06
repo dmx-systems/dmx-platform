@@ -58,8 +58,8 @@ public class Neo4jStorageTest {
     // ---
 
     @Test
-    public void fetchAssociation() {
-        AssocModel assoc = storage.fetchAssociation(assocId);
+    public void fetchAssoc() {
+        AssocModel assoc = storage.fetchAssoc(assocId);
         assertNotNull(assoc);
         //
         PlayerModel roleModel1 = assoc.getRoleModel("dmx.core.type");
@@ -137,11 +137,11 @@ public class Neo4jStorageTest {
     public void deleteAssociationAndFetchAgain() {
         DMXTransaction tx = storage.beginTx();
         try {
-            AssocModel assoc = storage.fetchAssociation(assocId);
+            AssocModel assoc = storage.fetchAssoc(assocId);
             assertNotNull(assoc);
             //
             storage.deleteAssociation(assoc.getId());
-            assoc = storage.fetchAssociation(assocId);  // throws IllegalStateException
+            assoc = storage.fetchAssoc(assocId);  // throws IllegalStateException
             //
             tx.success();
         } finally {
@@ -301,12 +301,12 @@ public class Neo4jStorageTest {
         );
         assertEquals(-1, assoc.getId());
         //
-        storage.storeAssociation(assoc);
+        storage.storeAssoc(assoc);
         //
         long assocId = assoc.getId();
         assertTrue(assocId != -1);
         //
-        storage.storeAssociationValue(assocId, new SimpleValue(""), typeUri, false);
+        storage.storeAssocValue(assocId, new SimpleValue(""), typeUri, false);
         //
         return assocId;
     }

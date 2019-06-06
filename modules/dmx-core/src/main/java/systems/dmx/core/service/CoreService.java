@@ -142,8 +142,8 @@ public interface CoreService {
      */
     Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);
 
-    Assoc getAssocBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
-                                             String assocRoleTypeUri);
+    Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
+                                       String assocRoleTypeUri);
 
     // ---
 

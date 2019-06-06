@@ -99,9 +99,9 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     }
 
     @Override
-    public final List<RelatedAssoc> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
-        return pl.instantiate(pl.getTopicRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+    public final List<RelatedAssoc> getRelatedAssocs(String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
+        return pl.instantiate(pl.getTopicRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 

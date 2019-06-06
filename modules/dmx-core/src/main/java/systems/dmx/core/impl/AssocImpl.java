@@ -176,10 +176,10 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     }
 
     @Override
-    public final List<RelatedAssoc> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
-        return pl.instantiate(pl.getAssocRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri));
+    public final List<RelatedAssoc> getRelatedAssocs(String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
+        return pl.instantiate(pl.getAssocRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri));
     }
 
     // ---
@@ -187,8 +187,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                 long othersTopicId) {
-        return pl.getAssocBetweenTopicAndAssociation(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
-            myRoleTypeUri);
+        return pl.getAssocBetweenTopicAndAssoc(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
     }
 
     @Override

@@ -41,7 +41,7 @@ class CoreEvent {
     static DMXEvent CHECK_ASSOCIATION_READ_ACCESS = new DMXEvent(CheckAssocReadAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckAssocReadAccess) listener).checkAssociationReadAccess(
+            ((CheckAssocReadAccess) listener).checkAssocReadAccess(
                 (Long) params[0]
             );
         }
@@ -61,7 +61,7 @@ class CoreEvent {
     static DMXEvent CHECK_ASSOCIATION_WRITE_ACCESS = new DMXEvent(CheckAssocWriteAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckAssocWriteAccess) listener).checkAssociationWriteAccess(
+            ((CheckAssocWriteAccess) listener).checkAssocWriteAccess(
                 (Long) params[0]
             );
         }

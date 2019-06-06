@@ -180,7 +180,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return pl.fetchAssociationAssociations(id);
+        return pl.fetchAssocAssociations(id);
     }
 
     // ---
@@ -188,23 +188,21 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     @Override
     final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
+        return pl.fetchAssocRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
+        return pl.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---
 
     @Override
     final void storeUri() {
-        pl.storeAssociationUri(id, uri);
+        pl.storeAssocUri(id, uri);
     }
 
     @Override
@@ -215,12 +213,12 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void storeSimpleValue() {
-        pl.storeAssociationValue(id, value, typeUri, isHtml());
+        pl.storeAssocValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        pl.storeAssociationProperty(id, propUri, propValue, addToIndex);
+        pl.storeAssocProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
@@ -239,12 +237,12 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void checkReadAccess() {
-        pl.checkAssociationReadAccess(id);
+        pl.checkAssocReadAccess(id);
     }
 
     @Override
     final void checkWriteAccess() {
-        pl.checkAssociationWriteAccess(id);
+        pl.checkAssocWriteAccess(id);
     }
 
     // ---

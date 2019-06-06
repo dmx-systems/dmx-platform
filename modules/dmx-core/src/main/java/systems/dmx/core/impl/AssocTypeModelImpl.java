@@ -64,7 +64,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     List<AssocModelImpl> getAllInstances() {
-        return pl.fetchAssociations("typeUri", new SimpleValue(uri));
+        return pl.fetchAssocs("typeUri", new SimpleValue(uri));
     }
 
     // ---

@@ -359,14 +359,13 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_assocs")
-    public List<RelatedAssoc> getTopicRelatedAssociations(@PathParam("id")                  long topicId,
-                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+    public List<RelatedAssoc> getTopicRelatedAssocs(@PathParam("id")                     long topicId,
+                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                    @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
         Topic topic = dmx.getTopic(topicId);
-        return getRelatedAssociations(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
+        return getRelatedAssocs(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
     }
 
 
@@ -393,13 +392,13 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_assocs")
-    public List<RelatedAssoc> getAssocRelatedAssociations(@PathParam("id")                     long assocId,
-                                                          @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                          @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+    public List<RelatedAssoc> getAssocRelatedAssocs(@PathParam("id")                     long assocId,
+                                                    @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                    @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                    @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                    @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
         Assoc assoc = dmx.getAssoc(assocId);
-        return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return getRelatedAssocs(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
 
@@ -468,7 +467,8 @@ public class WebservicePlugin extends PluginActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private List<RelatedTopic> getRelatedTopics(DMXObject object, String objectInfo, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                String othersTopicTypeUri) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")";
@@ -480,14 +480,15 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
-    private List<RelatedAssoc> getRelatedAssociations(DMXObject object, String objectInfo, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+    private List<RelatedAssoc> getRelatedAssocs(DMXObject object, String objectInfo, String assocTypeUri,
+                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                String othersAssocTypeUri) {
         String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
         try {
             logger.fine(operation + " " + paramInfo);
-            return object.getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+            return object.getRelatedAssocs(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

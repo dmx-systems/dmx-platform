@@ -6,5 +6,5 @@ import systems.dmx.core.service.EventListener;
 
 public interface CheckAssocWriteAccess extends EventListener {
 
-    void checkAssociationWriteAccess(long assocId);
+    void checkAssocWriteAccess(long assocId);
 }

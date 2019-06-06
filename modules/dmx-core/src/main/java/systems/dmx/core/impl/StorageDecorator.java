@@ -136,8 +136,8 @@ class StorageDecorator {
 
     // === Associations ===
 
-    final AssocModelImpl fetchAssociation(long assocId) {
-        return (AssocModelImpl) storage.fetchAssociation(assocId);
+    final AssocModelImpl fetchAssoc(long assocId) {
+        return (AssocModelImpl) storage.fetchAssoc(assocId);
     }
 
     /**
@@ -151,12 +151,12 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final AssocModelImpl fetchAssociation(String key, SimpleValue value) {
-        return (AssocModelImpl) storage.fetchAssociation(key, value.value());
+    final AssocModelImpl fetchAssoc(String key, SimpleValue value) {
+        return (AssocModelImpl) storage.fetchAssoc(key, value.value());
     }
 
-    final List<AssocModelImpl> fetchAssociations(String key, SimpleValue value) {
-        return (List<AssocModelImpl>) storage.fetchAssociations(key, value.value());
+    final List<AssocModelImpl> fetchAssocs(String key, SimpleValue value) {
+        return (List<AssocModelImpl>) storage.fetchAssocs(key, value.value());
     }
 
     // ---
@@ -171,9 +171,9 @@ class StorageDecorator {
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    final AssocModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                             String roleTypeUri2) {
-        List<AssocModelImpl> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+    final AssocModelImpl fetchAssoc(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                       String roleTypeUri2) {
+        List<AssocModelImpl> assocs = fetchAssocs(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
         switch (assocs.size()) {
         case 0:
             return null;
@@ -191,9 +191,9 @@ class StorageDecorator {
      *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    final List<AssocModelImpl> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                                  String roleTypeUri2) {
-        return (List<AssocModelImpl>) storage.fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1,
+    final List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                              String roleTypeUri2) {
+        return (List<AssocModelImpl>) storage.fetchAssocs(assocTypeUri, topicId1, topicId2, roleTypeUri1,
             roleTypeUri2);
     }
 
@@ -202,9 +202,9 @@ class StorageDecorator {
     /**
      * Convenience method (checks singularity).
      */
-    final AssocModelImpl fetchAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                    String topicRoleTypeUri, String assocRoleTypeUri) {
-        List<AssocModelImpl> assocs = fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+    final AssocModelImpl fetchAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                        String topicRoleTypeUri, String assocRoleTypeUri) {
+        List<AssocModelImpl> assocs = fetchAssocsBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
             topicRoleTypeUri, assocRoleTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -218,10 +218,10 @@ class StorageDecorator {
         }
     }
 
-    final List<AssocModelImpl> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
-                                                       long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
-        return (List<AssocModelImpl>) storage.fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId,
-            assocId, topicRoleTypeUri, assocRoleTypeUri);
+    final List<AssocModelImpl> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                               String topicRoleTypeUri, String assocRoleTypeUri) {
+        return (List<AssocModelImpl>) storage.fetchAssocsBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
+            topicRoleTypeUri, assocRoleTypeUri);
     }
 
     // ---
@@ -236,15 +236,15 @@ class StorageDecorator {
 
     // ---
 
-    final void storeAssociation(AssocModel model) {
-        storage.storeAssociation(model);
+    final void storeAssoc(AssocModel model) {
+        storage.storeAssoc(model);
     }
 
     /**
      * Stores and indexes the association's URI.
      */
-    final void storeAssociationUri(long assocId, String uri) {
-        storage.storeAssociationUri(assocId, uri);
+    final void storeAssocUri(long assocId, String uri) {
+        storage.storeAssocUri(assocId, uri);
     }
 
     final void storeAssocTypeUri(long assocId, String assocTypeUri) {
@@ -258,8 +258,8 @@ class StorageDecorator {
     /**
      * Stores and indexes an association value.
      */
-    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue) {
-        storage.storeAssociationValue(assocId, value, indexKey, isHtmlValue);
+    final void storeAssocValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue) {
+        storage.storeAssocValue(assocId, value, indexKey, isHtmlValue);
     }
 
     // ---
@@ -334,7 +334,7 @@ class StorageDecorator {
      */
     final RelatedAssocModelImpl fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                              String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssocModelImpl> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+        List<RelatedAssocModelImpl> assocs = fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -357,10 +357,10 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final List<RelatedAssocModelImpl> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return (List<RelatedAssocModelImpl>) storage.fetchTopicRelatedAssociations(topicId, assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+    final List<RelatedAssocModelImpl> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersAssocTypeUri) {
+        return (List<RelatedAssocModelImpl>) storage.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
     }
 
     // ---
@@ -381,9 +381,9 @@ class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
      */
-    final RelatedTopicModelImpl fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                             String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> topics = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+    final RelatedTopicModelImpl fetchAssocRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+        List<RelatedTopicModelImpl> topics = fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         switch (topics.size()) {
         case 0:
@@ -401,9 +401,9 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final List<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        return (List<RelatedTopicModelImpl>) storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+    final List<RelatedTopicModelImpl> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+        return (List<RelatedTopicModelImpl>) storage.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
     }
 
@@ -415,9 +415,9 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final RelatedAssocModelImpl fetchAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                   String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssocModelImpl> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
+    final RelatedAssocModelImpl fetchAssocRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersAssocTypeUri) {
+        List<RelatedAssocModelImpl> assocs = fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -441,16 +441,16 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final List<RelatedAssocModelImpl> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return (List<RelatedAssocModelImpl>) storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+    final List<RelatedAssocModelImpl> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersAssocTypeUri) {
+        return (List<RelatedAssocModelImpl>) storage.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
     }
 
     // ---
 
-    final List<AssocModelImpl> fetchAssociationAssociations(long assocId) {
-        return (List<AssocModelImpl>) storage.fetchAssociationAssociations(assocId);
+    final List<AssocModelImpl> fetchAssocAssociations(long assocId) {
+        return (List<AssocModelImpl>) storage.fetchAssocAssociations(assocId);
     }
 
     // --- Object Source ---
@@ -499,7 +499,7 @@ class StorageDecorator {
             othersRoleTypeUri, othersTopicTypeUri);
     }
 
-    // ### TODO: decorator for fetchRelatedAssociations()
+    // ### TODO: decorator for fetchRelatedAssocs()
 
 
 
@@ -523,12 +523,12 @@ class StorageDecorator {
         return (List<TopicModelImpl>) storage.fetchTopicsByPropertyRange(propUri, from, to);
     }
 
-    final List<AssocModelImpl> fetchAssociationsByProperty(String propUri, Object propValue) {
-        return (List<AssocModelImpl>) storage.fetchAssociationsByProperty(propUri, propValue);
+    final List<AssocModelImpl> fetchAssocsByProperty(String propUri, Object propValue) {
+        return (List<AssocModelImpl>) storage.fetchAssocsByProperty(propUri, propValue);
     }
 
-    final List<AssocModelImpl> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return (List<AssocModelImpl>) storage.fetchAssociationsByPropertyRange(propUri, from, to);
+    final List<AssocModelImpl> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
+        return (List<AssocModelImpl>) storage.fetchAssocsByPropertyRange(propUri, from, to);
     }
 
     // ---
@@ -537,8 +537,8 @@ class StorageDecorator {
         storage.storeTopicProperty(topicId, propUri, propValue, addToIndex);
     }
 
-    final void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
-        storage.storeAssociationProperty(assocId, propUri, propValue, addToIndex);
+    final void storeAssocProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
+        storage.storeAssocProperty(assocId, propUri, propValue, addToIndex);
     }
 
     // ---

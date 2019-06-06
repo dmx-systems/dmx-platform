@@ -115,7 +115,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 topicmapTopic.getModel(),
                 fetchTopicmapViewProps(topicmapTopic),
                 fetchTopics(topicmapTopic, includeChilds),
-                fetchAssociations(topicmapTopic)
+                fetchAssocs(topicmapTopic)
             );
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
@@ -129,7 +129,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Assoc getAssocMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssocBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId, ROLE_TYPE_TOPICMAP,
+        return dmx.getAssocBetweenTopicAndAssoc(TOPICMAP_CONTEXT, topicmapId, assocId, ROLE_TYPE_TOPICMAP,
             ROLE_TYPE_CONTENT);
     }
 
@@ -258,7 +258,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setAssociationViewProps(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
                                                                           ViewProps viewProps) {
-        storeAssociationViewProps(topicmapId, assocId, viewProps);
+        storeAssocViewProps(topicmapId, assocId, viewProps);
     }
 
     @PUT
@@ -453,9 +453,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         return topics;
     }
 
-    private Map<Long, ViewAssoc> fetchAssociations(Topic topicmapTopic) {
+    private Map<Long, ViewAssoc> fetchAssocs(Topic topicmapTopic) {
         Map<Long, ViewAssoc> assocs = new HashMap();
-        List<RelatedAssoc> relAssocs = topicmapTopic.getRelatedAssociations(TOPICMAP_CONTEXT, ROLE_TYPE_TOPICMAP,
+        List<RelatedAssoc> relAssocs = topicmapTopic.getRelatedAssocs(TOPICMAP_CONTEXT, ROLE_TYPE_TOPICMAP,
             ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
         for (RelatedAssoc assoc : relAssocs) {
             assocs.put(assoc.getId(), buildViewAssoc(assoc));
@@ -554,7 +554,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         for (RelatedTopic topic : object.getRelatedTopics()) {
             _autoRevealAssocs(topic, getTopicMapcontext(topicmapId, topic.getId()), topicmapId);
         }
-        for (RelatedAssoc assoc : object.getRelatedAssociations()) {
+        for (RelatedAssoc assoc : object.getRelatedAssocs()) {
             _autoRevealAssocs(assoc, getAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
         }
     }
@@ -617,7 +617,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     /**
      * Convenience when you don't have a topicmap context already.
      */
-    private void storeAssociationViewProps(long topicmapId, long assocId, ViewProps viewProps) {
+    private void storeAssocViewProps(long topicmapId, long assocId, ViewProps viewProps) {
         try {
             viewProps.store(fetchAssocMapcontext(topicmapId, assocId));
         } catch (Exception e) {

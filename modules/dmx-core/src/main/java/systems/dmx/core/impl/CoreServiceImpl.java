@@ -152,10 +152,9 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Assoc getAssocBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                    String topicRoleTypeUri, String assocRoleTypeUri) {
-        return pl.getAssocBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
-            assocRoleTypeUri);
+    public Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
+                                              String assocRoleTypeUri) {
+        return pl.getAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
     }
 
     // ---
@@ -531,7 +530,7 @@ public class CoreServiceImpl implements CoreService {
             // Note: at time of the first associateDataType() call the required association type (dmx.core.composition)
             // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
             // the data type assigning association is created *before* the association type is fetched.
-            // (see AssocImpl.store(): storage.storeAssociation() is called before getType() in DMXObjectImpl.store().)
+            // (see AssocImpl.store(): storage.storeAssoc() is called before getType() in DMXObjectImpl.store().)
             // ### FIXDOC: not true anymore
             //
             // Important is that associateDataType("dmx.core.composition") is the first call here.
@@ -574,7 +573,7 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
             mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
         );
-        pl.storeAssociation(assoc);
-        pl.storeAssociationValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
+        pl.storeAssoc(assoc);
+        pl.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
     }
 }
