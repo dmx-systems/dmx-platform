@@ -28,13 +28,13 @@ import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.Permissions;
 import systems.dmx.core.service.accesscontrol.SharingMode;
-import systems.dmx.core.service.event.CheckAssociationReadAccessListener;
-import systems.dmx.core.service.event.CheckAssociationWriteAccessListener;
+import systems.dmx.core.service.event.CheckAssocReadAccess;
+import systems.dmx.core.service.event.CheckAssocWriteAccess;
 import systems.dmx.core.service.event.CheckTopicReadAccessListener;
 import systems.dmx.core.service.event.CheckTopicWriteAccessListener;
-import systems.dmx.core.service.event.PostCreateAssociationListener;
+import systems.dmx.core.service.event.PostCreateAssocListener;
 import systems.dmx.core.service.event.PostCreateTopicListener;
-import systems.dmx.core.service.event.PostUpdateAssociationListener;
+import systems.dmx.core.service.event.PostUpdateAssocListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
 import systems.dmx.core.service.event.PreUpdateTopicListener;
 import systems.dmx.core.service.event.ServiceRequestFilterListener;
@@ -79,13 +79,13 @@ import java.util.logging.Logger;
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
                                                                                     CheckTopicReadAccessListener,
                                                                                     CheckTopicWriteAccessListener,
-                                                                                    CheckAssociationReadAccessListener,
-                                                                                    CheckAssociationWriteAccessListener,
+                                                                                    CheckAssocReadAccess,
+                                                                                    CheckAssocWriteAccess,
                                                                                     PreUpdateTopicListener,
                                                                                     PostCreateTopicListener,
-                                                                                    PostCreateAssociationListener,
+                                                                                    PostCreateAssocListener,
                                                                                     PostUpdateTopicListener,
-                                                                                    PostUpdateAssociationListener,
+                                                                                    PostUpdateAssocListener,
                                                                                     ServiceRequestFilterListener,
                                                                                     StaticResourceFilterListener,
                                                                                     CheckDiskQuotaListener {

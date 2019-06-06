@@ -22,7 +22,7 @@ import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.IntroduceAssocTypeListener;
 import systems.dmx.core.service.event.IntroduceTopicTypeListener;
-import systems.dmx.core.service.event.PostCreateAssociationListener;
+import systems.dmx.core.service.event.PostCreateAssocListener;
 import systems.dmx.core.service.event.PostCreateTopicListener;
 import systems.dmx.core.service.event.PreDeleteTopicListener;
 
@@ -54,7 +54,7 @@ import java.util.logging.Logger;
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssocTypeListener,
                                                                                     PostCreateTopicListener,
-                                                                                    PostCreateAssociationListener,
+                                                                                    PostCreateAssocListener,
                                                                                     PreDeleteTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants

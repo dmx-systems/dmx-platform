@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreSendAssociationListener extends EventListener {
+public interface PostCreateAssocListener extends EventListener {
 
-    void preSendAssociation(Assoc assoc);
+    void postCreateAssociation(Assoc assoc);
 }

@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreCreateAssociationListener extends EventListener {
+public interface PreCreateAssocListener extends EventListener {
 
     void preCreateAssociation(AssocModel model);
 }

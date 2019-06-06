@@ -3,7 +3,7 @@ package systems.dmx.contacts;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.osgi.PluginActivator;
-import systems.dmx.core.service.event.PreCreateAssociationListener;
+import systems.dmx.core.service.event.PreCreateAssocListener;
 import systems.dmx.core.util.DMXUtils;
 
 import javax.ws.rs.GET;
@@ -17,17 +17,11 @@ import java.util.List;
 
 @Path("/contacts")
 @Produces("application/json")
-public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssociationListener {
+public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssocListener {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // **************************************
-    // *** ContactsService Implementation ***
-    // **************************************
-
-
+    // ContactsService
 
     @GET
     @Path("/person/{id}/organizations")
@@ -45,13 +39,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
             "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
-
-
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
-
-
+    // Listeners
 
     @Override
     public void preCreateAssociation(AssocModel assoc) {

@@ -6,7 +6,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PostUpdateAssociationListener extends EventListener {
+public interface PreUpdateAssocListener extends EventListener {
 
-    void postUpdateAssociation(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc);
+    void preUpdateAssociation(Assoc assoc, AssocModel updateModel);
 }

@@ -6,7 +6,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.event.PreCreateAssociationListener;
+import systems.dmx.core.service.event.PreCreateAssocListener;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.timestamps.TimestampsService;
 
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @Path("/event")
 @Consumes("application/json")
 @Produces("application/json")
-public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssociationListener {
+public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssocListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -35,13 +35,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // *********************
-    // *** EventsService ***
-    // *********************
-
-
+    // EventsService
 
     @GET
     @Path("/person/{id}")
@@ -59,13 +53,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
             "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
-
-
-    // *****************
-    // *** Listeners ***
-    // *****************
-
-
+    // Listeners
 
     @Override
     public void preCreateAssociation(AssocModel assoc) {

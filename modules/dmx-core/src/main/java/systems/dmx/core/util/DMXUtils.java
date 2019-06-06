@@ -187,7 +187,7 @@ public class DMXUtils {
 
     /**
      * Retypes the given association if its players match the given topic types. The given assoc model is modified
-     * in-place. Typically called from a plugin's {@link systems.dmx.core.service.event.PreCreateAssociationListener}.
+     * in-place. Typically called from a plugin's {@link systems.dmx.core.service.event.PreCreateAssocListener}.
      *
      * <p>Read the parameters as follows: if "assoc" connects a "topicTypeUri1" with a "topicTypeUri2" (regardless of
      * 1,2 position) then retype it to "assocTypeUri" and use the role types "roleTypeUri1" and "roleTypeUri2".

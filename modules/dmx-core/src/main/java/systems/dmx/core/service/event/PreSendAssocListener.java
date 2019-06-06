@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreDeleteAssociationListener extends EventListener {
+public interface PreSendAssocListener extends EventListener {
 
-    void preDeleteAssociation(Assoc assoc);
+    void preSendAssociation(Assoc assoc);
 }

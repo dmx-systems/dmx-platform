@@ -38,11 +38,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent CHECK_ASSOCIATION_READ_ACCESS =
-                                                         new DMXEvent(CheckAssociationReadAccessListener.class) {
+    static DMXEvent CHECK_ASSOCIATION_READ_ACCESS = new DMXEvent(CheckAssocReadAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckAssociationReadAccessListener) listener).checkAssociationReadAccess(
+            ((CheckAssocReadAccess) listener).checkAssociationReadAccess(
                 (Long) params[0]
             );
         }
@@ -59,11 +58,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent CHECK_ASSOCIATION_WRITE_ACCESS =
-                                                        new DMXEvent(CheckAssociationWriteAccessListener.class) {
+    static DMXEvent CHECK_ASSOCIATION_WRITE_ACCESS = new DMXEvent(CheckAssocWriteAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckAssociationWriteAccessListener) listener).checkAssociationWriteAccess(
+            ((CheckAssocWriteAccess) listener).checkAssociationWriteAccess(
                 (Long) params[0]
             );
         }
@@ -80,10 +78,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_CREATE_ASSOCIATION = new DMXEvent(PreCreateAssociationListener.class) {
+    static DMXEvent PRE_CREATE_ASSOCIATION = new DMXEvent(PreCreateAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateAssociationListener) listener).preCreateAssociation(
+            ((PreCreateAssocListener) listener).preCreateAssociation(
                 (AssocModel) params[0]
             );
         }
@@ -118,10 +116,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent POST_CREATE_ASSOCIATION = new DMXEvent(PostCreateAssociationListener.class) {
+    static DMXEvent POST_CREATE_ASSOCIATION = new DMXEvent(PostCreateAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostCreateAssociationListener) listener).postCreateAssociation(
+            ((PostCreateAssocListener) listener).postCreateAssociation(
                 (Assoc) params[0]
             );
         }
@@ -138,10 +136,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_UPDATE_ASSOCIATION = new DMXEvent(PreUpdateAssociationListener.class) {
+    static DMXEvent PRE_UPDATE_ASSOCIATION = new DMXEvent(PreUpdateAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreUpdateAssociationListener) listener).preUpdateAssociation(
+            ((PreUpdateAssocListener) listener).preUpdateAssociation(
                 (Assoc) params[0], (AssocModel) params[1]
             );
         }
@@ -158,10 +156,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent POST_UPDATE_ASSOCIATION = new DMXEvent(PostUpdateAssociationListener.class) {
+    static DMXEvent POST_UPDATE_ASSOCIATION = new DMXEvent(PostUpdateAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostUpdateAssociationListener) listener).postUpdateAssociation(
+            ((PostUpdateAssocListener) listener).postUpdateAssociation(
                 (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2]
             );
         }
@@ -178,10 +176,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_DELETE_ASSOCIATION = new DMXEvent(PreDeleteAssociationListener.class) {
+    static DMXEvent PRE_DELETE_ASSOCIATION = new DMXEvent(PreDeleteAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreDeleteAssociationListener) listener).preDeleteAssociation(
+            ((PreDeleteAssocListener) listener).preDeleteAssociation(
                 (Assoc) params[0]
             );
         }
@@ -198,10 +196,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent POST_DELETE_ASSOCIATION = new DMXEvent(PostDeleteAssociationListener.class) {
+    static DMXEvent POST_DELETE_ASSOCIATION = new DMXEvent(PostDeleteAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostDeleteAssociationListener) listener).postDeleteAssociation(
+            ((PostDeleteAssocListener) listener).postDeleteAssociation(
                 (AssocModel) params[0]
             );
         }
@@ -284,10 +282,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_SEND_ASSOCIATION = new DMXEvent(PreSendAssociationListener.class) {
+    static DMXEvent PRE_SEND_ASSOCIATION = new DMXEvent(PreSendAssocListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendAssociationListener) listener).preSendAssociation(
+            ((PreSendAssocListener) listener).preSendAssociation(
                 (Assoc) params[0]
             );
         }
