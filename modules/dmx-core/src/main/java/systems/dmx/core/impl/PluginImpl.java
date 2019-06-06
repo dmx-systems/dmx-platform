@@ -548,7 +548,7 @@ public class PluginImpl implements Plugin, EventHandler {
             // 3) type introduction
             if (isCleanInstall) {
                 introduceTopicTypesToPlugin();
-                introduceAssociationTypesToPlugin();
+                introduceAssocTypesToPlugin();
             }
             //
             tx.success();
@@ -604,9 +604,9 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     // ### TODO: move to PersistenceLayer?
-    private void introduceAssociationTypesToPlugin() {
+    private void introduceAssocTypesToPlugin() {
         try {
-            for (AssocType assocType : dmx.getAllAssociationTypes()) {
+            for (AssocType assocType : dmx.getAllAssocTypes()) {
                 dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {

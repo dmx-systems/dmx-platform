@@ -36,7 +36,7 @@ public class Migration3 extends Migration {
             (dmxWorkspaceId == -1 ? "clean install" : "update") + " detected)");
         //
         repair(dmx.getAllTopicTypes(), 0);
-        repair(dmx.getAllAssociationTypes(), 1);
+        repair(dmx.getAllAssocTypes(), 1);
         //
         logger.info("########## Repairing types with missing \"View Config\" topic complete\n    " +
             "Topic types repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +

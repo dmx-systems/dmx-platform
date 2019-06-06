@@ -53,9 +53,9 @@ class TypeStorage {
         return topicType != null ? topicType : fetchTopicType(topicTypeUri);
     }
 
-    AssocTypeModelImpl getAssociationType(String assocTypeUri) {
+    AssocTypeModelImpl getAssocType(String assocTypeUri) {
         AssocTypeModelImpl assocType = (AssocTypeModelImpl) getTypeIfExists(assocTypeUri);
-        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
+        return assocType != null ? assocType : fetchAssocType(assocTypeUri);
     }
 
     // ---
@@ -122,14 +122,14 @@ class TypeStorage {
         }
     }
 
-    private AssocTypeModelImpl fetchAssociationType(String assocTypeUri) {
+    private AssocTypeModelImpl fetchAssocType(String assocTypeUri) {
         try {
             logger.info("Fetching association type \"" + assocTypeUri + "\"");
             endlessRecursionDetection.check(assocTypeUri);
             //
             // fetch generic topic
             TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
-            checkAssociationType(assocTypeUri, typeTopic);
+            checkAssocType(assocTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
             // fetch type-specific parts
@@ -137,8 +137,8 @@ class TypeStorage {
             List<CompDefModel> compDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
-            AssocTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, compDefs, null);
-            putInTypeCache(assocType);                                                                // viewConfig=null
+            AssocTypeModelImpl assocType = mf.newAssocTypeModel(typeTopic, dataTypeUri, compDefs, null);
+            putInTypeCache(assocType);                                                            // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
@@ -166,7 +166,7 @@ class TypeStorage {
         }
     }
 
-    private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
+    private void checkAssocType(String assocTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Assoc type \"" + assocTypeUri + "\" not found in DB");
         } else if (!typeTopic.getTypeUri().equals("dmx.core.assoc_type")) {
@@ -466,7 +466,7 @@ class TypeStorage {
         if (type.typeUri.equals("dmx.core.topic_type")) {
             return getTopicType(type.uri);
         } else if (type.typeUri.equals("dmx.core.assoc_type")) {
-            return getAssociationType(type.uri);
+            return getAssocType(type.uri);
         } else {
             throw new RuntimeException("DB inconsistency: the \"dmx.core.parent_type\" player is not a type " +
                 "but of type \"" + type.typeUri + "\" in " + assoc);

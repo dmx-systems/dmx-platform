@@ -98,10 +98,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_CREATE_ASSOCIATION_TYPE = new DMXEvent(PreCreateAssociationTypeListener.class) {
+    static DMXEvent PRE_CREATE_ASSOCIATION_TYPE = new DMXEvent(PreCreateAssocTypeListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateAssociationTypeListener) listener).preCreateAssociationType(
+            ((PreCreateAssocTypeListener) listener).preCreateAssocType(
                 (AssocTypeModel) params[0]
             );
         }
@@ -231,12 +231,12 @@ class CoreEvent {
     };
 
     // This event has a double nature:
-    //   a) it is fired regularily (see CoreServiceImpl.createAssociationType()).
-    //   b) it is fired locally (see PluginImpl.introduceAssociationTypesToPlugin()).
-    static DMXEvent INTRODUCE_ASSOCIATION_TYPE = new DMXEvent(IntroduceAssociationTypeListener.class) {
+    //   a) it is fired regularily (see CoreServiceImpl.createAssocType()).
+    //   b) it is fired locally (see PluginImpl.introduceAssocTypesToPlugin()).
+    static DMXEvent INTRODUCE_ASSOCIATION_TYPE = new DMXEvent(IntroduceAssocTypeListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((IntroduceAssociationTypeListener) listener).introduceAssociationType(
+            ((IntroduceAssocTypeListener) listener).introduceAssocType(
                 (AssocType) params[0]
             );
         }
@@ -302,10 +302,10 @@ class CoreEvent {
         }
     };
 
-    static DMXEvent PRE_SEND_ASSOCIATION_TYPE = new DMXEvent(PreSendAssociationTypeListener.class) {
+    static DMXEvent PRE_SEND_ASSOCIATION_TYPE = new DMXEvent(PreSendAssocTypeListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendAssociationTypeListener) listener).preSendAssociationType(
+            ((PreSendAssocTypeListener) listener).preSendAssocType(
                 (AssocType) params[0]
             );
         }

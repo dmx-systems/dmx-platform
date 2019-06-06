@@ -444,7 +444,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) create composite type, set a custom assoc type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", "dmx.core.text"));
-            dmx.createAssociationType(mf.newAssociationTypeModel("dmx.test.birthday", "Birthday", "dmx.core.text"));
+            dmx.createAssocType(mf.newAssocTypeModel("dmx.test.birthday", "Birthday", "dmx.core.text"));
             TopicTypeImpl tt = dmx.createTopicType(
                 mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addCompDef(
                     mf.newCompDefModel("dmx.test.birthday", false, false,

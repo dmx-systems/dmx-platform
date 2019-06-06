@@ -45,7 +45,7 @@ public abstract class Migration {
      * @param   value           The config value (String, Integer, Long, Double, or Boolean).
      */
     protected final void setAssocTypeViewConfigValue(String assocTypeUri, String setting, Object value) {
-        setViewConfigValue(dmx.getAssociationType(assocTypeUri), setting, value);
+        setViewConfigValue(dmx.getAssocType(assocTypeUri), setting, value);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

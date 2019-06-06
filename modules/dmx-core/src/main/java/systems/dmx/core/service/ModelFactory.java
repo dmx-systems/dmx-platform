@@ -193,12 +193,12 @@ public interface ModelFactory {
 
     // === AssocTypeModel ===
 
-    AssocTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                           ViewConfigurationModel viewConfig);
+    AssocTypeModel newAssocTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
+                                     ViewConfigurationModel viewConfig);
 
-    AssocTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
+    AssocTypeModel newAssocTypeModel(String uri, String value, String dataTypeUri);
 
-    AssocTypeModel newAssociationTypeModel(JSONObject assocType);
+    AssocTypeModel newAssocTypeModel(JSONObject assocType);
 
 
 

@@ -287,7 +287,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     List<Assoc> getAssociationsByType(String assocTypeUri) {
         try {
-            return checkReadAccessAndInstantiate(_getAssociationType(assocTypeUri).getAllInstances());
+            return checkReadAccessAndInstantiate(_getAssocType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
@@ -482,13 +482,13 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    AssocTypeImpl getAssociationType(String uri) {
-        return checkReadAccessAndInstantiate(_getAssociationType(uri));
+    AssocTypeImpl getAssocType(String uri) {
+        return checkReadAccessAndInstantiate(_getAssocType(uri));
     }
 
-    AssocTypeImpl getAssociationTypeImplicitly(long assocId) {
+    AssocTypeImpl getAssocTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
-        return _getAssociationType(typeUri(assocId)).instantiate();
+        return _getAssocType(typeUri(assocId)).instantiate();
     }
 
     // ---
@@ -505,11 +505,11 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<AssocType> getAllAssociationTypes() {
+    List<AssocType> getAllAssocTypes() {
         try {
             List<AssocType> assocTypes = new ArrayList();
-            for (String uri : getAssociationTypeUris()) {
-                assocTypes.add(_getAssociationType(uri).instantiate());
+            for (String uri : getAssocTypeUris()) {
+                assocTypes.add(_getAssocType(uri).instantiate());
             }
             return assocTypes;
         } catch (Exception e) {
@@ -535,7 +535,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssocTypeImpl createAssociationType(AssocTypeModelImpl model) {
+    AssocTypeImpl createAssocType(AssocTypeModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
             //
@@ -564,12 +564,12 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void updateAssociationType(AssocTypeModelImpl updateModel) {
+    void updateAssocType(AssocTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             TopicModelImpl topic = fetchTopic(updateModel.getId());
             topic.checkWriteAccess();
-            _getAssociationType(topic.getUri()).update(updateModel);
+            _getAssocType(topic.getUri()).update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating association type failed, updateModel=" + updateModel, e);
         }
@@ -588,9 +588,9 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void deleteAssociationType(String assocTypeUri) {
+    void deleteAssocType(String assocTypeUri) {
         try {
-            TypeModelImpl type = _getAssociationType(assocTypeUri);
+            TypeModelImpl type = _getAssocType(assocTypeUri);
             type.checkWriteAccess();
             type.delete();
             // ### TODO: delete view config topics
@@ -628,8 +628,8 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Type cache direct access. No permission check.
      */
-    AssocTypeModelImpl _getAssociationType(String uri) {
-        return typeStorage.getAssociationType(uri);
+    AssocTypeModelImpl _getAssocType(String uri) {
+        return typeStorage.getAssocType(uri);
     }
 
 
@@ -844,7 +844,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    private List<String> getAssociationTypeUris() {
+    private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
             for (TopicModel assocType : filterReadables(fetchTopics("typeUri", new SimpleValue(

@@ -275,27 +275,27 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/{uri}")
-    public AssocType getAssociationType(@PathParam("uri") String uri) {
-        return dmx.getAssociationType(uri);
+    public AssocType getAssocType(@PathParam("uri") String uri) {
+        return dmx.getAssocType(uri);
     }
 
     @GET
     @Path("/assoctype/assoc/{id}")
-    public AssocType getAssociationTypeImplicitly(@PathParam("id") long assocId) {
-        return dmx.getAssociationTypeImplicitly(assocId);
+    public AssocType getAssocTypeImplicitly(@PathParam("id") long assocId) {
+        return dmx.getAssocTypeImplicitly(assocId);
     }
 
     @GET
     @Path("/assoctype/all")
-    public List<AssocType> getAllAssociationTypes() {
-        return dmx.getAllAssociationTypes();
+    public List<AssocType> getAllAssocTypes() {
+        return dmx.getAllAssocTypes();
     }
 
     @POST
     @Path("/assoctype")
     @Transactional
-    public AssocType createAssociationType(AssocTypeModel model) {
-        AssocType assocType = dmx.createAssociationType(model);
+    public AssocType createAssocType(AssocTypeModel model) {
+        AssocType assocType = dmx.createAssocType(model);
         me.newAssocType(assocType);
         return assocType;
     }
@@ -303,16 +303,16 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/assoctype")
     @Transactional
-    public DirectivesResponse updateAssociationType(AssocTypeModel model) {
-        dmx.updateAssociationType(model);
+    public DirectivesResponse updateAssocType(AssocTypeModel model) {
+        dmx.updateAssocType(model);
         return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/assoctype/{uri}")
     @Transactional
-    public DirectivesResponse deleteAssociationType(@PathParam("uri") String uri) {
-        dmx.deleteAssociationType(uri);
+    public DirectivesResponse deleteAssocType(@PathParam("uri") String uri) {
+        dmx.deleteAssocType(uri);
         return new DirectivesResponse();
     }
 
@@ -505,7 +505,7 @@ public class WebservicePlugin extends PluginActivator {
         if (typeUri.equals("dmx.core.topic_type")) {
             dmx.deleteTopicType(t.getUri());
         } else if (typeUri.equals("dmx.core.assoc_type")) {
-            dmx.deleteAssociationType(t.getUri());
+            dmx.deleteAssocType(t.getUri());
         } else {
             dmx.deleteTopic(id);
         }

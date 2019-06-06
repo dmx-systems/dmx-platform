@@ -35,7 +35,7 @@ import systems.dmx.core.service.EventListener;
  *                      particular the underlying type topic has an ID already. That is, the type is ready for
  *                      e.g. being related to other topics.
  */
-public interface IntroduceAssociationTypeListener extends EventListener {
+public interface IntroduceAssocTypeListener extends EventListener {
 
-    void introduceAssociationType(AssocType assocType);
+    void introduceAssocType(AssocType assocType);
 }

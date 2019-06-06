@@ -255,7 +255,7 @@ public class DMXUtils {
     // Note: this is experimental
     // ### TODO: do it only for simple assoc types? Drop it, and let the application do this?
     private static void setAssocValue(AssocModel assoc) {
-        AssocType assocType = CoreActivator.getCoreService().getAssociationType(assoc.getTypeUri());
+        AssocType assocType = CoreActivator.getCoreService().getAssocType(assoc.getTypeUri());
         assoc.setSimpleValue(assocType.getSimpleValue());
     }
 }

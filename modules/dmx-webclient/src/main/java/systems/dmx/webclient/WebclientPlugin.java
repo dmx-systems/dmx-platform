@@ -17,10 +17,10 @@ import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.event.AllPluginsActiveListener;
 import systems.dmx.core.service.event.IntroduceTopicTypeListener;
-import systems.dmx.core.service.event.IntroduceAssociationTypeListener;
+import systems.dmx.core.service.event.IntroduceAssocTypeListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
 import systems.dmx.core.service.event.PreCreateTopicTypeListener;
-import systems.dmx.core.service.event.PreCreateAssociationTypeListener;
+import systems.dmx.core.service.event.PreCreateAssocTypeListener;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
                                                                 IntroduceTopicTypeListener,
-                                                                IntroduceAssociationTypeListener,
+                                                                IntroduceAssocTypeListener,
                                                                 PreCreateTopicTypeListener,
-                                                                PreCreateAssociationTypeListener,
+                                                                PreCreateAssocTypeListener,
                                                                 PostUpdateTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -92,7 +92,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * On the other hand the order of type-introduction invocations is not deterministic accross plugins.
      */
     @Override
-    public void preCreateAssociationType(AssocTypeModel model) {
+    public void preCreateAssocType(AssocTypeModel model) {
         addDefaultViewConfig(model);
     }
 
@@ -117,7 +117,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     @Override
-    public void introduceAssociationType(AssocType assocType) {
+    public void introduceAssocType(AssocType assocType) {
         setViewConfigLabel(assocType);
     }
 
@@ -156,7 +156,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             );
         } else if (typeUri.equals("dmx.core.assoc_type")) {
             _updateTypeCacheAndAddDirective(
-                dmx.getAssociationType(type.getUri()),
+                dmx.getAssocType(type.getUri()),
                 compDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
             );
         } else {

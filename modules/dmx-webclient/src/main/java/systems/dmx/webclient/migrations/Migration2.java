@@ -24,18 +24,18 @@ public class Migration2 extends Migration {
         addIconToTopicType("dmx.core.plugin",     "\uf12e");    // fa-puzzle-piece
         // colors match dm5-color-picker
         // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
-        addColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 80%)");
-        addColorToAssociationType("dmx.core.composition",     "hsl(5, 50%, 53%)");
-        addColorToAssociationType("dmx.core.composition_def", "hsl(210, 50%, 53%)");
-        addColorToAssociationType("dmx.core.instantiation",   "hsl(180, 50%, 53%)");
-        addColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 53%)");
-        addBackgroundColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 97%)");
-        addBackgroundColorToAssociationType("dmx.core.composition",     "hsl(5, 80%, 96%)");
-        addBackgroundColorToAssociationType("dmx.core.composition_def", "hsl(210, 80%, 96%)");
-        addBackgroundColorToAssociationType("dmx.core.instantiation",   "hsl(180, 80%, 96%)");
-        addBackgroundColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 96%)");
+        addColorToAssocType("dmx.core.association",     "hsl(0, 0%, 80%)");
+        addColorToAssocType("dmx.core.composition",     "hsl(5, 50%, 53%)");
+        addColorToAssocType("dmx.core.composition_def", "hsl(210, 50%, 53%)");
+        addColorToAssocType("dmx.core.instantiation",   "hsl(180, 50%, 53%)");
+        addColorToAssocType("dmx.core.sequence",        "hsl(60, 80%, 53%)");
+        addBackgroundColorToAssocType("dmx.core.association",     "hsl(0, 0%, 97%)");
+        addBackgroundColorToAssocType("dmx.core.composition",     "hsl(5, 80%, 96%)");
+        addBackgroundColorToAssocType("dmx.core.composition_def", "hsl(210, 80%, 96%)");
+        addBackgroundColorToAssocType("dmx.core.instantiation",   "hsl(180, 80%, 96%)");
+        addBackgroundColorToAssocType("dmx.core.sequence",        "hsl(60, 80%, 96%)");
         //
-        AssocType compDef = dmx.getAssociationType("dmx.core.composition_def");
+        AssocType compDef = dmx.getAssocType("dmx.core.composition_def");
         compDef.getCompDef("dmx.core.cardinality")
             .getViewConfig()
                 .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");
@@ -51,11 +51,11 @@ public class Migration2 extends Migration {
         setTopicTypeViewConfigValue(topicTypeUri, "icon", icon);
     }
 
-    private void addColorToAssociationType(String assocTypeUri, String color) {
+    private void addColorToAssocType(String assocTypeUri, String color) {
         setAssocTypeViewConfigValue(assocTypeUri, "color", color);
     }
 
-    private void addBackgroundColorToAssociationType(String assocTypeUri, String color) {
+    private void addBackgroundColorToAssocType(String assocTypeUri, String color) {
         setAssocTypeViewConfigValue(assocTypeUri, "color#dmx.webclient.background_color", color);
     }
 }

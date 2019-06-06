@@ -32,6 +32,6 @@ class AssocTypeImpl extends DMXTypeImpl implements AssocType {
 
     @Override
     AssocTypeModelImpl _getModel() {
-        return pl._getAssociationType(getUri());
+        return pl._getAssocType(getUri());
     }
 }

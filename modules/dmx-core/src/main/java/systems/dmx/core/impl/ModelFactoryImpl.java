@@ -603,20 +603,19 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocTypeModel ===
 
     @Override
-    public AssocTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                      List<CompDefModel> compDefs,
-                                                      ViewConfigurationModel viewConfig) {
+    public AssocTypeModelImpl newAssocTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
+                                                ViewConfigurationModel viewConfig) {
         return new AssocTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
     @Override
-    public AssocTypeModelImpl newAssociationTypeModel(String uri, String value, String dataTypeUri) {
+    public AssocTypeModelImpl newAssocTypeModel(String uri, String value, String dataTypeUri) {
         return new AssocTypeModelImpl(newTypeModel(uri, "dmx.core.assoc_type", new SimpleValue(value), dataTypeUri));
     }
 
     @Override
-    public AssocTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
+    public AssocTypeModelImpl newAssocTypeModel(JSONObject assocType) {
         try {
             return new AssocTypeModelImpl(newTypeModel(assocType.put("typeUri", "dmx.core.assoc_type")));
         } catch (Exception e) {

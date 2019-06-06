@@ -205,26 +205,26 @@ public interface CoreService {
 
     // === Assoc Types ===
 
-    AssocType getAssociationType(String assocTypeUri);
+    AssocType getAssocType(String assocTypeUri);
 
     /**
      * Acccesses an association type while enforcing the <i>implicit READ permission</i>.
      * A user has implicit READ permission for the association type if she has READ permission for the given
      * association.
      */
-    AssocType getAssociationTypeImplicitly(long assocId);
+    AssocType getAssocTypeImplicitly(long assocId);
 
     // ---
 
-    List<AssocType> getAllAssociationTypes();
+    List<AssocType> getAllAssocTypes();
 
     // ---
 
-    AssocType createAssociationType(AssocTypeModel model);
+    AssocType createAssocType(AssocTypeModel model);
 
-    void updateAssociationType(AssocTypeModel updateModel);
+    void updateAssocType(AssocTypeModel updateModel);
 
-    void deleteAssociationType(String assocTypeUri);
+    void deleteAssocType(String assocTypeUri);
 
 
 

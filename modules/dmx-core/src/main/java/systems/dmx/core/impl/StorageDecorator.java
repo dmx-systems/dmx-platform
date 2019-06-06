@@ -247,8 +247,8 @@ class StorageDecorator {
         storage.storeAssociationUri(assocId, uri);
     }
 
-    final void storeAssociationTypeUri(long assocId, String assocTypeUri) {
-        storage.storeAssociationTypeUri(assocId, assocTypeUri);
+    final void storeAssocTypeUri(long assocId, String assocTypeUri) {
+        storage.storeAssocTypeUri(assocId, assocTypeUri);
     }
 
     final void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {

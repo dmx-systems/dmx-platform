@@ -279,7 +279,7 @@ public class Neo4jStorage implements DMXStorage {
         assocNode.setProperty(KEY_NODE_TYPE, "assoc");
         //
         storeAndIndexAssociationUri(assocNode, assocModel.getUri());
-        storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
+        storeAndIndexAssocTypeUri(assocNode, assocModel.getTypeUri());
         //
         PlayerModel role1 = assocModel.getRoleModel1();
         PlayerModel role2 = assocModel.getRoleModel2();
@@ -301,15 +301,15 @@ public class Neo4jStorage implements DMXStorage {
     // Note: a storage implementation is not responsible for maintaining the "Instantiation" associations.
     // This is performed at the application layer.
     @Override
-    public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
+    public void storeAssocTypeUri(long assocId, String assocTypeUri) {
         Node assocNode = fetchAssociationNode(assocId);
         //
         // 1) update DB and content index
-        storeAndIndexAssociationTypeUri(assocNode, assocTypeUri);
+        storeAndIndexAssocTypeUri(assocNode, assocTypeUri);
         //
         // 2) update association metadata index
-        indexAssociationType(assocNode, assocTypeUri);  // update association entry itself
-        reindexTypeUri(assocNode, assocTypeUri);        // update all association entries the association is a player of
+        indexAssocType(assocNode, assocTypeUri);    // update association entry itself
+        reindexTypeUri(assocNode, assocTypeUri);    // update all association entries the association is a player of
     }
 
     @Override
@@ -605,7 +605,7 @@ public class Neo4jStorage implements DMXStorage {
         storeAndIndexExactValue(topicNode, KEY_TPYE_URI, topicTypeUri, topicContentExact);
     }
 
-    private void storeAndIndexAssociationTypeUri(Node assocNode, String assocTypeUri) {
+    private void storeAndIndexAssocTypeUri(Node assocNode, String assocTypeUri) {
         storeAndIndexExactValue(assocNode, KEY_TPYE_URI, assocTypeUri, assocContentExact);
     }
 
@@ -698,7 +698,7 @@ public class Neo4jStorage implements DMXStorage {
     private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
                                                   String roleTypeUri2, Node playerNode2) {
         indexAssociationId(assocNode);
-        indexAssociationType(assocNode, typeUri(assocNode));
+        indexAssocType(assocNode, typeUri(assocNode));
         //
         indexAssociationRole(assocNode, 1, roleTypeUri1, playerNode1);
         indexAssociationRole(assocNode, 2, roleTypeUri2, playerNode2);
@@ -708,7 +708,7 @@ public class Neo4jStorage implements DMXStorage {
         assocMetadata.add(assocNode, KEY_ASSOC_ID, assocNode.getId());
     }
 
-    private void indexAssociationType(Node assocNode, String assocTypeUri) {
+    private void indexAssocType(Node assocNode, String assocTypeUri) {
         reindexValue(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
     }
 

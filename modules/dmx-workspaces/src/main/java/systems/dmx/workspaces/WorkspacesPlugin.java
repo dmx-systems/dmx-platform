@@ -20,7 +20,7 @@ import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
-import systems.dmx.core.service.event.IntroduceAssociationTypeListener;
+import systems.dmx.core.service.event.IntroduceAssocTypeListener;
 import systems.dmx.core.service.event.IntroduceTopicTypeListener;
 import systems.dmx.core.service.event.PostCreateAssociationListener;
 import systems.dmx.core.service.event.PostCreateTopicListener;
@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
-                                                                                    IntroduceAssociationTypeListener,
+                                                                                    IntroduceAssocTypeListener,
                                                                                     PostCreateTopicListener,
                                                                                     PostCreateAssociationListener,
                                                                                     PreDeleteTopicListener {
@@ -332,7 +332,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      *       type if its URI begins with "dmx."
      */
     @Override
-    public void introduceAssociationType(AssocType assocType) {
+    public void introduceAssocType(AssocType assocType) {
         long workspaceId = workspaceIdForType(assocType);
         if (workspaceId == -1) {
             return;
@@ -465,7 +465,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 for (Assoc assoc : dmx.getAssociationsByType(typeUri)) {
                     assoc.delete();
                 }
-                dmx.getAssociationType(typeUri).delete();
+                dmx.getAssocType(typeUri).delete();
             }
             // 2) delete remaining instances
             for (Topic topic : getAssignedTopics(workspaceId)) {

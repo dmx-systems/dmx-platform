@@ -248,37 +248,37 @@ public class CoreServiceImpl implements CoreService {
     // === Assoc Types ===
 
     @Override
-    public AssocTypeImpl getAssociationType(String uri) {
-        return pl.getAssociationType(uri);
+    public AssocTypeImpl getAssocType(String uri) {
+        return pl.getAssocType(uri);
     }
 
     @Override
-    public AssocTypeImpl getAssociationTypeImplicitly(long assocId) {
-        return pl.getAssociationTypeImplicitly(assocId);
-    }
-
-    // ---
-
-    @Override
-    public List<AssocType> getAllAssociationTypes() {
-        return pl.getAllAssociationTypes();
+    public AssocTypeImpl getAssocTypeImplicitly(long assocId) {
+        return pl.getAssocTypeImplicitly(assocId);
     }
 
     // ---
 
     @Override
-    public AssocTypeImpl createAssociationType(AssocTypeModel model) {
-        return pl.createAssociationType((AssocTypeModelImpl) model);
+    public List<AssocType> getAllAssocTypes() {
+        return pl.getAllAssocTypes();
+    }
+
+    // ---
+
+    @Override
+    public AssocTypeImpl createAssocType(AssocTypeModel model) {
+        return pl.createAssocType((AssocTypeModelImpl) model);
     }
 
     @Override
-    public void updateAssociationType(AssocTypeModel updateModel) {
-        pl.updateAssociationType((AssocTypeModelImpl) updateModel);
+    public void updateAssocType(AssocTypeModel updateModel) {
+        pl.updateAssocType((AssocTypeModelImpl) updateModel);
     }
 
     @Override
-    public void deleteAssociationType(String assocTypeUri) {
-        pl.deleteAssociationType(assocTypeUri);
+    public void deleteAssocType(String assocTypeUri) {
+        pl.deleteAssocType(assocTypeUri);
     }
 
 
@@ -504,10 +504,10 @@ public class CoreServiceImpl implements CoreService {
             TopicModelImpl text = mf.newTopicModel("dmx.core.text", "dmx.core.data_type", new SimpleValue("Text"));
             _createTopic(text);
             // Create association type "Composition" -- needed to associate topic/association types with data types
-            TopicModelImpl composition = mf.newAssociationTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
+            TopicModelImpl composition = mf.newAssocTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
             _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
-            TopicModelImpl instn = mf.newAssociationTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
+            TopicModelImpl instn = mf.newAssocTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
             _createTopic(instn);
             //
             // 1) Postponed topic type association

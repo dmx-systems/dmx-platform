@@ -93,7 +93,7 @@ public interface DMXStorage {
 
     void storeAssociationUri(long assocId, String uri);
 
-    void storeAssociationTypeUri(long assocId, String assocTypeUri);
+    void storeAssocTypeUri(long assocId, String assocTypeUri);
 
     /**
      * Stores and indexes an association value.
