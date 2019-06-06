@@ -5,7 +5,7 @@ import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -617,7 +617,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
         // find comp def 1/3
-        RelatedAssociation compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
+        RelatedAssoc compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
         logger.info("### comp def ID 1/3 = " + compDef.getId() +
             ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
@@ -718,7 +718,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // Note: when the meta model changes the values might need adjustment
     @Test
     public void getAssociationsByType() {
-        List<RelatedAssociation> assocs;
+        List<RelatedAssoc> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dmx.core.instantiation");
         assertEquals(66, assocs.size());
@@ -841,7 +841,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociationAndTraverse() {
         DMXTransaction tx = dmx.beginTx();
         Topic t0;
-        List<RelatedAssociation> assocs;
+        List<RelatedAssoc> assocs;
         try {
             setupTestAssociations();
             //
@@ -1296,7 +1296,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dmx.core.type", "dmx.core.instance", type.getUri());
     }
 
-    private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
+    private List<RelatedAssoc> getAssociationInstancesByTraversal(String assocTypeUri) {
         return dmx.getTopicByUri(assocTypeUri).getRelatedAssociations("dmx.core.instantiation",
             "dmx.core.type", "dmx.core.instance", assocTypeUri);
     }
@@ -1356,7 +1356,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dmx.core.default", "dmx.core.default", "dmx.core.plugin");
     }
 
-    private List<RelatedAssociation> getTestAssociations(Topic topic) {
+    private List<RelatedAssoc> getTestAssociations(Topic topic) {
         return topic.getRelatedAssociations("dmx.core.association",
             "dmx.core.default", "dmx.core.default", "dmx.core.association");
     }

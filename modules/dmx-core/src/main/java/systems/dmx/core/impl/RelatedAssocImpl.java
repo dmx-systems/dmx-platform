@@ -1,18 +1,18 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 
 
 
 /**
  * An Assoc-Assoc pair that is attached to the {@link PersistenceLayer}.
  */
-class RelatedAssociationImpl extends AssocImpl implements RelatedAssociation {
+class RelatedAssocImpl extends AssocImpl implements RelatedAssoc {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationImpl(RelatedAssociationModelImpl model, PersistenceLayer pl) {
+    RelatedAssocImpl(RelatedAssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 

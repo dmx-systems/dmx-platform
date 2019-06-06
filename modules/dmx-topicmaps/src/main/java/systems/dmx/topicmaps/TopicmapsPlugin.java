@@ -2,7 +2,7 @@ package systems.dmx.topicmaps;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -456,9 +456,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, ViewAssoc> fetchAssociations(Topic topicmapTopic) {
         Map<Long, ViewAssoc> assocs = new HashMap();
-        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(TOPICMAP_CONTEXT,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
-        for (RelatedAssociation assoc : relAssocs) {
+        List<RelatedAssoc> relAssocs = topicmapTopic.getRelatedAssociations(TOPICMAP_CONTEXT, ROLE_TYPE_TOPICMAP,
+            ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
+        for (RelatedAssoc assoc : relAssocs) {
             assocs.put(assoc.getId(), buildViewAssoc(assoc));
         }
         return assocs;
@@ -476,7 +476,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    private ViewAssoc buildViewAssoc(RelatedAssociation assoc) {
+    private ViewAssoc buildViewAssoc(RelatedAssoc assoc) {
         try {
             ViewProps viewProps = fetchAssocViewProps(assoc.getRelatingAssociation());
             // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
@@ -555,7 +555,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         for (RelatedTopic topic : object.getRelatedTopics()) {
             _autoRevealAssocs(topic, getTopicMapcontext(topicmapId, topic.getId()), topicmapId);
         }
-        for (RelatedAssociation assoc : object.getRelatedAssociations()) {
+        for (RelatedAssoc assoc : object.getRelatedAssociations()) {
             _autoRevealAssocs(assoc, getAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
         }
     }

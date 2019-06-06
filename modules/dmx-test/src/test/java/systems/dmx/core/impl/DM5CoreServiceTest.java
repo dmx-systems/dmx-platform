@@ -4,7 +4,6 @@ import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
-import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;

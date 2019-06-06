@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Player;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -147,7 +147,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---
 
-    // Note: overridden by RelatedAssociationImpl
+    // Note: overridden by RelatedAssocImpl
     @Override
     public AssocModelImpl getModel() {
         return (AssocModelImpl) model;
@@ -168,16 +168,16 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // --- Assoc Retrieval ---
 
     @Override
-    public final RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                          String othersRoleTypeUri, String othersAssocTypeUri) {
+    public final RelatedAssoc getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssociationModelImpl assoc = pl.getAssociationRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
-    public final List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
+    public final List<RelatedAssoc> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
         return pl.instantiate(pl.getAssociationRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri));
     }

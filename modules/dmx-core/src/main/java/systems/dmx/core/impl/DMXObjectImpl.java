@@ -3,7 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.SimpleValue;
@@ -197,7 +197,7 @@ abstract class DMXObjectImpl implements DMXObject {
     // --- Assoc Retrieval ---
 
     @Override
-    public final List<RelatedAssociation> getRelatedAssociations() {
+    public final List<RelatedAssoc> getRelatedAssociations() {
         return getRelatedAssociations(null, null, null, null);
     }
 

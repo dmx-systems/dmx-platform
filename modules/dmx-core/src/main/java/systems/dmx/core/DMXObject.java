@@ -121,10 +121,10 @@ public interface DMXObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersAssocTypeUri  may be null
      */
-    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                             String othersAssocTypeUri);
+    RelatedAssoc getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                       String othersAssocTypeUri);
 
-    List<RelatedAssociation> getRelatedAssociations();
+    List<RelatedAssoc> getRelatedAssociations();
 
     /**
      * @param   assocTypeUri        may be null
@@ -132,8 +132,8 @@ public interface DMXObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersAssocTypeUri  may be null
      */
-    List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersAssocTypeUri);
+    List<RelatedAssoc> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                              String othersAssocTypeUri);
 
     // ---
 

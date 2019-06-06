@@ -1,6 +1,5 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 
@@ -34,7 +33,7 @@ class RelatedAssociationModelImpl extends AssocModelImpl implements RelatedAssoc
     }
 
     @Override
-    RelatedAssociationImpl instantiate() {
-        return new RelatedAssociationImpl(this, pl);
+    RelatedAssocImpl instantiate() {
+        return new RelatedAssocImpl(this, pl);
     }
 }

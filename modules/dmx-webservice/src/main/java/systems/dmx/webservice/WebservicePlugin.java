@@ -4,7 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -362,7 +362,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_assocs")
-    public List<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")            long topicId,
+    public List<RelatedAssoc> getTopicRelatedAssociations(@PathParam("id")                  long topicId,
                                                        @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
@@ -396,7 +396,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_assocs")
-    public List<RelatedAssociation> getAssociationRelatedAssociations(@PathParam("id")      long assocId,
+    public List<RelatedAssoc> getAssociationRelatedAssociations(@PathParam("id")            long assocId,
                                                        @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
@@ -483,8 +483,8 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
-    private List<RelatedAssociation> getRelatedAssociations(DMXObject object, String objectInfo,
-                       String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+    private List<RelatedAssoc> getRelatedAssociations(DMXObject object, String objectInfo, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
