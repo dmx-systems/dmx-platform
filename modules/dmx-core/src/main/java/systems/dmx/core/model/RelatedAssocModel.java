@@ -2,7 +2,7 @@ package systems.dmx.core.model;
 
 
 
-public interface RelatedAssociationModel extends AssocModel {
+public interface RelatedAssocModel extends AssocModel {
 
     AssocModel getRelatingAssociation();
 }

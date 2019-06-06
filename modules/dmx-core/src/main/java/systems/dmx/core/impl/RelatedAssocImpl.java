@@ -12,7 +12,7 @@ class RelatedAssocImpl extends AssocImpl implements RelatedAssoc {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssocImpl(RelatedAssociationModelImpl model, PersistenceLayer pl) {
+    RelatedAssocImpl(RelatedAssocModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -24,7 +24,7 @@ class RelatedAssocImpl extends AssocImpl implements RelatedAssoc {
     }
 
     @Override
-    public RelatedAssociationModelImpl getModel() {
-        return (RelatedAssociationModelImpl) model;
+    public RelatedAssocModelImpl getModel() {
+        return (RelatedAssocModelImpl) model;
     }
 }

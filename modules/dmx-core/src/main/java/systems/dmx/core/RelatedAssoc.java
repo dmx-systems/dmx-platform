@@ -1,6 +1,6 @@
 package systems.dmx.core;
 
-import systems.dmx.core.model.RelatedAssociationModel;
+import systems.dmx.core.model.RelatedAssocModel;
 
 
 
@@ -9,5 +9,5 @@ import systems.dmx.core.model.RelatedAssociationModel;
  */
 public interface RelatedAssoc extends RelatedObject, Assoc {
 
-    RelatedAssociationModel getModel();
+    RelatedAssocModel getModel();
 }

@@ -500,11 +500,11 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === RelatedAssociationModel ===
+    // === RelatedAssocModel ===
 
     @Override
-    public RelatedAssociationModelImpl newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc) {
-        return new RelatedAssociationModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc);
+    public RelatedAssocModelImpl newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc) {
+        return new RelatedAssocModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc);
     }
 
 

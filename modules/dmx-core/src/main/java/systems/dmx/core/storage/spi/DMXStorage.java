@@ -3,7 +3,7 @@ package systems.dmx.core.storage.spi;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedAssociationModel;
+import systems.dmx.core.model.RelatedAssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -140,7 +140,7 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    List<? extends RelatedAssocModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -160,7 +160,7 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    List<? extends RelatedAssocModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -182,7 +182,7 @@ public interface DMXStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<? extends RelatedAssociationModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
+    List<? extends RelatedAssocModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
 

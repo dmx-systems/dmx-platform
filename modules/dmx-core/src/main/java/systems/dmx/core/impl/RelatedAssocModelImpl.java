@@ -1,11 +1,10 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.RelatedAssociationModel;
+import systems.dmx.core.model.RelatedAssocModel;
 
 
 
-class RelatedAssociationModelImpl extends AssocModelImpl implements RelatedAssociationModel {
+class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -13,7 +12,7 @@ class RelatedAssociationModelImpl extends AssocModelImpl implements RelatedAssoc
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationModelImpl(AssocModelImpl assoc, AssocModelImpl relatingAssoc) {
+    RelatedAssocModelImpl(AssocModelImpl assoc, AssocModelImpl relatingAssoc) {
         super(assoc);
         this.relatingAssoc = relatingAssoc;
     }

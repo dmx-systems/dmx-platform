@@ -238,7 +238,7 @@ class TypeStorage {
 
     private List<CompDefModel> fetchCompDefs(TopicModelImpl typeTopic) {
         Map<Long, CompDefModel> compDefs = fetchCompDefsUnsorted(typeTopic);
-        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
+        List<RelatedAssocModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (compDefs.size() != sequence.size()) {
             throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " + compDefs.size() +
@@ -516,11 +516,11 @@ class TypeStorage {
     // 1) When fetching a type's comp defs.
     //    In this situation we don't have a DMXType object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
-    private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {
+    private List<RelatedAssocModelImpl> fetchSequence(TopicModel typeTopic) {
         try {
-            List<RelatedAssociationModelImpl> sequence = new ArrayList();
+            List<RelatedAssocModelImpl> sequence = new ArrayList();
             //
-            RelatedAssociationModelImpl compDef = fetchSequenceStart(typeTopic.getId());
+            RelatedAssocModelImpl compDef = fetchSequenceStart(typeTopic.getId());
             if (compDef != null) {
                 sequence.add(compDef);
                 while ((compDef = fetchSuccessor(compDef.getId())) != null) {
@@ -536,17 +536,17 @@ class TypeStorage {
 
     // ---
 
-    private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
+    private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
         return pl.fetchTopicRelatedAssociation(typeId, "dmx.core.composition", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
-    private RelatedAssociationModelImpl fetchSuccessor(long compDefId) {
+    private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
         return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
             "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
-    private RelatedAssociationModelImpl fetchPredecessor(long compDefId) {
+    private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
         return pl.fetchAssociationRelatedAssociation(compDefId, "dmx.core.sequence", "dmx.core.successor",
             "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
@@ -597,7 +597,7 @@ class TypeStorage {
 
     private void insertAtSequenceStart(long typeId, long compDefId) {
         // delete sequence start
-        RelatedAssociationModelImpl compDef = fetchSequenceStart(typeId);
+        RelatedAssocModelImpl compDef = fetchSequenceStart(typeId);
         compDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceStart(typeId, compDefId);
@@ -606,7 +606,7 @@ class TypeStorage {
 
     private void insertIntoSequence(long compDefId, long beforeCompDefId) {
         // delete sequence segment
-        RelatedAssociationModelImpl compDef = fetchPredecessor(beforeCompDefId);
+        RelatedAssocModelImpl compDef = fetchPredecessor(beforeCompDefId);
         compDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceSegment(compDef.getId(), compDefId);
@@ -637,9 +637,9 @@ class TypeStorage {
     }
 
     private void deleteSequence(TopicModel typeTopic) {
-        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
+        List<RelatedAssocModelImpl> sequence = fetchSequence(typeTopic);
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
-        for (RelatedAssociationModelImpl assoc : sequence) {
+        for (RelatedAssocModelImpl assoc : sequence) {
             assoc.getRelatingAssociation().delete();
         }
     }

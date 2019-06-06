@@ -7,7 +7,7 @@ import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedAssociationModel;
+import systems.dmx.core.model.RelatedAssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicDeletionModel;
@@ -144,9 +144,9 @@ public interface ModelFactory {
 
 
 
-    // === RelatedAssociationModel ===
+    // === RelatedAssocModel ===
 
-    RelatedAssociationModel newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc);
+    RelatedAssocModel newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc);
 
 
 

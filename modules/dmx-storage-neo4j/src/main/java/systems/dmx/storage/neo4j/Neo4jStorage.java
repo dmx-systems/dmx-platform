@@ -4,7 +4,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedAssociationModel;
+import systems.dmx.core.model.RelatedAssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -399,7 +399,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    public List<RelatedAssocModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
@@ -421,7 +421,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    public List<RelatedAssocModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
@@ -443,7 +443,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
+    public List<RelatedAssocModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
                                                                   String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
@@ -1133,8 +1133,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private List<RelatedAssociationModel> buildRelatedAssociations(List<AssocModel> assocs, long playerId) {
-        List<RelatedAssociationModel> relAssocs = new ArrayList();
+    private List<RelatedAssocModel> buildRelatedAssociations(List<AssocModel> assocs, long playerId) {
+        List<RelatedAssocModel> relAssocs = new ArrayList();
         for (AssocModel assoc : assocs) {
             relAssocs.add(mf.newRelatedAssociationModel(
                 fetchAssociation(

@@ -4,7 +4,6 @@ import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.PersistenceLayer;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;

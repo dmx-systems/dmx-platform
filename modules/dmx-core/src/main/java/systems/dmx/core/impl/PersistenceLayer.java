@@ -652,15 +652,15 @@ public final class PersistenceLayer extends StorageDecorator {
             othersTopicTypeUri));
     }
 
-    RelatedAssociationModelImpl getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModelImpl assoc = fetchTopicRelatedAssociation(topicId, assocTypeUri, myRoleTypeUri,
+    RelatedAssocModelImpl getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = fetchTopicRelatedAssociation(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? checkReadAccess(assoc) : null;
     }
 
-    List<RelatedAssociationModelImpl> getTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+    List<RelatedAssocModelImpl> getTopicRelatedAssociations(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
         return filterReadables(fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
@@ -671,21 +671,21 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // --- Assoc Source ---
 
-    List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
         return filterReadables(fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
-    RelatedAssociationModelImpl getAssociationRelatedAssociation(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModelImpl assoc = fetchAssociationRelatedAssociation(assocId, assocTypeUri, myRoleTypeUri,
+    RelatedAssocModelImpl getAssociationRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = fetchAssociationRelatedAssociation(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? checkReadAccess(assoc) : null;
     }
 
-    List<RelatedAssociationModelImpl> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+    List<RelatedAssocModelImpl> getAssociationRelatedAssociations(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         return filterReadables(fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri));
     }
