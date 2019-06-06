@@ -366,7 +366,7 @@ class AccessControlImpl implements AccessControl {
     // === Topicmaps ===
 
     @Override
-    public void deleteAssociationMapcontext(Assoc assoc) {
+    public void deleteAssocMapcontext(Assoc assoc) {
         if (!assoc.getTypeUri().equals(TOPICMAP_CONTEXT)) {
             throw new RuntimeException("Assoc " + assoc.getId() + " not eligible for privileged deletion (" + assoc +
                 ")");

@@ -146,7 +146,7 @@ public interface ModelFactory {
 
     // === RelatedAssocModel ===
 
-    RelatedAssocModel newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc);
+    RelatedAssocModel newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc);
 
 
 

@@ -186,8 +186,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/association/{assoc_id}")
     @Transactional
     @Override
-    public void addAssociationToTopicmap(@PathParam("id") final long topicmapId,
-                                         @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
+    public void addAssocToTopicmap(@PathParam("id") final long topicmapId,
+                                   @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
             dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
@@ -196,7 +196,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     if (getAssocMapcontext(topicmapId, assocId) != null) {      // TODO: idempotence?
                         throw new RuntimeException("Assoc " + assocId + " already added to topicmap " + topicmapId);
                     }
-                    createAssociationMapcontext(topicmapId, assocId, viewProps);
+                    createAssocMapcontext(topicmapId, assocId, viewProps);
                     return null;
                 }
             });
@@ -228,7 +228,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     // 2) add association
                     Assoc assocMapcontext = getAssocMapcontext(topicmapId, assocId);
                     if (assocMapcontext == null) {
-                        createAssociationMapcontext(topicmapId, assocId, mf.newViewProps(true, false));
+                        createAssocMapcontext(topicmapId, assocId, mf.newViewProps(true, false));
                     } else if (!visibility(assocMapcontext)) {
                         _setAssocVisibility(topicmapId, assocId, true, assocMapcontext);
                     }
@@ -597,7 +597,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private void deleteAssocMapcontext(Assoc assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deleting a mapcontext association is a privileged operation.
-        dmx.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
+        dmx.getAccessControl().deleteAssocMapcontext(assocMapcontext);
     }
 
     // --- Store View Properties ---
@@ -657,7 +657,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         me.addTopicToTopicmap(topicmapId, topic);
     }
 
-    private void createAssociationMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
+    private void createAssocMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
         Assoc assocMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
             mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
             mf.newAssocRoleModel(assocId,    ROLE_TYPE_CONTENT)
@@ -665,7 +665,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         viewProps.store(assocMapcontext);
         //
         ViewAssoc assoc = mf.newViewAssoc(dmx.getAssoc(assocId).getModel(), viewProps);
-        me.addAssociationToTopicmap(topicmapId, assoc);
+        me.addAssocToTopicmap(topicmapId, assoc);
     }
 
     // --- Viewmodel Customizers ---

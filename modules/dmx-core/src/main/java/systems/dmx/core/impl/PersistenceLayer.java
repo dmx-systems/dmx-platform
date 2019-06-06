@@ -325,8 +325,8 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Iterable<Assoc> getAllAssociations() {
-        return new AssociationIterable(this);
+    Iterable<Assoc> getAllAssocs() {
+        return new AssocIterable(this);
     }
 
     List<PlayerModel> getRoleModels(long assocId) {
@@ -354,7 +354,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // 1) store in DB
             storeAssoc(model);
             AssocModelImpl _model = updateValues(model, null);
-            createAssociationInstantiation(_model.getId(), _model.getTypeUri());
+            createAssocInstantiation(_model.getId(), _model.getTypeUri());
             // 2) instantiate
             AssocImpl assoc = _model.instantiate();
             //
@@ -377,10 +377,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssocModelImpl updateModel) {
+    void updateAssoc(AssocModelImpl updateModel) {
         try {
             AssocModelImpl model = fetchAssoc(updateModel.getId());
-            updateAssociation(model, updateModel);
+            updateAssoc(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
@@ -390,7 +390,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void updateAssociation(AssocModelImpl assoc, AssocModelImpl updateModel) {
+    void updateAssoc(AssocModelImpl assoc, AssocModelImpl updateModel) {
         try {
             assoc.checkWriteAccess();
             assoc.update(updateModel);
@@ -405,9 +405,9 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    void deleteAssociation(long assocId) {
+    void deleteAssoc(long assocId) {
         try {
-            deleteAssociation(fetchAssoc(assocId));
+            deleteAssoc(fetchAssoc(assocId));
         } catch (IllegalStateException e) {
             // Note: fetchAssoc() might throw IllegalStateException and is no problem.
             // This happens when the association is deleted already. In this case nothing needs to be performed.
@@ -425,7 +425,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void deleteAssociation(AssocModelImpl assoc) {
+    void deleteAssoc(AssocModelImpl assoc) {
         try {
             assoc.checkWriteAccess();
             assoc.delete();
@@ -446,14 +446,14 @@ public final class PersistenceLayer extends StorageDecorator {
             );
             storeAssoc(assoc);   // direct storage calls used here ### explain
             storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
-            createAssociationInstantiation(assoc.id, assoc.typeUri);
+            createAssocInstantiation(assoc.id, assoc.typeUri);
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
                 topicTypeUri + "\" failed", e);
         }
     }
 
-    void createAssociationInstantiation(long assocId, String assocTypeUri) {
+    void createAssocInstantiation(long assocId, String assocTypeUri) {
         try {
             AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
@@ -652,10 +652,10 @@ public final class PersistenceLayer extends StorageDecorator {
             othersTopicTypeUri));
     }
 
-    RelatedAssocModelImpl getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = fetchTopicRelatedAssociation(topicId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
+    RelatedAssocModelImpl getTopicRelatedAssoc(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                               String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
         return assoc != null ? checkReadAccess(assoc) : null;
     }
 
@@ -665,8 +665,8 @@ public final class PersistenceLayer extends StorageDecorator {
             othersAssocTypeUri));
     }
 
-    List<AssocModelImpl> getTopicAssociations(long topicId) {
-        return filterReadables(fetchTopicAssociations(topicId));
+    List<AssocModelImpl> getTopicAssocs(long topicId) {
+        return filterReadables(fetchTopicAssocs(topicId));
     }
 
     // --- Assoc Source ---
@@ -677,10 +677,10 @@ public final class PersistenceLayer extends StorageDecorator {
             othersTopicTypeUri));
     }
 
-    RelatedAssocModelImpl getAssocRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = fetchAssocRelatedAssociation(assocId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
+    RelatedAssocModelImpl getAssocRelatedAssoc(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                               String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
         return assoc != null ? checkReadAccess(assoc) : null;
     }
 
@@ -690,8 +690,8 @@ public final class PersistenceLayer extends StorageDecorator {
             othersAssocTypeUri));
     }
 
-    List<AssocModelImpl> getAssocAssociations(long assocId) {
-        return filterReadables(fetchAssocAssociations(assocId));
+    List<AssocModelImpl> getAssocAssocs(long assocId) {
+        return filterReadables(fetchAssocAssocs(assocId));
     }
 
     // --- Object Source ---

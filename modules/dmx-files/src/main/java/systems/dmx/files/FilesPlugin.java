@@ -161,7 +161,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Override
     public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFileTopic(repoPath);
-        createFolderAssociation(folderTopicId, topic);
+        createFolderAssoc(folderTopicId, topic);
         return topic;
     }
 
@@ -171,7 +171,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Override
     public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFolderTopic(repoPath);
-        createFolderAssociation(folderTopicId, topic);
+        createFolderAssoc(folderTopicId, topic);
         return topic;
     }
 
@@ -634,7 +634,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     /**
      * @param   topic   a File topic, or a Folder topic.
      */
-    private void createFolderAssociation(final long folderTopicId, Topic topic) {
+    private void createFolderAssoc(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
             boolean exists = dmx.getAssocs(folderTopicId, topicId, "dmx.core.composition").size() > 0;

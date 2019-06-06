@@ -617,29 +617,29 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
         // find comp def 1/3
-        RelatedAssoc compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
-            "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
-        logger.info("### comp def ID 1/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
+        RelatedAssoc compDef = type.getRelatedAssoc("dmx.core.aggregation", "dmx.core.type", "dmx.core.sequence_start",
+            null);   // othersAssocTypeUri=null
+        logger.info("### comp def ID 1/3 = " + compDef.getId() + ", relating assoc ID = " +
+            compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 2/3
-        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
-            null);                              // othersAssocTypeUri=null
-        logger.info("### comp def ID 2/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
+        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+                                                                                              // othersAssocTypeUri=null
+        logger.info("### comp def ID 2/3 = " + compDef.getId() + ", relating assoc ID = " +
+            compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 3/3
-        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
-            null);                              // othersAssocTypeUri=null
-        logger.info("### comp def ID 3/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
+        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+                                                                                              // othersAssocTypeUri=null
+        logger.info("### comp def ID 3/3 = " + compDef.getId() + ", relating assoc ID = " +
+            compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // there is no other
-        compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
-            null);                              // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+                                                                                              // othersAssocTypeUri=null
         assertNull(compDef);
     }
 

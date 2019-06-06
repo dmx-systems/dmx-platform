@@ -324,7 +324,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final void _removeCompDef(String compDefUri) {
         // We trigger deleting a comp def by deleting the underlying association. This mimics deleting a comp def
         // interactively in the webclient. Updating this type definition's memory and DB sequence is triggered then
-        // by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
+        // by the Type Editor plugin's preDeleteAssoc() hook. ### FIXDOC
         // This way deleting a comp def works for both cases: 1) interactive deletion (when the user deletes an
         // association), and 2) programmatical deletion (e.g. from a migration).
         getCompDef(compDefUri).delete();
@@ -380,7 +380,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     /**
      * Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
      * association is *not* removed from DB.
-     * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
+     * This method is called (by the Type Editor plugin's preDeleteAssoc() hook) when the
      * deletion of an association that represents a comp def is imminent. ### FIXDOC
      */
     final void _removeCompDefFromMemoryAndRebuildSequence(AssocModel assoc) {

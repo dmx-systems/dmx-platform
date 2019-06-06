@@ -83,7 +83,7 @@ public interface DMXStorage {
     List<? extends AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
                                                                String topicRoleTypeUri, String assocRoleTypeUri);
 
-    Iterator<? extends AssocModel> fetchAllAssociations();
+    Iterator<? extends AssocModel> fetchAllAssocs();
 
     List<PlayerModel> fetchRoleModels(long assocId);
 
@@ -107,7 +107,7 @@ public interface DMXStorage {
 
     // ---
 
-    void deleteAssociation(long assocId);
+    void deleteAssoc(long assocId);
 
 
 
@@ -119,9 +119,9 @@ public interface DMXStorage {
 
     // === Traversal ===
 
-    List<? extends AssocModel> fetchTopicAssociations(long topicId);
+    List<? extends AssocModel> fetchTopicAssocs(long topicId);
 
-    List<? extends AssocModel> fetchAssocAssociations(long assocId);
+    List<? extends AssocModel> fetchAssocAssocs(long assocId);
 
     // ---
 
@@ -219,13 +219,13 @@ public interface DMXStorage {
 
     void indexTopicProperty(long topicId, String propUri, Object propValue);
 
-    void indexAssociationProperty(long assocId, String propUri, Object propValue);
+    void indexAssocProperty(long assocId, String propUri, Object propValue);
 
     // ---
 
     void deleteTopicProperty(long topicId, String propUri);
 
-    void deleteAssociationProperty(long assocId, String propUri);
+    void deleteAssocProperty(long assocId, String propUri);
 
 
 

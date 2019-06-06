@@ -191,7 +191,7 @@ public interface AccessControl {
 
     // === Topicmaps ===
 
-    void deleteAssociationMapcontext(Assoc assoc);
+    void deleteAssocMapcontext(Assoc assoc);
 
 
 

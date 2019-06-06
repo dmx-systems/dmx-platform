@@ -180,7 +180,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return pl.fetchAssocAssociations(id);
+        return pl.fetchAssocAssocs(id);
     }
 
     // ---
@@ -223,14 +223,14 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void removeProperty(String propUri) {
-        pl.removeAssociationProperty(id, propUri);
+        pl.removeAssocProperty(id, propUri);
     }
 
     // ---
 
     @Override
     final void _delete() {
-        pl._deleteAssociation(id);
+        pl._deleteAssoc(id);
     }
 
     // ---
@@ -466,7 +466,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // remove current assignment
         fetchInstantiation().delete();
         // create new assignment
-        pl.createAssociationInstantiation(id, typeUri);
+        pl.createAssocInstantiation(id, typeUri);
     }
 
     private AssocModelImpl fetchInstantiation() {

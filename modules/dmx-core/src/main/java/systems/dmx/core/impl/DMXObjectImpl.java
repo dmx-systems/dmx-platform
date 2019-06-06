@@ -202,7 +202,7 @@ abstract class DMXObjectImpl implements DMXObject {
     }
 
     // Note: these methods are implemented in the subclasses (this is an abstract class):
-    //     getRelatedAssociation(...)
+    //     getRelatedAssoc(...)
     //     getRelatedAssocs(...)
     //     getAssoc(...)
     //     getAssocs()

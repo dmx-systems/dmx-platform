@@ -202,20 +202,20 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/association/{id}")
     @Transactional
-    public DirectivesResponse updateAssociation(@PathParam("id") long assocId, AssocModel model) {
+    public DirectivesResponse updateAssoc(@PathParam("id") long assocId, AssocModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(assocId);
-        dmx.updateAssociation(model);
+        dmx.updateAssoc(model);
         return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/association/{id}")
     @Transactional
-    public DirectivesResponse deleteAssociation(@PathParam("id") long assocId) {
-        dmx.deleteAssociation(assocId);
+    public DirectivesResponse deleteAssoc(@PathParam("id") long assocId) {
+        dmx.deleteAssoc(assocId);
         return new DirectivesResponse();
     }
 
@@ -434,7 +434,7 @@ public class WebservicePlugin extends PluginActivator {
             deleteAnyTopic(id);
         }
         for (long id : assocIds) {
-            dmx.deleteAssociation(id);
+            dmx.deleteAssoc(id);
         }
         return new DirectivesResponse();
     }

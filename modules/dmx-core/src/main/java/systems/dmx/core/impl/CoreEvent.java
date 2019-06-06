@@ -179,7 +179,7 @@ class CoreEvent {
     static DMXEvent PRE_DELETE_ASSOCIATION = new DMXEvent(PreDeleteAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreDeleteAssoc) listener).preDeleteAssociation(
+            ((PreDeleteAssoc) listener).preDeleteAssoc(
                 (Assoc) params[0]
             );
         }
@@ -199,7 +199,7 @@ class CoreEvent {
     static DMXEvent POST_DELETE_ASSOCIATION = new DMXEvent(PostDeleteAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostDeleteAssoc) listener).postDeleteAssociation(
+            ((PostDeleteAssoc) listener).postDeleteAssoc(
                 (AssocModel) params[0]
             );
         }
@@ -285,7 +285,7 @@ class CoreEvent {
     static DMXEvent PRE_SEND_ASSOCIATION = new DMXEvent(PreSendAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendAssoc) listener).preSendAssociation(
+            ((PreSendAssoc) listener).preSendAssoc(
                 (Assoc) params[0]
             );
         }

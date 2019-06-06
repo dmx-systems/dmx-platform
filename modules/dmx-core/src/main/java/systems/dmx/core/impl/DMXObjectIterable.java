@@ -31,12 +31,12 @@ class TopicIterable implements Iterable<Topic> {
 /**
  * An iterable over all associations stored in the DB.
  */
-class AssociationIterable implements Iterable<Assoc> {
+class AssocIterable implements Iterable<Assoc> {
 
     private Iterator<Assoc> assocs;
 
-    AssociationIterable(PersistenceLayer pl) {
-        this.assocs = new AssociationIterator(pl);
+    AssocIterable(PersistenceLayer pl) {
+        this.assocs = new AssocIterator(pl);
     }
 
     @Override
@@ -70,15 +70,15 @@ class TopicIterator extends ObjectIterator<Topic, TopicModelImpl> {
 
 
 
-class AssociationIterator extends ObjectIterator<Assoc, AssocModelImpl> {
+class AssocIterator extends ObjectIterator<Assoc, AssocModelImpl> {
 
-    AssociationIterator(PersistenceLayer pl) {
+    AssocIterator(PersistenceLayer pl) {
         super(pl);
     }
 
     @Override
     Iterator<AssocModelImpl> fetchObjects() {
-        return pl.fetchAllAssociations();
+        return pl.fetchAllAssocs();
     }
 
     @Override

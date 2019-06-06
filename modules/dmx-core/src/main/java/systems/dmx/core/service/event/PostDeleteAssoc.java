@@ -7,5 +7,5 @@ import systems.dmx.core.service.EventListener;
 
 public interface PostDeleteAssoc extends EventListener {
 
-    void postDeleteAssociation(AssocModel assoc);
+    void postDeleteAssoc(AssocModel assoc);
 }

@@ -259,7 +259,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterator<AssocModel> fetchAllAssociations() {
+    public Iterator<AssocModel> fetchAllAssocs() {
         return new AssociationModelIterator(this);
     }
 
@@ -287,8 +287,8 @@ public class Neo4jStorage implements DMXStorage {
         Node playerNode2 = storePlayerRelationship(assocNode, role2);
         //
         // 2) update index
-        indexAssociation(assocNode, role1.getRoleTypeUri(), playerNode1,
-                                    role2.getRoleTypeUri(), playerNode2);
+        indexAssoc(assocNode, role1.getRoleTypeUri(), playerNode1,
+                              role2.getRoleTypeUri(), playerNode2);
         // 3) update model
         assocModel.setId(assocNode.getId());
     }
@@ -322,7 +322,7 @@ public class Neo4jStorage implements DMXStorage {
         // store
         assocNode.setProperty(KEY_VALUE, value.value());
         // index
-        indexAssociationNodeValue(assocNode, indexKey, value.value(), isHtmlValue);
+        indexAssocNodeValue(assocNode, indexKey, value.value(), isHtmlValue);
     }
 
     @Override
@@ -334,13 +334,13 @@ public class Neo4jStorage implements DMXStorage {
         assocNode.createRelationshipTo(fetchNode(playerId), getRelationshipType(roleTypeUri));  // create new one
         //
         // 2) update association metadata index
-        indexAssociationRoleType(assocNode, playerId, roleTypeUri);
+        indexAssocRoleType(assocNode, playerId, roleTypeUri);
     }
 
     // ---
 
     @Override
-    public void deleteAssociation(long assocId) {
+    public void deleteAssoc(long assocId) {
         // 1) update DB
         Node assocNode = fetchAssocNode(assocId);
         // delete the 2 player relationships
@@ -351,7 +351,7 @@ public class Neo4jStorage implements DMXStorage {
         assocNode.delete();
         //
         // 2) update index
-        removeAssociationFromIndex(assocNode);
+        removeAssocFromIndex(assocNode);
     }
 
 
@@ -377,12 +377,12 @@ public class Neo4jStorage implements DMXStorage {
     // === Traversal ===
 
     @Override
-    public List<AssocModel> fetchTopicAssociations(long topicId) {
+    public List<AssocModel> fetchTopicAssocs(long topicId) {
         return fetchAssocs(fetchTopicNode(topicId));
     }
 
     @Override
-    public List<AssocModel> fetchAssocAssociations(long assocId) {
+    public List<AssocModel> fetchAssocAssocs(long assocId) {
         return fetchAssocs(fetchAssocNode(assocId));
     }
 
@@ -510,7 +510,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void indexAssociationProperty(long assocId, String propUri, Object propValue) {
+    public void indexAssocProperty(long assocId, String propUri, Object propValue) {
         indexExactValue(fetchAssocNode(assocId), propUri, propValue, assocContentExact);
     }
 
@@ -524,10 +524,10 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void deleteAssociationProperty(long assocId, String propUri) {
+    public void deleteAssocProperty(long assocId, String propUri) {
         Node assocNode = fetchAssocNode(assocId);
         assocNode.removeProperty(propUri);
-        removeAssociationPropertyFromIndex(assocNode, propUri);
+        removeAssocPropertyFromIndex(assocNode, propUri);
     }
 
 
@@ -656,7 +656,7 @@ public class Neo4jStorage implements DMXStorage {
         indexNodeValue(topicNode, value, IndexMode.FULLTEXT_KEY, indexKey, topicContentExact, topicContentFulltext);
     }
 
-    private void indexAssociationNodeValue(Node assocNode, String indexKey, Object value, boolean isHtmlValue) {
+    private void indexAssocNodeValue(Node assocNode, String indexKey, Object value, boolean isHtmlValue) {
         indexNodeValue(assocNode, value, IndexMode.KEY,          indexKey, assocContentExact, assocContentFulltext);
         // TODO: don't fulltext index numbers/booleans?
         value = getIndexValue(value, isHtmlValue);
@@ -695,16 +695,16 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private void indexAssociation(Node assocNode, String roleTypeUri1, Node playerNode1,
-                                                  String roleTypeUri2, Node playerNode2) {
-        indexAssociationId(assocNode);
+    private void indexAssoc(Node assocNode, String roleTypeUri1, Node playerNode1,
+                                            String roleTypeUri2, Node playerNode2) {
+        indexAssocId(assocNode);
         indexAssocType(assocNode, typeUri(assocNode));
         //
-        indexAssociationRole(assocNode, 1, roleTypeUri1, playerNode1);
-        indexAssociationRole(assocNode, 2, roleTypeUri2, playerNode2);
+        indexAssocRole(assocNode, 1, roleTypeUri1, playerNode1);
+        indexAssocRole(assocNode, 2, roleTypeUri2, playerNode2);
     }
 
-    private void indexAssociationId(Node assocNode) {
+    private void indexAssocId(Node assocNode) {
         assocMetadata.add(assocNode, KEY_ASSOC_ID, assocNode.getId());
     }
 
@@ -712,7 +712,7 @@ public class Neo4jStorage implements DMXStorage {
         reindexValue(assocNode, KEY_ASSOC_TPYE_URI, assocTypeUri);
     }
 
-    private void indexAssociationRole(Node assocNode, int pos, String roleTypeUri, Node playerNode) {
+    private void indexAssocRole(Node assocNode, int pos, String roleTypeUri, Node playerNode) {
         assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + pos, roleTypeUri);
         assocMetadata.add(assocNode, KEY_PLAYER_TPYE + pos, NodeType.of(playerNode).stringify());
         assocMetadata.add(assocNode, KEY_PLAYER_ID + pos, playerNode.getId());
@@ -721,7 +721,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private void indexAssociationRoleType(Node assocNode, long playerId, String roleTypeUri) {
+    private void indexAssocRoleType(Node assocNode, long playerId, String roleTypeUri) {
         int pos = lookupPlayerPosition(assocNode.getId(), playerId);
         reindexValue(assocNode, KEY_ROLE_TPYE_URI, pos, roleTypeUri);
     }
@@ -868,7 +868,7 @@ public class Neo4jStorage implements DMXStorage {
         topicContentFulltext.remove(topicNode);
     }
 
-    private void removeAssociationFromIndex(Node assocNode) {
+    private void removeAssocFromIndex(Node assocNode) {
         assocContentExact.remove(assocNode);
         assocContentFulltext.remove(assocNode);
         //
@@ -881,7 +881,7 @@ public class Neo4jStorage implements DMXStorage {
         topicContentExact.remove(topicNode, propUri);
     }
 
-    private void removeAssociationPropertyFromIndex(Node assocNode, String propUri) {
+    private void removeAssocPropertyFromIndex(Node assocNode, String propUri) {
         assocContentExact.remove(assocNode, propUri);
     }
 
@@ -1136,7 +1136,7 @@ public class Neo4jStorage implements DMXStorage {
     private List<RelatedAssocModel> buildRelatedAssocs(List<AssocModel> assocs, long playerId) {
         List<RelatedAssocModel> relAssocs = new ArrayList();
         for (AssocModel assoc : assocs) {
-            relAssocs.add(mf.newRelatedAssociationModel(
+            relAssocs.add(mf.newRelatedAssocModel(
                 fetchAssoc(
                     assoc.getOtherPlayerId(playerId)
                 ), assoc)

@@ -45,6 +45,6 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
 
     @Override
     RelatedAssocModelImpl getPlayer(AssocModelImpl assoc) {
-        return mf.newRelatedAssociationModel(pl.fetchAssoc(getPlayerId()), assoc);
+        return mf.newRelatedAssocModel(pl.fetchAssoc(getPlayerId()), assoc);
     }
 }

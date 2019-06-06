@@ -222,7 +222,7 @@ class MigrationManager {
         }
         JSONArray assocs = entities.optJSONArray("associations");
         if (assocs != null) {
-            createAssociations(assocs);
+            createAssocs(assocs);
         }
     }
 
@@ -244,7 +244,7 @@ class MigrationManager {
         }
     }
 
-    private void createAssociations(JSONArray assocs) throws JSONException {
+    private void createAssocs(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
             dmx.createAssoc(mf.newAssocModel(assocs.getJSONObject(i)));
         }

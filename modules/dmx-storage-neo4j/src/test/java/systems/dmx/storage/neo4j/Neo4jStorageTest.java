@@ -108,7 +108,7 @@ public class Neo4jStorageTest {
     }
 
     @Test
-    public void deleteAssociation() {
+    public void deleteAssoc() {
         DMXTransaction tx = storage.beginTx();
         try {
             TopicModel topic = storage.fetchTopic("uri", "dmx.core.data_type");
@@ -121,7 +121,7 @@ public class Neo4jStorageTest {
             AssocModel assoc = topics.get(0).getRelatingAssoc();
             assertNotNull(assoc);
             //
-            storage.deleteAssociation(assoc.getId());
+            storage.deleteAssoc(assoc.getId());
             //
             topics = storage.fetchTopicRelatedTopics(topic.getId(), "dmx.core.instantiation",
                 "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
@@ -134,13 +134,13 @@ public class Neo4jStorageTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void deleteAssociationAndFetchAgain() {
+    public void deleteAssocAndFetchAgain() {
         DMXTransaction tx = storage.beginTx();
         try {
             AssocModel assoc = storage.fetchAssoc(assocId);
             assertNotNull(assoc);
             //
-            storage.deleteAssociation(assoc.getId());
+            storage.deleteAssoc(assoc.getId());
             assoc = storage.fetchAssoc(assocId);  // throws IllegalStateException
             //
             tx.success();

@@ -177,8 +177,8 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public Iterable<Assoc> getAllAssociations() {
-        return pl.getAllAssociations();
+    public Iterable<Assoc> getAllAssocs() {
+        return pl.getAllAssocs();
     }
 
     @Override
@@ -194,13 +194,13 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public void updateAssociation(AssocModel updateModel) {
-        pl.updateAssociation((AssocModelImpl) updateModel);
+    public void updateAssoc(AssocModel updateModel) {
+        pl.updateAssoc((AssocModelImpl) updateModel);
     }
 
     @Override
-    public void deleteAssociation(long assocId) {
-        pl.deleteAssociation(assocId);
+    public void deleteAssoc(long assocId) {
+        pl.deleteAssoc(assocId);
     }
 
 
@@ -381,14 +381,14 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public void addAssociationPropertyIndex(String propUri) {
+    public void addAssocPropertyIndex(String propUri) {
         int assocs = 0;
         int added = 0;
         logger.info("########## Adding association property index for \"" + propUri + "\"");
-        for (Assoc assoc : getAllAssociations()) {
+        for (Assoc assoc : getAllAssocs()) {
             if (assoc.hasProperty(propUri)) {
                 Object value = assoc.getProperty(propUri);
-                pl.indexAssociationProperty(assoc.getId(), propUri, value);
+                pl.indexAssocProperty(assoc.getId(), propUri, value);
                 added++;
             }
             assocs++;

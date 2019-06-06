@@ -187,7 +187,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void preSendAssociation(Assoc assoc) {
+    public void preSendAssoc(Assoc assoc) {
         enrichWithTimestamp(assoc);
     }
 

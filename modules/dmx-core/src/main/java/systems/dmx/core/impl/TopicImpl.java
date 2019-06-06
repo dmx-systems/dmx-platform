@@ -91,10 +91,10 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     // --- Assoc Retrieval ---
 
     @Override
-    public final RelatedAssoc getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = pl.getTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
+    public final RelatedAssoc getRelatedAssoc(String assocTypeUri, String myRoleTypeUri,
+                                              String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = pl.getTopicRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
 
@@ -115,6 +115,6 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
     @Override
     public final List<Assoc> getAssocs() {
-        return pl.instantiate(pl.getTopicAssociations(getId()));
+        return pl.instantiate(pl.getTopicAssocs(getId()));
     }
 }

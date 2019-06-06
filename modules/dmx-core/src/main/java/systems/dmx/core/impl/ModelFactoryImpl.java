@@ -503,7 +503,7 @@ public class ModelFactoryImpl implements ModelFactory {
     // === RelatedAssocModel ===
 
     @Override
-    public RelatedAssocModelImpl newRelatedAssociationModel(AssocModel assoc, AssocModel relatingAssoc) {
+    public RelatedAssocModelImpl newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc) {
         return new RelatedAssocModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc);
     }
 

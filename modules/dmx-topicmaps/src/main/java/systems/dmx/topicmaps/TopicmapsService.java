@@ -62,7 +62,7 @@ public interface TopicmapsService extends TopicmapsConstants {
     /**
      * Adds an association to a topicmap. If the association is added already an exception is thrown.
      */
-    void addAssociationToTopicmap(long topicmapId, long assocId, ViewProps viewProps);
+    void addAssocToTopicmap(long topicmapId, long assocId, ViewProps viewProps);
 
     // Note: this is needed in order to reveal a related topic in a *single* request. Otherwise client-sync might fail
     // due to asynchronicity. A client might receive the "addAssoc" WebSocket message *before* the "addTopic" message.

@@ -123,12 +123,12 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     @Override
     public final void update(AssocModel updateModel) {
-        pl.updateAssociation(getModel(), (AssocModelImpl) updateModel);
+        pl.updateAssoc(getModel(), (AssocModelImpl) updateModel);
     }
 
     @Override
     public final void delete() {
-        pl.deleteAssociation(getModel());
+        pl.deleteAssoc(getModel());
     }
 
     // ---
@@ -168,10 +168,10 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // --- Assoc Retrieval ---
 
     @Override
-    public final RelatedAssoc getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = pl.getAssocRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
+    public final RelatedAssoc getRelatedAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                              String othersAssocTypeUri) {
+        RelatedAssocModelImpl assoc = pl.getAssocRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
 
@@ -192,7 +192,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     @Override
     public final List<Assoc> getAssocs() {
-        return pl.instantiate(pl.getAssocAssociations(getId()));
+        return pl.instantiate(pl.getAssocAssocs(getId()));
     }
 
 

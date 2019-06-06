@@ -226,8 +226,8 @@ class StorageDecorator {
 
     // ---
 
-    final Iterator<AssocModelImpl> fetchAllAssociations() {
-        return (Iterator<AssocModelImpl>) storage.fetchAllAssociations();
+    final Iterator<AssocModelImpl> fetchAllAssocs() {
+        return (Iterator<AssocModelImpl>) storage.fetchAllAssocs();
     }
 
     final List<PlayerModel> fetchRoleModels(long assocId) {
@@ -264,8 +264,8 @@ class StorageDecorator {
 
     // ---
 
-    final void _deleteAssociation(long assocId) {
-        storage.deleteAssociation(assocId);
+    final void _deleteAssoc(long assocId) {
+        storage.deleteAssoc(assocId);
     }
 
 
@@ -332,8 +332,8 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final RelatedAssocModelImpl fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                             String othersRoleTypeUri, String othersAssocTypeUri) {
+    final RelatedAssocModelImpl fetchTopicRelatedAssoc(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
         List<RelatedAssocModelImpl> assocs = fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
@@ -369,8 +369,8 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final List<AssocModelImpl> fetchTopicAssociations(long topicId) {
-        return (List<AssocModelImpl>) storage.fetchTopicAssociations(topicId);
+    final List<AssocModelImpl> fetchTopicAssocs(long topicId) {
+        return (List<AssocModelImpl>) storage.fetchTopicAssocs(topicId);
     }
 
     // --- Assoc Source ---
@@ -415,8 +415,8 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final RelatedAssocModelImpl fetchAssocRelatedAssociation(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                             String othersRoleTypeUri, String othersAssocTypeUri) {
+    final RelatedAssocModelImpl fetchAssocRelatedAssoc(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
         List<RelatedAssocModelImpl> assocs = fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.size()) {
@@ -449,8 +449,8 @@ class StorageDecorator {
 
     // ---
 
-    final List<AssocModelImpl> fetchAssocAssociations(long assocId) {
-        return (List<AssocModelImpl>) storage.fetchAssocAssociations(assocId);
+    final List<AssocModelImpl> fetchAssocAssocs(long assocId) {
+        return (List<AssocModelImpl>) storage.fetchAssocAssocs(assocId);
     }
 
     // --- Object Source ---
@@ -547,8 +547,8 @@ class StorageDecorator {
         storage.indexTopicProperty(topicId, propUri, propValue);
     }
 
-    final void indexAssociationProperty(long assocId, String propUri, Object propValue) {
-        storage.indexAssociationProperty(assocId, propUri, propValue);
+    final void indexAssocProperty(long assocId, String propUri, Object propValue) {
+        storage.indexAssocProperty(assocId, propUri, propValue);
     }
 
     // ---
@@ -557,8 +557,8 @@ class StorageDecorator {
         storage.deleteTopicProperty(topicId, propUri);
     }
 
-    final void removeAssociationProperty(long assocId, String propUri) {
-        storage.deleteAssociationProperty(assocId, propUri);
+    final void removeAssocProperty(long assocId, String propUri) {
+        storage.deleteAssocProperty(assocId, propUri);
     }
 
 

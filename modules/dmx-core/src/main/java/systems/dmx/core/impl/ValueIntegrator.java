@@ -552,7 +552,7 @@ class ValueIntegrator {
                     assoc.update(_newValues);
                     // TODO: access control? Note: currently the child assocs of a workspace have no workspace
                     // assignments. With strict access control, updating a workspace topic would fail.
-                    // pl.updateAssociation(assoc, _newValues);
+                    // pl.updateAssoc(assoc, _newValues);
                 }
             }
         } catch (Exception e) {

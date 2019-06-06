@@ -163,7 +163,7 @@ public interface CoreService {
 
     // ---
 
-    Iterable<Assoc> getAllAssociations();
+    Iterable<Assoc> getAllAssocs();
 
     List<PlayerModel> getRoleModels(long assocId);
 
@@ -171,9 +171,9 @@ public interface CoreService {
 
     Assoc createAssoc(AssocModel model);
 
-    void updateAssociation(AssocModel updateModel);
+    void updateAssoc(AssocModel updateModel);
 
-    void deleteAssociation(long assocId);
+    void deleteAssoc(long assocId);
 
 
 
@@ -288,7 +288,7 @@ public interface CoreService {
 
     void addTopicPropertyIndex(String propUri);
 
-    void addAssociationPropertyIndex(String propUri);
+    void addAssocPropertyIndex(String propUri);
 
 
 

@@ -485,7 +485,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
             // a topicmap's mapcontext association and then deletes the topicmap.
             //
-            // Compare to PersistenceLayer.deleteAssociation()
+            // Compare to PersistenceLayer.deleteAssoc()
             // TODO: introduce storage-vendor neutral DM exception.
             //
             if (e.getMessage().equals("Node[" + id + "] has been deleted in this tx")) {

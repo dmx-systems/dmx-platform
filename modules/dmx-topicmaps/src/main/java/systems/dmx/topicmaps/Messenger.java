@@ -58,7 +58,7 @@ class Messenger {
         }
     }
 
-    void addAssociationToTopicmap(long topicmapId, ViewAssoc assoc) {
+    void addAssocToTopicmap(long topicmapId, ViewAssoc assoc) {
         try {
             messageToAllButOne(new JSONObject()
                 .put("type", "addAssocToTopicmap")
