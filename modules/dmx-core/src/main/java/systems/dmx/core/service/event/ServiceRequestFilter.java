@@ -7,7 +7,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 
 
 
-public interface ServiceRequestFilterListener extends EventListener {
+public interface ServiceRequestFilter extends EventListener {
 
     void serviceRequestFilter(ContainerRequest containerRequest);
 }

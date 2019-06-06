@@ -12,9 +12,9 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
-import systems.dmx.core.service.event.PostCreateTopicListener;
-import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PreSendTopicListener;
+import systems.dmx.core.service.event.PostCreateTopic;
+import systems.dmx.core.service.event.PostUpdateTopic;
+import systems.dmx.core.service.event.PreSendTopic;
 import systems.dmx.core.util.ContextTracker;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
@@ -43,10 +43,9 @@ import java.util.logging.Logger;
 @Path("/geomap")    // TODO: change to "/geomaps"
 @Consumes("application/json")
 @Produces("application/json")
-public class GeomapsPlugin extends PluginActivator implements GeomapsService, GeomapsConstants,
-                                                                              PostCreateTopicListener,
-                                                                              PostUpdateTopicListener,
-                                                                              PreSendTopicListener {
+public class GeomapsPlugin extends PluginActivator implements GeomapsService, GeomapsConstants, PostCreateTopic,
+                                                                                                PostUpdateTopic,
+                                                                                                PreSendTopic {
 
     private static final String GEOCODER_URL = "https://nominatim.openstreetmap.org/search?" +
         "street=%s&postalcode=%s&city=%s&country=%s&format=json&limit=1";

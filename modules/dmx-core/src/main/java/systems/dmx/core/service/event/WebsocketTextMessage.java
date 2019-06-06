@@ -4,7 +4,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface WebsocketTextMessageListener extends EventListener {
+public interface WebsocketTextMessage extends EventListener {
 
     void websocketTextMessage(String message);
 }

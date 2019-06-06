@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreCreateTopicListener extends EventListener {
+public interface PreCreateTopic extends EventListener {
 
     void preCreateTopic(TopicModel model);
 }

@@ -4,7 +4,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PostLogoutUserListener extends EventListener {
+public interface PostLogoutUser extends EventListener {
 
     void postLogoutUser(String username);
 }

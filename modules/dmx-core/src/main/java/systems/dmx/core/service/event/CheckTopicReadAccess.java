@@ -4,7 +4,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface CheckTopicReadAccessListener extends EventListener {
+public interface CheckTopicReadAccess extends EventListener {
 
     void checkTopicReadAccess(long topicId);
 }

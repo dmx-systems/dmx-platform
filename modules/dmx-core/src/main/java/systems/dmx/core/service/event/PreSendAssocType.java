@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreSendAssocTypeListener extends EventListener {
+public interface PreSendAssocType extends EventListener {
 
     void preSendAssocType(AssocType assocType);
 }

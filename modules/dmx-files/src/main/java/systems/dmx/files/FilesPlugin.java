@@ -1,6 +1,6 @@
 package systems.dmx.files;
 
-import systems.dmx.files.event.CheckDiskQuotaListener;
+import systems.dmx.files.event.CheckDiskQuota;
 import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
@@ -20,7 +20,7 @@ import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.service.accesscontrol.Operation;
-import systems.dmx.core.service.event.StaticResourceFilterListener;
+import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
 
@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilterListener, PathMapper {
+public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilter, PathMapper {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -69,10 +69,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile(WORKSPACE_DIRECTORY_PREFIX + "(\\d+).*");
 
     // Events
-    public static DMXEvent CHECK_DISK_QUOTA = new DMXEvent(CheckDiskQuotaListener.class) {
+    public static DMXEvent CHECK_DISK_QUOTA = new DMXEvent(CheckDiskQuota.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckDiskQuotaListener) listener).checkDiskQuota(
+            ((CheckDiskQuota) listener).checkDiskQuota(
                 (String) params[0], (Long) params[1], (Long) params[2]
             );
         }
@@ -770,8 +770,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                 if (fileTopic != null) {
                     // We must perform access control for the fetchFileTopic() call manually here.
                     //
-                    // Although the AccessControlPlugin's CheckTopicReadAccessListener kicks in, the request is *not*
-                    // injected into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
+                    // Although the AccessControlPlugin's CheckTopicReadAccess kicks in, the request is *not* injected
+                    // into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
                     //
                     // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.

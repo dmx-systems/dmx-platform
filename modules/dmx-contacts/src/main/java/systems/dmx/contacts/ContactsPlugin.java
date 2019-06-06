@@ -3,7 +3,7 @@ package systems.dmx.contacts;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.osgi.PluginActivator;
-import systems.dmx.core.service.event.PreCreateAssocListener;
+import systems.dmx.core.service.event.PreCreateAssoc;
 import systems.dmx.core.util.DMXUtils;
 
 import javax.ws.rs.GET;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Path("/contacts")
 @Produces("application/json")
-public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssocListener {
+public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssoc {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

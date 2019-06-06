@@ -20,11 +20,11 @@ import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
-import systems.dmx.core.service.event.IntroduceAssocTypeListener;
-import systems.dmx.core.service.event.IntroduceTopicTypeListener;
-import systems.dmx.core.service.event.PostCreateAssocListener;
-import systems.dmx.core.service.event.PostCreateTopicListener;
-import systems.dmx.core.service.event.PreDeleteTopicListener;
+import systems.dmx.core.service.event.IntroduceAssocType;
+import systems.dmx.core.service.event.IntroduceTopicType;
+import systems.dmx.core.service.event.PostCreateAssoc;
+import systems.dmx.core.service.event.PostCreateTopic;
+import systems.dmx.core.service.event.PreDeleteTopic;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -51,11 +51,11 @@ import java.util.logging.Logger;
 @Path("/workspace")
 @Consumes("application/json")
 @Produces("application/json")
-public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
-                                                                                    IntroduceAssocTypeListener,
-                                                                                    PostCreateTopicListener,
-                                                                                    PostCreateAssocListener,
-                                                                                    PreDeleteTopicListener {
+public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicType,
+                                                                                    IntroduceAssocType,
+                                                                                    PostCreateTopic,
+                                                                                    PostCreateAssoc,
+                                                                                    PreDeleteTopic {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

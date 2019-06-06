@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 class CoreEvent {
 
-    static DMXEvent CHECK_TOPIC_READ_ACCESS = new DMXEvent(CheckTopicReadAccessListener.class) {
+    static DMXEvent CHECK_TOPIC_READ_ACCESS = new DMXEvent(CheckTopicReadAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckTopicReadAccessListener) listener).checkTopicReadAccess(
+            ((CheckTopicReadAccess) listener).checkTopicReadAccess(
                 (Long) params[0]
             );
         }
@@ -49,10 +49,10 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent CHECK_TOPIC_WRITE_ACCESS = new DMXEvent(CheckTopicWriteAccessListener.class) {
+    static DMXEvent CHECK_TOPIC_WRITE_ACCESS = new DMXEvent(CheckTopicWriteAccess.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((CheckTopicWriteAccessListener) listener).checkTopicWriteAccess(
+            ((CheckTopicWriteAccess) listener).checkTopicWriteAccess(
                 (Long) params[0]
             );
         }
@@ -69,37 +69,37 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent PRE_CREATE_TOPIC = new DMXEvent(PreCreateTopicListener.class) {
+    static DMXEvent PRE_CREATE_TOPIC = new DMXEvent(PreCreateTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateTopicListener) listener).preCreateTopic(
+            ((PreCreateTopic) listener).preCreateTopic(
                 (TopicModel) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_CREATE_ASSOCIATION = new DMXEvent(PreCreateAssocListener.class) {
+    static DMXEvent PRE_CREATE_ASSOCIATION = new DMXEvent(PreCreateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateAssocListener) listener).preCreateAssociation(
+            ((PreCreateAssoc) listener).preCreateAssociation(
                 (AssocModel) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_CREATE_TOPIC_TYPE = new DMXEvent(PreCreateTopicTypeListener.class) {
+    static DMXEvent PRE_CREATE_TOPIC_TYPE = new DMXEvent(PreCreateTopicType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateTopicTypeListener) listener).preCreateTopicType(
+            ((PreCreateTopicType) listener).preCreateTopicType(
                 (TopicTypeModel) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_CREATE_ASSOCIATION_TYPE = new DMXEvent(PreCreateAssocTypeListener.class) {
+    static DMXEvent PRE_CREATE_ASSOCIATION_TYPE = new DMXEvent(PreCreateAssocType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateAssocTypeListener) listener).preCreateAssocType(
+            ((PreCreateAssocType) listener).preCreateAssocType(
                 (AssocTypeModel) params[0]
             );
         }
@@ -107,19 +107,19 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent POST_CREATE_TOPIC = new DMXEvent(PostCreateTopicListener.class) {
+    static DMXEvent POST_CREATE_TOPIC = new DMXEvent(PostCreateTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostCreateTopicListener) listener).postCreateTopic(
+            ((PostCreateTopic) listener).postCreateTopic(
                 (Topic) params[0]
             );
         }
     };
 
-    static DMXEvent POST_CREATE_ASSOCIATION = new DMXEvent(PostCreateAssocListener.class) {
+    static DMXEvent POST_CREATE_ASSOCIATION = new DMXEvent(PostCreateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostCreateAssocListener) listener).postCreateAssociation(
+            ((PostCreateAssoc) listener).postCreateAssociation(
                 (Assoc) params[0]
             );
         }
@@ -127,19 +127,19 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent PRE_UPDATE_TOPIC = new DMXEvent(PreUpdateTopicListener.class) {
+    static DMXEvent PRE_UPDATE_TOPIC = new DMXEvent(PreUpdateTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreUpdateTopicListener) listener).preUpdateTopic(
+            ((PreUpdateTopic) listener).preUpdateTopic(
                 (Topic) params[0], (TopicModel) params[1]
             );
         }
     };
 
-    static DMXEvent PRE_UPDATE_ASSOCIATION = new DMXEvent(PreUpdateAssocListener.class) {
+    static DMXEvent PRE_UPDATE_ASSOCIATION = new DMXEvent(PreUpdateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreUpdateAssocListener) listener).preUpdateAssociation(
+            ((PreUpdateAssoc) listener).preUpdateAssociation(
                 (Assoc) params[0], (AssocModel) params[1]
             );
         }
@@ -147,19 +147,19 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent POST_UPDATE_TOPIC = new DMXEvent(PostUpdateTopicListener.class) {
+    static DMXEvent POST_UPDATE_TOPIC = new DMXEvent(PostUpdateTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostUpdateTopicListener) listener).postUpdateTopic(
+            ((PostUpdateTopic) listener).postUpdateTopic(
                 (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2]
             );
         }
     };
 
-    static DMXEvent POST_UPDATE_ASSOCIATION = new DMXEvent(PostUpdateAssocListener.class) {
+    static DMXEvent POST_UPDATE_ASSOCIATION = new DMXEvent(PostUpdateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostUpdateAssocListener) listener).postUpdateAssociation(
+            ((PostUpdateAssoc) listener).postUpdateAssociation(
                 (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2]
             );
         }
@@ -167,19 +167,19 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent PRE_DELETE_TOPIC = new DMXEvent(PreDeleteTopicListener.class) {
+    static DMXEvent PRE_DELETE_TOPIC = new DMXEvent(PreDeleteTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreDeleteTopicListener) listener).preDeleteTopic(
+            ((PreDeleteTopic) listener).preDeleteTopic(
                 (Topic) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_DELETE_ASSOCIATION = new DMXEvent(PreDeleteAssocListener.class) {
+    static DMXEvent PRE_DELETE_ASSOCIATION = new DMXEvent(PreDeleteAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreDeleteAssocListener) listener).preDeleteAssociation(
+            ((PreDeleteAssoc) listener).preDeleteAssociation(
                 (Assoc) params[0]
             );
         }
@@ -187,19 +187,19 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent POST_DELETE_TOPIC = new DMXEvent(PostDeleteTopicListener.class) {
+    static DMXEvent POST_DELETE_TOPIC = new DMXEvent(PostDeleteTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostDeleteTopicListener) listener).postDeleteTopic(
+            ((PostDeleteTopic) listener).postDeleteTopic(
                 (TopicModel) params[0]
             );
         }
     };
 
-    static DMXEvent POST_DELETE_ASSOCIATION = new DMXEvent(PostDeleteAssocListener.class) {
+    static DMXEvent POST_DELETE_ASSOCIATION = new DMXEvent(PostDeleteAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostDeleteAssocListener) listener).postDeleteAssociation(
+            ((PostDeleteAssoc) listener).postDeleteAssociation(
                 (AssocModel) params[0]
             );
         }
@@ -207,10 +207,10 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent ALL_PLUGINS_ACTIVE = new DMXEvent(AllPluginsActiveListener.class) {
+    static DMXEvent ALL_PLUGINS_ACTIVE = new DMXEvent(AllPluginsActive.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((AllPluginsActiveListener) listener).allPluginsActive();
+            ((AllPluginsActive) listener).allPluginsActive();
         }
     };
 
@@ -219,10 +219,10 @@ class CoreEvent {
     // This event has a double nature:
     //   a) it is fired regularily (see CoreServiceImpl.createTopicType()).
     //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
-    static DMXEvent INTRODUCE_TOPIC_TYPE = new DMXEvent(IntroduceTopicTypeListener.class) {
+    static DMXEvent INTRODUCE_TOPIC_TYPE = new DMXEvent(IntroduceTopicType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((IntroduceTopicTypeListener) listener).introduceTopicType(
+            ((IntroduceTopicType) listener).introduceTopicType(
                 (TopicType) params[0]
             );
         }
@@ -231,10 +231,10 @@ class CoreEvent {
     // This event has a double nature:
     //   a) it is fired regularily (see CoreServiceImpl.createAssocType()).
     //   b) it is fired locally (see PluginImpl.introduceAssocTypesToPlugin()).
-    static DMXEvent INTRODUCE_ASSOCIATION_TYPE = new DMXEvent(IntroduceAssocTypeListener.class) {
+    static DMXEvent INTRODUCE_ASSOCIATION_TYPE = new DMXEvent(IntroduceAssocType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((IntroduceAssocTypeListener) listener).introduceAssocType(
+            ((IntroduceAssocType) listener).introduceAssocType(
                 (AssocType) params[0]
             );
         }
@@ -244,28 +244,28 @@ class CoreEvent {
 
     // === WebPublishing Events ===
 
-    static DMXEvent SERVICE_REQUEST_FILTER = new DMXEvent(ServiceRequestFilterListener.class) {
+    static DMXEvent SERVICE_REQUEST_FILTER = new DMXEvent(ServiceRequestFilter.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((ServiceRequestFilterListener) listener).serviceRequestFilter(
+            ((ServiceRequestFilter) listener).serviceRequestFilter(
                 (ContainerRequest) params[0]
             );
         }
     };
 
-    static DMXEvent SERVICE_RESPONSE_FILTER = new DMXEvent(ServiceResponseFilterListener.class) {
+    static DMXEvent SERVICE_RESPONSE_FILTER = new DMXEvent(ServiceResponseFilter.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((ServiceResponseFilterListener) listener).serviceResponseFilter(
+            ((ServiceResponseFilter) listener).serviceResponseFilter(
                 (ContainerResponse) params[0]
             );
         }
     };
 
-    static DMXEvent STATIC_RESOURCE_FILTER = new DMXEvent(StaticResourceFilterListener.class) {
+    static DMXEvent STATIC_RESOURCE_FILTER = new DMXEvent(StaticResourceFilter.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((StaticResourceFilterListener) listener).staticResourceFilter(
+            ((StaticResourceFilter) listener).staticResourceFilter(
                 (HttpServletRequest) params[0], (HttpServletResponse) params[1]
             );
         }
@@ -273,37 +273,37 @@ class CoreEvent {
 
     // ---
 
-    static DMXEvent PRE_SEND_TOPIC = new DMXEvent(PreSendTopicListener.class) {
+    static DMXEvent PRE_SEND_TOPIC = new DMXEvent(PreSendTopic.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendTopicListener) listener).preSendTopic(
+            ((PreSendTopic) listener).preSendTopic(
                 (Topic) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_SEND_ASSOCIATION = new DMXEvent(PreSendAssocListener.class) {
+    static DMXEvent PRE_SEND_ASSOCIATION = new DMXEvent(PreSendAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendAssocListener) listener).preSendAssociation(
+            ((PreSendAssoc) listener).preSendAssociation(
                 (Assoc) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_SEND_TOPIC_TYPE = new DMXEvent(PreSendTopicTypeListener.class) {
+    static DMXEvent PRE_SEND_TOPIC_TYPE = new DMXEvent(PreSendTopicType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendTopicTypeListener) listener).preSendTopicType(
+            ((PreSendTopicType) listener).preSendTopicType(
                 (TopicType) params[0]
             );
         }
     };
 
-    static DMXEvent PRE_SEND_ASSOCIATION_TYPE = new DMXEvent(PreSendAssocTypeListener.class) {
+    static DMXEvent PRE_SEND_ASSOCIATION_TYPE = new DMXEvent(PreSendAssocType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreSendAssocTypeListener) listener).preSendAssocType(
+            ((PreSendAssocType) listener).preSendAssocType(
                 (AssocType) params[0]
             );
         }
@@ -313,10 +313,10 @@ class CoreEvent {
 
     // === WebSockets Events ===
 
-    static DMXEvent WEBSOCKET_TEXT_MESSAGE = new DMXEvent(WebsocketTextMessageListener.class) {
+    static DMXEvent WEBSOCKET_TEXT_MESSAGE = new DMXEvent(WebsocketTextMessage.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((WebsocketTextMessageListener) listener).websocketTextMessage(
+            ((WebsocketTextMessage) listener).websocketTextMessage(
                 (String) params[0]
             );
         }

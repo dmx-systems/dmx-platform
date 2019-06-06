@@ -4,7 +4,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface AllPluginsActiveListener extends EventListener {
+public interface AllPluginsActive extends EventListener {
 
     void allPluginsActive();
 }

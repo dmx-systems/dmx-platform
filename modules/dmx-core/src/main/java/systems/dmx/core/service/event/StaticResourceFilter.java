@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
-public interface StaticResourceFilterListener extends EventListener {
+public interface StaticResourceFilter extends EventListener {
 
     void staticResourceFilter(HttpServletRequest request, HttpServletResponse response);
 }

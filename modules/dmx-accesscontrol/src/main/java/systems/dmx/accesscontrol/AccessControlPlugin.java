@@ -1,7 +1,7 @@
 package systems.dmx.accesscontrol;
 
-import systems.dmx.accesscontrol.event.PostLoginUserListener;
-import systems.dmx.accesscontrol.event.PostLogoutUserListener;
+import systems.dmx.accesscontrol.event.PostLoginUser;
+import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
 import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
@@ -30,18 +30,18 @@ import systems.dmx.core.service.accesscontrol.Permissions;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.CheckAssocReadAccess;
 import systems.dmx.core.service.event.CheckAssocWriteAccess;
-import systems.dmx.core.service.event.CheckTopicReadAccessListener;
-import systems.dmx.core.service.event.CheckTopicWriteAccessListener;
-import systems.dmx.core.service.event.PostCreateAssocListener;
-import systems.dmx.core.service.event.PostCreateTopicListener;
-import systems.dmx.core.service.event.PostUpdateAssocListener;
-import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PreUpdateTopicListener;
-import systems.dmx.core.service.event.ServiceRequestFilterListener;
-import systems.dmx.core.service.event.StaticResourceFilterListener;
+import systems.dmx.core.service.event.CheckTopicReadAccess;
+import systems.dmx.core.service.event.CheckTopicWriteAccess;
+import systems.dmx.core.service.event.PostCreateAssoc;
+import systems.dmx.core.service.event.PostCreateTopic;
+import systems.dmx.core.service.event.PostUpdateAssoc;
+import systems.dmx.core.service.event.PostUpdateTopic;
+import systems.dmx.core.service.event.PreUpdateTopic;
+import systems.dmx.core.service.event.ServiceRequestFilter;
+import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.JavaUtils;
 import systems.dmx.files.FilesService;
-import systems.dmx.files.event.CheckDiskQuotaListener;
+import systems.dmx.files.event.CheckDiskQuota;
 import systems.dmx.workspaces.WorkspacesService;
 
 // ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
@@ -77,18 +77,18 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
-                                                                                    CheckTopicReadAccessListener,
-                                                                                    CheckTopicWriteAccessListener,
-                                                                                    CheckAssocReadAccess,
-                                                                                    CheckAssocWriteAccess,
-                                                                                    PreUpdateTopicListener,
-                                                                                    PostCreateTopicListener,
-                                                                                    PostCreateAssocListener,
-                                                                                    PostUpdateTopicListener,
-                                                                                    PostUpdateAssocListener,
-                                                                                    ServiceRequestFilterListener,
-                                                                                    StaticResourceFilterListener,
-                                                                                    CheckDiskQuotaListener {
+                                                                                          CheckTopicReadAccess,
+                                                                                          CheckTopicWriteAccess,
+                                                                                          CheckAssocReadAccess,
+                                                                                          CheckAssocWriteAccess,
+                                                                                          PreUpdateTopic,
+                                                                                          PostCreateTopic,
+                                                                                          PostCreateAssoc,
+                                                                                          PostUpdateTopic,
+                                                                                          PostUpdateAssoc,
+                                                                                          ServiceRequestFilter,
+                                                                                          StaticResourceFilter,
+                                                                                          CheckDiskQuota {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -118,18 +118,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String PROP_MODIFIER = "dmx.accesscontrol.modifier";
 
     // Events
-    private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUserListener.class) {
+    private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUser.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostLoginUserListener) listener).postLoginUser(
+            ((PostLoginUser) listener).postLoginUser(
                 (String) params[0]
             );
         }
     };
-    private static DMXEvent POST_LOGOUT_USER = new DMXEvent(PostLogoutUserListener.class) {
+    private static DMXEvent POST_LOGOUT_USER = new DMXEvent(PostLogoutUser.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostLogoutUserListener) listener).postLogoutUser(
+            ((PostLogoutUser) listener).postLogoutUser(
                 (String) params[0]
             );
         }

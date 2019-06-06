@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreDeleteTopicListener extends EventListener {
+public interface PostCreateTopic extends EventListener {
 
-    void preDeleteTopic(Topic topic);
+    void postCreateTopic(Topic topic);
 }

@@ -6,7 +6,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PostUpdateTopicListener extends EventListener {
+public interface PreUpdateTopic extends EventListener {
 
-    void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic);
+    void preUpdateTopic(Topic topic, TopicModel updateModel);
 }

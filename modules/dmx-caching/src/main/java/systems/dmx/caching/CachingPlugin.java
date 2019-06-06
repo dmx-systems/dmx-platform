@@ -5,8 +5,8 @@ import systems.dmx.timestamps.TimestampsService;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.event.ServiceRequestFilterListener;
-import systems.dmx.core.service.event.ServiceResponseFilterListener;
+import systems.dmx.core.service.event.ServiceRequestFilter;
+import systems.dmx.core.service.event.ServiceResponseFilter;
 import systems.dmx.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
@@ -29,8 +29,7 @@ import java.util.regex.Pattern;
 
 
 @Path("/cache")
-public class CachingPlugin extends PluginActivator implements ServiceRequestFilterListener,
-                                                              ServiceResponseFilterListener {
+public class CachingPlugin extends PluginActivator implements ServiceRequestFilter, ServiceResponseFilter {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -52,13 +51,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // *****************
-    // *** Listeners ***
-    // *****************
-
-
+    // Listeners
 
     @Override
     public void serviceRequestFilter(ContainerRequest request) {
@@ -88,8 +81,6 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
             // ### FIXME: support browser cache by using "max-age=0" instead (#35)
         }
     }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

@@ -6,7 +6,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.event.PreCreateAssocListener;
+import systems.dmx.core.service.event.PreCreateAssoc;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.timestamps.TimestampsService;
 
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @Path("/event")
 @Consumes("application/json")
 @Produces("application/json")
-public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssocListener {
+public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssoc {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

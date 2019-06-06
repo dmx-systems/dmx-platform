@@ -6,7 +6,7 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.AccessControl;
-import systems.dmx.core.service.event.PostCreateTopicListener;
+import systems.dmx.core.service.event.PostCreateTopic;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 @Path("/config")
 @Produces("application/json")
-public class ConfigPlugin extends PluginActivator implements ConfigService, PostCreateTopicListener {
+public class ConfigPlugin extends PluginActivator implements ConfigService, PostCreateTopic {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -52,13 +52,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ************************************
-    // *** ConfigService Implementation ***
-    // ************************************
-
-
+    // ConfigService
 
     @GET
     @Path("/{config_type_uri}/topic/{topic_id}")
@@ -137,13 +131,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         }
     }
 
-
-
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
-
-
+    // Listeners
 
     @Override
     public void postCreateTopic(Topic topic) {
@@ -151,8 +139,6 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             _createConfigTopic(configDef, topic);
         }
     }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

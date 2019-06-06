@@ -280,8 +280,8 @@ class WebPublishingService {
         } catch (Throwable e) {
             // Note: staticResourceFilter() is called from an OSGi HTTP service static resource HttpContext.
             // JAX-RS is not involved here. No JAX-RS exception mapper kicks in. Though the application's
-            // StaticResourceFilterListener can throw a WebApplicationException (which is JAX-RS API)
-            // in order to provide error response info.
+            // StaticResourceFilter can throw a WebApplicationException (which is JAX-RS API) in order to
+            // provide error response info.
             new UniversalExceptionMapper(e, request).initResponse(response);
             return false;
         }

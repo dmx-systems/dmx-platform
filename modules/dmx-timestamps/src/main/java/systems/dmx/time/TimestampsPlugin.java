@@ -7,13 +7,13 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
-import systems.dmx.core.service.event.PostCreateAssocListener;
-import systems.dmx.core.service.event.PostCreateTopicListener;
-import systems.dmx.core.service.event.PostUpdateAssocListener;
-import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PreSendAssocListener;
-import systems.dmx.core.service.event.PreSendTopicListener;
-import systems.dmx.core.service.event.ServiceResponseFilterListener;
+import systems.dmx.core.service.event.PostCreateAssoc;
+import systems.dmx.core.service.event.PostCreateTopic;
+import systems.dmx.core.service.event.PostUpdateAssoc;
+import systems.dmx.core.service.event.PostUpdateTopic;
+import systems.dmx.core.service.event.PreSendAssoc;
+import systems.dmx.core.service.event.PreSendTopic;
+import systems.dmx.core.service.event.ServiceResponseFilter;
 
 // ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -37,13 +37,13 @@ import java.util.logging.Logger;
 @Path("/timestamps")
 @Consumes("application/json")
 @Produces("application/json")
-public class TimestampsPlugin extends PluginActivator implements TimestampsService, PostCreateTopicListener,
-                                                                                    PostCreateAssocListener,
-                                                                                    PostUpdateTopicListener,
-                                                                                    PostUpdateAssocListener,
-                                                                                    PreSendTopicListener,
-                                                                                    PreSendAssocListener,
-                                                                                    ServiceResponseFilterListener {
+public class TimestampsPlugin extends PluginActivator implements TimestampsService, PostCreateTopic,
+                                                                                    PostCreateAssoc,
+                                                                                    PostUpdateTopic,
+                                                                                    PostUpdateAssoc,
+                                                                                    PreSendTopic,
+                                                                                    PreSendAssoc,
+                                                                                    ServiceResponseFilter {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

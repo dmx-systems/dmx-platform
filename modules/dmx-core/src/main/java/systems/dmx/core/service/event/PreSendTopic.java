@@ -5,7 +5,7 @@ import systems.dmx.core.service.EventListener;
 
 
 
-public interface PreSendTopicListener extends EventListener {
+public interface PreSendTopic extends EventListener {
 
     void preSendTopic(Topic topic);
 }

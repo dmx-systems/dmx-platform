@@ -15,12 +15,12 @@ import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
-import systems.dmx.core.service.event.AllPluginsActiveListener;
-import systems.dmx.core.service.event.IntroduceTopicTypeListener;
-import systems.dmx.core.service.event.IntroduceAssocTypeListener;
-import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PreCreateTopicTypeListener;
-import systems.dmx.core.service.event.PreCreateAssocTypeListener;
+import systems.dmx.core.service.event.AllPluginsActive;
+import systems.dmx.core.service.event.IntroduceTopicType;
+import systems.dmx.core.service.event.IntroduceAssocType;
+import systems.dmx.core.service.event.PostUpdateTopic;
+import systems.dmx.core.service.event.PreCreateTopicType;
+import systems.dmx.core.service.event.PreCreateAssocType;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -28,12 +28,12 @@ import java.util.logging.Logger;
 
 
 
-public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
-                                                                IntroduceTopicTypeListener,
-                                                                IntroduceAssocTypeListener,
-                                                                PreCreateTopicTypeListener,
-                                                                PreCreateAssocTypeListener,
-                                                                PostUpdateTopicListener {
+public class WebclientPlugin extends PluginActivator implements AllPluginsActive,
+                                                                IntroduceTopicType,
+                                                                IntroduceAssocType,
+                                                                PreCreateTopicType,
+                                                                PreCreateAssocType,
+                                                                PostUpdateTopic {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -47,7 +47,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // Listener Implementations
+    // Listeners
 
     @Override
     public void allPluginsActive() {
