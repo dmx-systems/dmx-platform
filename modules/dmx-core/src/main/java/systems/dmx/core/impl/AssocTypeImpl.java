@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.AssocType;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 
 /**
  * An association type that is attached to the {@link CoreService}.
@@ -10,7 +10,7 @@ class AssocTypeImpl extends DMXTypeImpl implements AssocType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocTypeImpl(AssociationTypeModelImpl model, PersistenceLayer pl) {
+    AssocTypeImpl(AssocTypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -19,19 +19,19 @@ class AssocTypeImpl extends DMXTypeImpl implements AssocType {
     // AssocType Implementation
 
     @Override
-    public AssociationTypeModelImpl getModel() {
-        return (AssociationTypeModelImpl) model;
+    public AssocTypeModelImpl getModel() {
+        return (AssocTypeModelImpl) model;
     }
 
     @Override
-    public void update(AssociationTypeModel updateModel) {
-        model.update((AssociationTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
+    public void update(AssocTypeModel updateModel) {
+        model.update((AssocTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    AssociationTypeModelImpl _getModel() {
+    AssocTypeModelImpl _getModel() {
         return pl._getAssociationType(getUri());
     }
 }

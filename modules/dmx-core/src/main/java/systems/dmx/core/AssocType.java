@@ -1,6 +1,6 @@
 package systems.dmx.core;
 
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 
 
 
@@ -8,5 +8,5 @@ public interface AssocType extends DMXType {
 
     // === Updating ===
 
-    void update(AssociationTypeModel model);
+    void update(AssocTypeModel model);
 }

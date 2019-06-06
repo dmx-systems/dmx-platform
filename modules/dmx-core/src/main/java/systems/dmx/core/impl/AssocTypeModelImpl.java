@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.Directive;
@@ -14,11 +14,11 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class AssociationTypeModelImpl extends TypeModelImpl implements AssociationTypeModel {
+public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationTypeModelImpl(TypeModelImpl type) {
+    AssocTypeModelImpl(TypeModelImpl type) {
         super(type);
         if (type.dataTypeUri.equals("dmx.core.value") || type.dataTypeUri.equals("dmx.core.identity")) {
             throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for an assoc " +
@@ -29,18 +29,18 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationTypeModel addCompDef(CompDefModel compDef) {
-        return (AssociationTypeModel) super.addCompDef(compDef);
+    public AssocTypeModel addCompDef(CompDefModel compDef) {
+        return (AssocTypeModel) super.addCompDef(compDef);
     }
 
     // ---
 
     @Override
-    public AssociationTypeModelImpl clone() {
+    public AssocTypeModelImpl clone() {
         try {
-            return (AssociationTypeModelImpl) super.clone();
+            return (AssocTypeModelImpl) super.clone();
         } catch (Exception e) {
-            throw new RuntimeException("Cloning a AssociationTypeModel failed", e);
+            throw new RuntimeException("Cloning a AssocTypeModel failed", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     @Override
     AssocTypeImpl instantiate() {
         // Note: declaration and assignment is required for type inference to work (at least in Java 6)
-        AssociationTypeModelImpl type = clone().filterReadableCompDefs();
+        AssocTypeModelImpl type = clone().filterReadableCompDefs();
         return new AssocTypeImpl(type, pl);
     }
 

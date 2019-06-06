@@ -535,7 +535,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssocTypeImpl createAssociationType(AssociationTypeModelImpl model) {
+    AssocTypeImpl createAssociationType(AssocTypeModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
             //
@@ -564,7 +564,7 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void updateAssociationType(AssociationTypeModelImpl updateModel) {
+    void updateAssociationType(AssocTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             TopicModelImpl topic = fetchTopic(updateModel.getId());
@@ -628,7 +628,7 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Type cache direct access. No permission check.
      */
-    AssociationTypeModelImpl _getAssociationType(String uri) {
+    AssocTypeModelImpl _getAssociationType(String uri) {
         return typeStorage.getAssociationType(uri);
     }
 

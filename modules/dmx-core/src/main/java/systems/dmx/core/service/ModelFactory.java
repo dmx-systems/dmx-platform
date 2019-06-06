@@ -2,7 +2,7 @@ package systems.dmx.core.service;
 
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -191,14 +191,14 @@ public interface ModelFactory {
 
 
 
-    // === AssociationTypeModel ===
+    // === AssocTypeModel ===
 
-    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                                 ViewConfigurationModel viewConfig);
+    AssocTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
+                                           ViewConfigurationModel viewConfig);
 
-    AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
+    AssocTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
 
-    AssociationTypeModel newAssociationTypeModel(JSONObject assocType);
+    AssocTypeModel newAssociationTypeModel(JSONObject assocType);
 
 
 

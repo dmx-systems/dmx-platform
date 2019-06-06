@@ -6,7 +6,7 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -267,13 +267,13 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssocTypeImpl createAssociationType(AssociationTypeModel model) {
-        return pl.createAssociationType((AssociationTypeModelImpl) model);
+    public AssocTypeImpl createAssociationType(AssocTypeModel model) {
+        return pl.createAssociationType((AssocTypeModelImpl) model);
     }
 
     @Override
-    public void updateAssociationType(AssociationTypeModel updateModel) {
-        pl.updateAssociationType((AssociationTypeModelImpl) updateModel);
+    public void updateAssociationType(AssocTypeModel updateModel) {
+        pl.updateAssociationType((AssocTypeModelImpl) updateModel);
     }
 
     @Override

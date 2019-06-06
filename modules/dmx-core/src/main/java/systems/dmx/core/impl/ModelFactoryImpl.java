@@ -600,28 +600,27 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === AssociationTypeModel ===
+    // === AssocTypeModel ===
 
     @Override
-    public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                            List<CompDefModel> compDefs,
-                                                            ViewConfigurationModel viewConfig) {
-        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
+    public AssocTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
+                                                      List<CompDefModel> compDefs,
+                                                      ViewConfigurationModel viewConfig) {
+        return new AssocTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
     @Override
-    public AssociationTypeModelImpl newAssociationTypeModel(String uri, String value, String dataTypeUri) {
-        return new AssociationTypeModelImpl(newTypeModel(uri, "dmx.core.assoc_type", new SimpleValue(value),
-            dataTypeUri));
+    public AssocTypeModelImpl newAssociationTypeModel(String uri, String value, String dataTypeUri) {
+        return new AssocTypeModelImpl(newTypeModel(uri, "dmx.core.assoc_type", new SimpleValue(value), dataTypeUri));
     }
 
     @Override
-    public AssociationTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
+    public AssocTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
         try {
-            return new AssociationTypeModelImpl(newTypeModel(assocType.put("typeUri", "dmx.core.assoc_type")));
+            return new AssocTypeModelImpl(newTypeModel(assocType.put("typeUri", "dmx.core.assoc_type")));
         } catch (Exception e) {
-            throw parsingFailed(assocType, e, "AssociationTypeModelImpl");
+            throw parsingFailed(assocType, e, "AssocTypeModelImpl");
         }
     }
 

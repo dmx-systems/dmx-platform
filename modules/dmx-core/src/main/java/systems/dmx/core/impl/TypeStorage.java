@@ -53,8 +53,8 @@ class TypeStorage {
         return topicType != null ? topicType : fetchTopicType(topicTypeUri);
     }
 
-    AssociationTypeModelImpl getAssociationType(String assocTypeUri) {
-        AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getTypeIfExists(assocTypeUri);
+    AssocTypeModelImpl getAssociationType(String assocTypeUri) {
+        AssocTypeModelImpl assocType = (AssocTypeModelImpl) getTypeIfExists(assocTypeUri);
         return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
     }
 
@@ -122,7 +122,7 @@ class TypeStorage {
         }
     }
 
-    private AssociationTypeModelImpl fetchAssociationType(String assocTypeUri) {
+    private AssocTypeModelImpl fetchAssociationType(String assocTypeUri) {
         try {
             logger.info("Fetching association type \"" + assocTypeUri + "\"");
             endlessRecursionDetection.check(assocTypeUri);
@@ -137,7 +137,7 @@ class TypeStorage {
             List<CompDefModel> compDefs = fetchCompDefs(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, compDefs, null);
+            AssocTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, compDefs, null);
             putInTypeCache(assocType);                                                                // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions

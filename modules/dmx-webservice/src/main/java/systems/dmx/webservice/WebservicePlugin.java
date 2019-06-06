@@ -9,7 +9,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -294,7 +294,7 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/assoctype")
     @Transactional
-    public AssocType createAssociationType(AssociationTypeModel model) {
+    public AssocType createAssociationType(AssocTypeModel model) {
         AssocType assocType = dmx.createAssociationType(model);
         me.newAssocType(assocType);
         return assocType;
@@ -303,7 +303,7 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/assoctype")
     @Transactional
-    public DirectivesResponse updateAssociationType(AssociationTypeModel model) {
+    public DirectivesResponse updateAssociationType(AssocTypeModel model) {
         dmx.updateAssociationType(model);
         return new DirectivesResponse();
     }

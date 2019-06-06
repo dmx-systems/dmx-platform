@@ -5,7 +5,7 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.DMXEvent;
@@ -102,7 +102,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PreCreateAssociationTypeListener) listener).preCreateAssociationType(
-                (AssociationTypeModel) params[0]
+                (AssocTypeModel) params[0]
             );
         }
     };

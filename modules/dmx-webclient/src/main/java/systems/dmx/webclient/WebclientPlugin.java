@@ -6,7 +6,7 @@ import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfiguration;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -92,7 +92,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * On the other hand the order of type-introduction invocations is not deterministic accross plugins.
      */
     @Override
-    public void preCreateAssociationType(AssociationTypeModel model) {
+    public void preCreateAssociationType(AssocTypeModel model) {
         addDefaultViewConfig(model);
     }
 

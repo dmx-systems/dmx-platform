@@ -174,7 +174,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // ---
 
     @Override
-    final AssociationTypeModelImpl getType() {
+    final AssocTypeModelImpl getType() {
         return pl.typeStorage.getAssociationType(typeUri);
     }
 

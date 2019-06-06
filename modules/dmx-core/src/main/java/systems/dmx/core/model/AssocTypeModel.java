@@ -7,8 +7,8 @@ package systems.dmx.core.model;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface AssociationTypeModel extends TypeModel {
+public interface AssocTypeModel extends TypeModel {
 
     @Override
-    AssociationTypeModel addCompDef(CompDefModel compDef);
+    AssocTypeModel addCompDef(CompDefModel compDef);
 }

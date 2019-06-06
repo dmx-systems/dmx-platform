@@ -8,7 +8,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssociationTypeModel;
+import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
@@ -220,9 +220,9 @@ public interface CoreService {
 
     // ---
 
-    AssocType createAssociationType(AssociationTypeModel model);
+    AssocType createAssociationType(AssocTypeModel model);
 
-    void updateAssociationType(AssociationTypeModel updateModel);
+    void updateAssociationType(AssocTypeModel updateModel);
 
     void deleteAssociationType(String assocTypeUri);
 
