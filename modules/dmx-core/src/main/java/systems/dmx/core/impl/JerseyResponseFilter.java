@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
@@ -167,7 +167,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     private void firePreSend(DMXObject object) {
         if (object instanceof TopicType) {                  // Note: must take precedence over topic
             em.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, object);
-        } else if (object instanceof AssociationType) {     // Note: must take precedence over topic
+        } else if (object instanceof AssocType) {           // Note: must take precedence over topic
             em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, object);
         } else if (object instanceof Topic) {
             em.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);

@@ -8,7 +8,7 @@ import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -975,7 +975,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private String info(DMXObject object) {
         if (object instanceof TopicType) {
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
-        } else if (object instanceof AssociationType) {
+        } else if (object instanceof AssocType) {
             return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +

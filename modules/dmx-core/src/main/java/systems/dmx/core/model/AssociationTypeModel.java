@@ -3,7 +3,7 @@ package systems.dmx.core.model;
 
 
 /**
- * Data that underlies a {@link AssociationType}.
+ * Data that underlies a {@link AssocType}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

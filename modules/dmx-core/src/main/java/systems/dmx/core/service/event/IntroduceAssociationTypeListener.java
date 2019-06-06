@@ -1,6 +1,6 @@
 package systems.dmx.core.service.event;
 
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.service.EventListener;
 
 
@@ -27,9 +27,9 @@ import systems.dmx.core.service.EventListener;
  *  <li>The "DMX Access Control" plugin adds a "Creator" field to all types and relates them to a user.
  * </ul>
  *
- * @param   assocType   the type to be modified. The passed object is actually an instance of a {@link AssociationType}
+ * @param   assocType   the type to be modified. The passed object is actually an instance of a {@link AssocType}
  *                      subclass that is backed by the database. That is, modifications by e.g.
- *                      {@link AssociationType#addDataField} are persistent.
+ *                      {@link AssocType#addDataField} are persistent.
  *                      <p>
  *                      Note: at the time the hook is triggered the type exists already in the database, in
  *                      particular the underlying type topic has an ID already. That is, the type is ready for
@@ -37,5 +37,5 @@ import systems.dmx.core.service.EventListener;
  */
 public interface IntroduceAssociationTypeListener extends EventListener {
 
-    void introduceAssociationType(AssociationType assocType);
+    void introduceAssociationType(AssocType assocType);
 }

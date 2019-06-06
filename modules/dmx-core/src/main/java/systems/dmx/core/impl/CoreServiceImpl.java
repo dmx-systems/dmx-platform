@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -248,26 +248,26 @@ public class CoreServiceImpl implements CoreService {
     // === Assoc Types ===
 
     @Override
-    public AssociationTypeImpl getAssociationType(String uri) {
+    public AssocTypeImpl getAssociationType(String uri) {
         return pl.getAssociationType(uri);
     }
 
     @Override
-    public AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
+    public AssocTypeImpl getAssociationTypeImplicitly(long assocId) {
         return pl.getAssociationTypeImplicitly(assocId);
     }
 
     // ---
 
     @Override
-    public List<AssociationType> getAllAssociationTypes() {
+    public List<AssocType> getAllAssociationTypes() {
         return pl.getAllAssociationTypes();
     }
 
     // ---
 
     @Override
-    public AssociationTypeImpl createAssociationType(AssociationTypeModel model) {
+    public AssocTypeImpl createAssociationType(AssociationTypeModel model) {
         return pl.createAssociationType((AssociationTypeModelImpl) model);
     }
 

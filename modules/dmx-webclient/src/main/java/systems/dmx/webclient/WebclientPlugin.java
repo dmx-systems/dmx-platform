@@ -1,7 +1,7 @@
 package systems.dmx.webclient;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -47,13 +47,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
-
-
+    // Listener Implementations
 
     @Override
     public void allPluginsActive() {
@@ -123,7 +117,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     @Override
-    public void introduceAssociationType(AssociationType assocType) {
+    public void introduceAssociationType(AssocType assocType) {
         setViewConfigLabel(assocType);
     }
 

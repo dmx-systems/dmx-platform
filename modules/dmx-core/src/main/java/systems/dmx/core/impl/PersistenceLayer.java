@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -482,11 +482,11 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    AssociationTypeImpl getAssociationType(String uri) {
+    AssocTypeImpl getAssociationType(String uri) {
         return checkReadAccessAndInstantiate(_getAssociationType(uri));
     }
 
-    AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
+    AssocTypeImpl getAssociationTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
         return _getAssociationType(typeUri(assocId)).instantiate();
     }
@@ -505,9 +505,9 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<AssociationType> getAllAssociationTypes() {
+    List<AssocType> getAllAssociationTypes() {
         try {
-            List<AssociationType> assocTypes = new ArrayList();
+            List<AssocType> assocTypes = new ArrayList();
             for (String uri : getAssociationTypeUris()) {
                 assocTypes.add(_getAssociationType(uri).instantiate());
             }
@@ -535,14 +535,14 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssociationTypeImpl createAssociationType(AssociationTypeModelImpl model) {
+    AssocTypeImpl createAssociationType(AssociationTypeModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
             //
             // store in DB
             createType(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
-            AssociationTypeImpl assocType = model.instantiate();
+            AssocTypeImpl assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             //
             return assocType;

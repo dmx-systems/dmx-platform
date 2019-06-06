@@ -2,9 +2,9 @@ package systems.dmx.core.storage.spi;
 
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
+import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
-import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.ModelFactory;

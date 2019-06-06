@@ -4,7 +4,7 @@ import systems.dmx.core.model.AssociationTypeModel;
 
 
 
-public interface AssociationType extends DMXType {
+public interface AssocType extends DMXType {
 
     // === Updating ===
 

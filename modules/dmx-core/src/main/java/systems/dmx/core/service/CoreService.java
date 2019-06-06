@@ -1,7 +1,7 @@
 package systems.dmx.core.service;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
@@ -205,22 +205,22 @@ public interface CoreService {
 
     // === Assoc Types ===
 
-    AssociationType getAssociationType(String assocTypeUri);
+    AssocType getAssociationType(String assocTypeUri);
 
     /**
      * Acccesses an association type while enforcing the <i>implicit READ permission</i>.
      * A user has implicit READ permission for the association type if she has READ permission for the given
      * association.
      */
-    AssociationType getAssociationTypeImplicitly(long assocId);
+    AssocType getAssociationTypeImplicitly(long assocId);
 
     // ---
 
-    List<AssociationType> getAllAssociationTypes();
+    List<AssocType> getAllAssociationTypes();
 
     // ---
 
-    AssociationType createAssociationType(AssociationTypeModel model);
+    AssocType createAssociationType(AssociationTypeModel model);
 
     void updateAssociationType(AssociationTypeModel updateModel);
 

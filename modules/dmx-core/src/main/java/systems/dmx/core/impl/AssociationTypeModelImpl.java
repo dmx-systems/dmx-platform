@@ -10,7 +10,7 @@ import java.util.List;
 
 
 /**
- * Data that underlies a {@link AssociationType}.
+ * Data that underlies a {@link AssocType}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -52,10 +52,10 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     }
 
     @Override
-    AssociationTypeImpl instantiate() {
+    AssocTypeImpl instantiate() {
         // Note: declaration and assignment is required for type inference to work (at least in Java 6)
         AssociationTypeModelImpl type = clone().filterReadableCompDefs();
-        return new AssociationTypeImpl(type, pl);
+        return new AssocTypeImpl(type, pl);
     }
 
 

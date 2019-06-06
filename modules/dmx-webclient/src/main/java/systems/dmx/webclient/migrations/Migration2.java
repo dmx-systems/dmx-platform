@@ -1,6 +1,6 @@
 package systems.dmx.webclient.migrations;
 
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.service.Migration;
 
 
@@ -35,7 +35,7 @@ public class Migration2 extends Migration {
         addBackgroundColorToAssociationType("dmx.core.instantiation",   "hsl(180, 80%, 96%)");
         addBackgroundColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 96%)");
         //
-        AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
+        AssocType compDef = dmx.getAssociationType("dmx.core.composition_def");
         compDef.getCompDef("dmx.core.cardinality")
             .getViewConfig()
                 .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");

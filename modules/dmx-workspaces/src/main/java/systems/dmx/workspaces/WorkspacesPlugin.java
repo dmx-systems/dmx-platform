@@ -8,7 +8,7 @@ import systems.dmx.facets.FacetsService;
 import systems.dmx.topicmaps.TopicmapsService;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
@@ -332,7 +332,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      *       type if its URI begins with "dmx."
      */
     @Override
-    public void introduceAssociationType(AssociationType assocType) {
+    public void introduceAssociationType(AssocType assocType) {
         long workspaceId = workspaceIdForType(assocType);
         if (workspaceId == -1) {
             return;
@@ -544,7 +544,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private String info(DMXObject object) {
         if (object instanceof TopicType) {
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
-        } else if (object instanceof AssociationType) {
+        } else if (object instanceof AssocType) {
             return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +

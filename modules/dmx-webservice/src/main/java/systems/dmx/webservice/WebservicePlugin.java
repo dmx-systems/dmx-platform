@@ -1,7 +1,7 @@
 package systems.dmx.webservice;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedAssociation;
@@ -275,27 +275,27 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/{uri}")
-    public AssociationType getAssociationType(@PathParam("uri") String uri) {
+    public AssocType getAssociationType(@PathParam("uri") String uri) {
         return dmx.getAssociationType(uri);
     }
 
     @GET
     @Path("/assoctype/assoc/{id}")
-    public AssociationType getAssociationTypeImplicitly(@PathParam("id") long assocId) {
+    public AssocType getAssociationTypeImplicitly(@PathParam("id") long assocId) {
         return dmx.getAssociationTypeImplicitly(assocId);
     }
 
     @GET
     @Path("/assoctype/all")
-    public List<AssociationType> getAllAssociationTypes() {
+    public List<AssocType> getAllAssociationTypes() {
         return dmx.getAllAssociationTypes();
     }
 
     @POST
     @Path("/assoctype")
     @Transactional
-    public AssociationType createAssociationType(AssociationTypeModel model) {
-        AssociationType assocType = dmx.createAssociationType(model);
+    public AssocType createAssociationType(AssociationTypeModel model) {
+        AssocType assocType = dmx.createAssociationType(model);
         me.newAssocType(assocType);
         return assocType;
     }
@@ -530,7 +530,7 @@ public class WebservicePlugin extends PluginActivator {
             newType(topicType, "topicType", "newTopicType");
         }
 
-        private void newAssocType(AssociationType assocType) {
+        private void newAssocType(AssocType assocType) {
             newType(assocType, "assocType", "newAssocType");
         }
 

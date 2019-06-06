@@ -1,6 +1,6 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.osgi.PluginContext;
@@ -606,7 +606,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ### TODO: move to PersistenceLayer?
     private void introduceAssociationTypesToPlugin() {
         try {
-            for (AssociationType assocType : dmx.getAllAssociationTypes()) {
+            for (AssocType assocType : dmx.getAllAssociationTypes()) {
                 dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -237,7 +237,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((IntroduceAssociationTypeListener) listener).introduceAssociationType(
-                (AssociationType) params[0]
+                (AssocType) params[0]
             );
         }
     };
@@ -306,7 +306,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PreSendAssociationTypeListener) listener).preSendAssociationType(
-                (AssociationType) params[0]
+                (AssocType) params[0]
             );
         }
     };

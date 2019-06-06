@@ -1,6 +1,6 @@
 package systems.dmx.core.util;
 
-import systems.dmx.core.AssociationType;
+import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Identifiable;
 import systems.dmx.core.JSONEnabled;
@@ -255,7 +255,7 @@ public class DMXUtils {
     // Note: this is experimental
     // ### TODO: do it only for simple assoc types? Drop it, and let the application do this?
     private static void setAssocValue(AssocModel assoc) {
-        AssociationType assocType = CoreActivator.getCoreService().getAssociationType(assoc.getTypeUri());
+        AssocType assocType = CoreActivator.getCoreService().getAssociationType(assoc.getTypeUri());
         assoc.setSimpleValue(assocType.getSimpleValue());
     }
 }
