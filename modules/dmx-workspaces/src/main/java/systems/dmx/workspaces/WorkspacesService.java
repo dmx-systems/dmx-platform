@@ -75,7 +75,7 @@ public interface WorkspacesService {
     /**
      * Returns all associations assigned to the given workspace.
      */
-    List<Assoc> getAssignedAssociations(long workspaceId);
+    List<Assoc> getAssignedAssocs(long workspaceId);
 
     // ---
 
@@ -87,5 +87,5 @@ public interface WorkspacesService {
     /**
      * Returns all associations of the given type that are assigned to the given workspace.
      */
-    List<Assoc> getAssignedAssociations(long workspaceId, String assocTypeUri);
+    List<Assoc> getAssignedAssocs(long workspaceId, String assocTypeUri);
 }

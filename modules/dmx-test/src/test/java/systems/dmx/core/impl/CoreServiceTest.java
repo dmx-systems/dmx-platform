@@ -730,7 +730,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void retypeAssociation() {
+    public void retypeAssoc() {
         DMXTransaction tx = dmx.beginTx();
         Topic type;
         List<RelatedTopic> childTypes;
@@ -767,7 +767,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void retypeAssociationRoles() {
+    public void retypeAssocRoles() {
         DMXTransaction tx = dmx.beginTx();
         Topic type;
         List<RelatedTopic> childTypes;
@@ -838,17 +838,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void retypeAssociationAndTraverse() {
+    public void retypeAssocAndTraverse() {
         DMXTransaction tx = dmx.beginTx();
         Topic t0;
         List<RelatedAssoc> assocs;
         try {
-            setupTestAssociations();
+            setupTestAssocs();
             //
             t0 = dmx.getTopicByUri("dmx.test.t0");
             //
             // execute query
-            assocs = getTestAssociations(t0);
+            assocs = getTestAssocs(t0);
             assertEquals(3, assocs.size());  // we have 3 associations
             //
             // retype the first association
@@ -860,7 +860,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dmx.core.composition", assoc.getTypeUri());
             //
             // re-execute query
-            assocs = getTestAssociations(t0);
+            assocs = getTestAssocs(t0);
             assertEquals(2, assocs.size());  // now we have 2 associations
             // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
             // ### created within the same transaction!
@@ -870,7 +870,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
         // re-execute query
-        assocs = getTestAssociations(t0);
+        assocs = getTestAssocs(t0);
         assertEquals(2, assocs.size());      // we still have 2 associations
     }
 
@@ -1266,7 +1266,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void coreACAssignAssociationToWorkspace() {
+    public void coreACAssignAssocToWorkspace() {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
@@ -1319,7 +1319,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         createAssoc(t0, t3);
     }
 
-    private void setupTestAssociations() {
+    private void setupTestAssocs() {
         Topic t0 = dmx.createTopic(mf.newTopicModel("dmx.test.t0", "dmx.core.plugin"));
         Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
         Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
@@ -1356,7 +1356,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dmx.core.default", "dmx.core.default", "dmx.core.plugin");
     }
 
-    private List<RelatedAssoc> getTestAssociations(Topic topic) {
+    private List<RelatedAssoc> getTestAssocs(Topic topic) {
         return topic.getRelatedAssocs("dmx.core.association",
             "dmx.core.default", "dmx.core.default", "dmx.core.association");
     }

@@ -26,15 +26,15 @@ class TopicModelIterator extends ModelIterator<TopicModel> {
 
 
 
-class AssociationModelIterator extends ModelIterator<AssocModel> {
+class AssocModelIterator extends ModelIterator<AssocModel> {
 
-    AssociationModelIterator(Neo4jStorage storage) {
+    AssocModelIterator(Neo4jStorage storage) {
         super(storage, NodeType.ASSOC);
     }
 
     @Override
     AssocModel buildModel(Node node) {
-        return storage.buildAssociation(node);
+        return storage.buildAssoc(node);
     }
 }
 

@@ -226,7 +226,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/assocs")
     @Override
-    public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId) {
+    public List<Assoc> getAssignedAssocs(@PathParam("id") long workspaceId) {
         return dmx.getAssocsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
@@ -248,8 +248,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/assocs/{assoc_type_uri}")
     @Override
-    public List<Assoc> getAssignedAssociations(@PathParam("id") long workspaceId,
-                                               @PathParam("assoc_type_uri") String assocTypeUri) {
+    public List<Assoc> getAssignedAssocs(@PathParam("id") long workspaceId,
+                                         @PathParam("assoc_type_uri") String assocTypeUri) {
         List<Assoc> assocs = dmx.getAssocsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
@@ -471,7 +471,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             for (Topic topic : getAssignedTopics(workspaceId)) {
                 topic.delete();
             }
-            for (Assoc assoc : getAssignedAssociations(workspaceId)) {
+            for (Assoc assoc : getAssignedAssocs(workspaceId)) {
                 assoc.delete();
             }
         } catch (Exception e) {

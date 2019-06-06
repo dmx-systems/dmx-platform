@@ -72,7 +72,7 @@ public interface TopicmapsService extends TopicmapsConstants {
 
     void setTopicViewProps(long topicmapId, long topicId, ViewProps viewProps);
 
-    void setAssociationViewProps(long topicmapId, long assocId, ViewProps viewProps);
+    void setAssocViewProps(long topicmapId, long assocId, ViewProps viewProps);
 
     /**
      * Convenience method to update the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.

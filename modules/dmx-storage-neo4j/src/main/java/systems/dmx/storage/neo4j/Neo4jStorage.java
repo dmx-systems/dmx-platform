@@ -224,25 +224,24 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public AssocModel fetchAssoc(long assocId) {
-        return buildAssociation(fetchAssocNode(assocId));
+        return buildAssoc(fetchAssocNode(assocId));
     }
 
     @Override
     public AssocModel fetchAssoc(String key, Object value) {
         Node node = assocContentExact.get(key, value).getSingle();
-        return node != null ? buildAssociation(node) : null;
+        return node != null ? buildAssoc(node) : null;
     }
 
     @Override
     public List<AssocModel> fetchAssocs(String key, Object value) {
-        return buildAssociations(assocContentExact.query(key, value));
+        return buildAssocs(assocContentExact.query(key, value));
     }
 
     @Override
     public List<AssocModel> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                            String roleTypeUri2) {
-        return queryAssociationIndex(
-            assocTypeUri,
+        return queryAssocIndex(assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
             roleTypeUri2, NodeType.TOPIC, topicId2, null
         );
@@ -251,8 +250,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
                                                             String topicRoleTypeUri, String assocRoleTypeUri) {
-        return queryAssociationIndex(
-            assocTypeUri,
+        return queryAssocIndex(assocTypeUri,
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
             assocRoleTypeUri, NodeType.ASSOC, assocId, null
         );
@@ -260,7 +258,7 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public Iterator<AssocModel> fetchAllAssocs() {
-        return new AssociationModelIterator(this);
+        return new AssocModelIterator(this);
     }
 
     @Override
@@ -278,7 +276,7 @@ public class Neo4jStorage implements DMXStorage {
         Node assocNode = neo4j.createNode();
         assocNode.setProperty(KEY_NODE_TYPE, "assoc");
         //
-        storeAndIndexAssociationUri(assocNode, assocModel.getUri());
+        storeAndIndexAssocUri(assocNode, assocModel.getUri());
         storeAndIndexAssocTypeUri(assocNode, assocModel.getTypeUri());
         //
         PlayerModel role1 = assocModel.getRoleModel1();
@@ -295,7 +293,7 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public void storeAssocUri(long assocId, String uri) {
-        storeAndIndexAssociationUri(fetchAssocNode(assocId), uri);
+        storeAndIndexAssocUri(fetchAssocNode(assocId), uri);
     }
 
     // Note: a storage implementation is not responsible for maintaining the "Instantiation" associations.
@@ -366,7 +364,7 @@ public class Neo4jStorage implements DMXStorage {
         case TOPIC:
             return buildTopic(node);
         case ASSOC:
-            return buildAssociation(node);
+            return buildAssoc(node);
         default:
             throw new RuntimeException("Unexpected node type: " + nodeType);
         }
@@ -391,8 +389,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
-        return buildRelatedTopics(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedTopics(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1,      othersTopicTypeUri
         ), topicId);
@@ -401,8 +398,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedAssocModel> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
-        return buildRelatedAssocs(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedAssocs(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1,      othersAssocTypeUri
         ), topicId);
@@ -413,8 +409,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedTopicModel> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
-        return buildRelatedTopics(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedTopics(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.TOPIC, -1,      othersTopicTypeUri
         ), assocId);
@@ -423,8 +418,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedAssocModel> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
-        return buildRelatedAssocs(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedAssocs(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1,      othersAssocTypeUri
         ), assocId);
@@ -435,8 +429,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return buildRelatedTopics(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedTopics(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     null,           id, null,
             othersRoleTypeUri, NodeType.TOPIC, -1, othersTopicTypeUri
         ), id);
@@ -445,8 +438,7 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public List<RelatedAssocModel> fetchRelatedAssocs(long id, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return buildRelatedAssocs(queryAssociationIndex(
-            assocTypeUri,
+        return buildRelatedAssocs(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     null,           id, null,
             othersRoleTypeUri, NodeType.ASSOC, -1, othersAssocTypeUri
         ), id);
@@ -480,12 +472,12 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public List<AssocModel> fetchAssocsByProperty(String propUri, Object propValue) {
-        return buildAssociations(queryIndexByProperty(assocContentExact, propUri, propValue));
+        return buildAssocs(queryIndexByProperty(assocContentExact, propUri, propValue));
     }
 
     @Override
     public List<AssocModel> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return buildAssociations(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
+        return buildAssocs(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
     }
 
     // ---
@@ -594,7 +586,7 @@ public class Neo4jStorage implements DMXStorage {
         storeAndIndexExactValue(topicNode, KEY_URI, uri, topicContentExact);
     }
 
-    private void storeAndIndexAssociationUri(Node assocNode, String uri) {
+    private void storeAndIndexAssocUri(Node assocNode, String uri) {
         checkUriUniqueness(uri);
         storeAndIndexExactValue(assocNode, KEY_URI, uri, assocContentExact);
     }
@@ -762,12 +754,12 @@ public class Neo4jStorage implements DMXStorage {
      * @param   typeUri     the new type URI to be indexed for the player node.
      */
     private void reindexTypeUri(int pos, Node playerNode, String typeUri) {
-        for (Node assocNode : lookupAssociations(pos, playerNode)) {
+        for (Node assocNode : lookupAssocs(pos, playerNode)) {
             reindexValue(assocNode, KEY_PLAYER_TYPE_URI, pos, typeUri);
         }
     }
 
-    private IndexHits<Node> lookupAssociations(int pos, Node playerNode) {
+    private IndexHits<Node> lookupAssocs(int pos, Node playerNode) {
         return assocMetadata.get(KEY_PLAYER_ID + pos, playerNode.getId());
     }
 
@@ -798,10 +790,10 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private List<AssocModel> queryAssociationIndex(String assocTypeUri,
+    private List<AssocModel> queryAssocIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        return buildAssociations(assocMetadata.query(buildAssociationQuery(assocTypeUri,
+        return buildAssocs(assocMetadata.query(buildAssocQuery(assocTypeUri,
             roleTypeUri1, playerType1, playerId1, playerTypeUri1,
             roleTypeUri2, playerType2, playerId2, playerTypeUri2
         )));
@@ -815,9 +807,9 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private Query buildAssociationQuery(String assocTypeUri,
-                                     String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
-                                     String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
+    private Query buildAssocQuery(String assocTypeUri,
+                                  String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
+                                  String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         // query bidirectional
         BooleanQuery direction1 = new BooleanQuery();
         addRole(direction1, 1, roleTypeUri1, playerType1, playerId1, playerTypeUri1);
@@ -931,7 +923,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    AssocModel buildAssociation(Node assocNode) {
+    AssocModel buildAssoc(Node assocNode) {
         try {
             List<PlayerModel> roleModels = buildRoleModels(assocNode);
             return mf.newAssocModel(
@@ -948,10 +940,10 @@ public class Neo4jStorage implements DMXStorage {
         }
     }
 
-    private List<AssocModel> buildAssociations(Iterable<Node> assocNodes) {
+    private List<AssocModel> buildAssocs(Iterable<Node> assocNodes) {
         List<AssocModel> assocs = new ArrayList();
         for (Node assocNode : assocNodes) {
-            assocs.add(buildAssociation(assocNode));
+            assocs.add(buildAssoc(assocNode));
         }
         return assocs;
     }
@@ -1053,7 +1045,7 @@ public class Neo4jStorage implements DMXStorage {
                 continue;
             }
             //
-            assocs.add(buildAssociation(assocNode));
+            assocs.add(buildAssoc(assocNode));
         }
         return assocs;
     }

@@ -248,7 +248,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void setTopicViewProps(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                                                    ViewProps viewProps) {
+                                  ViewProps viewProps) {
         storeTopicViewProps(topicmapId, topicId, viewProps);
     }
 
@@ -256,8 +256,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/association/{assoc_id}")
     @Transactional
     @Override
-    public void setAssociationViewProps(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
-                                                                          ViewProps viewProps) {
+    public void setAssocViewProps(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
+                                  ViewProps viewProps) {
         storeAssocViewProps(topicmapId, assocId, viewProps);
     }
 
