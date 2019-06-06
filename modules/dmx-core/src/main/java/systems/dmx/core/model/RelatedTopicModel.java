@@ -4,5 +4,5 @@ package systems.dmx.core.model;
 
 public interface RelatedTopicModel extends TopicModel {
 
-    AssocModel getRelatingAssociation();
+    AssocModel getRelatingAssoc();
 }

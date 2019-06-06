@@ -118,7 +118,7 @@ public class Neo4jStorageTest {
                 "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
             assertEquals(1, topics.size());
             //
-            AssocModel assoc = topics.get(0).getRelatingAssociation();
+            AssocModel assoc = topics.get(0).getRelatingAssoc();
             assertNotNull(assoc);
             //
             storage.deleteAssociation(assoc.getId());

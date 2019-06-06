@@ -81,7 +81,7 @@ class CoreEvent {
     static DMXEvent PRE_CREATE_ASSOCIATION = new DMXEvent(PreCreateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreCreateAssoc) listener).preCreateAssociation(
+            ((PreCreateAssoc) listener).preCreateAssoc(
                 (AssocModel) params[0]
             );
         }
@@ -119,7 +119,7 @@ class CoreEvent {
     static DMXEvent POST_CREATE_ASSOCIATION = new DMXEvent(PostCreateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostCreateAssoc) listener).postCreateAssociation(
+            ((PostCreateAssoc) listener).postCreateAssoc(
                 (Assoc) params[0]
             );
         }
@@ -139,7 +139,7 @@ class CoreEvent {
     static DMXEvent PRE_UPDATE_ASSOCIATION = new DMXEvent(PreUpdateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreUpdateAssoc) listener).preUpdateAssociation(
+            ((PreUpdateAssoc) listener).preUpdateAssoc(
                 (Assoc) params[0], (AssocModel) params[1]
             );
         }
@@ -159,7 +159,7 @@ class CoreEvent {
     static DMXEvent POST_UPDATE_ASSOCIATION = new DMXEvent(PostUpdateAssoc.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PostUpdateAssoc) listener).postUpdateAssociation(
+            ((PostUpdateAssoc) listener).postUpdateAssoc(
                 (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2]
             );
         }

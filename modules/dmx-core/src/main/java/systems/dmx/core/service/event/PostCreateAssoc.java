@@ -7,5 +7,5 @@ import systems.dmx.core.service.EventListener;
 
 public interface PostCreateAssoc extends EventListener {
 
-    void postCreateAssociation(Assoc assoc);
+    void postCreateAssoc(Assoc assoc);
 }

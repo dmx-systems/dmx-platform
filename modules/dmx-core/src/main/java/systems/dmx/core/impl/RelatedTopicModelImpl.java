@@ -24,13 +24,13 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     RelatedTopicModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
-        this.relatingAssoc = relatedTopic.getRelatingAssociation();
+        this.relatingAssoc = relatedTopic.getRelatingAssoc();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssocModelImpl getRelatingAssociation() {
+    public AssocModelImpl getRelatingAssoc() {
         return relatingAssoc;
     }
 

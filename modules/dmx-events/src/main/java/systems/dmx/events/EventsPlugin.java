@@ -56,7 +56,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     // Listeners
 
     @Override
-    public void preCreateAssociation(AssocModel assoc) {
+    public void preCreateAssoc(AssocModel assoc) {
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
             "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
@@ -70,7 +70,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
         if (roles != null) {
             long eventId = roles[0].getPlayerId();
             Topic event = dmx.getTopic(eventId);
-            event.getChildTopics().getTopic("dmx.contacts.address").getRelatingAssociation().delete();
+            event.getChildTopics().getTopic("dmx.contacts.address").getRelatingAssoc().delete();
             timestampsService.setModified(event);
         }
     }

@@ -20,7 +20,7 @@ class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAssocModel 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssocModelImpl getRelatingAssociation() {
+    public AssocModelImpl getRelatingAssoc() {
         return relatingAssoc;
     }
 

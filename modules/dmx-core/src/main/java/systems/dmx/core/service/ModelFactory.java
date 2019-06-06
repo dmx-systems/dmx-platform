@@ -118,9 +118,9 @@ public interface ModelFactory {
 
     // === AssocPlayerModel ===
 
-    AssocPlayerModel newAssociationRoleModel(long assocId, String roleTypeUri);
+    AssocPlayerModel newAssocRoleModel(long assocId, String roleTypeUri);
 
-    AssocPlayerModel newAssociationRoleModel(JSONObject assocRoleModel);
+    AssocPlayerModel newAssocRoleModel(JSONObject assocRoleModel);
 
 
 

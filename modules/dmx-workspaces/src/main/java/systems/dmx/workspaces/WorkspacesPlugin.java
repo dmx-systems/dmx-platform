@@ -375,7 +375,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created association to the current workspace.
      */
     @Override
-    public void postCreateAssociation(Assoc assoc) {
+    public void postCreateAssoc(Assoc assoc) {
         if (workspaceAssignmentIsSuppressed(assoc)) {
             return;
         }

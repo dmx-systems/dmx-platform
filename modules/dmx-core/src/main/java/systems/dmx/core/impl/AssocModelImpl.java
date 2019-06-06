@@ -120,7 +120,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     public PlayerModel createRoleModel(String roleTypeUri) {
-        return mf.newAssociationRoleModel(id, roleTypeUri);
+        return mf.newAssocRoleModel(id, roleTypeUri);
     }
 
 
@@ -477,7 +477,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             throw new RuntimeException("Assoc " + id + " is not associated to an association type");
         }
         //
-        return assocType.getRelatingAssociation();
+        return assocType.getRelatingAssoc();
     }
 
 

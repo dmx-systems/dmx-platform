@@ -444,7 +444,7 @@ class ValueIntegrator {
             boolean deleted = false;
             if (oldValue != null && (newValueIsEmpty || childTopic != null && !oldValue.equals(childTopic))) {
                 // update DB
-                oldValue.getRelatingAssociation().delete();
+                oldValue.getRelatingAssoc().delete();
                 // update memory
                 if (newValueIsEmpty) {
                     logger.fine("### Deleting assignment (compDefUri=\"" + compDefUri + "\") from composite " +
@@ -459,7 +459,7 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (childTopic != null && (oldValue == null || !oldValue.equals(childTopic))) {
                 // update DB
-                assoc = createChildAssociation(parent, childTopic, compDefUri, deleted);
+                assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
                 oldChildTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
@@ -467,11 +467,11 @@ class ValueIntegrator {
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
             if (assoc == null && oldValue != null && !deleted) {
-                assoc = oldValue.getRelatingAssociation();
+                assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
                 RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(compDefUri);
-                updateRelatingAssociation(assoc, compDefUri, newChildValue);
+                updateRelatingAssoc(assoc, compDefUri, newChildValue);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childTopic=" + childTopic +
@@ -508,7 +508,7 @@ class ValueIntegrator {
                 }
                 deleted = true;
                 // update DB
-                oldValue.getRelatingAssociation().delete();
+                oldValue.getRelatingAssoc().delete();
                 // update memory
                 removeTopic(oldValues, originalId);
             }
@@ -518,7 +518,7 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (newId != -1 && (originalId == -1 || originalId != newId)) {
                 // update DB
-                assoc = createChildAssociation(parent, childTopic, compDefUri, deleted);
+                assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
                 oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
@@ -526,20 +526,20 @@ class ValueIntegrator {
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
             if (assoc == null && oldValue != null && !deleted) {
-                assoc = oldValue.getRelatingAssociation();
+                assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
                 RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;
-                updateRelatingAssociation(assoc, compDefUri, newValues);
+                updateRelatingAssoc(assoc, compDefUri, newValues);
             }
         }
     }
 
-    private void updateRelatingAssociation(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
+    private void updateRelatingAssoc(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
         try {
             // Note: for partial create/update requests newValues might be null
             if (newValues != null) {
-                AssocModelImpl _newValues = newValues.getRelatingAssociation();
+                AssocModelImpl _newValues = newValues.getRelatingAssoc();
                 // Note: the roles must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
@@ -706,14 +706,14 @@ class ValueIntegrator {
             if (isOne(compDefUri)) {
                 TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
                 // update DB
-                AssocModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
+                AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);
                 // update memory
                 childTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             } else {
                 for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
                     TopicModel childTopic = value.value;
                     // update DB
-                    AssocModelImpl assoc = createChildAssociation(model, childTopic, compDefUri);
+                    AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);
                     // update memory
                     childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
                 }
@@ -743,12 +743,12 @@ class ValueIntegrator {
     /**
      * Convenience
      */
-    private AssocModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child, String compDefUri) {
-        return createChildAssociation(parent, child, compDefUri, false);
+    private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri) {
+        return createChildAssoc(parent, child, compDefUri, false);
     }
 
-    private AssocModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
-                                                  boolean deleted) {
+    private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
+                                            boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),

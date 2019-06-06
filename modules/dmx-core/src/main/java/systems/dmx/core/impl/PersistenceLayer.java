@@ -457,7 +457,7 @@ public final class PersistenceLayer extends StorageDecorator {
         try {
             AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
-                mf.newAssociationRoleModel(assocId, "dmx.core.instance")
+                mf.newAssocRoleModel(assocId, "dmx.core.instance")
             );
             storeAssoc(assoc);   // direct storage calls used here ### explain
             storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false

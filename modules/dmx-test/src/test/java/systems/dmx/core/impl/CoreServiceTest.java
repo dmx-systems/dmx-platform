@@ -620,21 +620,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         RelatedAssoc compDef = type.getRelatedAssociation("dmx.core.aggregation", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
         logger.info("### comp def ID 1/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 2/3
         compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
         logger.info("### comp def ID 2/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 3/3
         compDef = compDef.getRelatedAssociation("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor",
             null);                              // othersAssocTypeUri=null
         logger.info("### comp def ID 3/3 = " + compDef.getId() +
-            ", relating assoc ID = " + compDef.getRelatingAssociation().getId());
+            ", relating assoc ID = " + compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // there is no other
@@ -740,7 +740,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.size());
             //
             // retype assoc
-            Assoc assoc = childTypes.get(0).getRelatingAssociation();
+            Assoc assoc = childTypes.get(0).getRelatingAssoc();
             assertEquals("dmx.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dmx.core.association");
             assertEquals("dmx.core.association", assoc.getTypeUri());
@@ -777,7 +777,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.size());
             //
             // retype assoc roles
-            Assoc assoc = childTypes.get(0).getRelatingAssociation();
+            Assoc assoc = childTypes.get(0).getRelatingAssoc();
             assoc.getRole1().setRoleTypeUri("dmx.core.default");
             assoc.getRole2().setRoleTypeUri("dmx.core.default");
             //
@@ -1345,7 +1345,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     private Assoc createAssoc(Topic topic, Assoc assoc) {
         return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
             mf.newTopicRoleModel(topic.getId(), "dmx.core.default"),
-            mf.newAssociationRoleModel(assoc.getId(), "dmx.core.default")
+            mf.newAssocRoleModel(assoc.getId(), "dmx.core.default")
         ));
     }
 

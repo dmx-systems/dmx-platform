@@ -23,7 +23,7 @@ enum NodeType {
     ASSOC {
         @Override
         PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
-            return mf.newAssociationRoleModel(node.getId(), roleTypeUri);
+            return mf.newAssocRoleModel(node.getId(), roleTypeUri);
         }
 
         @Override

@@ -241,6 +241,6 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
             throw new RuntimeException("Topic " + id + " is not associated to a topic type");
         }
         //
-        return topicType.getRelatingAssociation();
+        return topicType.getRelatingAssoc();
     }
 }

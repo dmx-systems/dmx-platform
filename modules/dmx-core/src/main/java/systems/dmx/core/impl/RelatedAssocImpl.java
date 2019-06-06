@@ -19,8 +19,8 @@ class RelatedAssocImpl extends AssocImpl implements RelatedAssoc {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Assoc getRelatingAssociation() {
-        return getModel().getRelatingAssociation().instantiate();
+    public Assoc getRelatingAssoc() {
+        return getModel().getRelatingAssoc().instantiate();
     }
 
     @Override

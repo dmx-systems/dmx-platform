@@ -165,7 +165,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postCreateAssociation(Assoc assoc) {
+    public void postCreateAssoc(Assoc assoc) {
         storeTimestamps(assoc);
     }
 
@@ -175,7 +175,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postUpdateAssociation(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
+    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
         storeTimestamp(assoc);
     }
 

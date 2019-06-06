@@ -265,8 +265,7 @@ class TypeStorage {
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the comp def's according to the sequence IDs.
         for (RelatedTopicModelImpl childType : childTypes) {
-            CompDefModel compDef = fetchCompDef(childType.getRelatingAssociation(), typeTopic.getUri(),
-                childType.getUri());
+            CompDefModel compDef = fetchCompDef(childType.getRelatingAssoc(), typeTopic.getUri(), childType.getUri());
             compDefs.put(compDef.getId(), compDef);
         }
         return compDefs;
@@ -598,7 +597,7 @@ class TypeStorage {
     private void insertAtSequenceStart(long typeId, long compDefId) {
         // delete sequence start
         RelatedAssocModelImpl compDef = fetchSequenceStart(typeId);
-        compDef.getRelatingAssociation().delete();
+        compDef.getRelatingAssoc().delete();
         // reconnect
         storeSequenceStart(typeId, compDefId);
         storeSequenceSegment(compDefId, compDef.getId());
@@ -607,7 +606,7 @@ class TypeStorage {
     private void insertIntoSequence(long compDefId, long beforeCompDefId) {
         // delete sequence segment
         RelatedAssocModelImpl compDef = fetchPredecessor(beforeCompDefId);
-        compDef.getRelatingAssociation().delete();
+        compDef.getRelatingAssoc().delete();
         // reconnect
         storeSequenceSegment(compDef.getId(), compDefId);
         storeSequenceSegment(compDefId, beforeCompDefId);
@@ -618,14 +617,14 @@ class TypeStorage {
     private void storeSequenceStart(long typeId, long compDefId) {
         pl.createAssoc("dmx.core.composition",
             mf.newTopicRoleModel(typeId, "dmx.core.type"),
-            mf.newAssociationRoleModel(compDefId, "dmx.core.sequence_start")
+            mf.newAssocRoleModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predCompDefId, long succCompDefId) {
         pl.createAssoc("dmx.core.sequence",
-            mf.newAssociationRoleModel(predCompDefId, "dmx.core.predecessor"),
-            mf.newAssociationRoleModel(succCompDefId, "dmx.core.successor")
+            mf.newAssocRoleModel(predCompDefId, "dmx.core.predecessor"),
+            mf.newAssocRoleModel(succCompDefId, "dmx.core.successor")
         );
     }
 
@@ -640,7 +639,7 @@ class TypeStorage {
         List<RelatedAssocModelImpl> sequence = fetchSequence(typeTopic);
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
         for (RelatedAssocModelImpl assoc : sequence) {
-            assoc.getRelatingAssociation().delete();
+            assoc.getRelatingAssoc().delete();
         }
     }
 
@@ -752,7 +751,7 @@ class TypeStorage {
     }
 
     PlayerModel newCompDefRole(long compDefId) {
-        return mf.newAssociationRoleModel(compDefId, "dmx.core.parent");
+        return mf.newAssocRoleModel(compDefId, "dmx.core.parent");
     }
 
 

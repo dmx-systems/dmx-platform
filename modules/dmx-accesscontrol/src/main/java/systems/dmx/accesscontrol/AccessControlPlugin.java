@@ -551,7 +551,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postCreateAssociation(Assoc assoc) {
+    public void postCreateAssoc(Assoc assoc) {
         setCreatorAndModifier(assoc);
     }
 
@@ -575,7 +575,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssociation(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
+    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
         if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
             assignMembershipToWorkspace(assoc);
         }

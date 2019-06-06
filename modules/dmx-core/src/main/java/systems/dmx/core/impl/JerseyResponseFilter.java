@@ -128,7 +128,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         if (includeChilds) {
             object.loadChildTopics();
             if (includeAssocChilds) {
-                loadRelatingAssociationChildTopics(object);
+                loadRelatingAssocChildTopics(object);
             }
         }
     }
@@ -141,18 +141,18 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---
 
-    private void loadRelatingAssociationChildTopics(DMXObject object) {
+    private void loadRelatingAssocChildTopics(DMXObject object) {
         ChildTopics childTopics = object.getChildTopics();
         for (String childTypeUri : childTopics) {
             Object value = childTopics.get(childTypeUri);
             if (value instanceof RelatedTopic) {
                 RelatedTopic childTopic = (RelatedTopic) value;
-                childTopic.getRelatingAssociation().loadChildTopics();
-                loadRelatingAssociationChildTopics(childTopic);         // recursion
+                childTopic.getRelatingAssoc().loadChildTopics();
+                loadRelatingAssocChildTopics(childTopic);         // recursion
             } else if (value instanceof List) {
                 for (RelatedTopic childTopic : (List<RelatedTopic>) value) {
-                    childTopic.getRelatingAssociation().loadChildTopics();
-                    loadRelatingAssociationChildTopics(childTopic);     // recursion
+                    childTopic.getRelatingAssoc().loadChildTopics();
+                    loadRelatingAssocChildTopics(childTopic);     // recursion
                 }
             } else {
                 throw new RuntimeException("Unexpected \"" + childTypeUri + "\" value in ChildTopics: " + value);

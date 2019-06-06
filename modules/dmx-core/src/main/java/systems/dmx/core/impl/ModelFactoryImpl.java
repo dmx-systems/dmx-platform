@@ -207,7 +207,7 @@ public class ModelFactoryImpl implements ModelFactory {
         if (roleModel.has("topicId") || roleModel.has("topicUri")) {
             return newTopicRoleModel(roleModel);
         } else if (roleModel.has("assocId")) {
-            return newAssociationRoleModel(roleModel);
+            return newAssocRoleModel(roleModel);
         } else {
             throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
         }
@@ -437,16 +437,16 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocPlayerModel ===
 
     @Override
-    public AssocPlayerModelImpl newAssociationRoleModel(long assocId, String roleTypeUri) {
+    public AssocPlayerModelImpl newAssocRoleModel(long assocId, String roleTypeUri) {
         return new AssocPlayerModelImpl(assocId, roleTypeUri, pl());
     }    
 
     @Override
-    public AssocPlayerModelImpl newAssociationRoleModel(JSONObject assocRoleModel) {
+    public AssocPlayerModelImpl newAssocRoleModel(JSONObject assocRoleModel) {
         try {
             long assocId       = assocRoleModel.getLong("assocId");
             String roleTypeUri = assocRoleModel.getString("roleTypeUri");
-            return newAssociationRoleModel(assocId, roleTypeUri);
+            return newAssocRoleModel(assocId, roleTypeUri);
         } catch (Exception e) {
             throw parsingFailed(assocRoleModel, e, "AssocPlayerModelImpl");
         }
