@@ -9,8 +9,8 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    long playerId = -1;             // id of the player (a topic, or an association)
-    String roleTypeUri;             // is never null
+    long id = -1;           // id of the player (a topic, or an association)
+    String roleTypeUri;     // is never null
 
     PersistenceLayer pl;
     ModelFactoryImpl mf;
@@ -22,7 +22,7 @@ abstract class PlayerModelImpl implements PlayerModel {
     }
 
     PlayerModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
-        setPlayerId(playerId);
+        setId(playerId);
         setRoleTypeUri(roleTypeUri);
         this.pl = pl;
         this.mf = pl.mf;
@@ -31,11 +31,11 @@ abstract class PlayerModelImpl implements PlayerModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public long getPlayerId() {
-        if (playerId == -1) {
+    public long getId() {
+        if (id == -1) {
             throw new IllegalStateException("Player ID is not set in " + this);
         }
-        return playerId;
+        return id;
     }
 
     @Override
@@ -47,8 +47,8 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     // ### TODO: to be dropped?
     @Override
-    public void setPlayerId(long playerId) {
-        this.playerId = playerId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override
@@ -64,7 +64,7 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     @Override
     public boolean refsSameObject(PlayerModel model) {
-        return getPlayerId() == model.getPlayerId();
+        return getId() == model.getId();
     }
 
 

@@ -893,7 +893,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Calculate Permissions ===
 
     private void checkReadAccess(PlayerModel role) {
-        long id = role.getPlayerId();
+        long id = role.getId();
         if (role instanceof AssocPlayerModel) {
             checkAssocReadAccess(id);     // recursion
         } else {

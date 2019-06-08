@@ -93,8 +93,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         if (!hasSameRoleTypeUris()) {
             PlayerModel r1 = getRoleModel(roleTypeUri1);
             PlayerModel r2 = getRoleModel(roleTypeUri2);
-            if (r1 != null && r1.getPlayerId() == playerId1 &&
-                r2 != null && r2.getPlayerId() == playerId2) {
+            if (r1 != null && r1.getId() == playerId1 &&
+                r2 != null && r2.getId() == playerId2) {
                 return true;
             }
         }
@@ -103,8 +103,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     public long getOtherPlayerId(long id) {
-        long id1 = roleModel1.getPlayerId();
-        long id2 = roleModel2.getPlayerId();
+        long id1 = roleModel1.getId();
+        long id2 = roleModel2.getId();
         if (id1 == id) {
             return id2;
         } else if (id2 == id) {
@@ -363,8 +363,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // ---
 
     void updateRoleTypeUri(PlayerModelImpl role, String roleTypeUri) {
-        role.setRoleTypeUri(roleTypeUri);                           // update memory
-        pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
+        role.setRoleTypeUri(roleTypeUri);                       // update memory
+        pl.storeRoleTypeUri(id, role.id, role.roleTypeUri);     // update DB
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -380,8 +380,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             return;
         }
         // Note: only readable assocs (access control) are considered
-        for (AssocModelImpl assoc : pl._getAssocs(typeUri, roleModel1.playerId, roleModel2.playerId,
-               roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
+        for (AssocModelImpl assoc : pl._getAssocs(typeUri, roleModel1.id, roleModel2.id, roleModel1.roleTypeUri,
+                                                                                         roleModel2.roleTypeUri)) {
             if (assoc.id != id && assoc.value.equals(value)) {
                 throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
                     ", typeUri=\"" + typeUri + "\", value=\"" + value + "\")");

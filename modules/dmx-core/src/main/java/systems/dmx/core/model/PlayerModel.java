@@ -6,14 +6,14 @@ import systems.dmx.core.JSONEnabled;
 
 public interface PlayerModel extends JSONEnabled, Cloneable {
 
-    long getPlayerId();
+    long getId();
 
     String getRoleTypeUri();
 
     // ---
 
     // ### TODO: to be dropped?
-    void setPlayerId(long playerId);
+    void setId(long id);
 
     void setRoleTypeUri(String roleTypeUri);
 

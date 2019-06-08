@@ -35,8 +35,8 @@ abstract class PlayerImpl implements Player {
     }
 
     @Override
-    public long getPlayerId() {
-        return model.getPlayerId();
+    public long getId() {
+        return model.getId();
     }
 
     @Override

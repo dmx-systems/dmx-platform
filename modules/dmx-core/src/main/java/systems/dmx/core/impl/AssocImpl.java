@@ -202,6 +202,6 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ### TODO: move to model
     private final TopicPlayer filterRole(Player role, TopicPlayerModel roleModel) {
         return role instanceof TopicPlayer && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
-            role.getPlayerId() == roleModel.getPlayerId() ? (TopicPlayer) role : null;
+            role.getId() == roleModel.getId() ? (TopicPlayer) role : null;
     }
 }

@@ -51,7 +51,7 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("topicId", playerId)       // TODO: call getPlayerId() but results in endless recursion if thwows
+                .put("topicId", id)       // TODO: call getId() but results in endless recursion if thwows
                 .put("topicUri", topicUri)
                 .put("roleTypeUri", roleTypeUri);
         } catch (Exception e) {
@@ -72,6 +72,6 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
 
     @Override
     RelatedTopicModelImpl getPlayer(AssocModelImpl assoc) {
-        return mf.newRelatedTopicModel(pl.fetchTopic(getPlayerId()), assoc);
+        return mf.newRelatedTopicModel(pl.fetchTopic(getId()), assoc);
     }
 }

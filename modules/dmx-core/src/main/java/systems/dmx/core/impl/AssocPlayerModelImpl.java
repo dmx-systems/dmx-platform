@@ -25,7 +25,7 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("assocId", playerId)       // TODO: call getPlayerId() but results in endless recursion if thwows
+                .put("assocId", id)       // TODO: call getId() but results in endless recursion if thwows
                 .put("roleTypeUri", roleTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
@@ -45,6 +45,6 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
 
     @Override
     RelatedAssocModelImpl getPlayer(AssocModelImpl assoc) {
-        return mf.newRelatedAssocModel(pl.fetchAssoc(getPlayerId()), assoc);
+        return mf.newRelatedAssocModel(pl.fetchAssoc(getId()), assoc);
     }
 }

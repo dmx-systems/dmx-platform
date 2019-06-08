@@ -371,8 +371,8 @@ class TypeStorage {
     }
 
     private CompDefModelImpl addPlayerIds(CompDefModelImpl compDef) {
-        compDef.getRoleModel("dmx.core.parent_type").playerId = compDef.getParentType().id;
-        compDef.getRoleModel("dmx.core.child_type").playerId  = compDef.getChildType().id;
+        compDef.getRoleModel("dmx.core.parent_type").id = compDef.getParentType().id;
+        compDef.getRoleModel("dmx.core.child_type").id  = compDef.getChildType().id;
         return compDef;
     }
 

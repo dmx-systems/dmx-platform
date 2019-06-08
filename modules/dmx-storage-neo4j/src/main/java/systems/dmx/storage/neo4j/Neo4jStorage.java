@@ -976,7 +976,7 @@ public class Neo4jStorage implements DMXStorage {
         if (roleModel instanceof TopicPlayerModel) {
             return fetchTopicPlayerNode((TopicPlayerModel) roleModel);
         } else if (roleModel instanceof AssocPlayerModel) {
-            return fetchAssocNode(roleModel.getPlayerId());
+            return fetchAssocNode(roleModel.getId());
         } else {
             throw new RuntimeException("Unexpected role model: " + roleModel);
         }
@@ -986,7 +986,7 @@ public class Neo4jStorage implements DMXStorage {
         if (roleModel.topicIdentifiedByUri()) {
             return fetchTopicNodeByUri(roleModel.getTopicUri());
         } else {
-            return fetchTopicNode(roleModel.getPlayerId());
+            return fetchTopicNode(roleModel.getId());
         }
     }
 
