@@ -307,8 +307,6 @@
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
-                <module>modules/dmx-filemanager</module>
-                <module>modules/dmx-help</module>
                 <module>modules/dmx-accesscontrol</module>
                 <module>modules/dmx-facets</module>
                 <module>modules/dmx-geomaps</module>
@@ -399,8 +397,6 @@
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
-                <module>modules/dmx-filemanager</module>
-                <module>modules/dmx-help</module>
                 <module>modules/dmx-accesscontrol</module>
                 <module>modules/dmx-facets</module>
                 <module>modules/dmx-geomaps</module>

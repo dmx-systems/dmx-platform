@@ -88,16 +88,6 @@
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
-            <artifactId>dmx-filemanager</artifactId>
-            <version>5.0-beta-4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>systems.dmx</groupId>
-            <artifactId>dmx-help</artifactId>
-            <version>5.0-beta-4-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>systems.dmx</groupId>
             <artifactId>dmx-accesscontrol</artifactId>
             <version>5.0-beta-4-SNAPSHOT</version>
         </dependency>
