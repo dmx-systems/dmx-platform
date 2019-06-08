@@ -347,7 +347,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      */
     DMXObjectModelImpl getPlayer(String roleTypeUri) {
         PlayerModelImpl role = getRoleModel(roleTypeUri);
-        return role != null ? role.getPlayer(this) : null;
+        return role != null ? role.getDMXObject(this) : null;
     }
 
     TopicModelImpl getTopicByType(String topicTypeUri) {
@@ -373,9 +373,9 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     private void duplicateCheck() {
         // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
-        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // Note: we can't call roleModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
-        // Compare to DMXUtils.associationAutoTyping()
+        // Compare to DMXUtils.getRoleModels()
         if (!(roleModel1 instanceof TopicPlayerModel) || !(roleModel2 instanceof TopicPlayerModel)) {
             return;
         }
@@ -450,7 +450,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     private TopicModelImpl filterTopic(PlayerModelImpl role, String topicTypeUri) {
         if (role instanceof TopicPlayerModel) {
-            TopicModelImpl topic = ((TopicPlayerModelImpl) role).getPlayer(this);
+            TopicModelImpl topic = ((TopicPlayerModelImpl) role).getDMXObject(this);
             if (topic.getTypeUri().equals(topicTypeUri)) {
                 return topic;
             }

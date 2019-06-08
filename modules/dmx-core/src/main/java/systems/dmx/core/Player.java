@@ -6,11 +6,11 @@ import systems.dmx.core.model.PlayerModel;
 
 public interface Player extends JSONEnabled {
 
-    String getRoleTypeUri();
-
     long getId();
 
-    DMXObject getPlayer();
+    String getRoleTypeUri();
+
+    DMXObject getDMXObject();
 
     // ---
 

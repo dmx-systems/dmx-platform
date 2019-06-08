@@ -22,7 +22,7 @@ abstract class PlayerModelImpl implements PlayerModel {
     }
 
     PlayerModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
-        setId(playerId);
+        this.id = id;
         setRoleTypeUri(roleTypeUri);
         this.pl = pl;
         this.mf = pl.mf;
@@ -44,12 +44,6 @@ abstract class PlayerModelImpl implements PlayerModel {
     }
 
     // ---
-
-    // ### TODO: to be dropped?
-    @Override
-    public void setId(long id) {
-        this.id = id;
-    }
 
     @Override
     public final void setRoleTypeUri(String roleTypeUri) {
@@ -101,5 +95,5 @@ abstract class PlayerModelImpl implements PlayerModel {
     /**
      * @param   assoc   the association this role is involved in
      */
-    abstract DMXObjectModelImpl getPlayer(AssocModelImpl assoc);
+    abstract DMXObjectModelImpl getDMXObject(AssocModelImpl assoc);
 }

@@ -57,12 +57,12 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     @Override
     public final DMXObject getPlayer1() {
-        return getRole1().getPlayer();
+        return getRole1().getDMXObject();
     }
 
     @Override
     public final DMXObject getPlayer2() {
-        return getRole2().getPlayer();
+        return getRole2().getDMXObject();
     }
 
     // --- Convenience Methods ---

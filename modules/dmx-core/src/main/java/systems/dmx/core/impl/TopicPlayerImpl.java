@@ -24,7 +24,7 @@ class TopicPlayerImpl extends PlayerImpl implements TopicPlayer {
 
     @Override
     public Topic getTopic() {
-        return (Topic) getPlayer();
+        return (Topic) getDMXObject();
     }
 
     @Override

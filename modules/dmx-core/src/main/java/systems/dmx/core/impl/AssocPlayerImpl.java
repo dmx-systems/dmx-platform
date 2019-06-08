@@ -24,7 +24,7 @@ class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
 
     @Override
     public Assoc getAssoc() {
-        return (Assoc) getPlayer();
+        return (Assoc) getDMXObject();
     }
 
 

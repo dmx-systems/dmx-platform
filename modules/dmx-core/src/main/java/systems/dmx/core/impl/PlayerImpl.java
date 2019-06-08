@@ -30,18 +30,18 @@ abstract class PlayerImpl implements Player {
     // === Player Implementation ===
 
     @Override
-    public String getRoleTypeUri() {
-        return model.getRoleTypeUri();
-    }
-
-    @Override
     public long getId() {
         return model.getId();
     }
 
     @Override
-    public DMXObject getPlayer() {
-        return model.getPlayer(assoc).instantiate();    // ### TODO: permission check?
+    public String getRoleTypeUri() {
+        return model.getRoleTypeUri();
+    }
+
+    @Override
+    public DMXObject getDMXObject() {
+        return model.getDMXObject(assoc).instantiate();    // ### TODO: permission check?
     }
 
     // ---

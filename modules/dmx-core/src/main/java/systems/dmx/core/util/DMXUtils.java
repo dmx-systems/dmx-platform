@@ -225,7 +225,7 @@ public class DMXUtils {
             return null;
         }
         CoreService dmx = CoreActivator.getCoreService();
-        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // Note: we can't call roleModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case the association is part of the player's composite structure.
         // Compare to AssocModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getId(), "typeUri");

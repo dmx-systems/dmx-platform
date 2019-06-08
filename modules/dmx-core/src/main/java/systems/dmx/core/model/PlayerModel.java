@@ -12,9 +12,6 @@ public interface PlayerModel extends JSONEnabled, Cloneable {
 
     // ---
 
-    // ### TODO: to be dropped?
-    void setId(long id);
-
     void setRoleTypeUri(String roleTypeUri);
 
     // ---

@@ -71,7 +71,7 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
     }
 
     @Override
-    RelatedTopicModelImpl getPlayer(AssocModelImpl assoc) {
+    RelatedTopicModelImpl getDMXObject(AssocModelImpl assoc) {
         return mf.newRelatedTopicModel(pl.fetchTopic(getId()), assoc);
     }
 }
