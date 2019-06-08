@@ -131,8 +131,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("role1", roleModel1 != null ? roleModel1.toJSON() : null)
-                .put("role2", roleModel2 != null ? roleModel2.toJSON() : null);
+                .put("player1", roleModel1 != null ? roleModel1.toJSON() : null)
+                .put("player2", roleModel2 != null ? roleModel2.toJSON() : null);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

@@ -189,14 +189,14 @@ public class ModelFactoryImpl implements ModelFactory {
      * @return  maybe null
      */
     private PlayerModelImpl parseRole1(JSONObject assoc) throws JSONException {
-        return parseRole(assoc, "role1");
+        return parseRole(assoc, "player1");
     }
 
     /**
      * @return  maybe null
      */
     private PlayerModelImpl parseRole2(JSONObject assoc) throws JSONException {
-        return parseRole(assoc, "role2");
+        return parseRole(assoc, "player2");
     }
 
     private PlayerModelImpl parseRole(JSONObject assoc, String key) throws JSONException {
@@ -698,8 +698,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public CompDefModelImpl newCompDefModel(JSONObject compDef) {
         try {
-            PlayerModel role1 = parseRole1(compDef);     // may be null
-            PlayerModel role2 = parseRole2(compDef);     // may be null
+            PlayerModel player1 = parseRole1(compDef);     // may be null
+            PlayerModel player2 = parseRole2(compDef);     // may be null
             // Note: the canonic comp def JSON format does not require explicit assoc roles. Comp defs declared in
             // JSON migrations support a simplified format. In contrast comp defs contained in a request may include
             // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
@@ -707,8 +707,8 @@ public class ModelFactoryImpl implements ModelFactory {
             return new CompDefModelImpl(
                 newAssocModel(compDef.optLong("id", -1), null,
                     TYPE_COMP_DEF,
-                    role1 != null ? role1 : parentRole(compDef.getString("parentTypeUri")),
-                    role2 != null ? role2 : childRole(compDef.getString("childTypeUri")),
+                    player1 != null ? player1 : parentRole(compDef.getString("parentTypeUri")),
+                    player2 != null ? player2 : childRole(compDef.getString("childTypeUri")),
                     null, childTopics(compDef)
                 ),
                 newViewConfigurationModel(compDef.optJSONArray("viewConfigTopics"))

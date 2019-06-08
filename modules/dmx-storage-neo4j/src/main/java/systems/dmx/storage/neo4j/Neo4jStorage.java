@@ -279,14 +279,14 @@ public class Neo4jStorage implements DMXStorage {
         storeAndIndexAssocUri(assocNode, assocModel.getUri());
         storeAndIndexAssocTypeUri(assocNode, assocModel.getTypeUri());
         //
-        PlayerModel role1 = assocModel.getRoleModel1();
-        PlayerModel role2 = assocModel.getRoleModel2();
-        Node playerNode1 = storePlayerRelationship(assocNode, role1);
-        Node playerNode2 = storePlayerRelationship(assocNode, role2);
+        PlayerModel player1 = assocModel.getRoleModel1();
+        PlayerModel player2 = assocModel.getRoleModel2();
+        Node playerNode1 = storePlayerRelationship(assocNode, player1);
+        Node playerNode2 = storePlayerRelationship(assocNode, player2);
         //
         // 2) update index
-        indexAssoc(assocNode, role1.getRoleTypeUri(), playerNode1,
-                              role2.getRoleTypeUri(), playerNode2);
+        indexAssoc(assocNode, player1.getRoleTypeUri(), playerNode1,
+                              player2.getRoleTypeUri(), playerNode2);
         // 3) update model
         assocModel.setId(assocNode.getId());
     }
