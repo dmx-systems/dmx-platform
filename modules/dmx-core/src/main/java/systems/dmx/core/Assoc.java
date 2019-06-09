@@ -25,7 +25,28 @@ public interface Assoc extends DMXObject {
 
     DMXObject getDMXObject2();
 
-    // --- Convenience Methods ---
+    // ---
+
+    /**
+     * @return  this association's player which plays the given role.
+     *          If there is no such player, null is returned.
+     *          <p>
+     *          If there are 2 such players an exception is thrown.
+     */
+    RelatedObject getDMXObjectByRole(String roleTypeUri);
+
+    /**
+     * ### TODO: make it work for assoc players as well or drop it
+     * ### TODO: rename it to "getDMXObjectByType"
+     *
+     * @return  this association's topic which has the given type.
+     *          If there is no such topic, null is returned.
+     *          <p>
+     *          If there are 2 such topics an exception is thrown.
+     */
+    DMXObject getDMXObjectByType(String topicTypeUri);
+
+    // ---
 
     /**
      * @return  this association's role that matches the given role type.
@@ -48,27 +69,6 @@ public interface Assoc extends DMXObject {
     boolean matches(String roleTypeUri1, long playerId1, String roleTypeUri2, long playerId2);
 
     long getOtherPlayerId(long id);
-
-    // ---
-
-    /**
-     * @return  this association's player which plays the given role.
-     *          If there is no such player, null is returned.
-     *          <p>
-     *          If there are 2 such players an exception is thrown.
-     */
-    RelatedObject getPlayer(String roleTypeUri);
-
-    /**
-     * ### TODO: make it work for assoc players as well or drop it
-     * ### TODO: rename it to "getPlayerByType"
-     *
-     * @return  this association's topic which has the given type.
-     *          If there is no such topic, null is returned.
-     *          <p>
-     *          If there are 2 such topics an exception is thrown.
-     */
-    Topic getTopicByType(String topicTypeUri);
 
     // ---
 

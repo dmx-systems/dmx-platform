@@ -433,7 +433,7 @@ class TypeStorage {
      *          A topic representing either a topic type or an association type.
      */
     private TopicModelImpl fetchParentTypeTopic(AssocModelImpl assoc) {
-        TopicModelImpl parentType = (TopicModelImpl) assoc.getPlayer("dmx.core.parent_type");
+        TopicModelImpl parentType = (TopicModelImpl) assoc.getDMXObjectByRole("dmx.core.parent_type");
         // error check
         if (parentType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dmx.core.parent_type\" is missing in " + assoc);
@@ -449,7 +449,7 @@ class TypeStorage {
      *          A topic representing a topic type.
      */
     private TopicModelImpl fetchChildTypeTopic(AssocModelImpl assoc) {
-        TopicModelImpl childType = (TopicModelImpl) assoc.getPlayer("dmx.core.child_type");
+        TopicModelImpl childType = (TopicModelImpl) assoc.getDMXObjectByRole("dmx.core.child_type");
         // error check
         if (childType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dmx.core.child_type\" is missing in " + assoc);

@@ -327,8 +327,8 @@ class ValueIntegrator {
             }
             // TODO: partial updates. URI and role models must not expected to be part of the update model.
             AssocModelImpl _newValues = (AssocModelImpl) newValues;
-            return mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
-                                                                                    _newValues.roleModel2);
+            return mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.player1,
+                                                                                    _newValues.player2);
         } else {
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {

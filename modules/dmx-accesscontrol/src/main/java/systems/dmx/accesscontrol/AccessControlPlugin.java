@@ -641,7 +641,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private void assignMembershipToWorkspace(Assoc assoc) {
         try {
-            Topic workspace = assoc.getTopicByType("dmx.workspaces.workspace");
+            DMXObject workspace = assoc.getDMXObjectByType("dmx.workspaces.workspace");
             if (workspace == null) {
                 throw new RuntimeException("Assoc " + assoc.getId() + " has no workspace player");
             }

@@ -65,7 +65,21 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
         return getPlayer2().getDMXObject();
     }
 
-    // --- Convenience Methods ---
+    // ---
+
+    @Override
+    public final RelatedObject getDMXObjectByRole(String roleTypeUri) {
+        DMXObjectModelImpl object = getModel().getDMXObjectByRole(roleTypeUri);
+        return object != null ? (RelatedObject) object.instantiate() : null;    // ### TODO: permission check?
+    }
+
+    @Override
+    public final DMXObject getDMXObjectByType(String topicTypeUri) {
+        DMXObjectModelImpl object = getModel().getDMXObjectByType(topicTypeUri);
+        return object != null ? object.instantiate() : null;                    // ### TODO: permission check?
+    }
+
+    // ---
 
     @Override
     public final Player getRole(String roleTypeUri) {
@@ -85,20 +99,6 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final long getOtherPlayerId(long id) {
         return getModel().getOtherPlayerId(id);
-    }
-
-    // ---
-
-    @Override
-    public final RelatedObject getPlayer(String roleTypeUri) {
-        DMXObjectModelImpl object = getModel().getPlayer(roleTypeUri);
-        return object != null ? (RelatedObject) object.instantiate() : null;    // ### TODO: permission check?
-    }
-
-    @Override
-    public final Topic getTopicByType(String topicTypeUri) {
-        TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
-        return topic != null ? topic.instantiate() : null;                      // ### TODO: permission check?
     }
 
     // ---

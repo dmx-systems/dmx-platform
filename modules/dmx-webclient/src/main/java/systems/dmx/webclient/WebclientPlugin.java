@@ -144,7 +144,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             if (compDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }
-            type = (Topic) compDef.getPlayer("dmx.core.parent_type");
+            type = (Topic) compDef.getDMXObjectByRole("dmx.core.parent_type");
             compDefId = compDef.getId();
         }
         //

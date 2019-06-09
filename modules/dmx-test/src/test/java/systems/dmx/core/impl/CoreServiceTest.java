@@ -72,8 +72,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.plugin",              compDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", compDef.getChildTypeUri());
         assertEquals("dmx.core.one",                 compDef.getChildCardinalityUri());
-        DMXObject t1 = compDef.getPlayer("dmx.core.parent_type");
-        DMXObject t2 = compDef.getPlayer("dmx.core.child_type");
+        DMXObject t1 = compDef.getDMXObjectByRole("dmx.core.parent_type");
+        DMXObject t2 = compDef.getDMXObjectByRole("dmx.core.child_type");
         assertEquals("dmx.core.plugin",              t1.getUri());
         assertEquals("dmx.core.topic_type",          t1.getTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", t2.getUri());
