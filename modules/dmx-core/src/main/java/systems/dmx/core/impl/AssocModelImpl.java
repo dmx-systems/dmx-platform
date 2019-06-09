@@ -103,14 +103,18 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     public long getOtherPlayerId(long id) {
-        long id1 = player1.getId();
-        long id2 = player2.getId();
-        if (id1 == id) {
-            return id2;
-        } else if (id2 == id) {
-            return id1;
-        } else {
-            throw new IllegalArgumentException("ID " + id + " doesn't refer to a player in " + this);
+        try {
+            long id1 = player1.getId();
+            long id2 = player2.getId();
+            if (id1 == id) {
+                return id2;
+            } else if (id2 == id) {
+                return id1;
+            } else {
+                throw new IllegalArgumentException(id + " is not a player in " + this);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Can't get other player of " + id + " in " + this, e);
         }
     }
 

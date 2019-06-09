@@ -36,8 +36,7 @@ public interface Assoc extends DMXObject {
     RelatedObject getDMXObjectByRole(String roleTypeUri);
 
     /**
-     * ### TODO: make it work for assoc players as well or drop it
-     * ### TODO: rename it to "getDMXObjectByType"
+     * TODO: return RelatedObject
      *
      * @return  this association's topic which has the given type.
      *          If there is no such topic, null is returned.

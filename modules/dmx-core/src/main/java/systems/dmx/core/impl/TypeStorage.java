@@ -206,12 +206,11 @@ class TypeStorage {
             RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
                 "dmx.core.default", "dmx.core.data_type");
             if (dataType == null) {
-                throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
+                throw new RuntimeException("No data type topic associated to " + className + " \"" + typeUri + "\"");
             }
             return dataType;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the data type topic of " + className + " \"" + typeUri + "\" failed",
-                e);
+            throw new RuntimeException("Fetching data type topic of " + className + " \"" + typeUri + "\" failed", e);
         }
     }
 

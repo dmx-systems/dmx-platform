@@ -22,7 +22,7 @@ abstract class PlayerModelImpl implements PlayerModel {
     }
 
     PlayerModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
-        this.id = id;
+        this.id = playerId;
         setRoleTypeUri(roleTypeUri);
         this.pl = pl;
         this.mf = pl.mf;
@@ -33,7 +33,7 @@ abstract class PlayerModelImpl implements PlayerModel {
     @Override
     public long getId() {
         if (id == -1) {
-            throw new IllegalStateException("Player ID is not set in " + this);
+            throw new IllegalStateException("No player ID set in " + this);
         }
         return id;
     }
