@@ -44,25 +44,25 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
 
     @Override
-    public final Player getRole1() {
+    public final Player getPlayer1() {
         return getModel().getRoleModel1().instantiate(getModel());
     }
 
     @Override
-    public final Player getRole2() {
+    public final Player getPlayer2() {
         return getModel().getRoleModel2().instantiate(getModel());
     }
 
     // ---
 
     @Override
-    public final DMXObject getPlayer1() {
-        return getRole1().getDMXObject();
+    public final DMXObject getDMXObject1() {
+        return getPlayer1().getDMXObject();
     }
 
     @Override
-    public final DMXObject getPlayer2() {
-        return getRole2().getDMXObject();
+    public final DMXObject getDMXObject2() {
+        return getPlayer2().getDMXObject();
     }
 
     // --- Convenience Methods ---
@@ -106,17 +106,17 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ### TODO: make use of model's getRole()
     @Override
     public final Player getRole(PlayerModel roleModel) {
-        if (getRole1().getModel().refsSameObject(roleModel)) {
-            return getRole1();
-        } else if (getRole2().getModel().refsSameObject(roleModel)) {
-            return getRole2();
+        if (getPlayer1().getModel().refsSameObject(roleModel)) {
+            return getPlayer1();
+        } else if (getPlayer2().getModel().refsSameObject(roleModel)) {
+            return getPlayer2();
         }
         throw new RuntimeException("Player is not part of association (role=" + roleModel + ", association=" + this);
     }
 
     @Override
     public final boolean isPlayer(TopicPlayerModel roleModel) {
-        return filterRole(getRole1(), roleModel) != null || filterRole(getRole2(), roleModel) != null;
+        return filterRole(getPlayer1(), roleModel) != null || filterRole(getPlayer2(), roleModel) != null;
     }
 
     // ---

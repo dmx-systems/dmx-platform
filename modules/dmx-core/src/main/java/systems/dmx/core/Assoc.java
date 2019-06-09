@@ -15,15 +15,15 @@ import java.util.List;
  */
 public interface Assoc extends DMXObject {
 
-    Player getRole1();
+    Player getPlayer1();
 
-    Player getRole2();
+    Player getPlayer2();
 
     // ---
 
-    DMXObject getPlayer1();
+    DMXObject getDMXObject1();
 
-    DMXObject getPlayer2();
+    DMXObject getDMXObject2();
 
     // --- Convenience Methods ---
 

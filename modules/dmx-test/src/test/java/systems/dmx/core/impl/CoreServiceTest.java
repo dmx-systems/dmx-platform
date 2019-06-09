@@ -778,8 +778,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // retype assoc roles
             Assoc assoc = childTypes.get(0).getRelatingAssoc();
-            assoc.getRole1().setRoleTypeUri("dmx.core.default");
-            assoc.getRole2().setRoleTypeUri("dmx.core.default");
+            assoc.getPlayer1().setRoleTypeUri("dmx.core.default");
+            assoc.getPlayer2().setRoleTypeUri("dmx.core.default");
             //
             // re-execute query
             childTypes = getChildTypes(type);
