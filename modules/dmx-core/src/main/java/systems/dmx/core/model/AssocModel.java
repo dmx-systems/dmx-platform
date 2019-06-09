@@ -9,15 +9,15 @@ package systems.dmx.core.model;
  */
 public interface AssocModel extends DMXObjectModel {
 
-    PlayerModel getRoleModel1();
+    PlayerModel getPlayer1();
 
-    PlayerModel getRoleModel2();
+    PlayerModel getPlayer2();
 
     // ---
 
-    void setRoleModel1(PlayerModel roleModel1);
+    void setPlayer1(PlayerModel roleModel1);
 
-    void setRoleModel2(PlayerModel roleModel2);
+    void setPlayer2(PlayerModel roleModel2);
 
     // --- Convenience Methods ---
 

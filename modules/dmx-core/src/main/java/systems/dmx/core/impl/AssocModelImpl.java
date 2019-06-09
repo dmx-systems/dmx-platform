@@ -25,8 +25,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    PlayerModelImpl player1;   // may be null in update models
-    PlayerModelImpl player2;   // may be null in update models
+    PlayerModelImpl player1;    // may be null in update models
+    PlayerModelImpl player2;    // may be null in update models
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -45,24 +45,24 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public PlayerModelImpl getRoleModel1() {
+    public PlayerModelImpl getPlayer1() {
         return player1;
     }
 
     @Override
-    public PlayerModelImpl getRoleModel2() {
+    public PlayerModelImpl getPlayer2() {
         return player2;
     }
 
     // ---
 
     @Override
-    public void setRoleModel1(PlayerModel player1) {
+    public void setPlayer1(PlayerModel player1) {
         this.player1 = (PlayerModelImpl) player1;
     }
 
     @Override
-    public void setRoleModel2(PlayerModel player2) {
+    public void setPlayer2(PlayerModel player2) {
         this.player2 = (PlayerModelImpl) player2;
     }
 
@@ -150,8 +150,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     public AssocModel clone() {
         try {
             AssocModel model = (AssocModel) super.clone();
-            model.setRoleModel1(player1.clone());
-            model.setRoleModel2(player2.clone());
+            model.setPlayer1(player1.clone());
+            model.setPlayer2(player2.clone());
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Cloning an AssocModel failed", e);
@@ -403,8 +403,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      *                          If player 2 is <code>null</code> it is not updated.
      */
     private void updatePlayers(AssocModel updateModel) {
-        updatePlayer(updateModel.getRoleModel1(), 1);
-        updatePlayer(updateModel.getRoleModel2(), 2);
+        updatePlayer(updateModel.getPlayer1(), 1);
+        updatePlayer(updateModel.getPlayer2(), 2);
     }
 
     /**

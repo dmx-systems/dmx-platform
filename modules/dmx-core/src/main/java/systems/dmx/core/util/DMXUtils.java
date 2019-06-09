@@ -218,8 +218,8 @@ public class DMXUtils {
     }
 
     public static PlayerModel[] getRoleModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
-        PlayerModel r1 = assoc.getRoleModel1();
-        PlayerModel r2 = assoc.getRoleModel2();
+        PlayerModel r1 = assoc.getPlayer1();
+        PlayerModel r2 = assoc.getPlayer2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
         if (!(r1 instanceof TopicPlayerModel) || !(r2 instanceof TopicPlayerModel)) {
             return null;

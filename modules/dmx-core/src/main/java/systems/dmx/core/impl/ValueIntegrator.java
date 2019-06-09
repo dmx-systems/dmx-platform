@@ -543,8 +543,8 @@ class ValueIntegrator {
                 // Note: the roles must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
-                _newValues.setRoleModel1(null);
-                _newValues.setRoleModel2(null);
+                _newValues.setPlayer1(null);
+                _newValues.setPlayer2(null);
                 // Note: if no relating assocs are contained in a create/update request the model factory
                 // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
                 // TODO: is condition needed? => yes, try create new topic
