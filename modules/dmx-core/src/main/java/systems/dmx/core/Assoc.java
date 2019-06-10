@@ -71,13 +71,6 @@ public interface Assoc extends DMXObject {
 
     // ---
 
-    /**
-     * ### TODO: drop it
-     */
-    boolean isPlayer(TopicPlayerModel roleModel);
-
-    // ---
-
     void update(AssocModel model);
 
     // ---

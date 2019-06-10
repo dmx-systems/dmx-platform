@@ -104,13 +104,6 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ---
 
     @Override
-    public final boolean isPlayer(TopicPlayerModel roleModel) {
-        return filterRole(getPlayer1(), roleModel) != null || filterRole(getPlayer2(), roleModel) != null;
-    }
-
-    // ---
-
-    @Override
     public final void update(AssocModel updateModel) {
         pl.updateAssoc(getModel(), (AssocModelImpl) updateModel);
     }
@@ -182,15 +175,5 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final List<Assoc> getAssocs() {
         return pl.instantiate(pl.getAssocAssocs(getId()));
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // ### TODO: move to model
-    private final TopicPlayer filterRole(Player role, TopicPlayerModel roleModel) {
-        return role instanceof TopicPlayer && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
-            role.getId() == roleModel.getId() ? (TopicPlayer) role : null;
     }
 }
