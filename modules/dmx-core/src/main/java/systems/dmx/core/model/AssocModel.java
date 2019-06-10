@@ -15,14 +15,14 @@ public interface AssocModel extends DMXObjectModel {
 
     // ---
 
-    void setPlayer1(PlayerModel roleModel1);
+    void setPlayer1(PlayerModel player1);
 
-    void setPlayer2(PlayerModel roleModel2);
+    void setPlayer2(PlayerModel player2);
 
     // --- Convenience Methods ---
 
     /**
-     * @return  this association's player that plays the given role type.
+     * @return  this association's player that plays the given role.
      *          If no player matches, null is returned.
      *          If both players are matching an exception is thrown.
      */

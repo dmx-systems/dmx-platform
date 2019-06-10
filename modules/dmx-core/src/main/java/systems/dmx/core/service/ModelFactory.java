@@ -66,12 +66,12 @@ public interface ModelFactory {
 
     // === AssocModel ===
 
-    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2,
                              SimpleValue value, ChildTopicsModel childTopics);
 
-    AssocModel newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
+    AssocModel newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2);
 
-    AssocModel newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+    AssocModel newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2,
                              ChildTopicsModel childTopics);
 
     // ### TODO: Refactoring needed. See comments in impl.
@@ -83,7 +83,7 @@ public interface ModelFactory {
     // ### TODO: Refactoring needed. See comments in impl.
     AssocModel newAssocModel(String typeUri, ChildTopicsModel childTopics);
 
-    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1, PlayerModel roleModel2);
+    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2);
 
     AssocModel newAssocModel(AssocModel assoc);
 

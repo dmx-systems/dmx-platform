@@ -125,21 +125,21 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocModel ===
 
     @Override
-    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1,
-                                        PlayerModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
+    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2,
+                                        SimpleValue value, ChildTopicsModel childTopics) {
         return new AssocModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
-            (PlayerModelImpl) roleModel1, (PlayerModelImpl) roleModel2);
+            (PlayerModelImpl) player1, (PlayerModelImpl) player2);
     }
 
     @Override
-    public AssocModelImpl newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
-        return newAssocModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
+    public AssocModelImpl newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2) {
+        return newAssocModel(-1, null, typeUri, player1, player2, null, null);
     }
 
     @Override
-    public AssocModelImpl newAssocModel(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2,
+    public AssocModelImpl newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2,
                                         ChildTopicsModel childTopics) {
-        return newAssocModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
+        return newAssocModel(-1, null, typeUri, player1, player2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
@@ -164,9 +164,8 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel roleModel1,
-                                                                             PlayerModel roleModel2) {
-        return newAssocModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
+    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2) {
+        return newAssocModel(id, uri, typeUri, player1, player2, null, null);
     }
 
     @Override

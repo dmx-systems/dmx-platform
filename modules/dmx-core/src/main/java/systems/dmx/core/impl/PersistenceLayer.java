@@ -338,8 +338,8 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssocImpl createAssoc(String typeUri, PlayerModel roleModel1, PlayerModel roleModel2) {
-        return createAssoc(mf.newAssocModel(typeUri, roleModel1, roleModel2));
+    AssocImpl createAssoc(String typeUri, PlayerModel player1, PlayerModel player2) {
+        return createAssoc(mf.newAssocModel(typeUri, player1, player2));
     }
 
     /**

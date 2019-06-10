@@ -62,11 +62,11 @@ public class Neo4jStorageTest {
         AssocModel assoc = storage.fetchAssoc(assocId);
         assertNotNull(assoc);
         //
-        PlayerModel roleModel1 = assoc.getPlayerByRole("dmx.core.type");
-        assertNotNull(roleModel1);
+        PlayerModel player1 = assoc.getPlayerByRole("dmx.core.type");
+        assertNotNull(player1);
         //
-        PlayerModel roleModel2 = assoc.getPlayerByRole("dmx.core.instance");
-        assertNotNull(roleModel2);
+        PlayerModel player2 = assoc.getPlayerByRole("dmx.core.instance");
+        assertNotNull(player2);
     }
 
     @Test
