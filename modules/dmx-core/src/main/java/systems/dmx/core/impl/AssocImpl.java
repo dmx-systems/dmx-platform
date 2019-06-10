@@ -103,17 +103,6 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---
 
-    // ### TODO: make use of model's getRole()
-    @Override
-    public final Player getRole(PlayerModel roleModel) {
-        if (getPlayer1().getModel().refsSameObject(roleModel)) {
-            return getPlayer1();
-        } else if (getPlayer2().getModel().refsSameObject(roleModel)) {
-            return getPlayer2();
-        }
-        throw new RuntimeException("Player is not part of association (role=" + roleModel + ", association=" + this);
-    }
-
     @Override
     public final boolean isPlayer(TopicPlayerModel roleModel) {
         return filterRole(getPlayer1(), roleModel) != null || filterRole(getPlayer2(), roleModel) != null;

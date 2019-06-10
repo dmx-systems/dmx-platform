@@ -72,17 +72,6 @@ public interface Assoc extends DMXObject {
     // ---
 
     /**
-     * ### TODO: rethink this method
-     *
-     * Returns this association's role which refers to the same object as the given role model.
-     * The role returned is found by comparing topic IDs, topic URIs, or association IDs.
-     * The role types are <i>not</i> compared.
-     * <p>
-     * If the object refered by the given role model is not a player in this association an exception is thrown.
-     */
-    Player getRole(PlayerModel roleModel);
-
-    /**
      * ### TODO: drop it
      */
     boolean isPlayer(TopicPlayerModel roleModel);
