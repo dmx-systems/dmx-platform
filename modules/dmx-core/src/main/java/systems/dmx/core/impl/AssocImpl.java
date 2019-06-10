@@ -53,7 +53,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
         return getModel().getPlayer2().instantiate(getModel());
     }
 
-    // ---
+    // --- Convenience Methods ---
 
     @Override
     public final DMXObject getDMXObject1() {
@@ -82,7 +82,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ---
 
     @Override
-    public final Player getRole(String roleTypeUri) {
+    public final Player getPlayerByRole(String roleTypeUri) {
         return getModel().getPlayerByRole(roleTypeUri).instantiate(getModel());
     }
 

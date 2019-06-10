@@ -19,7 +19,7 @@ public interface Assoc extends DMXObject {
 
     Player getPlayer2();
 
-    // ---
+    // --- Convenience Methods ---
 
     DMXObject getDMXObject1();
 
@@ -52,7 +52,7 @@ public interface Assoc extends DMXObject {
      *          If no player matches, null is returned.
      *          If both players are matching an exception is thrown.
      */
-    Player getRole(String roleTypeUri);
+    Player getPlayerByRole(String roleTypeUri);
 
     boolean hasSameRoleTypeUris();
 
