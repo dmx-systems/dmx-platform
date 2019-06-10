@@ -83,7 +83,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     @Override
     public final Player getRole(String roleTypeUri) {
-        return getModel().getRoleModel(roleTypeUri).instantiate(getModel());
+        return getModel().getPlayerByRole(roleTypeUri).instantiate(getModel());
     }
 
     @Override

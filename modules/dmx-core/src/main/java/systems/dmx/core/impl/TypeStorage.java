@@ -364,14 +364,14 @@ class TypeStorage {
     // ---
 
     private AssocModel addPlayerUris(AssocModel assoc, String parentTypeUri, String childTypeUri) {
-        ((TopicPlayerModelImpl) assoc.getRoleModel("dmx.core.parent_type")).topicUri = parentTypeUri;
-        ((TopicPlayerModelImpl) assoc.getRoleModel("dmx.core.child_type")).topicUri  = childTypeUri;
+        ((TopicPlayerModelImpl) assoc.getPlayerByRole("dmx.core.parent_type")).topicUri = parentTypeUri;
+        ((TopicPlayerModelImpl) assoc.getPlayerByRole("dmx.core.child_type")).topicUri  = childTypeUri;
         return assoc;
     }
 
     private CompDefModelImpl addPlayerIds(CompDefModelImpl compDef) {
-        compDef.getRoleModel("dmx.core.parent_type").id = compDef.getParentType().id;
-        compDef.getRoleModel("dmx.core.child_type").id  = compDef.getChildType().id;
+        compDef.getPlayerByRole("dmx.core.parent_type").id = compDef.getParentType().id;
+        compDef.getPlayerByRole("dmx.core.child_type").id  = compDef.getChildType().id;
         return compDef;
     }
 

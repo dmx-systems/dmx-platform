@@ -230,10 +230,10 @@ public class DMXUtils {
         // Compare to AssocModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getId(), "typeUri");
         String t2 = (String) dmx.getProperty(r2.getId(), "typeUri");
-        PlayerModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
-        PlayerModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
+        PlayerModel roleModel1 = getPlayer(r1, r2, t1, t2, topicTypeUri1, 1);
+        PlayerModel roleModel2 = getPlayer(r1, r2, t1, t2, topicTypeUri2, 2);
         // Note: if topicTypeUri1 equals topicTypeUri2 and in the assoc only *one* player matches this type
-        // both getRoleModel() calls return the *same* player. Auto-typing must not be performed.
+        // both getPlayer() calls return the *same* player. Auto-typing must not be performed.
         if (roleModel1 != null && roleModel2 != null && roleModel1 != roleModel2) {
             return new PlayerModel[] {roleModel1, roleModel2};
         }
@@ -242,8 +242,8 @@ public class DMXUtils {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private static PlayerModel getRoleModel(PlayerModel r1, PlayerModel r2, String t1, String t2, String topicTypeUri,
-                                            int nr) {
+    private static PlayerModel getPlayer(PlayerModel r1, PlayerModel r2, String t1, String t2, String topicTypeUri,
+                                         int nr) {
         boolean m1 = t1.equals(topicTypeUri);
         boolean m2 = t2.equals(topicTypeUri);
         if (m1 && m2) {

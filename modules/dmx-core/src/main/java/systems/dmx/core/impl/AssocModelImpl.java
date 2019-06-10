@@ -69,11 +69,11 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // --- Convenience Methods ---
 
     @Override
-    public PlayerModelImpl getRoleModel(String roleTypeUri) {
+    public PlayerModelImpl getPlayerByRole(String roleTypeUri) {
         boolean rm1 = player1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = player2.getRoleTypeUri().equals(roleTypeUri);
         if (rm1 && rm2) {
-            throw new RuntimeException("Ambiguous getRoleModel() call: both players play role \"" + roleTypeUri +
+            throw new RuntimeException("Ambiguous getPlayerByRole() call: both players play role \"" + roleTypeUri +
                 "\" (" + this + ")");
         }
         return rm1 ? player1 : rm2 ? player2 : null;
@@ -91,8 +91,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                 roleTypeUri1 + "\")");
         }
         if (!hasSameRoleTypeUris()) {
-            PlayerModel r1 = getRoleModel(roleTypeUri1);
-            PlayerModel r2 = getRoleModel(roleTypeUri2);
+            PlayerModel r1 = getPlayerByRole(roleTypeUri1);
+            PlayerModel r2 = getPlayerByRole(roleTypeUri2);
             if (r1 != null && r1.getId() == playerId1 &&
                 r2 != null && r2.getId() == playerId2) {
                 return true;
@@ -350,7 +350,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      *          If there are 2 such players an exception is thrown.
      */
     DMXObjectModelImpl getDMXObjectByRole(String roleTypeUri) {
-        PlayerModelImpl player = getRoleModel(roleTypeUri);
+        PlayerModelImpl player = getPlayerByRole(roleTypeUri);
         return player != null ? player.getDMXObject(this) : null;
     }
 
@@ -524,8 +524,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         if (assoc.hasSameRoleTypeUris()) {
             return false;
         }
-        if (assoc.getRoleModel("dmx.core.parent_type") == null ||
-            assoc.getRoleModel("dmx.core.child_type") == null)  {
+        if (assoc.getPlayerByRole("dmx.core.parent_type") == null ||
+            assoc.getPlayerByRole("dmx.core.child_type") == null)  {
             return false;
         }
         //

@@ -22,11 +22,11 @@ public interface AssocModel extends DMXObjectModel {
     // --- Convenience Methods ---
 
     /**
-     * @return  this association's role that matches the given role type.
-     *          If no role matches, null is returned.
-     *          If both roles are matching an exception is thrown.
+     * @return  this association's player that plays the given role type.
+     *          If no player matches, null is returned.
+     *          If both players are matching an exception is thrown.
      */
-    PlayerModel getRoleModel(String roleTypeUri);
+    PlayerModel getPlayerByRole(String roleTypeUri);
 
     boolean hasSameRoleTypeUris();
 
