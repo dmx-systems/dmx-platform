@@ -54,13 +54,6 @@ abstract class PlayerModelImpl implements PlayerModel {
         this.roleTypeUri = roleTypeUri;
     }
 
-    // ---
-
-    @Override
-    public boolean refsSameObject(PlayerModel model) {
-        return getId() == model.getId();
-    }
-
 
 
     // === Java API ===

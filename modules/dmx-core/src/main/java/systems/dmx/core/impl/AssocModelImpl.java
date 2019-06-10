@@ -310,8 +310,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
-        // update association specific parts: the 2 players
-        updatePlayers((AssocModel) updateModel);
+        // update assoc specific parts: the 2 players
+        updatePlayers((AssocModelImpl) updateModel);
         //
         duplicateCheck();
         //
@@ -402,23 +402,23 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
      *                          If player 1 is <code>null</code> it is not updated.
      *                          If player 2 is <code>null</code> it is not updated.
      */
-    private void updatePlayers(AssocModel updateModel) {
-        updatePlayer(updateModel.getPlayer1(), 1);
-        updatePlayer(updateModel.getPlayer2(), 2);
+    private void updatePlayers(AssocModelImpl updateModel) {
+        updatePlayer(updateModel.player1, 1);
+        updatePlayer(updateModel.player2, 2);
     }
 
     /**
      * @param   nr      used only for logging
      */
-    private void updatePlayer(PlayerModel updateModel, int nr) {
+    private void updatePlayer(PlayerModelImpl updateModel, int nr) {
         try {
             if (updateModel != null) {     // abort if no update is requested
                 // Note: We must lookup the roles individually.
                 // The player order (getPlayer1(), getPlayer2()) is undeterministic and not fix.
-                PlayerModelImpl player = getRole(updateModel);
-                String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
-                String roleTypeUri = player.getRoleTypeUri();           // current value
-                if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
+                PlayerModelImpl player = getPlayer(updateModel);
+                String newRoleTypeUri = updateModel.roleTypeUri;    // new value
+                String roleTypeUri = player.roleTypeUri;            // current value
+                if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
                     logger.info("### Changing role type " + nr + " of association " + id + ": \"" + roleTypeUri +
                         "\" -> \"" + newRoleTypeUri + "\"");
                     updateRoleTypeUri(player, newRoleTypeUri);
@@ -436,21 +436,19 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     /**
      * Returns this association's player which refers to the same object as the given player.
-     * The player returned is found by comparing topic IDs, topic URIs, or association IDs. ### FIXDOC
-     * The role types are <i>not</i> compared.
-     * <p>
-     * If the object refered by the given player is not a player in this association an exception is thrown.
+     * Players are compared by ID. Role types are not compared.
+     *
+     * @throws  RuntimeException    if the given player is not a player in this association.
      */
-    private PlayerModelImpl getRole(PlayerModel roleModel) {
-        if (player1.refsSameObject(roleModel)) {
+    private PlayerModelImpl getPlayer(PlayerModel player) {
+        long playerId = player.getId();
+        if (player1.getId() == playerId) {
             return player1;
-        } else if (player2.refsSameObject(roleModel)) {
+        } else if (player2.getId() == playerId) {
             return player2;
         }
-        throw new RuntimeException(roleModel + " is not part of " + this);
+        throw new RuntimeException(player + " is not a player in " + this);
     }
-
-    // ---
 
     private DMXObjectModelImpl filter(PlayerModelImpl player, String typeUri) {
         DMXObjectModelImpl object = player.getDMXObject(this);
