@@ -325,7 +325,7 @@ class ValueIntegrator {
             if (newValues.id == -1) {
                 throw new RuntimeException("newValues has no ID set");
             }
-            // TODO: partial updates. URI and role models must not expected to be part of the update model.
+            // TODO: partial updates. URI and player models must not expected to be part of the update model.
             AssocModelImpl _newValues = (AssocModelImpl) newValues;
             return mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.player1,
                                                                                     _newValues.player2);
@@ -540,7 +540,7 @@ class ValueIntegrator {
             // Note: for partial create/update requests newValues might be null
             if (newValues != null) {
                 AssocModelImpl _newValues = newValues.getRelatingAssoc();
-                // Note: the roles must be suppressed from being updated. Update would fail if a new child has
+                // Note: the players must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
                 _newValues.setPlayer1(null);

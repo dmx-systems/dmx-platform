@@ -81,12 +81,12 @@ abstract class PlayerModelImpl implements PlayerModel {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * @param   assoc   the association this role is involved in
+     * @param   assoc   the association this player is involved in
      */
     abstract Player instantiate(AssocModelImpl assoc);
 
     /**
-     * @param   assoc   the association this role is involved in
+     * @param   assoc   the association this player is involved in
      */
     abstract DMXObjectModelImpl getDMXObject(AssocModelImpl assoc);
 }

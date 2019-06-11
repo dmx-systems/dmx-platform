@@ -22,8 +22,8 @@ class ViewConfigurationImpl implements ViewConfiguration {
     private ViewConfigurationModelImpl model;
 
     /**
-     * A role that points to the object this view configuration applies to.
-     * This is either a type (topic role) or a comp def (association role).
+     * A player that points to the object this view configuration applies to.
+     * This is either a type (topic player) or a comp def (association player).
      */
     private PlayerModel configurable;
 

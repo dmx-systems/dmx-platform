@@ -3,7 +3,7 @@ package systems.dmx.core.model;
 
 
 /**
- * The role an association plays in an association.
+ * An association-end of an association.
  * <p>
  * A AssocPlayerModel object is a pair of an association ID and a role type URI.
  * <p>

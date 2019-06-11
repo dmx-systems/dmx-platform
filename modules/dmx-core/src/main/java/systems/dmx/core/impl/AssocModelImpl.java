@@ -413,7 +413,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     private void updatePlayer(PlayerModelImpl updateModel, int nr) {
         try {
             if (updateModel != null) {     // abort if no update is requested
-                // Note: We must lookup the roles individually.
+                // Note: We must lookup the players individually.
                 // The player order (getPlayer1(), getPlayer2()) is undeterministic and not fix.
                 PlayerModelImpl player = getPlayer(updateModel);
                 String newRoleTypeUri = updateModel.roleTypeUri;    // new value

@@ -699,9 +699,9 @@ public class ModelFactoryImpl implements ModelFactory {
         try {
             PlayerModel player1 = parseRole1(compDef);     // may be null
             PlayerModel player2 = parseRole2(compDef);     // may be null
-            // Note: the canonic comp def JSON format does not require explicit assoc roles. Comp defs declared in
+            // Note: the canonic comp def JSON format does not require explicit assoc players. Comp defs declared in
             // JSON migrations support a simplified format. In contrast comp defs contained in a request may include
-            // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
+            // explicit assoc players already. In that case we use these ones as they contain both, the ID-ref and the
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(
                 newAssocModel(compDef.optLong("id", -1), null,

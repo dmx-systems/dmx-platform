@@ -14,7 +14,7 @@ abstract class PlayerImpl implements Player {
 
     PlayerModelImpl model;      // underlying model
 
-    AssocModelImpl assoc;       // the association this role is involved in
+    AssocModelImpl assoc;       // the association this player is involved in
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

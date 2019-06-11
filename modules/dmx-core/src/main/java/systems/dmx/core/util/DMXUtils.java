@@ -197,24 +197,24 @@ public class DMXUtils {
      * at least one assoc player, or if a topic player is identfied by-URI, no retyping takes place (null is returned).
      *
      * @return  a 2-element {@link systems.dmx.core.model.PlayerModel} array if auto-typing took place,
-     *          <code>null</code> otherwise. Convenience to access the assoc's roles after retyping. Element 0 is the
-     *          role of the "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
+     *          <code>null</code> otherwise. Convenience to access the assoc's players after retyping.
+     *          Element 0 is the player of "topicTypeUri1", Element 1 is the player of "topicTypeUri2".
      */
     public static PlayerModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
                                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        PlayerModel[] roles = getPlayerModels(assoc, topicTypeUri1, topicTypeUri2);
-        if (roles != null) {
+        PlayerModel[] players = getPlayerModels(assoc, topicTypeUri1, topicTypeUri2);
+        if (players != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
             assoc.setTypeUri(assocTypeUri);
             setAssocValue(assoc);
-            roles[0].setRoleTypeUri(roleTypeUri1);
-            roles[1].setRoleTypeUri(roleTypeUri2);
+            players[0].setRoleTypeUri(roleTypeUri1);
+            players[1].setRoleTypeUri(roleTypeUri2);
         }
-        return roles;
+        return players;
     }
 
     public static PlayerModel[] getPlayerModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {

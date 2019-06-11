@@ -314,7 +314,7 @@ class TypeStorage {
      */
     private CompDefModel fetchCompDef(AssocModelImpl assoc, String parentTypeUri, String childTypeUri) {
         try {
-            // 2 roles
+            // 2 players
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
             // cardinality (must exist in DB)
             ChildTopicsModel childTopics = assoc.getChildTopicsModel();
@@ -435,7 +435,7 @@ class TypeStorage {
         TopicModelImpl parentType = (TopicModelImpl) assoc.getDMXObjectByRole("dmx.core.parent_type");
         // error check
         if (parentType == null) {
-            throw new RuntimeException("DB inconsistency: topic role \"dmx.core.parent_type\" is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: player \"dmx.core.parent_type\" is missing in " + assoc);
         }
         //
         return parentType;
@@ -451,7 +451,7 @@ class TypeStorage {
         TopicModelImpl childType = (TopicModelImpl) assoc.getDMXObjectByRole("dmx.core.child_type");
         // error check
         if (childType == null) {
-            throw new RuntimeException("DB inconsistency: topic role \"dmx.core.child_type\" is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: player \"dmx.core.child_type\" is missing in " + assoc);
         }
         //
         return childType;

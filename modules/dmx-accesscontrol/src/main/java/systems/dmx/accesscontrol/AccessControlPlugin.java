@@ -530,9 +530,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkAssocReadAccess(long assocId) {
         checkReadAccess(assocId);
         //
-        List<PlayerModel> roles = dmx.getPlayerModels(assocId);
-        checkReadAccess(roles.get(0));
-        checkReadAccess(roles.get(1));
+        List<PlayerModel> players = dmx.getPlayerModels(assocId);
+        checkReadAccess(players.get(0));
+        checkReadAccess(players.get(1));
     }
 
     @Override
@@ -892,9 +892,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Calculate Permissions ===
 
-    private void checkReadAccess(PlayerModel role) {
-        long id = role.getId();
-        if (role instanceof AssocPlayerModel) {
+    private void checkReadAccess(PlayerModel player) {
+        long id = player.getId();
+        if (player instanceof AssocPlayerModel) {
             checkAssocReadAccess(id);     // recursion
         } else {
             checkReadAccess(id);

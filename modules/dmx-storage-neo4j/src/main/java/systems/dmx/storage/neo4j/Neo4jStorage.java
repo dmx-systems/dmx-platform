@@ -57,7 +57,7 @@ public class Neo4jStorage implements DMXStorage {
     // --- Association Metadata Index Keys ---
     private static final String KEY_ASSOC_ID       = "assocId";
     private static final String KEY_ASSOC_TPYE_URI = "assocTypeUri";
-    // role 1 & 2
+    // player 1 & 2
     private static final String KEY_ROLE_TPYE_URI   = "roleTypeUri";        // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TPYE     = "playerType";         // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_ID       = "playerId";           // "1" or "2" is appended programatically
@@ -978,7 +978,7 @@ public class Neo4jStorage implements DMXStorage {
         } else if (playerModel instanceof AssocPlayerModel) {
             return fetchAssocNode(playerModel.getId());
         } else {
-            throw new RuntimeException("Unexpected role model: " + playerModel);
+            throw new RuntimeException("Unexpected player model: " + playerModel);
         }
     }
 

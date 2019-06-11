@@ -3,7 +3,7 @@ package systems.dmx.core.model;
 
 
 /**
- * The role a topic plays in an association.
+ * A topic-end of an association.
  * <p>
  * A TopicPlayerModel object is a pair of a topic reference and a role type reference.
  * The topic is refered to either by its ID or URI.
