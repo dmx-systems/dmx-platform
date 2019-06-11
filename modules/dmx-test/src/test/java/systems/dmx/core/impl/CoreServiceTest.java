@@ -1337,15 +1337,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private Assoc createAssoc(Topic topic1, Topic topic2) {
         return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
-            mf.newTopicRoleModel(topic1.getId(), "dmx.core.default"),
-            mf.newTopicRoleModel(topic2.getId(), "dmx.core.default")
+            mf.newTopicPlayerModel(topic1.getId(), "dmx.core.default"),
+            mf.newTopicPlayerModel(topic2.getId(), "dmx.core.default")
         ));
     }
 
     private Assoc createAssoc(Topic topic, Assoc assoc) {
         return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
-            mf.newTopicRoleModel(topic.getId(), "dmx.core.default"),
-            mf.newAssocRoleModel(assoc.getId(), "dmx.core.default")
+            mf.newTopicPlayerModel(topic.getId(), "dmx.core.default"),
+            mf.newAssocPlayerModel(assoc.getId(), "dmx.core.default")
         ));
     }
 

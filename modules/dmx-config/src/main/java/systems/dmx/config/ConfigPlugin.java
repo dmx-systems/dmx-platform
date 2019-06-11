@@ -157,8 +157,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                 public RelatedTopic call() {
                     Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
                     dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
-                        mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
-                        mf.newTopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)
+                        mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
+                        mf.newTopicPlayerModel(configTopic.getId(), ROLE_TYPE_DEFAULT)
                     ));
                     ac.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
                     // ### TODO: extend Core API to avoid re-retrieval

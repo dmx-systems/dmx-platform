@@ -204,9 +204,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private PlayerModelImpl _parseRole(JSONObject roleModel) {
         if (roleModel.has("topicId") || roleModel.has("topicUri")) {
-            return newTopicRoleModel(roleModel);
+            return newTopicPlayerModel(roleModel);
         } else if (roleModel.has("assocId")) {
-            return newAssocRoleModel(roleModel);
+            return newAssocPlayerModel(roleModel);
         } else {
             throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
         }
@@ -401,22 +401,22 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TopicPlayerModel ===
 
     @Override
-    public TopicPlayerModelImpl newTopicRoleModel(long topicId, String roleTypeUri) {
+    public TopicPlayerModelImpl newTopicPlayerModel(long topicId, String roleTypeUri) {
         return new TopicPlayerModelImpl(topicId, roleTypeUri, pl());
     }
 
     @Override
-    public TopicPlayerModelImpl newTopicRoleModel(String topicUri, String roleTypeUri) {
+    public TopicPlayerModelImpl newTopicPlayerModel(String topicUri, String roleTypeUri) {
         return new TopicPlayerModelImpl(topicUri, roleTypeUri, pl());
     }
 
     @Override
-    public TopicPlayerModelImpl newTopicRoleModel(long topicId, String topicUri, String roleTypeUri) {
+    public TopicPlayerModelImpl newTopicPlayerModel(long topicId, String topicUri, String roleTypeUri) {
         return new TopicPlayerModelImpl(topicId, topicUri, roleTypeUri, pl());
     }
 
     @Override
-    public TopicPlayerModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
+    public TopicPlayerModelImpl newTopicPlayerModel(JSONObject topicRoleModel) {
         try {
             long topicId       = topicRoleModel.optLong("topicId", -1);
             String topicUri    = topicRoleModel.optString("topicUri", null);
@@ -425,7 +425,7 @@ public class ModelFactoryImpl implements ModelFactory {
             if (topicId == -1 && topicUri == null) {
                 throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
-            return newTopicRoleModel(topicId, topicUri, roleTypeUri);
+            return newTopicPlayerModel(topicId, topicUri, roleTypeUri);
         } catch (Exception e) {
             throw parsingFailed(topicRoleModel, e, "TopicPlayerModelImpl");
         }
@@ -436,16 +436,16 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssocPlayerModel ===
 
     @Override
-    public AssocPlayerModelImpl newAssocRoleModel(long assocId, String roleTypeUri) {
+    public AssocPlayerModelImpl newAssocPlayerModel(long assocId, String roleTypeUri) {
         return new AssocPlayerModelImpl(assocId, roleTypeUri, pl());
     }    
 
     @Override
-    public AssocPlayerModelImpl newAssocRoleModel(JSONObject assocRoleModel) {
+    public AssocPlayerModelImpl newAssocPlayerModel(JSONObject assocRoleModel) {
         try {
             long assocId       = assocRoleModel.getLong("assocId");
             String roleTypeUri = assocRoleModel.getString("roleTypeUri");
-            return newAssocRoleModel(assocId, roleTypeUri);
+            return newAssocPlayerModel(assocId, roleTypeUri);
         } catch (Exception e) {
             throw parsingFailed(assocRoleModel, e, "AssocPlayerModelImpl");
         }
@@ -743,11 +743,11 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private TopicPlayerModel parentRole(String parentTypeUri) {
-        return newTopicRoleModel(parentTypeUri, "dmx.core.parent_type");
+        return newTopicPlayerModel(parentTypeUri, "dmx.core.parent_type");
     }
 
     private TopicPlayerModel childRole(String childTypeUri) {
-        return newTopicRoleModel(childTypeUri, "dmx.core.child_type");
+        return newTopicPlayerModel(childTypeUri, "dmx.core.child_type");
     }
 
     // ---

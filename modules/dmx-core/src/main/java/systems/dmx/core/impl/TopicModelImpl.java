@@ -27,7 +27,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     public PlayerModel createRoleModel(String roleTypeUri) {
-        return mf.newTopicRoleModel(id, roleTypeUri);
+        return mf.newTopicPlayerModel(id, roleTypeUri);
     }
 
 

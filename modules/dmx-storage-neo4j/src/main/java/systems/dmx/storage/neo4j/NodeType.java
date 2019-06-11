@@ -12,7 +12,7 @@ enum NodeType {
     TOPIC {
         @Override
         PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
-            return mf.newTopicRoleModel(node.getId(), roleTypeUri);
+            return mf.newTopicPlayerModel(node.getId(), roleTypeUri);
         }
 
         @Override
@@ -23,7 +23,7 @@ enum NodeType {
     ASSOC {
         @Override
         PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
-            return mf.newAssocRoleModel(node.getId(), roleTypeUri);
+            return mf.newAssocPlayerModel(node.getId(), roleTypeUri);
         }
 
         @Override

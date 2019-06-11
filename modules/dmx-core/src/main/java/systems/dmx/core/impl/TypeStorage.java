@@ -220,8 +220,8 @@ class TypeStorage {
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
             pl.createAssoc("dmx.core.composition",
-                mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
-                mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
+                mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
+                mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
             );
         } catch (Exception e) {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
@@ -615,15 +615,15 @@ class TypeStorage {
 
     private void storeSequenceStart(long typeId, long compDefId) {
         pl.createAssoc("dmx.core.composition",
-            mf.newTopicRoleModel(typeId, "dmx.core.type"),
-            mf.newAssocRoleModel(compDefId, "dmx.core.sequence_start")
+            mf.newTopicPlayerModel(typeId, "dmx.core.type"),
+            mf.newAssocPlayerModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predCompDefId, long succCompDefId) {
         pl.createAssoc("dmx.core.sequence",
-            mf.newAssocRoleModel(predCompDefId, "dmx.core.predecessor"),
-            mf.newAssocRoleModel(succCompDefId, "dmx.core.successor")
+            mf.newAssocPlayerModel(predCompDefId, "dmx.core.predecessor"),
+            mf.newAssocPlayerModel(succCompDefId, "dmx.core.successor")
         );
     }
 
@@ -730,7 +730,7 @@ class TypeStorage {
         TopicImpl topic = pl.createTopic(configTopic);
         pl.createAssoc("dmx.core.composition",
             configurable,
-            mf.newTopicRoleModel(configTopic.id, "dmx.core.child")
+            mf.newTopicPlayerModel(configTopic.id, "dmx.core.child")
         );
         return topic.getModel();
     }
@@ -746,11 +746,11 @@ class TypeStorage {
     // ---
 
     PlayerModel newTypeRole(long typeId) {
-        return mf.newTopicRoleModel(typeId, "dmx.core.parent");
+        return mf.newTopicPlayerModel(typeId, "dmx.core.parent");
     }
 
     PlayerModel newCompDefRole(long compDefId) {
-        return mf.newAssocRoleModel(compDefId, "dmx.core.parent");
+        return mf.newAssocPlayerModel(compDefId, "dmx.core.parent");
     }
 
 

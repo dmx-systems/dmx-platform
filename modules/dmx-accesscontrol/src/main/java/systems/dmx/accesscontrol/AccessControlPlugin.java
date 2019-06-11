@@ -344,8 +344,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
             Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP_TYPE,
-                mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
-                mf.newTopicRoleModel(workspaceId, "dmx.core.default")
+                mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
+                mf.newTopicPlayerModel(workspaceId, "dmx.core.default")
             ));
             assignMembershipToWorkspace(assoc);
         } catch (Exception e) {

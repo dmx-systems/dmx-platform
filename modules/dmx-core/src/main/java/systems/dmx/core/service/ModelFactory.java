@@ -106,21 +106,21 @@ public interface ModelFactory {
 
     // === TopicPlayerModel ===
     
-    TopicPlayerModel newTopicRoleModel(long topicId, String roleTypeUri);
+    TopicPlayerModel newTopicPlayerModel(long topicId, String roleTypeUri);
 
-    TopicPlayerModel newTopicRoleModel(String topicUri, String roleTypeUri);
+    TopicPlayerModel newTopicPlayerModel(String topicUri, String roleTypeUri);
 
-    TopicPlayerModel newTopicRoleModel(long topicId, String topicUri, String roleTypeUri);
+    TopicPlayerModel newTopicPlayerModel(long topicId, String topicUri, String roleTypeUri);
 
-    TopicPlayerModel newTopicRoleModel(JSONObject topicRoleModel);
+    TopicPlayerModel newTopicPlayerModel(JSONObject topicRoleModel);
 
 
 
     // === AssocPlayerModel ===
 
-    AssocPlayerModel newAssocRoleModel(long assocId, String roleTypeUri);
+    AssocPlayerModel newAssocPlayerModel(long assocId, String roleTypeUri);
 
-    AssocPlayerModel newAssocRoleModel(JSONObject assocRoleModel);
+    AssocPlayerModel newAssocPlayerModel(JSONObject assocRoleModel);
 
 
 

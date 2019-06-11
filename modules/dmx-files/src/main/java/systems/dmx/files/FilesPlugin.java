@@ -644,8 +644,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                     @Override
                     public Assoc call() {
                         return dmx.createAssoc(mf.newAssocModel("dmx.core.composition",
-                            mf.newTopicRoleModel(folderTopicId, "dmx.core.parent"),
-                            mf.newTopicRoleModel(topicId,       "dmx.core.child")
+                            mf.newTopicPlayerModel(folderTopicId, "dmx.core.parent"),
+                            mf.newTopicPlayerModel(topicId,       "dmx.core.child")
                         ));
                     }
                 });

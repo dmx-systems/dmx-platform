@@ -124,7 +124,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     public PlayerModel createRoleModel(String roleTypeUri) {
-        return mf.newAssocRoleModel(id, roleTypeUri);
+        return mf.newAssocPlayerModel(id, roleTypeUri);
     }
 
 

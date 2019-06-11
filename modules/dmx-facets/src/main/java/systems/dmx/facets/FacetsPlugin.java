@@ -115,8 +115,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dmx.createAssoc(mf.newAssocModel("dmx.core.instantiation",
-            mf.newTopicRoleModel(topicId,      "dmx.core.instance"),
-            mf.newTopicRoleModel(facetTypeUri, "dmx.facets.facet")
+            mf.newTopicPlayerModel(topicId,      "dmx.core.instance"),
+            mf.newTopicPlayerModel(facetTypeUri, "dmx.facets.facet")
         ));
     }
 

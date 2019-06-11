@@ -296,8 +296,8 @@ public class Neo4jStorageTest {
     private long createAssoc(String typeUri, String topicUri1, String roleTypeUri1,
                                              String topicUri2, String roleTypeUri2) {
         AssocModel assoc = mf.newAssocModel(typeUri,
-            mf.newTopicRoleModel(topicUri1, roleTypeUri1),
-            mf.newTopicRoleModel(topicUri2, roleTypeUri2)
+            mf.newTopicPlayerModel(topicUri1, roleTypeUri1),
+            mf.newTopicPlayerModel(topicUri2, roleTypeUri2)
         );
         assertEquals(-1, assoc.getId());
         //

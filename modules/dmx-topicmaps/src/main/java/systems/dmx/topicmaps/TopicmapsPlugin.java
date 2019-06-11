@@ -648,8 +648,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void createTopicMapcontext(long topicmapId, long topicId, ViewProps viewProps) {
         Assoc topicMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
-            mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            mf.newTopicRoleModel(topicId,    ROLE_TYPE_CONTENT)
+            mf.newTopicPlayerModel(topicmapId, ROLE_TYPE_TOPICMAP),
+            mf.newTopicPlayerModel(topicId,    ROLE_TYPE_CONTENT)
         ));
         viewProps.store(topicMapcontext);
         //
@@ -659,8 +659,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void createAssocMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
         Assoc assocMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
-            mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            mf.newAssocRoleModel(assocId,    ROLE_TYPE_CONTENT)
+            mf.newTopicPlayerModel(topicmapId, ROLE_TYPE_TOPICMAP),
+            mf.newAssocPlayerModel(assocId,    ROLE_TYPE_CONTENT)
         ));
         viewProps.store(assocMapcontext);
         //

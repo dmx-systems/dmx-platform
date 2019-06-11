@@ -441,8 +441,8 @@ public final class PersistenceLayer extends StorageDecorator {
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
             AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
-                mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
-                mf.newTopicRoleModel(topicId, "dmx.core.instance")
+                mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
+                mf.newTopicPlayerModel(topicId, "dmx.core.instance")
             );
             storeAssoc(assoc);   // direct storage calls used here ### explain
             storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
@@ -456,8 +456,8 @@ public final class PersistenceLayer extends StorageDecorator {
     void createAssocInstantiation(long assocId, String assocTypeUri) {
         try {
             AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
-                mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
-                mf.newAssocRoleModel(assocId, "dmx.core.instance")
+                mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
+                mf.newAssocPlayerModel(assocId, "dmx.core.instance")
             );
             storeAssoc(assoc);   // direct storage calls used here ### explain
             storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
