@@ -163,7 +163,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // ---
 
     @Override
-    public PlayerModel createRoleModel(String roleTypeUri) {
+    public PlayerModel createPlayerModel(String roleTypeUri) {
         throw new RuntimeException("Not implemented");  // only implemented in subclasses
         // Note: technically this class is not abstract. It is instantiated by the ModelFactory.
     }

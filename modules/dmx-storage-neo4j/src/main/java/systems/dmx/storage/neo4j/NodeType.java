@@ -11,7 +11,7 @@ enum NodeType {
 
     TOPIC {
         @Override
-        PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+        PlayerModel createPlayerModel(Node node, String roleTypeUri, ModelFactory mf) {
             return mf.newTopicPlayerModel(node.getId(), roleTypeUri);
         }
 
@@ -22,7 +22,7 @@ enum NodeType {
     },
     ASSOC {
         @Override
-        PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+        PlayerModel createPlayerModel(Node node, String roleTypeUri, ModelFactory mf) {
             return mf.newAssocPlayerModel(node.getId(), roleTypeUri);
         }
 
@@ -34,7 +34,7 @@ enum NodeType {
 
     // ---
 
-    abstract PlayerModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf);
+    abstract PlayerModel createPlayerModel(Node node, String roleTypeUri, ModelFactory mf);
 
     abstract String error(Node node);
 

@@ -165,7 +165,7 @@ public interface CoreService {
 
     Iterable<Assoc> getAllAssocs();
 
-    List<PlayerModel> getRoleModels(long assocId);
+    List<PlayerModel> getPlayerModels(long assocId);
 
     // ---
 

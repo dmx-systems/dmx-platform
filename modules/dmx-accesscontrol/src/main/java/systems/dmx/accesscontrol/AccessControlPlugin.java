@@ -530,7 +530,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkAssocReadAccess(long assocId) {
         checkReadAccess(assocId);
         //
-        List<PlayerModel> roles = dmx.getRoleModels(assocId);
+        List<PlayerModel> roles = dmx.getPlayerModels(assocId);
         checkReadAccess(roles.get(0));
         checkReadAccess(roles.get(1));
     }

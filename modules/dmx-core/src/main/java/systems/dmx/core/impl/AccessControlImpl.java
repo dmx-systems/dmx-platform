@@ -339,7 +339,7 @@ class AccessControlImpl implements AccessControl {
         try {
             // create assignment association
             pl.createAssoc("dmx.workspaces.workspace_assignment",
-                object.getModel().createRoleModel("dmx.core.parent"),
+                object.getModel().createPlayerModel("dmx.core.parent"),
                 mf.newTopicPlayerModel(workspaceId, "dmx.core.child")
             );
             // store assignment property

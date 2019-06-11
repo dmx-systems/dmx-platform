@@ -205,7 +205,7 @@ public class DMXUtils {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        PlayerModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2);
+        PlayerModel[] roles = getPlayerModels(assoc, topicTypeUri1, topicTypeUri2);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -217,7 +217,7 @@ public class DMXUtils {
         return roles;
     }
 
-    public static PlayerModel[] getRoleModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
+    public static PlayerModel[] getPlayerModels(AssocModel assoc, String topicTypeUri1, String topicTypeUri2) {
         PlayerModel r1 = assoc.getPlayer1();
         PlayerModel r2 = assoc.getPlayer2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
@@ -225,7 +225,7 @@ public class DMXUtils {
             return null;
         }
         CoreService dmx = CoreActivator.getCoreService();
-        // Note: we can't call roleModel.getDMXObject() as this would build an entire object model, but its "value"
+        // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case the association is part of the player's composite structure.
         // Compare to AssocModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getId(), "typeUri");

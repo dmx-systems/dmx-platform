@@ -202,11 +202,11 @@ public class ModelFactoryImpl implements ModelFactory {
         return assoc.has(key) ? _parseRole(assoc.getJSONObject(key)) : null;
     }
 
-    private PlayerModelImpl _parseRole(JSONObject roleModel) {
-        if (roleModel.has("topicId") || roleModel.has("topicUri")) {
-            return newTopicPlayerModel(roleModel);
-        } else if (roleModel.has("assocId")) {
-            return newAssocPlayerModel(roleModel);
+    private PlayerModelImpl _parseRole(JSONObject playerModel) {
+        if (playerModel.has("topicId") || playerModel.has("topicUri")) {
+            return newTopicPlayerModel(playerModel);
+        } else if (playerModel.has("assocId")) {
+            return newAssocPlayerModel(playerModel);
         } else {
             throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
         }
@@ -416,18 +416,18 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public TopicPlayerModelImpl newTopicPlayerModel(JSONObject topicRoleModel) {
+    public TopicPlayerModelImpl newTopicPlayerModel(JSONObject topicPlayerModel) {
         try {
-            long topicId       = topicRoleModel.optLong("topicId", -1);
-            String topicUri    = topicRoleModel.optString("topicUri", null);
-            String roleTypeUri = topicRoleModel.getString("roleTypeUri");
+            long topicId       = topicPlayerModel.optLong("topicId", -1);
+            String topicUri    = topicPlayerModel.optString("topicUri", null);
+            String roleTypeUri = topicPlayerModel.getString("roleTypeUri");
             //
             if (topicId == -1 && topicUri == null) {
                 throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
             return newTopicPlayerModel(topicId, topicUri, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(topicRoleModel, e, "TopicPlayerModelImpl");
+            throw parsingFailed(topicPlayerModel, e, "TopicPlayerModelImpl");
         }
     }
 
@@ -441,13 +441,13 @@ public class ModelFactoryImpl implements ModelFactory {
     }    
 
     @Override
-    public AssocPlayerModelImpl newAssocPlayerModel(JSONObject assocRoleModel) {
+    public AssocPlayerModelImpl newAssocPlayerModel(JSONObject assocPlayerModel) {
         try {
-            long assocId       = assocRoleModel.getLong("assocId");
-            String roleTypeUri = assocRoleModel.getString("roleTypeUri");
+            long assocId       = assocPlayerModel.getLong("assocId");
+            String roleTypeUri = assocPlayerModel.getString("roleTypeUri");
             return newAssocPlayerModel(assocId, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(assocRoleModel, e, "AssocPlayerModelImpl");
+            throw parsingFailed(assocPlayerModel, e, "AssocPlayerModelImpl");
         }
     }    
 

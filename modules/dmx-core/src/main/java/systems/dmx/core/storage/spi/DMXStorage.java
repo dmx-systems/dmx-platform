@@ -85,7 +85,7 @@ public interface DMXStorage {
 
     Iterator<? extends AssocModel> fetchAllAssocs();
 
-    List<PlayerModel> fetchRoleModels(long assocId);
+    List<PlayerModel> fetchPlayerModels(long assocId);
 
     // ---
 

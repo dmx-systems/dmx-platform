@@ -230,8 +230,8 @@ class StorageDecorator {
         return (Iterator<AssocModelImpl>) storage.fetchAllAssocs();
     }
 
-    final List<PlayerModel> fetchRoleModels(long assocId) {
-        return storage.fetchRoleModels(assocId);
+    final List<PlayerModel> fetchPlayerModels(long assocId) {
+        return storage.fetchPlayerModels(assocId);
     }
 
     // ---

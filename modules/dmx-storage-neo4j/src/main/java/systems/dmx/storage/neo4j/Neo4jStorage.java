@@ -262,8 +262,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<PlayerModel> fetchRoleModels(long assocId) {
-        return buildRoleModels(fetchAssocNode(assocId));
+    public List<PlayerModel> fetchPlayerModels(long assocId) {
+        return buildPlayerModels(fetchAssocNode(assocId));
     }
 
     // ---
@@ -925,12 +925,12 @@ public class Neo4jStorage implements DMXStorage {
 
     AssocModel buildAssoc(Node assocNode) {
         try {
-            List<PlayerModel> roleModels = buildRoleModels(assocNode);
+            List<PlayerModel> playerModels = buildPlayerModels(assocNode);
             return mf.newAssocModel(
                 assocNode.getId(),
                 uri(assocNode),
                 typeUri(assocNode),
-                roleModels.get(0), roleModels.get(1),
+                playerModels.get(0), playerModels.get(1),
                 simpleValue(assocNode),
                 null    // childTopics=null
             );
@@ -948,45 +948,45 @@ public class Neo4jStorage implements DMXStorage {
         return assocs;
     }
 
-    private List<PlayerModel> buildRoleModels(Node assocNode) {
-        List<PlayerModel> roleModels = new ArrayList();
+    private List<PlayerModel> buildPlayerModels(Node assocNode) {
+        List<PlayerModel> playerModels = new ArrayList();
         for (Relationship rel : fetchRelationships(assocNode)) {
             Node node = rel.getEndNode();
             String roleTypeUri = rel.getType().name();
-            PlayerModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri, mf);
-            roleModels.add(roleModel);
+            PlayerModel playerModel = NodeType.of(node).createPlayerModel(node, roleTypeUri, mf);
+            playerModels.add(playerModel);
         }
-        return roleModels;
+        return playerModels;
     }
 
 
 
     // --- DMX -> Neo4j Bridge ---
 
-    private Node storePlayerRelationship(Node assocNode, PlayerModel roleModel) {
-        Node playerNode = fetchPlayerNode(roleModel);
+    private Node storePlayerRelationship(Node assocNode, PlayerModel playerModel) {
+        Node playerNode = fetchPlayerNode(playerModel);
         assocNode.createRelationshipTo(
             playerNode,
-            getRelationshipType(roleModel.getRoleTypeUri())
+            getRelationshipType(playerModel.getRoleTypeUri())
         );
         return playerNode;
     }
 
-    private Node fetchPlayerNode(PlayerModel roleModel) {
-        if (roleModel instanceof TopicPlayerModel) {
-            return fetchTopicPlayerNode((TopicPlayerModel) roleModel);
-        } else if (roleModel instanceof AssocPlayerModel) {
-            return fetchAssocNode(roleModel.getId());
+    private Node fetchPlayerNode(PlayerModel playerModel) {
+        if (playerModel instanceof TopicPlayerModel) {
+            return fetchTopicPlayerNode((TopicPlayerModel) playerModel);
+        } else if (playerModel instanceof AssocPlayerModel) {
+            return fetchAssocNode(playerModel.getId());
         } else {
-            throw new RuntimeException("Unexpected role model: " + roleModel);
+            throw new RuntimeException("Unexpected role model: " + playerModel);
         }
     }
 
-    private Node fetchTopicPlayerNode(TopicPlayerModel roleModel) {
-        if (roleModel.topicIdentifiedByUri()) {
-            return fetchTopicNodeByUri(roleModel.getTopicUri());
+    private Node fetchTopicPlayerNode(TopicPlayerModel playerModel) {
+        if (playerModel.topicIdentifiedByUri()) {
+            return fetchTopicNodeByUri(playerModel.getTopicUri());
         } else {
-            return fetchTopicNode(roleModel.getId());
+            return fetchTopicNode(playerModel.getId());
         }
     }
 

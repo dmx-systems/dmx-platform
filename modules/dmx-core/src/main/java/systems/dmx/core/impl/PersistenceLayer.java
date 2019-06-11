@@ -329,8 +329,8 @@ public final class PersistenceLayer extends StorageDecorator {
         return new AssocIterable(this);
     }
 
-    List<PlayerModel> getRoleModels(long assocId) {
-        return fetchRoleModels(assocId);
+    List<PlayerModel> getPlayerModels(long assocId) {
+        return fetchPlayerModels(assocId);
     }
 
     // ---

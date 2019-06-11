@@ -112,7 +112,7 @@ public interface ModelFactory {
 
     TopicPlayerModel newTopicPlayerModel(long topicId, String topicUri, String roleTypeUri);
 
-    TopicPlayerModel newTopicPlayerModel(JSONObject topicRoleModel);
+    TopicPlayerModel newTopicPlayerModel(JSONObject topicPlayerModel);
 
 
 
@@ -120,7 +120,7 @@ public interface ModelFactory {
 
     AssocPlayerModel newAssocPlayerModel(long assocId, String roleTypeUri);
 
-    AssocPlayerModel newAssocPlayerModel(JSONObject assocRoleModel);
+    AssocPlayerModel newAssocPlayerModel(JSONObject assocPlayerModel);
 
 
 

@@ -123,7 +123,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // === Implementation of the abstract methods ===
 
     @Override
-    public PlayerModel createRoleModel(String roleTypeUri) {
+    public PlayerModel createPlayerModel(String roleTypeUri) {
         return mf.newAssocPlayerModel(id, roleTypeUri);
     }
 
@@ -377,9 +377,9 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     private void duplicateCheck() {
         // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
-        // Note: we can't call roleModel.getDMXObject() as this would build an entire object model, but its "value"
+        // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
-        // Compare to DMXUtils.getRoleModels()
+        // Compare to DMXUtils.getPlayerModels()
         if (!(player1 instanceof TopicPlayerModel) || !(player2 instanceof TopicPlayerModel)) {
             return;
         }

@@ -752,8 +752,8 @@ class ValueIntegrator {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
-            parent.createRoleModel("dmx.core.parent"),
-            child.createRoleModel("dmx.core.child")
+            parent.createPlayerModel("dmx.core.parent"),
+            child.createPlayerModel("dmx.core.child")
         ).getModel();
     }
 

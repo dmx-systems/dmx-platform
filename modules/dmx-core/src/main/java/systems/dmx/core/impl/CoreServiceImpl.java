@@ -182,8 +182,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<PlayerModel> getRoleModels(long assocId) {
-        return pl.getRoleModels(assocId);
+    public List<PlayerModel> getPlayerModels(long assocId) {
+        return pl.getPlayerModels(assocId);
     }
 
     // ---

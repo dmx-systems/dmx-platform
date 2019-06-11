@@ -54,7 +54,7 @@ public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     // ---
 
-    PlayerModel createRoleModel(String roleTypeUri);
+    PlayerModel createPlayerModel(String roleTypeUri);
 
 
 
