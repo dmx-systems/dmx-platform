@@ -50,7 +50,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.icon": "\uf133",
             "dmx.webclient.add_to_create_menu": true
           }
@@ -76,7 +76,7 @@
           "viewConfigTopics": [
             {
               "typeUri": "dmx.webclient.view_config",
-              "childs": {
+              "children": {
                 "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
                 "dmx.webclient.clearable": true,
                 "dmx.webclient.customizable": true
@@ -88,7 +88,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.color": "hsl(300, 43%, 53%)",
             "dmx.webclient.color#dmx.webclient.background_color": "hsl(300, 80%, 96%)"
           }

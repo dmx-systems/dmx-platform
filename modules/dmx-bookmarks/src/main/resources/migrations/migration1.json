@@ -26,7 +26,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.icon": "\uf08e",
             "dmx.webclient.add_to_create_menu": true
           }

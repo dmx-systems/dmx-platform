@@ -10,7 +10,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.color": "hsl(255, 40%, 53%)",
             "dmx.webclient.color#dmx.webclient.background_color": "hsl(255, 80%, 96%)"
           }

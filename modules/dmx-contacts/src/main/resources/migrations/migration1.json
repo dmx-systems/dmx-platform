@@ -32,7 +32,7 @@
             "viewConfigTopics": [
               {
                 "typeUri": "dmx.webclient.view_config",
-                "childs": {
+                "children": {
                   "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
                   "dmx.webclient.clearable": true,
                   "dmx.webclient.customizable": true
@@ -53,7 +53,7 @@
             "viewConfigTopics": [
               {
                 "typeUri": "dmx.webclient.view_config",
-                "childs": {
+                "children": {
                   "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
                   "dmx.webclient.clearable": true,
                   "dmx.webclient.customizable": true
@@ -218,7 +218,7 @@
         "viewConfigTopics": [
           {
             "typeUri": "dmx.webclient.view_config",
-            "childs": {
+            "children": {
               "dmx.webclient.icon": "\uf007",
               "dmx.webclient.add_to_create_menu": true
             }
@@ -267,7 +267,7 @@
         "viewConfigTopics": [
           {
             "typeUri": "dmx.webclient.view_config",
-            "childs": {
+            "children": {
               "dmx.webclient.icon": "\uf0e8",
               "dmx.webclient.add_to_create_menu": true
             }

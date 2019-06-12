@@ -384,7 +384,7 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
-            // Its childs are always topics (never associations).
+            // Its children are always topics (never associations).
         } catch (Exception e) {
             throw new RuntimeException("Fetching and updating association " + updateModel.getId() + " failed", e);
         }

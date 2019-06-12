@@ -226,7 +226,7 @@ class ValueIntegrator {
         Map<String, Object> childValues = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
         ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
         // Iterate through type, not through newValues.
-        // newValues might contain childs not contained in the type def, e.g. "dmx.timestamps.modified".
+        // newValues might contain children not contained in the type def, e.g. "dmx.timestamps.modified".
         for (String compDefUri : compDefUris()) {
             Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
             if (isOne(compDefUri)) {
@@ -380,7 +380,7 @@ class ValueIntegrator {
             // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
             return identityChildTopics;
         } catch (Exception e) {
-            throw new RuntimeException("Selecting identity childs " + identityCompDefUris + " failed, childValues=" +
+            throw new RuntimeException("Selecting identity children " + identityCompDefUris + " failed, childValues=" +
                 childValues, e);
         }
     }
@@ -674,7 +674,7 @@ class ValueIntegrator {
                 // TODO: assoc parents?
                 if (!pl.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         compDef.getChildTypeUri()).isEmpty()) {
-                    // logger.info("### eliminate (childs exist)");
+                    // logger.info("### eliminate (children exist)");
                     i.remove();
                 }
             }

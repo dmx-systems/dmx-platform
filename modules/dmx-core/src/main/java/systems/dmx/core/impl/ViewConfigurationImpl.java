@@ -86,13 +86,13 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void _setConfigValue(String configTypeUri, ChildTopicsModel childs) {
+    private void _setConfigValue(String configTypeUri, ChildTopicsModel children) {
         TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
         if (configTopic == null) {
-            configTopic = mf.newTopicModel(configTypeUri, childs);
+            configTopic = mf.newTopicModel(configTypeUri, children);
             _addConfigTopic(configTopic);               // update memory + DB
         } else {
-            configTopic.updateChildTopics(childs);      // update memory + DB
+            configTopic.updateChildTopics(children);    // update memory + DB
         }
     }
 

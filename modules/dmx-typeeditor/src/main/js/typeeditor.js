@@ -42,7 +42,7 @@ function defaultTopicType (name) {
     dataTypeUri: 'dmx.core.text',
     viewConfigTopics: [{
       typeUri: 'dmx.webclient.view_config',
-      childs: {
+      children: {
         'dmx.webclient.add_to_create_menu': true
       }
     }]

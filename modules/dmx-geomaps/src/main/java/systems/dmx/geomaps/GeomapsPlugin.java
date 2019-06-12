@@ -389,11 +389,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
         Address(Topic address) {
             // Note: some Address child topics might be deleted (resp. do not exist), so we use ""
             // as defaults here. Otherwise "Invalid access to ChildTopicsModel" would be thrown.
-            ChildTopics childs = address.getChildTopics();
-            String st = childs.getStringOrNull("dmx.contacts.street");
-            String po = childs.getStringOrNull("dmx.contacts.postal_code");
-            String ci = childs.getStringOrNull("dmx.contacts.city");
-            String co = childs.getStringOrNull("dmx.contacts.country");
+            ChildTopics children = address.getChildTopics();
+            String st = children.getStringOrNull("dmx.contacts.street");
+            String po = children.getStringOrNull("dmx.contacts.postal_code");
+            String ci = children.getStringOrNull("dmx.contacts.city");
+            String co = children.getStringOrNull("dmx.contacts.country");
             street     = st != null ? st : "";
             postalCode = po != null ? po : "";
             city       = ci != null ? ci : "";

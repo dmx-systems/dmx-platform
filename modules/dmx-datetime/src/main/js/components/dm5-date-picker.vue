@@ -40,7 +40,7 @@ export default {
 
       get () {
         // console.log('date getter', this.object)
-        const c = this.object.childs
+        const c = this.object.children
         const y = c['dmx.datetime.year'].value
         const m = c['dmx.datetime.month'].value
         const d = c['dmx.datetime.day'].value
@@ -53,7 +53,7 @@ export default {
         // console.log('date setter', date)
         // Note: if a date field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
-        const c = this.object.childs
+        const c = this.object.children
         c['dmx.datetime.year'].value  = date && date.getFullYear()  || ''
         c['dmx.datetime.month'].value = date && date.getMonth() + 1 || ''
         c['dmx.datetime.day'].value   = date && date.getDate()      || ''
@@ -61,9 +61,9 @@ export default {
     },
 
     dateString () {
-      // Note: after updating the server sends the Date topic without its childs. This is a bug (#153).
+      // Note: after updating the server sends the Date topic without its children. This is a bug (#153).
       // Calculation of "this.date" would fail. As a workaround we display nothing.
-      return this.object.childs['dmx.datetime.year'] && this.date.toLocaleDateString()
+      return this.object.children['dmx.datetime.year'] && this.date.toLocaleDateString()
     }
   },
 

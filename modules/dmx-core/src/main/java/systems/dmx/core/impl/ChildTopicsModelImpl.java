@@ -418,7 +418,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // --- Read ---
 
     /**
-     * For multiple-valued childs: looks in the attached object cache for a child topic by ID. ### FIXDOC
+     * For multiple-valued children: looks in the attached object cache for a child topic by ID. ### FIXDOC
      */
     RelatedTopicModelImpl findChildTopicById(long childTopicId, CompDefModel compDef) {
         List<RelatedTopicModelImpl> childTopics = getTopicsOrNull(compDef.getCompDefUri());
@@ -433,8 +433,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     /**
-     * For multiple-valued childs: looks in the attached object cache for the child topic the given reference refers to.
-     * ### FIXDOC
+     * For multiple-valued children: looks in the attached object cache for the child topic the given reference refers
+     * to. ### FIXDOC
      *
      * @param   compDef     the child topics according to this comp def are considered.
      */
@@ -456,8 +456,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     /**
-     * Returns the number of childs contained in this ChildTopicsModel.
-     * Multiple-valued childs count as one.
+     * Returns the number of children contained in this ChildTopicsModel.
+     * Multiple-valued children count as one.
      */
     int size() {
         return childTopics.size();
@@ -466,28 +466,28 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // --- Write Helper ---
 
     /**
-     * For single-valued childs
+     * For single-valued child
      */
     void putInChildTopics(RelatedTopicModel childTopic, CompDefModel compDef) {
         put(compDef.getCompDefUri(), childTopic);
     }
 
     /**
-     * For single-valued childs
+     * For single-valued child
      */
     void removeChildTopic(CompDefModel compDef) {
         remove(compDef.getCompDefUri());
     }
 
     /**
-     * For multiple-valued childs
+     * For multiple-valued child
      */
     void addToChildTopics(RelatedTopicModel childTopic, CompDefModel compDef) {
         add(compDef.getCompDefUri(), childTopic);
     }
 
     /**
-     * For multiple-valued childs
+     * For multiple-valued child
      */
     void removeFromChildTopics(RelatedTopicModel childTopic, CompDefModel compDef) {
         remove(compDef.getCompDefUri(), childTopic);

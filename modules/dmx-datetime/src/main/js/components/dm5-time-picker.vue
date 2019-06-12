@@ -39,7 +39,7 @@ export default {
     time: {
 
       get () {
-        const c = this.object.childs
+        const c = this.object.children
         const h = c['dmx.datetime.hour'].value
         const m = c['dmx.datetime.minute'].value
         // console.log('time getter', this.object, h, m)
@@ -53,16 +53,16 @@ export default {
         // console.log('time setter', time, time && time.getHours(), time && time.getMinutes())
         // Note: if a time field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
-        const c = this.object.childs
+        const c = this.object.children
         c['dmx.datetime.hour'].value   = time === null ? '' : time.getHours()
         c['dmx.datetime.minute'].value = time === null ? '' : time.getMinutes()
       }
     },
 
     timeString () {
-      // Note: after updating the server sends the Time topic without its childs. This is a bug (#153).
+      // Note: after updating the server sends the Time topic without its children. This is a bug (#153).
       // Calculation of "this.time" would fail. As a workaround we display nothing.
-      return this.object.childs['dmx.datetime.hour'] && this.time.toLocaleTimeString()
+      return this.object.children['dmx.datetime.hour'] && this.time.toLocaleTimeString()
     }
   },
 

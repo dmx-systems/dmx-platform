@@ -235,7 +235,7 @@ public class ModelFactoryImpl implements ModelFactory {
             object.optString("uri", null),
             object.optString("typeUri", null),
             object.has("value") ? new SimpleValue(object.get("value")) : null,
-            object.has("childs") ? newChildTopicsModel(object.getJSONObject("childs")) : null
+            object.has("children") ? newChildTopicsModel(object.getJSONObject("children")) : null
         );
     }
 
@@ -297,7 +297,7 @@ public class ModelFactoryImpl implements ModelFactory {
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for mandatory topic properties
-            if (val.has("value") || val.has("childs")) {
+            if (val.has("value") || val.has("children")) {
                 // canonic format (topic or topic reference)
                 AssocModel relatingAssoc = null;
                 if (val.has("assoc")) {

@@ -228,7 +228,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            topic = dmx.getTopic(topic.getId());                            // Note: the childs are not loaded
+            topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
             topic.getChildTopics().set("dmx.core.plugin_name", "HuHu");     // setting child used for labeling
             assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
@@ -250,7 +250,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            topic = dmx.getTopic(topic.getId());                            // Note: the childs are not loaded
+            topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
             topic.getChildTopics().set("dmx.core.plugin_migration_nr", 3);  // setting child NOT used for labeling
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
@@ -449,7 +449,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addCompDef(
                     mf.newCompDefModel("dmx.test.birthday", false, false,
                         "dmx.test.person", "dmx.test.date", "dmx.core.one")));
-            // test comp def childs *before* set
+            // test comp def children *before* set
             ChildTopics ct = tt.getCompDef("dmx.test.date#dmx.test.birthday").getChildTopics();
             assertEquals(false, ct.getBoolean("dmx.core.include_in_label"));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
@@ -457,7 +457,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 2) set "Include in Label" flag
             ct.set("dmx.core.include_in_label", true);
             //
-            // test comp def childs *after* set (custom assoc type must not change)
+            // test comp def children *after* set (custom assoc type must not change)
             assertEquals(true, ct.getBoolean("dmx.core.include_in_label"));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
@@ -1081,10 +1081,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dmx.test.child");
-        assertEquals(1, childs.size());
-        assertEquals(child1.getId(), childs.get(0).getId());
-        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+        List<RelatedTopic> children = parent1.getChildTopics().getTopics("dmx.test.child");
+        assertEquals(1, children.size());
+        assertEquals(child1.getId(), children.get(0).getId());
+        assertEquals("Child 1", children.get(0).getSimpleValue().toString());
     }
 
     @Test
@@ -1108,10 +1108,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dmx.test.child");
-        assertEquals(1, childs.size());
-        assertEquals(child1.getId(), childs.get(0).getId());
-        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+        List<RelatedTopic> children = parent1.getChildTopics().getTopics("dmx.test.child");
+        assertEquals(1, children.size());
+        assertEquals(child1.getId(), children.get(0).getId());
+        assertEquals("Child 1", children.get(0).getSimpleValue().toString());
     }
 
     @Test
@@ -1135,9 +1135,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dmx.test.child");
-        assertEquals(1, childs.size());
-        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+        List<RelatedTopic> children = parent1.getChildTopics().getTopics("dmx.test.child");
+        assertEquals(1, children.size());
+        assertEquals("Child 1", children.get(0).getSimpleValue().toString());
     }
 
     // ---

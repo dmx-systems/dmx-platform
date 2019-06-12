@@ -184,7 +184,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
                 .put("uri", uri)
                 .put("typeUri", typeUri)
                 .put("value", value.value())
-                .put("childs", childTopics.toJSON());
+                .put("children", childTopics.toJSON());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

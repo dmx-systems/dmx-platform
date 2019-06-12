@@ -84,7 +84,7 @@
             "viewConfigTopics": [
               {
                 "typeUri": "dmx.webclient.view_config",
-                "childs": {
+                "children": {
                   "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
                   "dmx.webclient.clearable": true
                 }

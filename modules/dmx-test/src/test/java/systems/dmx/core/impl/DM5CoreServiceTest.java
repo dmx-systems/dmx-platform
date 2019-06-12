@@ -236,10 +236,10 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
             Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
             topic.getChildTopics().addRef(fullCompDefUriToBeUpdated, futureChild.getId());
-            List<RelatedTopic> childs = topic.getChildTopics().getTopics(fullCompDefUriToBeUpdated);
-            assertSame(2, childs.size());
-            assertEquals("Text 1", childs.get(0).getSimpleValue().toString());
-            assertEquals("Text 2", childs.get(1).getSimpleValue().toString());
+            List<RelatedTopic> children = topic.getChildTopics().getTopics(fullCompDefUriToBeUpdated);
+            assertSame(2, children.size());
+            assertEquals("Text 1", children.get(0).getSimpleValue().toString());
+            assertEquals("Text 2", children.get(1).getSimpleValue().toString());
         } finally {
             tx.finish();
         }

@@ -59,7 +59,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.icon": "\uf15b"
           }
         }
@@ -97,7 +97,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.icon": "\uf07b"
           }
         }

@@ -31,7 +31,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.icon": "\uf21b"
           }
         }
@@ -52,7 +52,7 @@
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
-          "childs": {
+          "children": {
             "dmx.webclient.color": "hsl(40, 70%, 53%)",
             "dmx.webclient.color#dmx.webclient.background_color": "hsl(40, 80%, 96%)"
           }

@@ -155,8 +155,8 @@ export default {
       // Note: Leaflet uses lat-lon order while most other tools (including DMX) and formats use lon-lat order.
       // For exhaustive background information on this topic see https://macwright.org/lonlat/
       return [
-        geoCoordTopic.childs['dmx.geomaps.latitude'].value,
-        geoCoordTopic.childs['dmx.geomaps.longitude'].value
+        geoCoordTopic.children['dmx.geomaps.latitude'].value,
+        geoCoordTopic.children['dmx.geomaps.longitude'].value
       ]
     },
 

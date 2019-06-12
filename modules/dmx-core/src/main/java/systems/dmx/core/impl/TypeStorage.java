@@ -310,7 +310,7 @@ class TypeStorage {
      *
      * @param   assoc   the underlying assoc as retrieved from DB, that is
      *                  1) players are ref'd by-ID
-     *                  2) childs are not retrieved
+     *                  2) children are not retrieved
      */
     private CompDefModel fetchCompDef(AssocModelImpl assoc, String parentTypeUri, String childTypeUri) {
         try {
