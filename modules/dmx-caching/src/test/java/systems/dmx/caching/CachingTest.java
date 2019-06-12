@@ -25,7 +25,7 @@ public class CachingTest {
         assertFalse("/core/topic/2695".matches(CACHABLE_PATH));
         assertFalse("base/core/topic/2695".matches(CACHABLE_PATH));
         assertFalse("core/topic/2695?".matches(CACHABLE_PATH));
-        assertFalse("core/topic/2695?include_childs=true".matches(CACHABLE_PATH));
+        assertFalse("core/topic/2695?children=true".matches(CACHABLE_PATH));
     }
 
     @Test

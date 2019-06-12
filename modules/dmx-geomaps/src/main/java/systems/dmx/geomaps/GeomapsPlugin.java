@@ -95,7 +95,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
         }
     }
 
-    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/coord/{geo_coord_id}")
     @Override

@@ -105,7 +105,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("include_childs") boolean includeChilds) {
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("children") boolean includeChilds) {
         try {
             logger.info("Fetching topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic

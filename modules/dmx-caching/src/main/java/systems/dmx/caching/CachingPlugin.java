@@ -85,11 +85,11 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private long requestObjectId(ContainerRequest request) {
-        // Example URL: "http://localhost:8080/core/topic/2695?include_childs=true"
+        // Example URL: "http://localhost:8080/core/topic/2695?children=true"
         //   request.getBaseUri()="http://localhost:8080/"
         //   request.getPath()="core/topic/2695"
         //   request.getAbsolutePath()="http://localhost:8080/core/topic/2695"
-        //   request.getRequestUri()="http://localhost:8080/core/topic/2695?include_childs=true"
+        //   request.getRequestUri()="http://localhost:8080/core/topic/2695?children=true"
         Matcher m = cachablePath.matcher(request.getPath());
         if (m.matches()) {
             long objectId = Long.parseLong(m.group(2));

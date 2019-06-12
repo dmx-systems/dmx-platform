@@ -37,8 +37,8 @@ import java.util.logging.Logger;
  * <li>Fire the <code>CoreEvent.SERVICE_RESPONSE_FILTER</code> event to let plugins operate on the response, e.g.
  *     - the Caching plugin sets the <code>Cache-Control</code> response header
  *     - the Time plugin sets the <code>Last-Modified</code> response header
- * <li>Load child topics of the response object(s) if requested with the <code>include_childs</code> and
- *     <code>include_assoc_childs</code> query parameters.
+ * <li>Load child topics of the response object(s) if requested with the <code>children</code> and
+ *     <code>assoc_children</code> query parameters.
  * <li>Fire the <code>CoreEvent.PRE_SEND_XXX</code> events for all response object(s) and objects contained in response
  *     directives. This let plugins operate on the response on a per-object basis, e.g.
  *     - the Geomaps plugin enriches an Address topic with its geo coordinate
@@ -226,11 +226,11 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ---
 
     private boolean getIncludeChilds(ContainerRequest request) {
-        return getBooleanQueryParameter(request, "include_childs");
+        return getBooleanQueryParameter(request, "children");
     }
 
     private boolean getIncludeAssocChilds(ContainerRequest request) {
-        return getBooleanQueryParameter(request, "include_assoc_childs");
+        return getBooleanQueryParameter(request, "assoc_children");
     }
 
     // ---
