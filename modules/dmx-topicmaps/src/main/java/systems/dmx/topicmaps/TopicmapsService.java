@@ -49,6 +49,8 @@ public interface TopicmapsService extends TopicmapsConstants {
 
     // ---
 
+    // TODO: add addTopicToTopicmap() with default visibility (true)
+
     /**
      * Convenience method to add a topic with the standard view properties.
      */
@@ -58,6 +60,8 @@ public interface TopicmapsService extends TopicmapsConstants {
      * Adds a topic to a topicmap. If the topic is added already an exception is thrown.
      */
     void addTopicToTopicmap(long topicmapId, long topicId, ViewProps viewProps);
+
+    // TODO: add addAssocToTopicmap() with default view props (visibility=true, pinned=false)
 
     /**
      * Adds an association to a topicmap. If the association is added already an exception is thrown.

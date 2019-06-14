@@ -84,20 +84,25 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public Topic createTopicmap(@QueryParam("name") String name,
                                 @QueryParam("topicmap_type_uri") String topicmapTypeUri,
                                 @QueryParam("private") boolean isPrivate) {
-        logger.info("Creating topicmap \"" + name + "\" (topicmapTypeUri=\"" + topicmapTypeUri + "\", isPrivate=" +
-            isPrivate +")");
-        Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
-            .put("dmx.topicmaps.topicmap_name", name)
-            .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
-            .put("dmx.topicmaps.private", isPrivate)
-        ));
-        // init topicmap state
-        ViewProps viewProps = mf.newViewProps();
-        getTopicmapType(topicmapTypeUri).initTopicmapState(viewProps);
-        viewProps.store(topicmapTopic);
-        //
-        me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
-        return topicmapTopic;
+        try {
+            logger.info("Creating topicmap \"" + name + "\" (topicmapTypeUri=\"" + topicmapTypeUri + "\", isPrivate=" +
+                isPrivate +")");
+            Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
+                .put("dmx.topicmaps.topicmap_name", name)
+                .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
+                .put("dmx.topicmaps.private", isPrivate)
+            ));
+            // init topicmap state
+            ViewProps viewProps = mf.newViewProps();
+            getTopicmapType(topicmapTypeUri).initTopicmapState(viewProps);
+            viewProps.store(topicmapTopic);
+            //
+            me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
+            return topicmapTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating topicmap \"" + name + "\" failed (topicmapTypeUri=\"" +
+                topicmapTypeUri + "\", isPrivate=" + isPrivate +")", e);
+        }
     }
 
     // ---
