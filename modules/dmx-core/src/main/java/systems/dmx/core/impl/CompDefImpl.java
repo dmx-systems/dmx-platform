@@ -73,7 +73,7 @@ class CompDefImpl extends AssocImpl implements CompDef {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        PlayerModel configurable = pl.typeStorage.newCompDefRole(getId());   // ### ID is uninitialized
+        PlayerModel configurable = pl.typeStorage.newCompDefPlayer(getId());   // ### ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 

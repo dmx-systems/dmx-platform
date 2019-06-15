@@ -689,7 +689,7 @@ class TypeStorage {
 
     private void storeViewConfig(TypeModelImpl type) {
         ViewConfigurationModelImpl viewConfig = type.viewConfig;
-        TopicModel configTopic = _storeViewConfig(newTypeRole(type.id), viewConfig);
+        TopicModel configTopic = _storeViewConfig(newTypePlayer(type.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
         // would be missing on a cold start. Subsequent migrations operating on them would fail.
         if (configTopic != null) {
@@ -699,7 +699,7 @@ class TypeStorage {
 
     void storeViewConfig(CompDefModelImpl compDef) {
         ViewConfigurationModelImpl viewConfig = compDef.viewConfig;
-        TopicModel configTopic = _storeViewConfig(newCompDefRole(compDef.id), viewConfig);
+        TopicModel configTopic = _storeViewConfig(newCompDefPlayer(compDef.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
         // would be missing on a cold start. Subsequent migrations operating on them would fail.
         if (configTopic != null) {
@@ -745,11 +745,11 @@ class TypeStorage {
 
     // ---
 
-    PlayerModel newTypeRole(long typeId) {
+    PlayerModel newTypePlayer(long typeId) {
         return mf.newTopicPlayerModel(typeId, "dmx.core.parent");
     }
 
-    PlayerModel newCompDefRole(long compDefId) {
+    PlayerModel newCompDefPlayer(long compDefId) {
         return mf.newAssocPlayerModel(compDefId, "dmx.core.parent");
     }
 

@@ -88,7 +88,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     @Override
     public final ViewConfiguration getViewConfig() {
-        PlayerModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
+        PlayerModel configurable = pl.typeStorage.newTypePlayer(getId());   // ### type ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 

@@ -176,7 +176,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssocModelImpl newAssocModel(JSONObject assoc) {
         try {
-            return new AssocModelImpl(newDMXObjectModel(assoc), parseRole1(assoc), parseRole2(assoc));
+            return new AssocModelImpl(newDMXObjectModel(assoc), parsePlayer1(assoc), parsePlayer2(assoc));
         } catch (Exception e) {
             throw parsingFailed(assoc, e, "AssocModelImpl");
         }
@@ -187,22 +187,22 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * @return  maybe null
      */
-    private PlayerModelImpl parseRole1(JSONObject assoc) throws JSONException {
-        return parseRole(assoc, "player1");
+    private PlayerModelImpl parsePlayer1(JSONObject assoc) throws JSONException {
+        return parsePlayer(assoc, "player1");
     }
 
     /**
      * @return  maybe null
      */
-    private PlayerModelImpl parseRole2(JSONObject assoc) throws JSONException {
-        return parseRole(assoc, "player2");
+    private PlayerModelImpl parsePlayer2(JSONObject assoc) throws JSONException {
+        return parsePlayer(assoc, "player2");
     }
 
-    private PlayerModelImpl parseRole(JSONObject assoc, String key) throws JSONException {
-        return assoc.has(key) ? _parseRole(assoc.getJSONObject(key)) : null;
+    private PlayerModelImpl parsePlayer(JSONObject assoc, String key) throws JSONException {
+        return assoc.has(key) ? _parsePlayer(assoc.getJSONObject(key)) : null;
     }
 
-    private PlayerModelImpl _parseRole(JSONObject playerModel) {
+    private PlayerModelImpl _parsePlayer(JSONObject playerModel) {
         if (playerModel.has("topicId") || playerModel.has("topicUri")) {
             return newTopicPlayerModel(playerModel);
         } else if (playerModel.has("assocId")) {
@@ -697,8 +697,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public CompDefModelImpl newCompDefModel(JSONObject compDef) {
         try {
-            PlayerModel player1 = parseRole1(compDef);     // may be null
-            PlayerModel player2 = parseRole2(compDef);     // may be null
+            PlayerModel player1 = parsePlayer1(compDef);     // may be null
+            PlayerModel player2 = parsePlayer2(compDef);     // may be null
             // Note: the canonic comp def JSON format does not require explicit assoc players. Comp defs declared in
             // JSON migrations support a simplified format. In contrast comp defs contained in a request may include
             // explicit assoc players already. In that case we use these ones as they contain both, the ID-ref and the
@@ -706,8 +706,8 @@ public class ModelFactoryImpl implements ModelFactory {
             return new CompDefModelImpl(
                 newAssocModel(compDef.optLong("id", -1), null,
                     TYPE_COMP_DEF,
-                    player1 != null ? player1 : parentRole(compDef.getString("parentTypeUri")),
-                    player2 != null ? player2 : childRole(compDef.getString("childTypeUri")),
+                    player1 != null ? player1 : parentPlayer(compDef.getString("parentTypeUri")),
+                    player2 != null ? player2 : childPlayer(compDef.getString("childTypeUri")),
                     null, childTopics(compDef)
                 ),
                 newViewConfigurationModel(compDef.optJSONArray("viewConfigTopics"))
@@ -726,7 +726,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                      String childCardinalityUri,
                                      ViewConfigurationModel viewConfig) {
         return new CompDefModelImpl(
-            newAssocModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
+            newAssocModel(id, uri, TYPE_COMP_DEF, parentPlayer(parentTypeUri), childPlayer(childTypeUri),
                 null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
             ),
             (ViewConfigurationModelImpl) viewConfig
@@ -742,11 +742,11 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private TopicPlayerModel parentRole(String parentTypeUri) {
+    private TopicPlayerModel parentPlayer(String parentTypeUri) {
         return newTopicPlayerModel(parentTypeUri, "dmx.core.parent_type");
     }
 
-    private TopicPlayerModel childRole(String childTypeUri) {
+    private TopicPlayerModel childPlayer(String childTypeUri) {
         return newTopicPlayerModel(childTypeUri, "dmx.core.child_type");
     }
 
