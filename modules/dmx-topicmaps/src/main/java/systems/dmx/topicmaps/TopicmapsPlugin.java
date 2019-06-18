@@ -110,16 +110,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("children") boolean includeChilds) {
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("children") boolean includeChildren) {
         try {
-            logger.info("Fetching topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
+            logger.info("Fetching topicmap " + topicmapId + " (includeChildren=" + includeChildren + ")");
             // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
             return new Topicmap(
                 topicmapTopic.getModel(),
                 fetchTopicmapViewProps(topicmapTopic),
-                fetchTopics(topicmapTopic, includeChilds),
+                fetchTopics(topicmapTopic, includeChildren),
                 fetchAssocs(topicmapTopic)
             );
         } catch (Exception e) {
@@ -445,11 +445,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch Topicmap ---
 
-    private Map<Long, ViewTopic> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
+    private Map<Long, ViewTopic> fetchTopics(Topic topicmapTopic, boolean includeChildren) {
         Map<Long, ViewTopic> topics = new HashMap();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPICMAP_CONTEXT,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersTopicTypeUri=null
-        if (includeChilds) {
+        if (includeChildren) {
             DMXUtils.loadChildTopics(relTopics);
         }
         for (RelatedTopic topic : relTopics) {

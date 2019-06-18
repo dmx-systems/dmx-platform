@@ -163,7 +163,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // === Manipulators ===
 
-    // --- Single-valued Childs ---
+    // --- Single-valued Children ---
 
     // ### TODO: rename "put" methods to "set" to be consistent with ChildTopics interface.
 
@@ -229,7 +229,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      */
     ChildTopicsModel remove(String compDefUri);
 
-    // --- Multiple-valued Childs ---
+    // --- Multiple-valued Children ---
 
     /**
      * Adds a value to a multiple-valued child.

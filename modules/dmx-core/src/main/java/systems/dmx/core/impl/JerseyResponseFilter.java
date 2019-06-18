@@ -77,12 +77,12 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             if (entity != null) {
                 //
                 // 1) Loading child topics
-                boolean includeChilds = getIncludeChilds(request);
-                boolean includeAssocChilds = getIncludeAssocChilds(request);
+                boolean includeChildren = getIncludeChildren(request);
+                boolean includeAssocChildren = getIncludeAssocChildren(request);
                 if (entity instanceof DMXObject) {
-                    loadChildTopics((DMXObject) entity, includeChilds, includeAssocChilds);
+                    loadChildTopics((DMXObject) entity, includeChildren, includeAssocChildren);
                 } else if (isIterable(response, DMXObject.class)) {
-                    loadChildTopics((Iterable<DMXObject>) entity, includeChilds, includeAssocChilds);
+                    loadChildTopics((Iterable<DMXObject>) entity, includeChildren, includeAssocChildren);
                 }
                 //
                 // 2) Firing PRE_SEND events
@@ -124,18 +124,18 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Loading child topics ===
 
-    private void loadChildTopics(DMXObject object, boolean includeChilds, boolean includeAssocChilds) {
-        if (includeChilds) {
+    private void loadChildTopics(DMXObject object, boolean includeChildren, boolean includeAssocChildren) {
+        if (includeChildren) {
             object.loadChildTopics();
-            if (includeAssocChilds) {
+            if (includeAssocChildren) {
                 loadRelatingAssocChildTopics(object);
             }
         }
     }
 
-    private void loadChildTopics(Iterable<DMXObject> objects, boolean includeChilds, boolean includeAssocChilds) {
+    private void loadChildTopics(Iterable<DMXObject> objects, boolean includeChildren, boolean includeAssocChildren) {
         for (DMXObject object : objects) {
-            loadChildTopics(object, includeChilds, includeChilds);
+            loadChildTopics(object, includeChildren, includeChildren);
         }
     }
 
@@ -225,11 +225,11 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---
 
-    private boolean getIncludeChilds(ContainerRequest request) {
+    private boolean getIncludeChildren(ContainerRequest request) {
         return getBooleanQueryParameter(request, "children");
     }
 
-    private boolean getIncludeAssocChilds(ContainerRequest request) {
+    private boolean getIncludeAssocChildren(ContainerRequest request) {
         return getBooleanQueryParameter(request, "assoc_children");
     }
 

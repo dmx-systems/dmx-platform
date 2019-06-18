@@ -203,7 +203,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // === Manipulators ===
 
-    // --- Single-valued Childs ---
+    // --- Single-valued Children ---
 
     @Override
     public final ChildTopicsModel put(String compDefUri, RelatedTopicModel value) {
@@ -277,7 +277,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return this;
     }
 
-    // --- Multiple-valued Childs ---
+    // --- Multiple-valued Children ---
 
     @Override
     public final ChildTopicsModel add(String compDefUri, RelatedTopicModel value) {

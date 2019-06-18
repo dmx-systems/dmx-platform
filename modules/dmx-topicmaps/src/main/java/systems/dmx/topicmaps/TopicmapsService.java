@@ -29,9 +29,9 @@ public interface TopicmapsService extends TopicmapsConstants {
     /**
      * Fetches a topicmap from DB.
      *
-     * @param   includeChilds   if true the topics contained in the topicmap will include their child topics.
+     * @param   includeChildren   if true the topics contained in the topicmap will include their child topics.
      */
-    Topicmap getTopicmap(long topicmapId, boolean includeChilds);
+    Topicmap getTopicmap(long topicmapId, boolean includeChildren);
 
     Assoc getTopicMapcontext(long topicmapId, long topicId);
 

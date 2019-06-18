@@ -295,7 +295,7 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
 function fetchTopic (id, p) {
   // console.log('requesting topic', id)
   // detail panel
-  const p2 = dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
+  const p2 = dm5.restClient.getTopic(id, true, true).then(topic => {  // includeChildren=true, includeAssocChildren=true
     // console.log('topic', id, 'arrived')
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
@@ -320,7 +320,7 @@ function fetchTopic (id, p) {
  */
 function fetchAssoc (id, p) {
   // detail panel
-  const p2 = dm5.restClient.getAssoc(id, true, true).then(assoc => {    // includeChilds=true, includeAssocChilds=true
+  const p2 = dm5.restClient.getAssoc(id, true, true).then(assoc => {  // includeChildren=true, includeAssocChildren=true
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
     p.then(() => {

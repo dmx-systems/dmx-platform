@@ -103,7 +103,7 @@ public interface ChildTopics extends Iterable<String> {
 
     // === Manipulators ===
 
-    // --- Single-valued Childs ---
+    // --- Single-valued Children ---
 
     /**
      * Sets a child.
@@ -141,7 +141,7 @@ public interface ChildTopics extends Iterable<String> {
 
     ChildTopics setDeletionRef(String compDefUri, String refTopicUri);
 
-    // --- Multiple-valued Childs ---
+    // --- Multiple-valued Children ---
 
     ChildTopics add(String compDefUri, TopicModel value);
 

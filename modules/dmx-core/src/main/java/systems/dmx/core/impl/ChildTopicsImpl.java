@@ -188,7 +188,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     // === Manipulators ===
 
-    // --- Single-valued Childs ---
+    // --- Single-valued Children ---
 
     @Override
     public ChildTopics set(String compDefUri, TopicModel value) {
@@ -241,7 +241,7 @@ class ChildTopicsImpl implements ChildTopics {
         return _updateOne(compDefUri, mf.newTopicDeletionModel(refTopicUri));
     }
 
-    // --- Multiple-valued Childs ---
+    // --- Multiple-valued Children ---
 
     @Override
     public ChildTopics add(String compDefUri, TopicModel value) {

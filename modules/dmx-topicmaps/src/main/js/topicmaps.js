@@ -358,7 +358,7 @@ const actions = {
     } else {
       // console.log('fetchTopicmapTopics', workspaceId)
       p = dm5.restClient.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
-        // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
+        // console.log('### Topicmap topics ready!', topics.length)               // includeChildren=true
         if (!topics.length) {
           throw Error(`workspace ${workspaceId} has no topicmap`)
         }

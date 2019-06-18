@@ -218,7 +218,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void setLabelChildWhileChildsAreNotLoaded() {
+    public void setLabelChildWhileChildrenAreNotLoaded() {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin", mf.newChildTopicsModel()
@@ -240,7 +240,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void setNonlabelChildWhileChildsAreNotLoaded() {
+    public void setNonlabelChildWhileChildrenAreNotLoaded() {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin", mf.newChildTopicsModel()
