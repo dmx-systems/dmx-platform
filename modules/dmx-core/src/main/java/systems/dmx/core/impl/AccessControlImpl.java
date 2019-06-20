@@ -345,7 +345,8 @@ class AccessControlImpl implements AccessControl {
             // store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
         } catch (Exception e) {
-            throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
+            throw new RuntimeException("Assigning object " + object.getId() + " to workspace " + workspaceId +
+                " failed, object=" + object, e);
         }
     }
 

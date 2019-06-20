@@ -380,7 +380,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
         // Compare to DMXUtils.getPlayerModels()
-        if (!(player1 instanceof TopicPlayerModel) || !(player2 instanceof TopicPlayerModel)) {
+        if (!(player1 instanceof TopicPlayerModel) || player1.id == -1 ||
+            !(player2 instanceof TopicPlayerModel) || player2.id == -1) {
             return;
         }
         // Note: only readable assocs (access control) are considered
