@@ -4,8 +4,8 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicPlayerModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.util.DMXUtils;
@@ -386,9 +386,15 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // Note: only readable assocs (access control) are considered
         for (AssocModelImpl assoc : pl._getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
                                                                                    player2.roleTypeUri)) {
-            if (assoc.id != id && assoc.value.equals(value)) {
-                throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
-                    ", typeUri=\"" + typeUri + "\", value=\"" + value + "\")");
+            // Note (ID comparison): on post-update the assoc exists already in the DB. It must not be regarded a
+            // duplicate of itself.
+            // Note (value comparison): on pre-create this assoc model's value might be null. It must be regarded a
+            // duplicate only if an existing assoc has empty string value. (Existing assocs never have null values,
+            // but empty string.)
+            SimpleValue _value = value != null ? value : new SimpleValue("");
+            if (assoc.id != id && assoc.value.equals(_value)) {
+                throw new RuntimeException("Duplicate: such an association exists already, " + this +
+                    ", existing assoc=" + assoc);
             }
         }
     }

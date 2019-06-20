@@ -175,8 +175,9 @@ class DMXObjectModelImpl implements DMXObjectModel {
     @Override
     public JSONObject toJSON() {
         try {
-            // Note: for models used for topic/association enrichment (e.g. timestamps, permissions)
-            // default values must be set in case they are not fully initialized.
+            // Note: for models used for topic/association enrichment (e.g. timestamps) default values must be set
+            // in case they are not fully initialized.
+            // ### TODO: remove this side effect! Note that toJSON() is also used for logging!
             setDefaults();
             //
             return new JSONObject()
