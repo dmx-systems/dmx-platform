@@ -68,7 +68,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
     @Override
     public void check(long fileSize) {
         CoreService dmx = CoreActivator.getCoreService();
-        String username = dmx.getAccessControl().getUsername(request);
+        String username = dmx.getPrivilegedAccess().getUsername(request);
         if (username == null) {
             throw new RuntimeException("User <anonymous> has no disk quota");
         }
@@ -109,7 +109,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
     }
 
     private long diskQuota(String username) {
-        Topic usernameTopic = CoreActivator.getCoreService().getAccessControl().getUsernameTopic(username);
+        Topic usernameTopic = CoreActivator.getCoreService().getPrivilegedAccess().getUsernameTopic(username);
         ConfigService cs = CoreActivator.getService(ConfigService.class);
         Topic configTopic = cs.getConfigTopic("dmx.files.disk_quota", usernameTopic.getId());
         return 1024 * 1024 * configTopic.getSimpleValue().intValue();

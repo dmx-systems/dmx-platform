@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 
 
-public interface AccessControl {
+public interface PrivilegedAccess {
 
 
 

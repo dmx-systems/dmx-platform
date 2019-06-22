@@ -5,7 +5,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Transactional;
-import systems.dmx.core.service.accesscontrol.AccessControl;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.event.PostCreateTopic;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -113,13 +113,13 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     public ConfigDefinitions getConfigDefinitions() {
         try {
             JSONObject json = new JSONObject();
-            AccessControl ac = dmx.getAccessControl();
+            PrivilegedAccess pa = dmx.getPrivilegedAccess();
             for (String configurableUri: registry.keySet()) {
                 JSONArray array = new JSONArray();
                 for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
-                    String username = ac.getUsername(request);
+                    String username = pa.getUsername(request);
                     long workspaceId = workspaceId(configDef.getConfigModificationRole());
-                    if (ac.hasReadPermission(username, workspaceId)) {
+                    if (pa.hasReadPermission(username, workspaceId)) {
                         array.put(configDef.getConfigTypeUri());
                     }
                 }
@@ -143,7 +143,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private RelatedTopic _getConfigTopic(String configTypeUri, long topicId) {
-        return dmx.getAccessControl().getConfigTopic(configTypeUri, topicId);
+        return dmx.getPrivilegedAccess().getConfigTopic(configTypeUri, topicId);
     }
 
     private RelatedTopic _createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
@@ -151,8 +151,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             // suppress standard workspace assignment as a config topic requires a special assignment
-            final AccessControl ac = dmx.getAccessControl();
-            return ac.runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
+            final PrivilegedAccess pa = dmx.getPrivilegedAccess();
+            return pa.runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
                 @Override
                 public RelatedTopic call() {
                     Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
@@ -160,7 +160,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                         mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
                         mf.newTopicPlayerModel(configTopic.getId(), ROLE_TYPE_DEFAULT)
                     ));
-                    ac.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
+                    pa.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
                     // ### TODO: extend Core API to avoid re-retrieval
                     return _getConfigTopic(configTypeUri, topic.getId());
                 }
@@ -172,12 +172,12 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     }
 
     private long workspaceId(ConfigModificationRole role) {
-        AccessControl ac = dmx.getAccessControl();
+        PrivilegedAccess pa = dmx.getPrivilegedAccess();
         switch (role) {
         case ADMIN:
-            return ac.getAdministrationWorkspaceId();
+            return pa.getAdministrationWorkspaceId();
         case SYSTEM:
-            return ac.getSystemWorkspaceId();
+            return pa.getSystemWorkspaceId();
         default:
             throw new RuntimeException("Modification role \"" + role + "\" not yet implemented");
         }

@@ -9,9 +9,9 @@ import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.util.ContextTracker;
 
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 
 
-class AccessControlImpl implements AccessControl {
+class PrivilegedAccessImpl implements PrivilegedAccess {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -74,7 +74,7 @@ class AccessControlImpl implements AccessControl {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AccessControlImpl(PersistenceLayer pl) {
+    PrivilegedAccessImpl(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
     }

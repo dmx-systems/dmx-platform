@@ -11,7 +11,7 @@ import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
-import systems.dmx.core.service.accesscontrol.AccessControl;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
 import java.util.List;
@@ -300,7 +300,7 @@ public interface CoreService {
 
     ModelFactory getModelFactory();
 
-    AccessControl getAccessControl();   // ### TODO: drop this
+    PrivilegedAccess getPrivilegedAccess();
 
     WebSocketsService getWebSocketsService();
 

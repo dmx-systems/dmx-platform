@@ -1254,7 +1254,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             //
-            dmx.getAccessControl().assignToWorkspace(t1, ws.getId());
+            dmx.getPrivilegedAccess().assignToWorkspace(t1, ws.getId());
             //
             long wsId = (Long) t1.getProperty("dmx.workspaces.workspace_id");
             assertEquals(ws.getId(), wsId);
@@ -1274,7 +1274,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
             Assoc assoc = createAssoc(t1, t2);
             //
-            dmx.getAccessControl().assignToWorkspace(assoc, ws.getId());
+            dmx.getPrivilegedAccess().assignToWorkspace(assoc, ws.getId());
             //
             long wsId = (Long) assoc.getProperty("dmx.workspaces.workspace_id");
             assertEquals(ws.getId(), wsId);

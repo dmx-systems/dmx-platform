@@ -18,8 +18,8 @@ import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
-import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.service.accesscontrol.Operation;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
@@ -621,7 +621,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
-        Topic topic = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
+        // Note: runWithoutWorkspaceAssignment() throws Exception
+        Topic topic = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Topic>() {
             @Override
             public Topic call() {
                 return dmx.createTopic(model);
@@ -640,7 +641,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             boolean exists = dmx.getAssocs(folderTopicId, topicId, "dmx.core.composition").size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
-                Assoc assoc = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Assoc>() {
+                Assoc assoc = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Assoc>() {
                     @Override
                     public Assoc call() {
                         return dmx.createAssoc(mf.newAssocModel("dmx.core.composition",
@@ -666,9 +667,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private void createWorkspaceAssignment(DMXObject object, String repoPath) {
         try {
-            AccessControl ac = dmx.getAccessControl();
-            long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDMXWorkspaceId();
-            ac.assignToWorkspace(object, workspaceId);
+            PrivilegedAccess pa = dmx.getPrivilegedAccess();
+            long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : pa.getDMXWorkspaceId();
+            pa.assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Creating workspace assignment for File/Folder topic or folder association " +
                 "failed", e);
@@ -775,9 +776,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                     //
                     // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
-                    String username = dmx.getAccessControl().getUsername(request);
+                    String username = dmx.getPrivilegedAccess().getUsername(request);
                     long fileTopicId = fileTopic.getId();
-                    if (!dmx.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
+                    if (!dmx.getPrivilegedAccess().hasPermission(username, Operation.READ, fileTopicId)) {
                         throw new FileRepositoryException(userInfo(username) + " has no READ permission for " +
                             "repository path \"" + repoPath + "\" (File topic ID=" + fileTopicId + ")",
                             Status.UNAUTHORIZED);

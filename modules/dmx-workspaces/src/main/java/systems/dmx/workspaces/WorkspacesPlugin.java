@@ -110,7 +110,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
-            Topic workspace = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            Topic workspace = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     logger.info(operation + info);
@@ -129,7 +129,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
                     // So we must use the privileged assignToWorkspace() call here. This is to support the
                     // "DM4 Sign-up" 3rd-party plugin.
-                    dmx.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
+                    dmx.getPrivilegedAccess().assignToWorkspace(topicmap, workspace.getId());
                     //
                     return workspace;
                 }
@@ -148,7 +148,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{uri}")
     @Override
     public Topic getWorkspace(@PathParam("uri") String uri) {
-        return dmx.getAccessControl().getWorkspace(uri);
+        return dmx.getPrivilegedAccess().getWorkspace(uri);
     }
 
     // Note: the "children" query parameter is handled by core's JerseyResponseFilter
@@ -433,7 +433,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     private long getAssignedWorkspaceId(long objectId) {
-        return dmx.getAccessControl().getAssignedWorkspaceId(objectId);
+        return dmx.getPrivilegedAccess().getAssignedWorkspaceId(objectId);
     }
 
     private void _assignToWorkspace(DMXObject object, long workspaceId) {
@@ -516,7 +516,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
      *
-     * ### TODO: principle copy in AccessControlImpl.checkWorkspaceId()
+     * ### TODO: principle copy in PrivilegedAccessImpl.checkWorkspaceId()
      */
     private void checkWorkspaceId(long topicId) {
         String typeUri = dmx.getTopic(topicId).getTypeUri();
@@ -530,7 +530,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
     private boolean workspaceAssignmentIsSuppressed(DMXObject object) {
-        boolean suppressed = dmx.getAccessControl().workspaceAssignmentIsSuppressed();
+        boolean suppressed = dmx.getPrivilegedAccess().workspaceAssignmentIsSuppressed();
         if (suppressed) {
             logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
         }

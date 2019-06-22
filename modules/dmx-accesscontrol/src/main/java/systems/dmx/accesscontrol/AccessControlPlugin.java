@@ -22,11 +22,11 @@ import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
-import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.service.accesscontrol.AccessControlException;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.Permissions;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.CheckAssocReadAccess;
 import systems.dmx.core.service.event.CheckAssocWriteAccess;
@@ -196,14 +196,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getUsername() {
-        return dmx.getAccessControl().getUsername(request);
+        return dmx.getPrivilegedAccess().getUsername(request);
     }
 
     @GET
     @Path("/username")
     @Override
     public Topic getUsernameTopic() {
-        return dmx.getAccessControl().getUsernameTopic(request);
+        return dmx.getPrivilegedAccess().getUsernameTopic(request);
     }
 
     // ---
@@ -216,7 +216,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (username == null) {
             throw new IllegalStateException("No user is logged in");
         }
-        return dmx.getAccessControl().getPrivateWorkspace(username);
+        return dmx.getPrivilegedAccess().getPrivateWorkspace(username);
     }
 
 
@@ -230,7 +230,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public Topic createUserAccount(final Credentials cred) {
         try {
             String username = cred.username;
-            AccessControl ac = dmx.getAccessControl();
+            PrivilegedAccess pa = dmx.getPrivilegedAccess();
             logger.info("Creating user account \"" + username + "\"");
             //
             // 1) create username topic and a private workspace
@@ -239,7 +239,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 2) create user account
             // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
             // special assignments. See step 3) below.
-            Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.user_account", mf.newChildTopicsModel()
@@ -251,9 +251,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Note: the current user has no READ access to the private workspace just created.
             // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
             Topic passwordTopic = userAccount.getChildTopics().getTopic("dmx.accesscontrol.password");
-            long privateWorkspaceId = ac.getPrivateWorkspace(username).getId();
-            ac.assignToWorkspace(userAccount, privateWorkspaceId);
-            ac.assignToWorkspace(passwordTopic, privateWorkspaceId);
+            long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
+            pa.assignToWorkspace(userAccount, privateWorkspaceId);
+            pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
             //
             return usernameTopic;
         } catch (Exception e) {
@@ -265,7 +265,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public Topic createUsername(final String username) {
         try {
             logger.info("Creating username topic \"" + username + "\"");
-            AccessControl ac = dmx.getAccessControl();
+            PrivilegedAccess pa = dmx.getPrivilegedAccess();
             //
             // 1) check username uniqueness
             // Note: we can't do this check in the preCreateTopic() listener. If such an username topic exists already
@@ -278,7 +278,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 2) create username topic
             // We suppress standard workspace assignment here as a username topic require special assignment.
             // See step 3) below.
-            usernameTopic = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            usernameTopic = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.username", new SimpleValue(username)));
@@ -297,7 +297,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 4) assign username topic to "System" workspace
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
             // This is to support the "DM4 Sign-up" 3rd-party plugin.
-            ac.assignToWorkspace(usernameTopic, ac.getSystemWorkspaceId());
+            pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
             //
             return usernameTopic;
         } catch (Exception e) {
@@ -309,7 +309,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/username/{username}")
     @Override
     public Topic getUsernameTopic(@PathParam("username") String username) {
-        return dmx.getAccessControl().getUsernameTopic(username);
+        return dmx.getPrivilegedAccess().getUsernameTopic(username);
     }
 
 
@@ -321,7 +321,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
-        // ### TODO: delegate to Core's AccessControl.getOwner()?
+        // ### TODO: delegate to Core's PrivilegedAccess.getOwner()?
         return dmx.hasProperty(workspaceId, PROP_OWNER) ? (String) dmx.getProperty(workspaceId, PROP_OWNER) : null;
     }
 
@@ -356,7 +356,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public boolean isMember(String username, long workspaceId) {
-        return dmx.getAccessControl().isMember(username, workspaceId);
+        return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
 
@@ -386,7 +386,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getCreator(@PathParam("id") long objectId) {
-        return dmx.getAccessControl().getCreator(objectId);
+        return dmx.getPrivilegedAccess().getCreator(objectId);
     }
 
     @GET
@@ -755,14 +755,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Topic checkCredentials(Credentials cred, AuthorizationMethod am) {
         if (am == null) {
-            return dmx.getAccessControl().checkCredentials(cred);
+            return dmx.getPrivilegedAccess().checkCredentials(cred);
         } else {
             return am.checkCredentials(cred);
         }
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
-        Topic loginEnabled = dmx.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
+        Topic loginEnabled = dmx.getPrivilegedAccess().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
         return loginEnabled.getSimpleValue().booleanValue();
     }
 
@@ -785,7 +785,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private String username(HttpSession session) {
-        return dmx.getAccessControl().username(session);
+        return dmx.getPrivilegedAccess().username(session);
     }
 
     // ---
@@ -950,7 +950,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
-        return dmx.getAccessControl().hasPermission(username, operation, objectId);
+        return dmx.getPrivilegedAccess().hasPermission(username, operation, objectId);
     }
 
     private boolean inRequestScope() {

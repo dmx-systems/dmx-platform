@@ -72,7 +72,7 @@ public class Migration3 extends Migration {
                 // In case of a UPDATE the DMX workspace exists already and we make the assignment here.
                 // Type-introduction of the Workspaces module will not perform as this module is installed already.
                 if (dmxWorkspaceId != -1 && isDMXStandardType(type)) {
-                    dmx.getAccessControl().assignToWorkspace(configTopic, dmxWorkspaceId);
+                    dmx.getPrivilegedAccess().assignToWorkspace(configTopic, dmxWorkspaceId);
                 }
                 //
                 count[i][1]++;

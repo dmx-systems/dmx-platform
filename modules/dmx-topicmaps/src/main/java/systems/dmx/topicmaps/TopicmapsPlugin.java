@@ -171,7 +171,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("topic_id") final long topicId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     if (getTopicMapcontext(topicmapId, topicId) != null) {      // TODO: idempotence?
@@ -195,7 +195,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     if (getAssocMapcontext(topicmapId, assocId) != null) {      // TODO: idempotence?
@@ -220,7 +220,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     // 1) add topic
@@ -602,7 +602,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private void deleteAssocMapcontext(Assoc assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deleting a mapcontext association is a privileged operation.
-        dmx.getAccessControl().deleteAssocMapcontext(assocMapcontext);
+        dmx.getPrivilegedAccess().deleteAssocMapcontext(assocMapcontext);
     }
 
     // --- Store View Properties ---

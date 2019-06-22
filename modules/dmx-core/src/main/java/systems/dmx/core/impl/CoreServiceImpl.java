@@ -15,7 +15,7 @@ import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.PluginInfo;
-import systems.dmx.core.service.accesscontrol.AccessControl;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
 import org.osgi.framework.BundleContext;
@@ -36,9 +36,9 @@ public class CoreServiceImpl implements CoreService {
     PersistenceLayer pl;
     EventManager em;
     ModelFactoryImpl mf;
+    PrivilegedAccess ac;
     MigrationManager migrationManager;
     PluginManager pluginManager;
-    AccessControl accessControl;
     WebSocketsServiceImpl wsService;
     WebPublishingService wpService;
 
@@ -54,9 +54,9 @@ public class CoreServiceImpl implements CoreService {
         this.pl = pl;
         this.em = pl.em;
         this.mf = pl.mf;
+        this.ac = new PrivilegedAccessImpl(pl);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.accessControl = new AccessControlImpl(pl);
         this.wsService = new WebSocketsServiceImpl(this);
         this.wpService = new WebPublishingService(pl, wsService);
         //
@@ -414,8 +414,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public AccessControl getAccessControl() {
-        return accessControl;
+    public PrivilegedAccess getPrivilegedAccess() {
+        return ac;
     }
 
     @Override
