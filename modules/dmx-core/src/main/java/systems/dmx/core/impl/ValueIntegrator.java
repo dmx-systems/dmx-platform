@@ -199,10 +199,8 @@ class ValueIntegrator {
      */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
-        // FIXME: don't throw when topic is not READable; create another one; don't try to reuse
-        TopicImpl _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
-        TopicModelImpl topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
-        if (topic != null) {
+        TopicModelImpl topic = pl.fetchTopic(type.getUri(), newValue);
+        if (topic != null && topic.isReadable()) {
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
             topic = createSimpleTopic();

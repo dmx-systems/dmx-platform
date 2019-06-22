@@ -9,6 +9,7 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
+import systems.dmx.core.service.accesscontrol.AccessControlException;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -318,6 +319,15 @@ class DMXObjectModelImpl implements DMXObjectModel {
      */
     void checkWriteAccess() {
         throw new UnsupportedOperationException();
+    }
+
+    boolean isReadable() {
+        try {
+            checkReadAccess();
+            return true;
+        } catch (AccessControlException e) {
+            return false;
+        }
     }
 
     // ---

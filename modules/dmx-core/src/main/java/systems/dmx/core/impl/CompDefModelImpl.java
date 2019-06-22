@@ -173,7 +173,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     boolean isReadable() {
         try {
             // 1) check comp def
-            if (!pl.hasReadAccess(this)) {
+            if (!super.isReadable()) {
                 logger.info("### Comp def \"" + getCompDefUri() + "\" not READable");
                 return false;
             }
@@ -182,7 +182,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
             //
             // 2) check custom assoc type, if set
             TopicModelImpl assocType = getCustomAssocType();
-            if (assocType != null && !pl.hasReadAccess(assocType)) {
+            if (assocType != null && !assocType.isReadable()) {
                 logger.info("### Comp def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
                 return false;
             }

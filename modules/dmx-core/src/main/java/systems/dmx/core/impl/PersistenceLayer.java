@@ -9,7 +9,6 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.service.accesscontrol.AccessControlException;
 import systems.dmx.core.storage.spi.DMXStorage;
 
 import java.util.ArrayList;
@@ -753,7 +752,7 @@ public final class PersistenceLayer extends StorageDecorator {
     private <M extends DMXObjectModelImpl> List<M> filterReadables(List<M> models) {
         Iterator<? extends DMXObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
-            if (!hasReadAccess(i.next())) {
+            if (!i.next().isReadable()) {
                 i.remove();
             }
         }
