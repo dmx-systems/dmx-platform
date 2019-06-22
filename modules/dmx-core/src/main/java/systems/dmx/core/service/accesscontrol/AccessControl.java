@@ -129,7 +129,7 @@ public interface AccessControl {
      *
      * @return  The workspace (a topic of type "Workspace").
      *
-     * @throws  RuntimeException    If no workspace exists for the given URI.
+     * @throws  RuntimeException    if no workspace exists for the given URI.
      */
     Topic getWorkspace(String uri);
 
@@ -162,15 +162,20 @@ public interface AccessControl {
      *
      * @return  The workspace ID, or <code>-1</code> if no workspace is assigned.
      *
-     * @throws  RuntimeException     If no object with the given ID exists.
+     * @throws  RuntimeException     if no object with the given ID exists.
      */
     long getAssignedWorkspaceId(long objectId);
 
     /**
      * Performs the initial workspace assignment for an object.
      * <p>
-     * Use this method only for objects which have no workspace assignment already, that is e.g. objects
-     * created in a migration or objects created while workspace assignment is deliberately suppressed.
+     * If the object is already assigned to the given workspace nothing is performed.
+     * <p>
+     * Note: this method can't be used to reassign an object to another workspace; use the `WorkspacesService` instead.
+     * Typically this method is used for objects created in a migration or objects created inside a
+     * `runWithoutWorkspaceAssignment` context, and when the `WorkspacesService` is not available for some reason.
+     *
+     * @throws  RuntimeException    if the object is already assigned to another workspace than the given workspace.
      */
     void assignToWorkspace(DMXObject object, long workspaceId);
 

@@ -199,7 +199,7 @@ class ValueIntegrator {
      */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
-        // FIXME: HTML values must be tag-stripped before lookup, complementary to indexing
+        // FIXME: don't throw when topic is not READable; create another one; don't try to reuse
         TopicImpl _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModelImpl topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic != null) {

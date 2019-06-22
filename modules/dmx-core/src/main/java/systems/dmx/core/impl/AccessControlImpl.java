@@ -337,13 +337,19 @@ class AccessControlImpl implements AccessControl {
     @Override
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
-            // create assignment association
-            pl.createAssoc("dmx.workspaces.workspace_assignment",
-                object.getModel().createPlayerModel("dmx.core.parent"),
-                mf.newTopicPlayerModel(workspaceId, "dmx.core.child")
-            );
-            // store assignment property
-            object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
+            long _workspaceId = getAssignedWorkspaceId(object.getId());
+            if (_workspaceId == -1) {
+                // create assignment association
+                pl.createAssoc("dmx.workspaces.workspace_assignment",
+                    object.getModel().createPlayerModel("dmx.core.parent"),
+                    mf.newTopicPlayerModel(workspaceId, "dmx.core.child")
+                );
+                // store assignment property
+                object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
+            } else if (_workspaceId != workspaceId) {
+                throw new RuntimeException("object " + object.getId() + " is already assigned to workspace " +
+                    _workspaceId);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Assigning object " + object.getId() + " to workspace " + workspaceId +
                 " failed, object=" + object, e);
