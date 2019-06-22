@@ -655,7 +655,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssocModelImpl assoc = fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
-        return assoc != null ? checkReadAccess(assoc) : null;
+        return assoc != null ? assoc.<RelatedAssocModelImpl>checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
@@ -680,7 +680,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssocModelImpl assoc = fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
-        return assoc != null ? checkReadAccess(assoc) : null;
+        return assoc != null ? assoc.<RelatedAssocModelImpl>checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
@@ -699,7 +699,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                           String othersRoleTypeUri, String othersTopicTypeUri) {
         RelatedTopicModelImpl topic = fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return topic != null ? checkReadAccess(topic) : null;
+        return topic != null ? topic.<RelatedTopicModelImpl>checkReadAccess() : null;
     }
 
     List<RelatedTopicModelImpl> getRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
@@ -739,7 +739,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ### TODO: drop this. No instatiations in this class.
     <O> O checkReadAccessAndInstantiate(DMXObjectModelImpl model) {
-        return (O) checkReadAccess(model).instantiate();
+        return (O) model.checkReadAccess().instantiate();
     }
 
     // ### TODO: drop this. No instatiations in this class.
@@ -757,23 +757,6 @@ public final class PersistenceLayer extends StorageDecorator {
             }
         }
         return models;
-    }
-
-    boolean hasReadAccess(DMXObjectModelImpl model) {
-        try {
-            checkReadAccess(model);
-            return true;
-        } catch (AccessControlException e) {
-            return false;
-        }
-    }
-
-    // ---
-
-    // TODO: add return to model's checkReadAccess() and drop this method?
-    <M extends DMXObjectModelImpl> M checkReadAccess(M model) {
-        model.checkReadAccess();
-        return model;
     }
 
     // ---

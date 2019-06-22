@@ -310,7 +310,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     /**
      * @throws  AccessControlException
      */
-    void checkReadAccess() {
+    <M extends DMXObjectModelImpl> M checkReadAccess() {
         throw new UnsupportedOperationException();
     }
 

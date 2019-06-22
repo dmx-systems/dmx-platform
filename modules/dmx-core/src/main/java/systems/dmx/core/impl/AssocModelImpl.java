@@ -240,8 +240,9 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // ---
 
     @Override
-    final void checkReadAccess() {
+    final <M extends DMXObjectModelImpl> M checkReadAccess() {
         pl.checkAssocReadAccess(id);
+        return (M) this;
     }
 
     @Override

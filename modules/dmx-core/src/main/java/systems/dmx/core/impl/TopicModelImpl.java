@@ -125,8 +125,9 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    final void checkReadAccess() {
+    final <M extends DMXObjectModelImpl> M checkReadAccess() {
         pl.checkTopicReadAccess(id);
+        return (M) this;
     }
 
     @Override
