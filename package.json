@@ -29,7 +29,7 @@
     "vue-font-awesome-search": "1.0.0",
     "vue-router": "^3.0.6",
     "vue2-leaflet": "^2.1.1",
-    "vuedraggable": "^2.21.0",
+    "vuedraggable": "^2.22.0",
     "vuex": "^3.1.1"
   },
   "devDependencies": {
@@ -49,7 +49,7 @@
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.35.0",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "^3.3.4",
+    "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2"
   }
 }

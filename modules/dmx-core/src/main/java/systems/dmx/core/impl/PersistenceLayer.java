@@ -66,54 +66,54 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Topics ===
 
-    Topic getTopic(long topicId) {
+    TopicModelImpl getTopic(long topicId) {
         try {
-            return checkReadAccessAndInstantiate(fetchTopic(topicId));
+            return fetchTopic(topicId).checkReadAccess();
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
     }
 
-    TopicImpl getTopicByUri(String uri) {
+    TopicModelImpl getTopicByUri(String uri) {
         try {
             TopicModelImpl topic = fetchTopicByUri(uri);
-            return topic != null ? this.checkReadAccessAndInstantiate(topic) : null;
+            return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topic by URI failed (uri=\"" + uri + "\")", e);
+            throw new RuntimeException("Fetching topic failed, uri=\"" + uri + "\"", e);
         }
     }
 
-    TopicImpl getTopicByValue(String key, SimpleValue value) {
+    TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
             TopicModelImpl topic = fetchTopic(key, value);
-            return topic != null ? this.checkReadAccessAndInstantiate(topic) : null;
+            return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+            throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
-    List<Topic> getTopicsByValue(String key, SimpleValue value) {
+    List<TopicModelImpl> getTopicsByValue(String key, SimpleValue value) {
         try {
-            return checkReadAccessAndInstantiate(fetchTopics(key, value));
+            return filterReadables(fetchTopics(key, value));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+            throw new RuntimeException("Fetching topics failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
-    List<Topic> getTopicsByType(String topicTypeUri) {
+    List<TopicModelImpl> getTopicsByType(String topicTypeUri) {
         try {
-            return checkReadAccessAndInstantiate(_getTopicType(topicTypeUri).getAllInstances());
+            return filterReadables(_getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
+            throw new RuntimeException("Fetching topics failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
         }
     }
 
-    List<Topic> searchTopics(String searchTerm, String fieldUri) {
+    List<TopicModelImpl> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return checkReadAccessAndInstantiate(queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return filterReadables(queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
-            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\")", e);
+            throw new RuntimeException("Searching topics failed, searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
+                fieldUri + "\"", e);
         }
     }
 
@@ -790,7 +790,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Instantiation ===
 
-    // ### TODO: move to kernel utils
+    // ### TODO: move to kernel utils? To be dropped completely? Copy exists in CoreServiceImpl.java
     <O> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
         List<O> objects = new ArrayList();
         for (DMXObjectModelImpl model : models) {

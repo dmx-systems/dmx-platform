@@ -20,6 +20,7 @@ import systems.dmx.core.storage.spi.DMXTransaction;
 
 import org.osgi.framework.BundleContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -77,32 +78,32 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic getTopic(long topicId) {
-        return pl.getTopic(topicId);
+        return pl.getTopic(topicId).instantiate();
     }
 
     @Override
-    public TopicImpl getTopicByUri(String uri) {
-        return pl.getTopicByUri(uri);
+    public Topic getTopicByUri(String uri) {
+        return pl.getTopicByUri(uri).instantiate();
     }
 
     @Override
     public Topic getTopicByValue(String key, SimpleValue value) {
-        return pl.getTopicByValue(key, value);
+        return pl.getTopicByValue(key, value).instantiate();
     }
 
     @Override
     public List<Topic> getTopicsByValue(String key, SimpleValue value) {
-        return pl.getTopicsByValue(key, value);
+        return instantiate(pl.getTopicsByValue(key, value));
     }
 
     @Override
     public List<Topic> getTopicsByType(String topicTypeUri) {
-        return pl.getTopicsByType(topicTypeUri);
+        return instantiate(pl.getTopicsByType(topicTypeUri));
     }
 
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
-        return pl.searchTopics(searchTerm, fieldUri);
+        return instantiate(pl.searchTopics(searchTerm, fieldUri));
     }
 
     @Override
@@ -450,6 +451,19 @@ public class CoreServiceImpl implements CoreService {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Instantiation ===
+
+    // ### TODO: remove copy in PersistenceLayer
+    private <O extends DMXObject> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
+        List<O> objects = new ArrayList();
+        for (DMXObjectModelImpl model : models) {
+            objects.add(model.instantiate());
+        }
+        return objects;
+    }
 
 
 

@@ -239,7 +239,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    DMXObject instantiate() {
+    <O extends DMXObject> O instantiate() {
         throw new UnsupportedOperationException();
     }
 
