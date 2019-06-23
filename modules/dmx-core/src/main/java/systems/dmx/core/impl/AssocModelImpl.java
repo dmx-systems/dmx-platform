@@ -386,8 +386,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             return;
         }
         // Note: only readable assocs (access control) are considered
-        for (AssocModelImpl assoc : pl._getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
-                                                                                   player2.roleTypeUri)) {
+        for (AssocModelImpl assoc : pl.getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
+                                                                                  player2.roleTypeUri)) {
             // Note (ID comparison): on post-update the assoc exists already in the DB. It must not be regarded a
             // duplicate of itself.
             // Note (value comparison): on pre-create this assoc model's value might be null. It must be regarded a

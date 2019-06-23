@@ -659,13 +659,13 @@ class ValueIntegrator {
             String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                AssocImpl assoc = pl.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
+                AssocModelImpl assoc = pl.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
                     "dmx.core.child");
                 if (assoc != null) {
                     // update memory
                     parent.getChildTopicsModel().put(
                         compDefUri,
-                        mf.newRelatedTopicModel(childTopic, assoc.getModel())
+                        mf.newRelatedTopicModel(childTopic, assoc)
                     );
                 } else {
                     // logger.info("### eliminate (assoc doesn't exist)");

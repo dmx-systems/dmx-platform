@@ -252,69 +252,61 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssocImpl getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
+    AssocModelImpl getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                               String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssocModelImpl assoc = fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (" + info + ")", e);
+            throw new RuntimeException("Fetching assoc failed, " + info, e);
         }
     }
 
-    Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
-                                       String assocRoleTypeUri) {
+    AssocModelImpl getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                String topicRoleTypeUri, String assocRoleTypeUri) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
-        logger.info(info);
         try {
-            AssocModelImpl assoc = fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
-                topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
+            logger.info(info);
+            AssocModelImpl assoc = fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+                assocRoleTypeUri);
+            return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (" + info + ")", e);
+            throw new RuntimeException("Fetching assoc failed, " + info, e);
         }
     }
 
     // ---
 
-    List<Assoc> getAssocsByType(String assocTypeUri) {
+    List<AssocModelImpl> getAssocsByType(String assocTypeUri) {
         try {
-            return checkReadAccessAndInstantiate(_getAssocType(assocTypeUri).getAllInstances());
+            return filterReadables(_getAssocType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
-            throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
-                e);
+            throw new RuntimeException("Fetching assocs by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
         }
     }
 
-    List<Assoc> getAssocs(long topic1Id, long topic2Id) {
+    List<AssocModelImpl> getAssocs(long topic1Id, long topic2Id) {
         return getAssocs(null, topic1Id, topic2Id);   // assocTypeUri=null
     }
 
-    List<Assoc> getAssocs(String assocTypeUri, long topic1Id, long topic2Id) {
+    List<AssocModelImpl> getAssocs(String assocTypeUri, long topic1Id, long topic2Id) {
         return getAssocs(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
     }
 
-    List<Assoc> getAssocs(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
-        return instantiate(_getAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
-    }
-
-    /**
-     * Fetches from DB and filters READables. No instantiation.
-     *
-     * ### TODO: drop this. Use the new traversal methods instead.
-     */
-    Iterable<AssocModelImpl> _getAssocs(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                                           String roleTypeUri2) {
+    // Note: not part of core service; called e.g. by AssocModelImpl.duplicateCheck()
+    List<AssocModelImpl> getAssocs(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                      String roleTypeUri2) {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
             return filterReadables(fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
-                "\", roleTypeUri2=\"" + roleTypeUri2 + "\")", e);
+            throw new RuntimeException("Fetching assocs between topics " + topic1Id + " and " + topic2Id +
+                " failed, assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
+                "\", roleTypeUri2=\"" + roleTypeUri2 + "\"", e);
         }
     }
 

@@ -83,12 +83,14 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic getTopicByUri(String uri) {
-        return pl.getTopicByUri(uri).instantiate();
+        TopicModelImpl topic = pl.getTopicByUri(uri);
+        return topic != null ? topic.instantiate() : null;
     }
 
     @Override
     public Topic getTopicByValue(String key, SimpleValue value) {
-        return pl.getTopicByValue(key, value).instantiate();
+        TopicModelImpl topic = pl.getTopicByValue(key, value);
+        return topic != null ? topic.instantiate() : null;
     }
 
     @Override
@@ -139,7 +141,8 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Assoc getAssocByValue(String key, SimpleValue value) {
-        return pl.getAssocByValue(key, value).instantiate();
+        AssocModelImpl assoc = pl.getAssocByValue(key, value);
+        return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
@@ -149,30 +152,33 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
-        return pl.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        AssocModelImpl assoc = pl.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
                                               String assocRoleTypeUri) {
-        return pl.getAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
+        AssocModelImpl assoc = pl.getAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+            assocRoleTypeUri);
+        return assoc != null ? assoc.instantiate() : null;
     }
 
     // ---
 
     @Override
     public List<Assoc> getAssocsByType(String assocTypeUri) {
-        return pl.getAssocsByType(assocTypeUri);
+        return instantiate(pl.getAssocsByType(assocTypeUri));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
-        return pl.getAssocs(topic1Id, topic2Id);
+        return instantiate(pl.getAssocs(topic1Id, topic2Id));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
-        return pl.getAssocs(assocTypeUri, topic1Id, topic2Id);
+        return instantiate(pl.getAssocs(assocTypeUri, topic1Id, topic2Id));
     }
 
     // ---

@@ -169,7 +169,9 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                 long othersTopicId) {
-        return pl.getAssocBetweenTopicAndAssoc(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
+        AssocModelImpl assoc = pl.getAssocBetweenTopicAndAssoc(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
+            myRoleTypeUri);
+        return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
