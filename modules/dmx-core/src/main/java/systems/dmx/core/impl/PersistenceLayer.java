@@ -77,8 +77,7 @@ public final class PersistenceLayer extends StorageDecorator {
     TopicImpl getTopicByUri(String uri) {
         try {
             TopicModelImpl topic = fetchTopicByUri(uri);
-            return topic != null ? this.<TopicImpl>checkReadAccessAndInstantiate(topic) : null;
-            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+            return topic != null ? this.checkReadAccessAndInstantiate(topic) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic by URI failed (uri=\"" + uri + "\")", e);
         }
@@ -87,8 +86,7 @@ public final class PersistenceLayer extends StorageDecorator {
     TopicImpl getTopicByValue(String key, SimpleValue value) {
         try {
             TopicModelImpl topic = fetchTopic(key, value);
-            return topic != null ? this.<TopicImpl>checkReadAccessAndInstantiate(topic) : null;
-            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+            return topic != null ? this.checkReadAccessAndInstantiate(topic) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -238,8 +236,7 @@ public final class PersistenceLayer extends StorageDecorator {
     Assoc getAssocByValue(String key, SimpleValue value) {
         try {
             AssocModelImpl assoc = fetchAssoc(key, value);
-            return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
-            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -259,8 +256,7 @@ public final class PersistenceLayer extends StorageDecorator {
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssocModelImpl assoc = fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? this.<AssocImpl>checkReadAccessAndInstantiate(assoc) : null;
-            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -274,8 +270,7 @@ public final class PersistenceLayer extends StorageDecorator {
         try {
             AssocModelImpl assoc = fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? this.<Assoc>checkReadAccessAndInstantiate(assoc) : null;
-            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -655,7 +650,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssocModelImpl assoc = fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
-        return assoc != null ? assoc.<RelatedAssocModelImpl>checkReadAccess() : null;
+        return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
@@ -680,7 +675,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssocModelImpl assoc = fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
-        return assoc != null ? assoc.<RelatedAssocModelImpl>checkReadAccess() : null;
+        return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
@@ -699,7 +694,7 @@ public final class PersistenceLayer extends StorageDecorator {
                                           String othersRoleTypeUri, String othersTopicTypeUri) {
         RelatedTopicModelImpl topic = fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return topic != null ? topic.<RelatedTopicModelImpl>checkReadAccess() : null;
+        return topic != null ? topic.checkReadAccess() : null;
     }
 
     List<RelatedTopicModelImpl> getRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,

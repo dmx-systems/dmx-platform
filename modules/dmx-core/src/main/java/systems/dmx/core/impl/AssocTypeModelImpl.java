@@ -53,9 +53,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     AssocTypeImpl instantiate() {
-        // Note: declaration and assignment is required for type inference to work (at least in Java 6)
-        AssocTypeModelImpl type = clone().filterReadableCompDefs();
-        return new AssocTypeImpl(type, pl);
+        return new AssocTypeImpl(clone().filterReadableCompDefs(), pl);
     }
 
 

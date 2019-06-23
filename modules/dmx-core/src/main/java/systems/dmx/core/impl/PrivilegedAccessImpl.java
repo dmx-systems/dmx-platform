@@ -634,8 +634,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     /**
      * Fetches a topic by key/value.
-     * <p>
-     * IMPORTANT: only applicable to values indexed with <code>dmx.core.key</code>.
      *
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
@@ -645,9 +643,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     /**
      * Queries topics by key/value.
-     * <p>
-     * IMPORTANT: only applicable to values indexed with <code>dmx.core.fulltext</code> or
-     * <code>dmx.core.fulltext_key</code>.
      *
      * @return  a list, possibly empty.
      */

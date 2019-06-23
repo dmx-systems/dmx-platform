@@ -189,16 +189,19 @@ class ValueIntegrator {
     }
 
     /**
-     * Finds a simple topic by-value in the DB, or creates it.
+     * Fetches a simple topic by-value, or creates it.
      *
      * Preconditions:
      *   - this.newValues is simple
      *   - this.newValues is not empty
      *
-     * @return  the unified value; never null.
+     * @return  the fetched or created topic; never null.
      */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
+        // Note: in order to be reused a topic must be readable. If an unreadable topic exists the persistence layer
+        // must not throw AccessControlException as this would abort value integration. Instead we do direct DB access
+        // and check for readability explicitly.
         TopicModelImpl topic = pl.fetchTopic(type.getUri(), newValue);
         if (topic != null && topic.isReadable()) {
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");

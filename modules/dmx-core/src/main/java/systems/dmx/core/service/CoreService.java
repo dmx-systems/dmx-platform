@@ -59,9 +59,6 @@ public interface CoreService {
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
      * Compare to {@link #getTopicsByValue(String,SimpleValue)}
-     * <p>
-     * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      *
      * @return  the topic, or <code>null</code> if no such topic exists.
      *
@@ -73,9 +70,6 @@ public interface CoreService {
      * Looks up topics by key and value.
      * <p>
      * Wildcards like "*" in String values are interpreted.
-     * <p>
-     * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      */
     List<Topic> getTopicsByValue(String key, SimpleValue value);
 
@@ -83,9 +77,6 @@ public interface CoreService {
 
     /**
      * Performs a fulltext search.
-     * <p>
-     * IMPORTANT: Searching topics this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.fulltext</code> or <code>dmx.core.fulltext_key</code>. ### FIXDOC
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
      *                      ### TODO: rename parameter to "key"/"typeUri"?
@@ -113,9 +104,6 @@ public interface CoreService {
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
      * Compare to {@link #getAssocsByValue(String,SimpleValue)}
-     * <p>
-     * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      *
      * @return  the association, or <code>null</code> if no such association exists.
      *
@@ -127,9 +115,6 @@ public interface CoreService {
      * Looks up associations by key and value.
      * <p>
      * Wildcards like "*" in String values <i>are</i> interpreted.
-     * <p>
-     * IMPORTANT: Looking up associations this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      */
     List<Assoc> getAssocsByValue(String key, SimpleValue value);
 

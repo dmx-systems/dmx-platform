@@ -53,9 +53,6 @@ class StorageDecorator {
 
     /**
      * Looks up a single topic by exact value.
-     * <p>
-     * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      *
      * @return  The fetched topic, or <code>null</code> if no such topic exists.
      *          Note: its child topics are not fetched.
@@ -144,9 +141,6 @@ class StorageDecorator {
      * Looks up a single association by exact value.
      * If no such association exists <code>null</code> is returned.
      * If more than one association is found a runtime exception is thrown.
-     * <p>
-     * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
-     * <code>dmx.core.key</code>.
      *
      * @return  The fetched association.
      *          Note: its child topics are not fetched.

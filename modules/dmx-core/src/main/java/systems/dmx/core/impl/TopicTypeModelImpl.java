@@ -53,9 +53,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     TopicTypeImpl instantiate() {
-        // Note: declaration and assignment is required for type inference to work (at least in Java 6)
-        TopicTypeModelImpl type = clone().filterReadableCompDefs();
-        return new TopicTypeImpl(type, pl);
+        return new TopicTypeImpl(clone().filterReadableCompDefs(), pl);
     }
 
 

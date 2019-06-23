@@ -126,8 +126,12 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public TopicModel fetchTopic(String key, Object value) {
-        Node node = topicContentExact.get(key, value).getSingle();
-        return node != null ? buildTopic(node) : null;
+        try {
+            Node node = topicContentExact.get(key, value).getSingle();
+            return node != null ? buildTopic(node) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
+        }
     }
 
     @Override
@@ -909,7 +913,7 @@ public class Neo4jStorage implements DMXStorage {
             );
         } catch (Exception e) {
             throw new RuntimeException("Building a TopicModel failed (id=" + topicNode.getId() + ", typeUri=" +
-                typeUri(topicNode) + ")");
+                typeUri(topicNode) + ")", e);
         }
     }
 
@@ -936,7 +940,7 @@ public class Neo4jStorage implements DMXStorage {
             );
         } catch (Exception e) {
             throw new RuntimeException("Building an AssocModel failed (id=" + assocNode.getId() + ", typeUri=" +
-                typeUri(assocNode) + ")");
+                typeUri(assocNode) + ")", e);
         }
     }
 
