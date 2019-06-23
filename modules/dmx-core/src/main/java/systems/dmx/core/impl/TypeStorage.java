@@ -727,12 +727,12 @@ class TypeStorage {
     }
 
     TopicModel storeViewConfigTopic(PlayerModel configurable, TopicModelImpl configTopic) {
-        TopicImpl topic = pl.createTopic(configTopic);
+        TopicModel topic = pl.createTopic(configTopic);
         pl.createAssoc("dmx.core.composition",
             configurable,
             mf.newTopicPlayerModel(configTopic.id, "dmx.core.child")
         );
-        return topic.getModel();
+        return topic;
     }
 
     // --- Helper ---

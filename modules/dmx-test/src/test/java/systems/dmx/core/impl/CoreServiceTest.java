@@ -138,7 +138,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newChildTopicsModel().put("dmx.core.plugin_migration_nr", 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
-            TopicImpl topic = dmx.getTopicByUri("systems.dmx.notes");
+            TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
             ChildTopicsImpl comp = topic.getChildTopics();
             assertFalse(comp.has("dmx.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
@@ -160,7 +160,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newChildTopicsModel().put("dmx.core.plugin_migration_nr", 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
-            TopicImpl topic = dmx.getTopicByUri("systems.dmx.notes");
+            TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
             ChildTopicsImpl comp = topic.getChildTopics();
             assertFalse(comp.has("dmx.core.plugin_migration_nr"));              // child topic is not yet loaded
             //

@@ -115,7 +115,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public TopicImpl createTopic(TopicModel model) {
-        return pl.createTopic((TopicModelImpl) model);
+        return pl.createTopic((TopicModelImpl) model).instantiate();
     }
 
     @Override
@@ -134,17 +134,17 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Assoc getAssoc(long assocId) {
-        return pl.getAssoc(assocId);
+        return pl.getAssoc(assocId).instantiate();
     }
 
     @Override
     public Assoc getAssocByValue(String key, SimpleValue value) {
-        return pl.getAssocByValue(key, value);
+        return pl.getAssocByValue(key, value).instantiate();
     }
 
     @Override
     public List<Assoc> getAssocsByValue(String key, SimpleValue value) {
-        return pl.getAssocsByValue(key, value);
+        return instantiate(pl.getAssocsByValue(key, value));
     }
 
     @Override

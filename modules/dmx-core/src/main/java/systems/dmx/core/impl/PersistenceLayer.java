@@ -104,7 +104,7 @@ public final class PersistenceLayer extends StorageDecorator {
         try {
             return filterReadables(_getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topics failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
+            throw new RuntimeException("Fetching topics by type failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
         }
     }
 
@@ -123,9 +123,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicImpl createTopic(TopicModelImpl model) {
+    TopicModelImpl createTopic(TopicModelImpl model) {
         try {
-            return updateValues(model, null).instantiate();
+            return updateValues(model, null);
         } catch (Exception e) {
             throw new RuntimeException("Creating topic failed, model=" + model, e);
         }
@@ -134,6 +134,7 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     // ### TODO: drop "firePostCreate" param
+    // ### TODO: return model?
     TopicImpl createSingleTopic(TopicModelImpl model, boolean firePostCreate) {
         return createSingleTopic(model, null, firePostCreate);   // uriPrefix=null
     }
@@ -143,6 +144,7 @@ public final class PersistenceLayer extends StorageDecorator {
      * No child topics are created.
      *
      * ### TODO: drop "firePostCreate" param
+    // ### TODO: return model?
      */
     private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix, boolean firePostCreate) {
         try {
@@ -225,29 +227,28 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Associations ===
 
-    Assoc getAssoc(long assocId) {
+    AssocModelImpl getAssoc(long assocId) {
         try {
-            return checkReadAccessAndInstantiate(fetchAssoc(assocId));
+            return fetchAssoc(assocId).checkReadAccess();
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association " + assocId + " failed", e);
+            throw new RuntimeException("Fetching assoc " + assocId + " failed", e);
         }
     }
 
-    Assoc getAssocByValue(String key, SimpleValue value) {
+    AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
             AssocModelImpl assoc = fetchAssoc(key, value);
-            return assoc != null ? this.checkReadAccessAndInstantiate(assoc) : null;
+            return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+            throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
-    List<Assoc> getAssocsByValue(String key, SimpleValue value) {
+    List<AssocModelImpl> getAssocsByValue(String key, SimpleValue value) {
         try {
-            return checkReadAccessAndInstantiate(fetchAssocs(key, value));
+            return filterReadables(fetchAssocs(key, value));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching associations failed (key=\"" + key + "\", value=\"" + value + "\")",
-                e);
+            throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
