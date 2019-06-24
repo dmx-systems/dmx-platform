@@ -134,8 +134,7 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     // ### TODO: drop "firePostCreate" param
-    // ### TODO: return model?
-    TopicImpl createSingleTopic(TopicModelImpl model, boolean firePostCreate) {
+    TopicModelImpl createSingleTopic(TopicModelImpl model, boolean firePostCreate) {
         return createSingleTopic(model, null, firePostCreate);   // uriPrefix=null
     }
 
@@ -144,9 +143,8 @@ public final class PersistenceLayer extends StorageDecorator {
      * No child topics are created.
      *
      * ### TODO: drop "firePostCreate" param
-    // ### TODO: return model?
      */
-    private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix, boolean firePostCreate) {
+    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, boolean firePostCreate) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
@@ -168,11 +166,10 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             model.postCreate();
             //
-            TopicImpl topic = model.instantiate();
             if (firePostCreate) {
-                em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+                em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
             }
-            return topic;
+            return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
                 "\"", e);
@@ -325,14 +322,14 @@ public final class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssocImpl createAssoc(String typeUri, PlayerModel player1, PlayerModel player2) {
+    AssocModelImpl createAssoc(String typeUri, PlayerModel player1, PlayerModel player2) {
         return createAssoc(mf.newAssocModel(typeUri, player1, player2));
     }
 
     /**
      * Creates a new association in the DB.
      */
-    AssocImpl createAssoc(AssocModelImpl model) {
+    AssocModelImpl createAssoc(AssocModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -342,21 +339,21 @@ public final class PersistenceLayer extends StorageDecorator {
             storeAssoc(model);
             AssocModelImpl _model = updateValues(model, null);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
-            // 2) instantiate
-            AssocImpl assoc = _model.instantiate();
             //
-            // Note 1: the postCreate() hook is invoked on the update model, *not* on the value integration result
-            // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
-            // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssocModel.
-            // Note 2: postCreate() creates and caches the comp def based on "model". Cached comp defs need an
+            // 2) transfer value
+            // Note: postCreate() creates and caches the comp def based on "model". Cached comp defs need an
             // up-to-date value (as being displayed in webclient's type editor). The value is calculated while
             // value integration. We must transfer that value to "model".
             // TODO: rethink this solution.
             model.value = _model.value;
+            //
+            // Note: the postCreate() hook is invoked on the update model, *not* on the value integration result
+            // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
+            // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssocModel.
             model.postCreate();
             //
-            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
-            return assoc;
+            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, _model.instantiate());
+            return _model;
         } catch (Exception e) {
             throw new RuntimeException("Creating association failed, model=" + model, e);
         }
@@ -588,7 +585,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Topic createRoleType(TopicModelImpl model) {
+    TopicModelImpl createRoleType(TopicModelImpl model) {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {

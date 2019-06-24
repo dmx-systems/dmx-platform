@@ -197,7 +197,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public AssocImpl createAssoc(AssocModel model) {
-        return pl.createAssoc((AssocModelImpl) model);
+        return pl.createAssoc((AssocModelImpl) model).instantiate();
     }
 
     @Override
@@ -292,7 +292,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic createRoleType(TopicModel model) {
-        return pl.createRoleType((TopicModelImpl) model);
+        return pl.createRoleType((TopicModelImpl) model).instantiate();
     }
 
 
