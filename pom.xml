@@ -96,10 +96,6 @@
         <dmx.ldap.user_member_group></dmx.ldap.user_member_group>
         <dmx.ldap.logging>INFO</dmx.ldap.logging>
 
-        <!-- Java Trust Store -->
-        <javax.net.ssl.trustStore></javax.net.ssl.trustStore>
-        <javax.net.ssl.trustStorePassword></javax.net.ssl.trustStorePassword>
-
         <!-- Workspace Sharing Modes -->
         <dmx.workspaces.private.enabled>true</dmx.workspaces.private.enabled>
         <dmx.workspaces.confidential.enabled>true</dmx.workspaces.confidential.enabled>
