@@ -95,17 +95,17 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Topic> getTopicsByValue(String key, SimpleValue value) {
-        return instantiate(pl.getTopicsByValue(key, value));
+        return pl.instantiate(pl.getTopicsByValue(key, value));
     }
 
     @Override
     public List<Topic> getTopicsByType(String topicTypeUri) {
-        return instantiate(pl.getTopicsByType(topicTypeUri));
+        return pl.instantiate(pl.getTopicsByType(topicTypeUri));
     }
 
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
-        return instantiate(pl.searchTopics(searchTerm, fieldUri));
+        return pl.instantiate(pl.searchTopics(searchTerm, fieldUri));
     }
 
     @Override
@@ -147,7 +147,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Assoc> getAssocsByValue(String key, SimpleValue value) {
-        return instantiate(pl.getAssocsByValue(key, value));
+        return pl.instantiate(pl.getAssocsByValue(key, value));
     }
 
     @Override
@@ -168,17 +168,17 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Assoc> getAssocsByType(String assocTypeUri) {
-        return instantiate(pl.getAssocsByType(assocTypeUri));
+        return pl.instantiate(pl.getAssocsByType(assocTypeUri));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
-        return instantiate(pl.getAssocs(topic1Id, topic2Id));
+        return pl.instantiate(pl.getAssocs(topic1Id, topic2Id));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
-        return instantiate(pl.getAssocs(assocTypeUri, topic1Id, topic2Id));
+        return pl.instantiate(pl.getAssocs(assocTypeUri, topic1Id, topic2Id));
     }
 
     // ---
@@ -216,12 +216,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public TopicTypeImpl getTopicType(String uri) {
-        return pl.getTopicType(uri);
+        return pl.getTopicType(uri).instantiate();
     }
 
     @Override
     public TopicTypeImpl getTopicTypeImplicitly(long topicId) {
-        return pl.getTopicTypeImplicitly(topicId);
+        return pl.getTopicTypeImplicitly(topicId).instantiate();
     }
 
     // ---
@@ -254,12 +254,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public AssocTypeImpl getAssocType(String uri) {
-        return pl.getAssocType(uri);
+        return pl.getAssocType(uri).instantiate();
     }
 
     @Override
     public AssocTypeImpl getAssocTypeImplicitly(long assocId) {
-        return pl.getAssocTypeImplicitly(assocId);
+        return pl.getAssocTypeImplicitly(assocId).instantiate();
     }
 
     // ---
@@ -301,7 +301,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public DMXObject getObject(long id) {
-        return pl.getObject(id);
+        return pl.getObject(id).instantiate();
     }
 
 
@@ -350,22 +350,22 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return pl.getTopicsByProperty(propUri, propValue);
+        return pl.instantiate(pl.getTopicsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.getTopicsByPropertyRange(propUri, from, to);
+        return pl.instantiate(pl.getTopicsByPropertyRange(propUri, from, to));
     }
 
     @Override
     public List<Assoc> getAssocsByProperty(String propUri, Object propValue) {
-        return pl.getAssocsByProperty(propUri, propValue);
+        return pl.instantiate(pl.getAssocsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.getAssocsByPropertyRange(propUri, from, to);
+        return pl.instantiate(pl.getAssocsByPropertyRange(propUri, from, to));
     }
 
     // ---
@@ -457,19 +457,6 @@ public class CoreServiceImpl implements CoreService {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Instantiation ===
-
-    // ### TODO: remove copy in PersistenceLayer
-    private <O extends DMXObject> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
-        List<O> objects = new ArrayList();
-        for (DMXObjectModelImpl model : models) {
-            objects.add(model.instantiate());
-        }
-        return objects;
-    }
 
 
 

@@ -178,7 +178,7 @@ abstract class DMXObjectImpl implements DMXObject {
                                               String othersRoleTypeUri, String othersTopicTypeUri) {
         RelatedTopicModelImpl topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return topic != null ? pl.<RelatedTopic>checkReadAccessAndInstantiate(topic) : null;
+        return topic != null ? topic.checkReadAccess().instantiate() : null;
     }
 
     @Override
@@ -191,7 +191,7 @@ abstract class DMXObjectImpl implements DMXObject {
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
         List<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return pl.checkReadAccessAndInstantiate(topics);
+        return pl.instantiate(pl.filterReadables(topics));
     }
 
     // --- Assoc Retrieval ---

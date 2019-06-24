@@ -64,7 +64,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModelImpl> {
 
     @Override
     Topic instantiateObject(TopicModelImpl model) {
-        return pl.checkReadAccessAndInstantiate(model);
+        return model.checkReadAccess().instantiate();
     }
 }
 
@@ -83,7 +83,7 @@ class AssocIterator extends ObjectIterator<Assoc, AssocModelImpl> {
 
     @Override
     Assoc instantiateObject(AssocModelImpl model) {
-        return pl.checkReadAccessAndInstantiate(model);
+        return model.checkReadAccess().instantiate();
     }
 }
 

@@ -458,24 +458,24 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Types ===
 
-    TopicTypeImpl getTopicType(String uri) {
-        return checkReadAccessAndInstantiate(_getTopicType(uri));
+    TopicTypeModelImpl getTopicType(String uri) {
+        return _getTopicType(uri).checkReadAccess();
     }
 
-    TopicTypeImpl getTopicTypeImplicitly(long topicId) {
+    TopicTypeModelImpl getTopicTypeImplicitly(long topicId) {
         checkTopicReadAccess(topicId);
-        return _getTopicType(typeUri(topicId)).instantiate();
+        return _getTopicType(typeUri(topicId));
     }
 
     // ---
 
-    AssocTypeImpl getAssocType(String uri) {
-        return checkReadAccessAndInstantiate(_getAssocType(uri));
+    AssocTypeModelImpl getAssocType(String uri) {
+        return _getAssocType(uri).checkReadAccess();
     }
 
-    AssocTypeImpl getAssocTypeImplicitly(long assocId) {
+    AssocTypeModelImpl getAssocTypeImplicitly(long assocId) {
         checkAssocReadAccess(assocId);
-        return _getAssocType(typeUri(assocId)).instantiate();
+        return _getAssocType(typeUri(assocId));
     }
 
     // ---
@@ -623,8 +623,8 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Generic Object ===
 
-    DMXObject getObject(long id) {
-        return checkReadAccessAndInstantiate(fetchObject(id));
+    DMXObjectModelImpl getObject(long id) {
+        return fetchObject(id).checkReadAccess();
     }
 
 
@@ -700,44 +700,29 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Properties ===
 
-    List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return checkReadAccessAndInstantiate(fetchTopicsByProperty(propUri, propValue));
+    List<TopicModelImpl> getTopicsByProperty(String propUri, Object propValue) {
+        return filterReadables(fetchTopicsByProperty(propUri, propValue));
     }
 
-    List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return checkReadAccessAndInstantiate(fetchTopicsByPropertyRange(propUri, from, to));
+    List<TopicModelImpl> getTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return filterReadables(fetchTopicsByPropertyRange(propUri, from, to));
     }
 
-    List<Assoc> getAssocsByProperty(String propUri, Object propValue) {
-        return checkReadAccessAndInstantiate(fetchAssocsByProperty(propUri, propValue));
+    List<AssocModelImpl> getAssocsByProperty(String propUri, Object propValue) {
+        return filterReadables(fetchAssocsByProperty(propUri, propValue));
     }
 
-    List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return checkReadAccessAndInstantiate(fetchAssocsByPropertyRange(propUri, from, to));
+    List<AssocModelImpl> getAssocsByPropertyRange(String propUri, Number from, Number to) {
+        return filterReadables(fetchAssocsByPropertyRange(propUri, from, to));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
 
-    // === Access Control / Instantiation ===
+    // === Access Control ===
 
-    // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
-    // Call these methods when passing objects fetched from the DB to the user.
-
-    // ### TODO: drop this. No instatiations in this class.
-    <O> O checkReadAccessAndInstantiate(DMXObjectModelImpl model) {
-        return (O) model.checkReadAccess().instantiate();
-    }
-
-    // ### TODO: drop this. No instatiations in this class.
-    <O> List<O> checkReadAccessAndInstantiate(List<? extends DMXObjectModelImpl> models) {
-        return instantiate(filterReadables(models));
-    }
-
-    // ---
-
-    private <M extends DMXObjectModelImpl> List<M> filterReadables(List<M> models) {
+    <M extends DMXObjectModelImpl> List<M> filterReadables(List<M> models) {
         Iterator<? extends DMXObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
             if (!i.next().isReadable()) {
@@ -745,6 +730,14 @@ public final class PersistenceLayer extends StorageDecorator {
             }
         }
         return models;
+    }
+
+    <O extends DMXObject> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
+        List<O> objects = new ArrayList();
+        for (DMXObjectModelImpl model : models) {
+            objects.add(model.instantiate());
+        }
+        return objects;
     }
 
     // ---
@@ -777,19 +770,6 @@ public final class PersistenceLayer extends StorageDecorator {
      */
     void checkAssocWriteAccess(long assocId) {
         em.fireEvent(CoreEvent.CHECK_ASSOCIATION_WRITE_ACCESS, assocId);
-    }
-
-
-
-    // === Instantiation ===
-
-    // ### TODO: move to kernel utils? To be dropped completely? Copy exists in CoreServiceImpl.java
-    <O> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
-        List<O> objects = new ArrayList();
-        for (DMXObjectModelImpl model : models) {
-            objects.add((O) model.instantiate());
-        }
-        return objects;
     }
 
 
