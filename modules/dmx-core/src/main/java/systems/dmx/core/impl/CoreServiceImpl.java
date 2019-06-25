@@ -110,7 +110,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Iterable<Topic> getAllTopics() {
-        return pl.getAllTopics();
+        return new InstantiationIterable(pl.getAllTopics());
     }
 
     // ---
@@ -185,7 +185,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Iterable<Assoc> getAllAssocs() {
-        return pl.getAllAssocs();
+        return new InstantiationIterable(pl.getAllAssocs());
     }
 
     @Override

@@ -117,8 +117,8 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Iterable<Topic> getAllTopics() {
-        return new TopicIterable(this);
+    Iterable<TopicModelImpl> getAllTopics() {
+        return new ReadableIterable(fetchAllTopics());
     }
 
     // ---
@@ -309,8 +309,8 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Iterable<Assoc> getAllAssocs() {
-        return new AssocIterable(this);
+    Iterable<AssocModelImpl> getAllAssocs() {
+        return new ReadableIterable(fetchAllAssocs());
     }
 
     List<PlayerModel> getPlayerModels(long assocId) {
