@@ -9,7 +9,6 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.ModelFactory;
 
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -30,7 +29,7 @@ public interface DMXStorage {
 
     List<? extends TopicModel> queryTopics(String key, Object value);
 
-    Iterator<? extends TopicModel> fetchAllTopics();
+    Iterable<? extends TopicModel> fetchAllTopics();
 
     // ---
 
@@ -83,7 +82,7 @@ public interface DMXStorage {
     List<? extends AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
                                                                String topicRoleTypeUri, String assocRoleTypeUri);
 
-    Iterator<? extends AssocModel> fetchAllAssocs();
+    Iterable<? extends AssocModel> fetchAllAssocs();
 
     List<PlayerModel> fetchPlayerModels(long assocId);
 

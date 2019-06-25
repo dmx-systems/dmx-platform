@@ -12,9 +12,9 @@ import java.util.NoSuchElementException;
 
 
 
-class TopicModelIterator extends ModelIterator<TopicModel> {
+class TopicModelIterable extends ModelIterable<TopicModel> {
 
-    TopicModelIterator(Neo4jStorage storage) {
+    TopicModelIterable(Neo4jStorage storage) {
         super(storage, NodeType.TOPIC);
     }
 
@@ -26,9 +26,9 @@ class TopicModelIterator extends ModelIterator<TopicModel> {
 
 
 
-class AssocModelIterator extends ModelIterator<AssocModel> {
+class AssocModelIterable extends ModelIterable<AssocModel> {
 
-    AssocModelIterator(Neo4jStorage storage) {
+    AssocModelIterable(Neo4jStorage storage) {
         super(storage, NodeType.ASSOC);
     }
 
@@ -40,59 +40,68 @@ class AssocModelIterator extends ModelIterator<AssocModel> {
 
 
 
-abstract class ModelIterator<E extends DMXObjectModel> implements Iterator<E> {
+abstract class ModelIterable<M extends DMXObjectModel> implements Iterable<M> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected Neo4jStorage storage;
 
-    private NodeType nodeType;
-    private Iterator<Node> nodes;
-    private Node nextNode;
+    private NodeType nodeType;      // the node type we're looking for
+    private Iterable<Node> nodes;   // all nodes in the DB
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ModelIterator(Neo4jStorage storage, NodeType nodeType) {
+    ModelIterable(Neo4jStorage storage, NodeType nodeType) {
         this.storage = storage;
         this.nodeType = nodeType;
-        this.nodes = GlobalGraphOperations.at(storage.neo4j).getAllNodes().iterator();
+        this.nodes = GlobalGraphOperations.at(storage.neo4j).getAllNodes();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public boolean hasNext() {
-        nextNode = fetchNextNode();
-        return nextNode != null;
-    }
-
-    @Override
-    public E next() {
-        if (nextNode == null) {
-            throw new NoSuchElementException("there is no next node");
-        }
-        //
-        return buildModel(nextNode);
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("removal is not supported");
+    public Iterator<M> iterator() {
+        return new ModelIterator();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract E buildModel(Node node);
+    abstract M buildModel(Node node);
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---------------------------------------------------------------------------------------------------- Nested Class
 
-    private Node fetchNextNode() {
-        while (nodes.hasNext()) {
-            Node node = nodes.next();
-            if (nodeType.isTypeOf(node)) {
-                return node;
+    private class ModelIterator implements Iterator<M> {
+
+        Iterator<Node> i = nodes.iterator();
+        Node next = null;       // next matching node; updated by fetchNext()
+
+        @Override
+        public boolean hasNext() {
+            fetchNext();
+            return next != null;
+        }
+
+        @Override
+        public M next() {
+            if (next == null) {
+                throw new NoSuchElementException("next() called when there is no next node");
+            }
+            return buildModel(next);
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("removal is not supported");
+        }
+
+        private void fetchNext() {
+            next = null;
+            while (i.hasNext() && next == null) {
+                Node node = i.next();
+                if (nodeType.isTypeOf(node)) {
+                    next = node;
+                }
             }
         }
-        return null;
     }
 }

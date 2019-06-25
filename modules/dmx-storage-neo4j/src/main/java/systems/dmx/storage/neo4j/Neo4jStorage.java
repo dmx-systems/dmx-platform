@@ -34,7 +34,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -158,8 +157,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterator<TopicModel> fetchAllTopics() {
-        return new TopicModelIterator(this);
+    public Iterable<TopicModel> fetchAllTopics() {
+        return new TopicModelIterable(this);
     }
 
     // ---
@@ -261,8 +260,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterator<AssocModel> fetchAllAssocs() {
-        return new AssocModelIterator(this);
+    public Iterable<AssocModel> fetchAllAssocs() {
+        return new AssocModelIterable(this);
     }
 
     @Override
@@ -912,8 +911,8 @@ public class Neo4jStorage implements DMXStorage {
                 null    // childTopics=null
             );
         } catch (Exception e) {
-            throw new RuntimeException("Building a TopicModel failed (id=" + topicNode.getId() + ", typeUri=" +
-                typeUri(topicNode) + ")", e);
+            throw new RuntimeException("Building a TopicModel failed, id=" + topicNode.getId() + ", typeUri=" +
+                typeUri(topicNode), e);
         }
     }
 
@@ -939,8 +938,8 @@ public class Neo4jStorage implements DMXStorage {
                 null    // childTopics=null
             );
         } catch (Exception e) {
-            throw new RuntimeException("Building an AssocModel failed (id=" + assocNode.getId() + ", typeUri=" +
-                typeUri(assocNode) + ")", e);
+            throw new RuntimeException("Building an AssocModel failed, id=" + assocNode.getId() + ", typeUri=" +
+                typeUri(assocNode), e);
         }
     }
 

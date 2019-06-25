@@ -207,6 +207,40 @@ public class Neo4jStorageTest {
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }
 
+    // --- Iterables ---
+
+    @Test
+    public void fetchAllTopics() {
+        Iterable<? extends TopicModel> topics = storage.fetchAllTopics();
+        int count = 0;
+        for (TopicModel topic : topics) {
+            count++;
+        }
+        assertEquals(10, count);
+        // reuse iterable
+        count = 0;
+        for (TopicModel topic : topics) {
+            count++;
+        }
+        assertEquals(10, count);
+    }
+
+    @Test
+    public void fetchAllAssocs() {
+        Iterable<? extends AssocModel> assocs = storage.fetchAllAssocs();
+        int count = 0;
+        for (AssocModel assoc : assocs) {
+            count++;
+        }
+        assertEquals(1, count);
+        // reuse iterable
+        count = 0;
+        for (AssocModel assoc : assocs) {
+            count++;
+        }
+        assertEquals(1, count);
+    }
+
     // --- Property Index ---
 
     @Test
