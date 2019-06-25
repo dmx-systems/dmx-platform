@@ -1,14 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Assoc;
-import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.Topic;
-import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXStorage;
 
 import java.util.ArrayList;
@@ -25,7 +19,6 @@ import java.util.logging.Logger;
  *   - access controlled: get/create/update
  *   - direct DB access: fetch/store (as derived from storage impl)
  *
- * ### TODO: no instatiations here
  * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
  */
 public final class PersistenceLayer extends StorageDecorator {
@@ -53,7 +46,7 @@ public final class PersistenceLayer extends StorageDecorator {
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
         this.typeStorage = new TypeStorage(this);
         //
-        // Note: this is a constructor side effect. This is a cyclic dependency. This is nasty.
+        // Note: this is a constructor side effect. This is a cyclic dependency.
         // ### TODO: explain why we do it.
         mf.pl = this;
         //
@@ -477,11 +470,11 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    List<TopicType> getAllTopicTypes() {
+    List<TopicTypeModelImpl> getAllTopicTypes() {
         try {
-            List<TopicType> topicTypes = new ArrayList();
+            List<TopicTypeModelImpl> topicTypes = new ArrayList();
             for (String uri : getTopicTypeUris()) {
-                topicTypes.add(_getTopicType(uri).instantiate());
+                topicTypes.add(_getTopicType(uri));
             }
             return topicTypes;
         } catch (Exception e) {
@@ -489,11 +482,11 @@ public final class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<AssocType> getAllAssocTypes() {
+    List<AssocTypeModelImpl> getAllAssocTypes() {
         try {
-            List<AssocType> assocTypes = new ArrayList();
+            List<AssocTypeModelImpl> assocTypes = new ArrayList();
             for (String uri : getAssocTypeUris()) {
-                assocTypes.add(_getAssocType(uri).instantiate());
+                assocTypes.add(_getAssocType(uri));
             }
             return assocTypes;
         } catch (Exception e) {
@@ -503,33 +496,31 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicTypeImpl createTopicType(TopicTypeModelImpl model) {
+    TopicTypeModelImpl createTopicType(TopicTypeModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC_TYPE, model);
             //
             // store in DB
             createType(model, URI_PREFIX_TOPIC_TYPE);
             //
-            TopicTypeImpl topicType = model.instantiate();
-            em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
+            em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, model.instantiate());
             //
-            return topicType;
+            return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed", e);
         }
     }
 
-    AssocTypeImpl createAssocType(AssocTypeModelImpl model) {
+    AssocTypeModelImpl createAssocType(AssocTypeModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
             //
             // store in DB
             createType(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
-            AssocTypeImpl assocType = model.instantiate();
-            em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+            em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, model.instantiate());
             //
-            return assocType;
+            return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed", e);
         }
@@ -781,8 +772,8 @@ public final class PersistenceLayer extends StorageDecorator {
             topicTypeUris.add("dmx.core.assoc_type");
             topicTypeUris.add("dmx.core.meta_type");
             // add regular types
-            for (TopicModel topicType : filterReadables(fetchTopics("typeUri", new SimpleValue(
-                                                                    "dmx.core.topic_type")))) {
+            for (TopicModelImpl topicType : filterReadables(fetchTopics("typeUri",
+                                                                        new SimpleValue("dmx.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -794,8 +785,8 @@ public final class PersistenceLayer extends StorageDecorator {
     private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModel assocType : filterReadables(fetchTopics("typeUri", new SimpleValue(
-                                                                    "dmx.core.assoc_type")))) {
+            for (TopicModelImpl assocType : filterReadables(fetchTopics("typeUri",
+                                                                        new SimpleValue("dmx.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;

@@ -228,14 +228,14 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<TopicType> getAllTopicTypes() {
-        return pl.getAllTopicTypes();
+        return pl.instantiate(pl.getAllTopicTypes());
     }
 
     // ---
 
     @Override
     public TopicTypeImpl createTopicType(TopicTypeModel model) {
-        return pl.createTopicType((TopicTypeModelImpl) model);
+        return pl.createTopicType((TopicTypeModelImpl) model).instantiate();
     }
 
     @Override
@@ -266,14 +266,14 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<AssocType> getAllAssocTypes() {
-        return pl.getAllAssocTypes();
+        return pl.instantiate(pl.getAllAssocTypes());
     }
 
     // ---
 
     @Override
     public AssocTypeImpl createAssocType(AssocTypeModel model) {
-        return pl.createAssocType((AssocTypeModelImpl) model);
+        return pl.createAssocType((AssocTypeModelImpl) model).instantiate();
     }
 
     @Override

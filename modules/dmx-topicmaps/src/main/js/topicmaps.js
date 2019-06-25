@@ -34,11 +34,9 @@ const state = {
 
 const actions = {
 
-  createTopicmap ({rootState, dispatch}, {name, topicmapTypeUri, isPrivate}) {
-    name            = name            || 'untitled'
-    topicmapTypeUri = topicmapTypeUri || 'dmx.topicmaps.topicmap'
-    isPrivate       = isPrivate       || false
-    //
+  createTopicmap ({rootState, dispatch}, {name = 'untitled',
+                                          topicmapTypeUri = 'dmx.topicmaps.topicmap',
+                                          isPrivate = false}) {
     console.log('Creating topicmap', name)
     dm5.restClient.createTopicmap(name, topicmapTypeUri, isPrivate).then(topic => {
       console.log('Topicmap topic', topic)
