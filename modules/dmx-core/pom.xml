@@ -14,7 +14,6 @@
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-module</artifactId>
         <version>5.0-beta-4-SNAPSHOT</version>
-        <relativePath>../dmx-module/pom.xml</relativePath>
     </parent>
 
     <dependencies>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Hot Deploy</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-hot-deploy</artifactId>
+    <version>5.0-beta-4-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>
+        DMX modules and plugins (= OSGi bundles) derive the hot deployment feature from this parent POM.
+        Once a DMX module or plugin is build it is copied to the `bundle-deploy` directory.
+
+        Bundle fragmemts can be build by directly deriving from this POM.
+    </description>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx</artifactId>
+        <version>5.0-beta-4-SNAPSHOT</version>
+    </parent>
+
+    <profiles>
+        <profile>
+            <id>hot-deploy</id>
+            <activation>
+                <property>
+                    <name>!dmx.deploy.disable</name>
+                </property>
+            </activation>
+            <properties>
+                <dmx.deploy.dir>../../bundle-deploy</dmx.deploy.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.7</version>
+                        <executions>
+                            <execution>
+                                <id>hot-deploy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>target</directory>
+                                            <includes>
+                                                <include>${project.artifactId}*.jar</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <outputDirectory>${dmx.deploy.dir}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
