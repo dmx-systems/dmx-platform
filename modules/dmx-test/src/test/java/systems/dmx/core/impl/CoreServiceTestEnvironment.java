@@ -39,7 +39,7 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dmx-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        dmx = new CoreServiceImpl(new PersistenceLayer(storage), null);     // bundleContext=null
+        dmx = new CoreServiceImpl(new AccessLayer(storage), null);     // bundleContext=null
     }
 
     @After

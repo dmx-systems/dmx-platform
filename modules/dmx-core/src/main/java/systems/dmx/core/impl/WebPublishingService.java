@@ -54,25 +54,25 @@ class WebPublishingService {
     private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(PersistenceLayer pl, WebSocketsService ws) {
+    WebPublishingService(AccessLayer al, WebSocketsService ws) {
         try {
             logger.info("Setting up the WebPublishingService");
-            this.pl = pl;
+            this.al = al;
             //
             // create Jersey application
             this.jerseyApplication = new DefaultResourceConfig();
             //
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(pl.em));
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(pl.em, ws));
-            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(pl));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(al.em));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(al.em, ws));
+            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(al));
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);
@@ -275,7 +275,7 @@ class WebPublishingService {
 
     private boolean staticResourceFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            pl.em.fireEvent(CoreEvent.STATIC_RESOURCE_FILTER, request, response);
+            al.em.fireEvent(CoreEvent.STATIC_RESOURCE_FILTER, request, response);
             return true;
         } catch (Throwable e) {
             // Note: staticResourceFilter() is called from an OSGi HTTP service static resource HttpContext.

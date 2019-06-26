@@ -40,7 +40,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // ---
 
-    PersistenceLayer pl;
+    AccessLayer al;
     EventManager em;
     ModelFactoryImpl mf;
 
@@ -49,21 +49,21 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DMXObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
-                                                                               PersistenceLayer pl) {
+                                                                               AccessLayer al) {
         this.id          = id;
         this.uri         = uri;
         this.typeUri     = typeUri;
         this.value       = value;
-        this.childTopics = childTopics != null ? childTopics : pl.mf.newChildTopicsModel();
+        this.childTopics = childTopics != null ? childTopics : al.mf.newChildTopicsModel();
         //
-        this.pl          = pl;
-        this.em          = pl.em;
-        this.mf          = pl.mf;
+        this.al          = al;
+        this.em          = al.em;
+        this.mf          = al.mf;
     }
 
     DMXObjectModelImpl(DMXObjectModelImpl object) {
         this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel(), object.pl);
+            object.getChildTopicsModel(), object.al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -396,7 +396,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
         // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
         // Compare to update() method.
-        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, compDef);
+        new ValueIntegrator(al).integrate(createModelWithChildTopics(updateModel), this, compDef);
     }
 
     // ---
@@ -417,7 +417,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
-            new ValueIntegrator(pl).integrate(updateModel, this, null);   // TODO: handle return value
+            new ValueIntegrator(al).integrate(updateModel, this, null);   // TODO: handle return value
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face
             // of DM5 update logic (= unification). Note that update() is not called recursively anmore.
             //
@@ -496,7 +496,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
             // a topicmap's mapcontext association and then deletes the topicmap.
             //
-            // Compare to PersistenceLayer.deleteAssoc()
+            // Compare to AccessLayer.deleteAssoc()
             // TODO: introduce storage-vendor neutral DM exception.
             //
             if (e.getMessage().equals("Node[" + id + "] has been deleted in this tx")) {
@@ -561,7 +561,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         String compDefUri = compDef.getCompDefUri();
         if (!childTopics.has(compDefUri)) {
             logger.fine("### Loading \"" + compDefUri + "\" child topics of " + objectInfo());
-            new ChildTopicsFetcher(pl).fetch(this, compDef, deep);
+            new ChildTopicsFetcher(al).fetch(this, compDef, deep);
         }
         return this;
     }

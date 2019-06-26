@@ -1,7 +1,7 @@
 package systems.dmx.storage.neo4j;
 
+import systems.dmx.core.impl.AccessLayer;
 import systems.dmx.core.impl.ModelFactoryImpl;
-import systems.dmx.core.impl.PersistenceLayer;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -44,7 +44,7 @@ public class Neo4jStorageTest {
     public void setup() {
         mf = new ModelFactoryImpl();
         storage = new Neo4jStorageFactory().newDMXStorage(createTempDirectory("neo4j-test-"), mf);
-        new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
+        new AccessLayer(storage);  // Note: the ModelFactory doesn't work when no AccessLayer is created
         setupContent();
     }
 

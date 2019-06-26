@@ -28,9 +28,9 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     /**
      * @param   configTopics    must not be null
      */
-    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics, PersistenceLayer pl) {
+    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics, AccessLayer al) {
         this.configTopics = configTopics;
-        this.mf = pl.mf;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

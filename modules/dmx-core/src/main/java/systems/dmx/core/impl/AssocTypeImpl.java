@@ -10,8 +10,8 @@ class AssocTypeImpl extends DMXTypeImpl implements AssocType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocTypeImpl(AssocTypeModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    AssocTypeImpl(AssocTypeModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -25,13 +25,13 @@ class AssocTypeImpl extends DMXTypeImpl implements AssocType {
 
     @Override
     public void update(AssocTypeModel updateModel) {
-        model.update((AssocTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
+        model.update((AssocTypeModelImpl) updateModel);     // ### FIXME: call through al for access control
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
     AssocTypeModelImpl _getModel() {
-        return pl._getAssocType(getUri());
+        return al._getAssocType(getUri());
     }
 }

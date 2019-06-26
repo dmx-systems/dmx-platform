@@ -48,16 +48,16 @@ class ValueIntegrator {
     // ### TODO: to be dropped?
     private List<String> emptyValues = new ArrayList();
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
     private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ValueIntegrator(PersistenceLayer pl) {
-        this.pl = pl;
-        this.mf = pl.mf;
+    ValueIntegrator(AccessLayer al) {
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -202,7 +202,7 @@ class ValueIntegrator {
         // Note: in order to be reused a topic must be readable. If an unreadable topic exists the persistence layer
         // must not throw AccessControlException as this would abort value integration. Instead we do direct DB access
         // and check for readability explicitly.
-        TopicModelImpl topic = pl.fetchTopic(type.getUri(), newValue);
+        TopicModelImpl topic = al.fetchTopic(type.getUri(), newValue);
         if (topic != null && topic.isReadable()) {
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
@@ -276,11 +276,11 @@ class ValueIntegrator {
      */
     private Object integrateChildValue(Object childValue, String compDefUri) {
         if (isOne(compDefUri)) {
-            return new ValueIntegrator(pl).integrate((RelatedTopicModelImpl) childValue, null, null);
+            return new ValueIntegrator(al).integrate((RelatedTopicModelImpl) childValue, null, null);
         } else {
             List<UnifiedValue> values = new ArrayList();
             for (RelatedTopicModelImpl value : (List<RelatedTopicModelImpl>) childValue) {
-                values.add(new ValueIntegrator(pl).integrate(value, null, null));
+                values.add(new ValueIntegrator(al).integrate(value, null, null));
             }
             return values;
         }
@@ -553,7 +553,7 @@ class ValueIntegrator {
                     assoc.update(_newValues);
                     // TODO: access control? Note: currently the child assocs of a workspace have no workspace
                     // assignments. With strict access control, updating a workspace topic would fail.
-                    // pl.updateAssoc(assoc, _newValues);
+                    // al.updateAssoc(assoc, _newValues);
                 }
             }
         } catch (Exception e) {
@@ -639,7 +639,7 @@ class ValueIntegrator {
         } else {
             childTopic = ((List<UnifiedValue>) childValues.get(compDefUri)).get(0).value;
         }
-        return pl.getTopicRelatedTopics(childTopic.getId(), compDef(compDefUri).getInstanceLevelAssocTypeUri(),
+        return al.getTopicRelatedTopics(childTopic.getId(), compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             "dmx.core.child", "dmx.core.parent", type.getUri());
     }
 
@@ -659,7 +659,7 @@ class ValueIntegrator {
             String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                AssocModelImpl assoc = pl.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
+                AssocModelImpl assoc = al.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
                     "dmx.core.child");
                 if (assoc != null) {
                     // update memory
@@ -673,7 +673,7 @@ class ValueIntegrator {
                 }
             } else {
                 // TODO: assoc parents?
-                if (!pl.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
+                if (!al.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         compDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (children exist)");
                     i.remove();
@@ -701,7 +701,7 @@ class ValueIntegrator {
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
         ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
-        pl.createSingleTopic(model, false);       // firePostCreate=false
+        al.createSingleTopic(model, false);       // firePostCreate=false
         logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
         for (String compDefUri : childValues.keySet()) {
             if (isOne(compDefUri)) {
@@ -716,7 +716,7 @@ class ValueIntegrator {
                 }
             }
         }
-        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
+        al.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
         return model;
     }
 
@@ -732,7 +732,7 @@ class ValueIntegrator {
             throw new RuntimeException("Tried to create a topic from an assoc model");
         }
         //
-        return pl.createSingleTopic(
+        return al.createSingleTopic(
             mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value),
             true    // firePostCreate=true
         );
@@ -749,7 +749,7 @@ class ValueIntegrator {
                                             boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
-        return pl.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
+        return al.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             parent.createPlayerModel("dmx.core.parent"),
             child.createPlayerModel("dmx.core.child")
         );

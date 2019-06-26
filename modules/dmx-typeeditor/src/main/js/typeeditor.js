@@ -61,7 +61,7 @@ function defaultAssocType (name) {
 function defaultRoleType (name) {
   return {
     // Note: a new type gets its default URI at server-side.
-    // Also "typeUri" is provided at server-side (see PersistenceLayer#createRoleType).
+    // Also "typeUri" is provided at server-side (see AccessLayer#createRoleType).
     value: name
   }
 }

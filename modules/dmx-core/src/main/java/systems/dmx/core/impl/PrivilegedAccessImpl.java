@@ -67,16 +67,16 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // used for workspace assignment suppression
     private ContextTracker contextTracker = new ContextTracker();
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
     private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    PrivilegedAccessImpl(PersistenceLayer pl) {
-        this.pl = pl;
-        this.mf = pl.mf;
+    PrivilegedAccessImpl(AccessLayer al) {
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -229,7 +229,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
                 return false;
             }
             // Note: direct storage access is required here
-            AssocModel membership = pl.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
+            AssocModel membership = al.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
                 workspaceId, "dmx.core.default", "dmx.core.default");
             return membership != null;
         } catch (Exception e) {
@@ -240,7 +240,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public String getCreator(long objectId) {
-        return pl.hasProperty(objectId, PROP_CREATOR) ? (String) pl.fetchProperty(objectId, PROP_CREATOR) : null;
+        return al.hasProperty(objectId, PROP_CREATOR) ? (String) al.fetchProperty(objectId, PROP_CREATOR) : null;
     }
 
 
@@ -324,8 +324,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public long getAssignedWorkspaceId(long objectId) {
         try {
             long workspaceId = -1;
-            if (pl.hasProperty(objectId, PROP_WORKSPACE_ID)) {
-                workspaceId = (Long) pl.fetchProperty(objectId, PROP_WORKSPACE_ID);
+            if (al.hasProperty(objectId, PROP_WORKSPACE_ID)) {
+                workspaceId = (Long) al.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
@@ -340,7 +340,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             long _workspaceId = getAssignedWorkspaceId(object.getId());
             if (_workspaceId == -1) {
                 // create assignment association
-                pl.createAssoc("dmx.workspaces.workspace_assignment",
+                al.createAssoc("dmx.workspaces.workspace_assignment",
                     object.getModel().createPlayerModel("dmx.core.parent"),
                     mf.newTopicPlayerModel(workspaceId, "dmx.core.child")
                 );
@@ -388,7 +388,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
         try {
-            RelatedTopicModelImpl configTopic = pl.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
+            RelatedTopicModelImpl configTopic = al.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
                 ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
             if (configTopic == null) {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
@@ -465,7 +465,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModelImpl userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
+        RelatedTopicModelImpl userAccount = al.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
             "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
@@ -480,7 +480,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = pl.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
+        RelatedTopicModel password = al.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
             "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
@@ -541,7 +541,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
+        TopicModel sharingMode = al.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
             "dmx.core.child", "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
@@ -560,7 +560,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ---
 
     private boolean isTopicmapPrivate(long topicmapId) {
-        TopicModel privateFlag = pl.fetchTopicRelatedTopic(topicmapId, "dmx.core.composition", "dmx.core.parent",
+        TopicModel privateFlag = al.fetchTopicRelatedTopic(topicmapId, "dmx.core.composition", "dmx.core.parent",
             "dmx.core.child", "dmx.topicmaps.private");
         if (privateFlag == null) {
             // Note: migrated topicmaps might not have a Private child topic ### TODO: throw exception?
@@ -577,15 +577,15 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String getOwner(long workspaceId) {
         // Note: direct storage access is required here
-        if (!pl.hasProperty(workspaceId, PROP_OWNER)) {
+        if (!al.hasProperty(workspaceId, PROP_OWNER)) {
             throw new RuntimeException("No owner is assigned to workspace " + workspaceId);
         }
-        return (String) pl.fetchProperty(workspaceId, PROP_OWNER);
+        return (String) al.fetchProperty(workspaceId, PROP_OWNER);
     }
 
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
-        return (String) pl.fetchProperty(objectId, "typeUri");
+        return (String) al.fetchProperty(objectId, "typeUri");
     }
 
     // ---
@@ -638,7 +638,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
     private TopicModelImpl fetchTopic(String key, Object value) {
-        return pl.fetchTopic(key, new SimpleValue(value));
+        return al.fetchTopic(key, new SimpleValue(value));
     }
 
     /**
@@ -647,7 +647,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  a list, possibly empty.
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
-        return pl.queryTopics(key, new SimpleValue(value));
+        return al.queryTopics(key, new SimpleValue(value));
     }
 
     /**
@@ -658,7 +658,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      */
     private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
         List<TopicModelImpl> topics = new ArrayList();
-        for (TopicModelImpl topic : pl.fetchTopicsByProperty(PROP_OWNER, username)) {
+        for (TopicModelImpl topic : al.fetchTopicsByProperty(PROP_OWNER, username)) {
             if (topic.getTypeUri().equals(typeUri)) {
                 topics.add(topic);
             }

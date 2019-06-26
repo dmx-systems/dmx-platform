@@ -167,7 +167,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     AssocImpl instantiate() {
-        return new AssocImpl(this, pl);
+        return new AssocImpl(this, al);
     }
 
     @Override
@@ -179,12 +179,12 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final AssocTypeModelImpl getType() {
-        return pl.typeStorage.getAssocType(typeUri);
+        return al.typeStorage.getAssocType(typeUri);
     }
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return pl.fetchAssocAssocs(id);
+        return al.fetchAssocAssocs(id);
     }
 
     // ---
@@ -192,62 +192,62 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     @Override
     final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchAssocRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.fetchAssocRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---
 
     @Override
     final void storeUri() {
-        pl.storeAssocUri(id, uri);
+        al.storeAssocUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        pl.storeAssocTypeUri(id, typeUri);
+        al.storeAssocTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        pl.storeAssocValue(id, value, typeUri, isHtml());
+        al.storeAssocValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        pl.storeAssocProperty(id, propUri, propValue, addToIndex);
+        al.storeAssocProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
     final void removeProperty(String propUri) {
-        pl.removeAssocProperty(id, propUri);
+        al.removeAssocProperty(id, propUri);
     }
 
     // ---
 
     @Override
     final void _delete() {
-        pl._deleteAssoc(id);
+        al._deleteAssoc(id);
     }
 
     // ---
 
     @Override
     final <M extends DMXObjectModelImpl> M checkReadAccess() {
-        pl.checkAssocReadAccess(id);
+        al.checkAssocReadAccess(id);
         return (M) this;
     }
 
     @Override
     final void checkWriteAccess() {
-        pl.checkAssocWriteAccess(id);
+        al.checkAssocWriteAccess(id);
     }
 
     // ---
@@ -369,7 +369,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     void updateRoleTypeUri(PlayerModelImpl player, String roleTypeUri) {
         player.setRoleTypeUri(roleTypeUri);                         // update memory
-        pl.storeRoleTypeUri(id, player.id, player.roleTypeUri);     // update DB
+        al.storeRoleTypeUri(id, player.id, player.roleTypeUri);     // update DB
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -386,7 +386,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             return;
         }
         // Note: only readable assocs (access control) are considered
-        for (AssocModelImpl assoc : pl.getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
+        for (AssocModelImpl assoc : al.getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
                                                                                   player2.roleTypeUri)) {
             // Note (ID comparison): on post-update the assoc exists already in the DB. It must not be regarded a
             // duplicate of itself.
@@ -471,7 +471,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // remove current assignment
         fetchInstantiation().delete();
         // create new assignment
-        pl.createAssocInstantiation(id, typeUri);
+        al.createAssocInstantiation(id, typeUri);
     }
 
     private AssocModelImpl fetchInstantiation() {
@@ -539,6 +539,6 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     }
 
     private TypeModelImpl fetchParentType() {
-        return pl.typeStorage.fetchParentType(this);
+        return al.typeStorage.fetchParentType(this);
     }
 }

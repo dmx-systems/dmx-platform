@@ -53,7 +53,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     TopicTypeImpl instantiate() {
-        return new TopicTypeImpl(clone().filterReadableCompDefs(), pl);
+        return new TopicTypeImpl(clone().filterReadableCompDefs(), al);
     }
 
 
@@ -62,7 +62,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     List<TopicModelImpl> getAllInstances() {
-        return pl.fetchTopics("typeUri", new SimpleValue(uri));
+        return al.fetchTopics("typeUri", new SimpleValue(uri));
     }
 
     // ---

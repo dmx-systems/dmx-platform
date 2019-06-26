@@ -11,8 +11,8 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocPlayerModelImpl(long assocId, String roleTypeUri, PersistenceLayer pl) {
-        super(assocId, roleTypeUri,  pl);
+    AssocPlayerModelImpl(long assocId, String roleTypeUri, AccessLayer al) {
+        super(assocId, roleTypeUri,  al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -45,6 +45,6 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
 
     @Override
     RelatedAssocModelImpl getDMXObject(AssocModelImpl assoc) {
-        return mf.newRelatedAssocModel(pl.fetchAssoc(getId()), assoc);
+        return mf.newRelatedAssocModel(al.fetchAssoc(getId()), assoc);
     }
 }

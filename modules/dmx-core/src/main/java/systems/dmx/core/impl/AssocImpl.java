@@ -29,8 +29,8 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssocImpl(AssocModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    AssocImpl(AssocModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -105,12 +105,12 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     @Override
     public final void update(AssocModel updateModel) {
-        pl.updateAssoc(getModel(), (AssocModelImpl) updateModel);
+        al.updateAssoc(getModel(), (AssocModelImpl) updateModel);
     }
 
     @Override
     public final void delete() {
-        pl.deleteAssoc(getModel());
+        al.deleteAssoc(getModel());
     }
 
     // ---
@@ -152,7 +152,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final RelatedAssoc getRelatedAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                               String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = pl.getAssocRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = al.getAssocRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
@@ -160,7 +160,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final List<RelatedAssoc> getRelatedAssocs(String assocTypeUri, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersAssocTypeUri) {
-        return pl.instantiate(pl.getAssocRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return al.instantiate(al.getAssocRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
@@ -169,13 +169,13 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                 long othersTopicId) {
-        AssocModelImpl assoc = pl.getAssocBetweenTopicAndAssoc(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
+        AssocModelImpl assoc = al.getAssocBetweenTopicAndAssoc(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
             myRoleTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public final List<Assoc> getAssocs() {
-        return pl.instantiate(pl.getAssocAssocs(getId()));
+        return al.instantiate(al.getAssocAssocs(getId()));
     }
 }

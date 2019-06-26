@@ -17,8 +17,8 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DMXTypeImpl(TypeModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    DMXTypeImpl(TypeModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -50,7 +50,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     @Override
     public final Collection<CompDef> getCompDefs() {
-        return pl.instantiate(getModel().getCompDefs());
+        return al.instantiate(getModel().getCompDefs());
     }
 
     @Override
@@ -71,7 +71,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     @Override
     public final DMXType addCompDefBefore(CompDefModel compDef, String beforeCompDefUri) {
         CompDefModelImpl _compDef = (CompDefModelImpl) compDef;
-        pl.typeStorage.storeCompDef(_compDef);
+        al.typeStorage.storeCompDef(_compDef);
         _getModel()._addCompDefBefore(_compDef, beforeCompDefUri);
         return this;
     }
@@ -88,8 +88,8 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     @Override
     public final ViewConfiguration getViewConfig() {
-        PlayerModel configurable = pl.typeStorage.newTypePlayer(getId());   // ### type ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
+        PlayerModel configurable = al.typeStorage.newTypePlayer(getId());   // ### type ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), al);
     }
 
     @Override
@@ -103,7 +103,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     @Override
     public void update(TypeModel updateModel) {
-        _getModel().update((TypeModelImpl) updateModel);   // ### FIXME: call through pl for access control
+        _getModel().update((TypeModelImpl) updateModel);   // ### FIXME: call through al for access control
     }
 
     // ---

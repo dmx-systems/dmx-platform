@@ -592,7 +592,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    // ### TODO: move to PersistenceLayer?
+    // ### TODO: move to AccessLayer?
     private void introduceTopicTypesToPlugin() {
         try {
             for (TopicType topicType : dmx.getAllTopicTypes()) {
@@ -603,7 +603,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-    // ### TODO: move to PersistenceLayer?
+    // ### TODO: move to AccessLayer?
     private void introduceAssocTypesToPlugin() {
         try {
             for (AssocType assocType : dmx.getAllAssocTypes()) {

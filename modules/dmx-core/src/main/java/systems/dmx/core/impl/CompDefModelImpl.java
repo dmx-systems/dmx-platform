@@ -110,7 +110,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     @Override
     CompDefImpl instantiate() {
-        return new CompDefImpl(this, pl);
+        return new CompDefImpl(this, al);
     }
 
     @Override
@@ -198,11 +198,11 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     // === Helper ===
 
     TypeModelImpl getParentType() {
-        return pl.typeStorage.getType(getParentTypeUri());
+        return al.typeStorage.getType(getParentTypeUri());
     }
 
     TypeModelImpl getChildType() {
-        return pl.typeStorage.getType(getChildTypeUri());
+        return al.typeStorage.getType(getChildTypeUri());
     }
 
 

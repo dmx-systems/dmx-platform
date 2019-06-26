@@ -32,15 +32,15 @@ abstract class DMXObjectImpl implements DMXObject {
 
     DMXObjectModelImpl model;    // underlying model
 
-    PersistenceLayer pl;
+    AccessLayer al;
     ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DMXObjectImpl(DMXObjectModelImpl model, PersistenceLayer pl) {
+    DMXObjectImpl(DMXObjectModelImpl model, AccessLayer al) {
         this.model = model;
-        this.pl = pl;
-        this.mf = pl.mf;
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -124,7 +124,7 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final ChildTopicsImpl getChildTopics() {
-        return new ChildTopicsImpl(model.childTopics, model, pl);
+        return new ChildTopicsImpl(model.childTopics, model, al);
     }
 
     @Override
@@ -191,7 +191,7 @@ abstract class DMXObjectImpl implements DMXObject {
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
         List<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return pl.instantiate(pl.filterReadables(topics));
+        return al.instantiate(al.filterReadables(topics));
     }
 
     // --- Assoc Retrieval ---
@@ -213,12 +213,12 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final Object getProperty(String propUri) {
-        return pl.fetchProperty(getId(), propUri);
+        return al.fetchProperty(getId(), propUri);
     }
 
     @Override
     public final boolean hasProperty(String propUri) {
-        return pl.hasProperty(getId(), propUri);
+        return al.hasProperty(getId(), propUri);
     }
 
     @Override
@@ -237,7 +237,7 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final Object getDatabaseVendorObject() {
-        return pl.getDatabaseVendorObject(getId());
+        return al.getDatabaseVendorObject(getId());
     }
 
 

@@ -314,7 +314,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // 2) update DB
             long beforeCompDefId = beforeCompDefUri != null ? getCompDef(beforeCompDefUri).getId() : -1;
             long firstCompDefId = firstCompDefId();   // must be determined *after* memory is updated
-            pl.typeStorage.addCompDefToSequence(id, compDef.id, beforeCompDefId, firstCompDefId, lastCompDefId);
+            al.typeStorage.addCompDefToSequence(id, compDef.id, beforeCompDefId, firstCompDefId, lastCompDefId);
         } catch (Exception e) {
             throw new RuntimeException("Adding comp def \"" + compDef.getCompDefUri() + "\" to type \"" + uri +
                 "\" failed (compDef=" + compDef + ", beforeCompDefUri=\"" + beforeCompDefUri + "\")", e);
@@ -337,8 +337,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // 3 methods to bridge between assoc and comp def
 
     final void _addCompDef(AssocModelImpl assoc) {
-        CompDefModelImpl compDef = pl.typeStorage.newCompDefModel(assoc);
-        pl.typeStorage.storeViewConfig(compDef);
+        CompDefModelImpl compDef = al.typeStorage.newCompDefModel(assoc);
+        al.typeStorage.storeViewConfig(compDef);
         _addCompDefBefore(compDef, null);      // beforeCompDefUri=null
         // FIXME: move addUpdateTypeDirective() call to _addCompDefBefore()? At the moment when adding ab comp def via
         // TypeImpl no directives are added.
@@ -389,7 +389,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         // update memory
         removeCompDef(compDefUri);
         // update DB
-        pl.typeStorage.rebuildSequence(this);
+        al.typeStorage.rebuildSequence(this);
         //
         addUpdateTypeDirective();
     }
@@ -517,7 +517,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             logger.info("##### Updating sequence (" + newCompDefs.size() + "/" + getCompDefs().size() + " comp defs)");
             rehashCompDefs(newCompDefs);
             // update DB
-            pl.typeStorage.rebuildSequence(this);
+            al.typeStorage.rebuildSequence(this);
         } catch (Exception e) {
             throw new RuntimeException("Updating the comp def sequence failed", e);
         }
@@ -532,7 +532,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         getRelatedTopic("dmx.core.composition", "dmx.core.type", "dmx.core.default", "dmx.core.data_type")
             .getRelatingAssoc().delete();
         // create new assignment
-        pl.typeStorage.storeDataType(uri, dataTypeUri);
+        al.typeStorage.storeDataType(uri, dataTypeUri);
     }
 
 
@@ -665,14 +665,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Type Cache (memory access) ===
 
     private void putInTypeCache() {
-        pl.typeStorage.putInTypeCache(this);
+        al.typeStorage.putInTypeCache(this);
     }
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
      */
     private void removeFromTypeCache() {
-        pl.typeStorage.removeFromTypeCache(uri);
+        al.typeStorage.removeFromTypeCache(uri);
         //
         Directive dir = getDeleteTypeDirective();   // abstract
         Directives.get().add(dir, new JSONWrapper("uri", uri));

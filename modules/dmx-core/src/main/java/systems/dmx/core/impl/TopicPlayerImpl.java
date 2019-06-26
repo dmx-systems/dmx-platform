@@ -6,7 +6,7 @@ import systems.dmx.core.TopicPlayer;
 
 
 /**
- * A topic player that is attached to the {@link PersistenceLayer}.
+ * A topic player that is attached to the {@link AccessLayer}.
  */
 class TopicPlayerImpl extends PlayerImpl implements TopicPlayer {
 

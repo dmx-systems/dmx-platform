@@ -15,16 +15,16 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicPlayerModelImpl(long topicId, String roleTypeUri, PersistenceLayer pl) {
-        this(topicId, null, roleTypeUri, pl);
+    TopicPlayerModelImpl(long topicId, String roleTypeUri, AccessLayer al) {
+        this(topicId, null, roleTypeUri, al);
     }
 
-    TopicPlayerModelImpl(String topicUri, String roleTypeUri, PersistenceLayer pl) {
-        this(-1, topicUri, roleTypeUri, pl);
+    TopicPlayerModelImpl(String topicUri, String roleTypeUri, AccessLayer al) {
+        this(-1, topicUri, roleTypeUri, al);
     }
 
-    TopicPlayerModelImpl(long topicId, String topicUri, String roleTypeUri, PersistenceLayer pl) {
-        super(topicId, roleTypeUri, pl);
+    TopicPlayerModelImpl(long topicId, String topicUri, String roleTypeUri, AccessLayer al) {
+        super(topicId, roleTypeUri, al);
         this.topicUri = topicUri;
     }
 
@@ -72,6 +72,6 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
 
     @Override
     RelatedTopicModelImpl getDMXObject(AssocModelImpl assoc) {
-        return mf.newRelatedTopicModel(pl.fetchTopic(getId()), assoc);
+        return mf.newRelatedTopicModel(al.fetchTopic(getId()), assoc);
     }
 }

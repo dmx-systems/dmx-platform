@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *
  * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
  */
-public final class PersistenceLayer extends StorageDecorator {
+public final class AccessLayer extends StorageDecorator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -39,7 +39,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PersistenceLayer(DMXStorage storage) {
+    public AccessLayer(DMXStorage storage) {
         super(storage);
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
@@ -48,7 +48,7 @@ public final class PersistenceLayer extends StorageDecorator {
         //
         // Note: this is a constructor side effect. This is a cyclic dependency.
         // ### TODO: explain why we do it.
-        mf.pl = this;
+        mf.al = this;
         //
         bootstrapTypeCache();
     }

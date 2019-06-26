@@ -6,7 +6,7 @@ import systems.dmx.core.AssocPlayer;
 
 
 /**
- * An association player that is attached to the {@link PersistenceLayer}.
+ * An association player that is attached to the {@link AccessLayer}.
  */
 class AssocPlayerImpl extends PlayerImpl implements AssocPlayer {
 

@@ -1,8 +1,8 @@
 package systems.dmx.core.osgi;
 
+import systems.dmx.core.impl.AccessLayer;
 import systems.dmx.core.impl.CoreServiceImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
-import systems.dmx.core.impl.PersistenceLayer;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
@@ -180,7 +180,7 @@ public class CoreActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
-            dmx = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
+            dmx = new CoreServiceImpl(new AccessLayer(storageService), bundleContext);
             //
             logger.info("Registering DMX core service at OSGi framework");
             bundleContext.registerService(CoreService.class.getName(), dmx, null);

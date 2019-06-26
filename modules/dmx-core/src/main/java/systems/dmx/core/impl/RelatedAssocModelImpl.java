@@ -33,6 +33,6 @@ class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAssocModel 
 
     @Override
     RelatedAssocImpl instantiate() {
-        return new RelatedAssocImpl(this, pl);
+        return new RelatedAssocImpl(this, al);
     }
 }

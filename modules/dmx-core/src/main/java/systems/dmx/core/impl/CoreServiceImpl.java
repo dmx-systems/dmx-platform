@@ -34,7 +34,7 @@ public class CoreServiceImpl implements CoreService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     BundleContext bundleContext;
-    PersistenceLayer pl;
+    AccessLayer al;
     EventManager em;
     ModelFactoryImpl mf;
     PrivilegedAccess ac;
@@ -50,16 +50,16 @@ public class CoreServiceImpl implements CoreService {
     /**
      * @param   bundleContext   The context of the DMX Core bundle.
      */
-    public CoreServiceImpl(PersistenceLayer pl, BundleContext bundleContext) {
+    public CoreServiceImpl(AccessLayer al, BundleContext bundleContext) {
         this.bundleContext = bundleContext;
-        this.pl = pl;
-        this.em = pl.em;
-        this.mf = pl.mf;
-        this.ac = new PrivilegedAccessImpl(pl);
+        this.al = al;
+        this.em = al.em;
+        this.mf = al.mf;
+        this.ac = new PrivilegedAccessImpl(al);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.wsService = new WebSocketsServiceImpl(this);
-        this.wpService = new WebPublishingService(pl, wsService);
+        this.wpService = new WebPublishingService(al, wsService);
         //
         setupDB();
     }
@@ -78,56 +78,56 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic getTopic(long topicId) {
-        return pl.getTopic(topicId).instantiate();
+        return al.getTopic(topicId).instantiate();
     }
 
     @Override
     public Topic getTopicByUri(String uri) {
-        TopicModelImpl topic = pl.getTopicByUri(uri);
+        TopicModelImpl topic = al.getTopicByUri(uri);
         return topic != null ? topic.instantiate() : null;
     }
 
     @Override
     public Topic getTopicByValue(String key, SimpleValue value) {
-        TopicModelImpl topic = pl.getTopicByValue(key, value);
+        TopicModelImpl topic = al.getTopicByValue(key, value);
         return topic != null ? topic.instantiate() : null;
     }
 
     @Override
     public List<Topic> getTopicsByValue(String key, SimpleValue value) {
-        return pl.instantiate(pl.getTopicsByValue(key, value));
+        return al.instantiate(al.getTopicsByValue(key, value));
     }
 
     @Override
     public List<Topic> getTopicsByType(String topicTypeUri) {
-        return pl.instantiate(pl.getTopicsByType(topicTypeUri));
+        return al.instantiate(al.getTopicsByType(topicTypeUri));
     }
 
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
-        return pl.instantiate(pl.searchTopics(searchTerm, fieldUri));
+        return al.instantiate(al.searchTopics(searchTerm, fieldUri));
     }
 
     @Override
     public Iterable<Topic> getAllTopics() {
-        return new InstantiationIterable(pl.getAllTopics());
+        return new InstantiationIterable(al.getAllTopics());
     }
 
     // ---
 
     @Override
     public TopicImpl createTopic(TopicModel model) {
-        return pl.createTopic((TopicModelImpl) model).instantiate();
+        return al.createTopic((TopicModelImpl) model).instantiate();
     }
 
     @Override
     public void updateTopic(TopicModel updateModel) {
-        pl.updateTopic((TopicModelImpl) updateModel);
+        al.updateTopic((TopicModelImpl) updateModel);
     }
 
     @Override
     public void deleteTopic(long topicId) {
-        pl.deleteTopic(topicId);
+        al.deleteTopic(topicId);
     }
 
 
@@ -136,30 +136,30 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Assoc getAssoc(long assocId) {
-        return pl.getAssoc(assocId).instantiate();
+        return al.getAssoc(assocId).instantiate();
     }
 
     @Override
     public Assoc getAssocByValue(String key, SimpleValue value) {
-        AssocModelImpl assoc = pl.getAssocByValue(key, value);
+        AssocModelImpl assoc = al.getAssocByValue(key, value);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public List<Assoc> getAssocsByValue(String key, SimpleValue value) {
-        return pl.instantiate(pl.getAssocsByValue(key, value));
+        return al.instantiate(al.getAssocsByValue(key, value));
     }
 
     @Override
     public Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
-        AssocModelImpl assoc = pl.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        AssocModelImpl assoc = al.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
                                               String assocRoleTypeUri) {
-        AssocModelImpl assoc = pl.getAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+        AssocModelImpl assoc = al.getAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
             assocRoleTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
@@ -168,46 +168,46 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Assoc> getAssocsByType(String assocTypeUri) {
-        return pl.instantiate(pl.getAssocsByType(assocTypeUri));
+        return al.instantiate(al.getAssocsByType(assocTypeUri));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
-        return pl.instantiate(pl.getAssocs(topic1Id, topic2Id));
+        return al.instantiate(al.getAssocs(topic1Id, topic2Id));
     }
 
     @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
-        return pl.instantiate(pl.getAssocs(assocTypeUri, topic1Id, topic2Id));
+        return al.instantiate(al.getAssocs(assocTypeUri, topic1Id, topic2Id));
     }
 
     // ---
 
     @Override
     public Iterable<Assoc> getAllAssocs() {
-        return new InstantiationIterable(pl.getAllAssocs());
+        return new InstantiationIterable(al.getAllAssocs());
     }
 
     @Override
     public List<PlayerModel> getPlayerModels(long assocId) {
-        return pl.getPlayerModels(assocId);
+        return al.getPlayerModels(assocId);
     }
 
     // ---
 
     @Override
     public AssocImpl createAssoc(AssocModel model) {
-        return pl.createAssoc((AssocModelImpl) model).instantiate();
+        return al.createAssoc((AssocModelImpl) model).instantiate();
     }
 
     @Override
     public void updateAssoc(AssocModel updateModel) {
-        pl.updateAssoc((AssocModelImpl) updateModel);
+        al.updateAssoc((AssocModelImpl) updateModel);
     }
 
     @Override
     public void deleteAssoc(long assocId) {
-        pl.deleteAssoc(assocId);
+        al.deleteAssoc(assocId);
     }
 
 
@@ -216,36 +216,36 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public TopicTypeImpl getTopicType(String uri) {
-        return pl.getTopicType(uri).instantiate();
+        return al.getTopicType(uri).instantiate();
     }
 
     @Override
     public TopicTypeImpl getTopicTypeImplicitly(long topicId) {
-        return pl.getTopicTypeImplicitly(topicId).instantiate();
+        return al.getTopicTypeImplicitly(topicId).instantiate();
     }
 
     // ---
 
     @Override
     public List<TopicType> getAllTopicTypes() {
-        return pl.instantiate(pl.getAllTopicTypes());
+        return al.instantiate(al.getAllTopicTypes());
     }
 
     // ---
 
     @Override
     public TopicTypeImpl createTopicType(TopicTypeModel model) {
-        return pl.createTopicType((TopicTypeModelImpl) model).instantiate();
+        return al.createTopicType((TopicTypeModelImpl) model).instantiate();
     }
 
     @Override
     public void updateTopicType(TopicTypeModel updateModel) {
-        pl.updateTopicType((TopicTypeModelImpl) updateModel);
+        al.updateTopicType((TopicTypeModelImpl) updateModel);
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
-        pl.deleteTopicType(topicTypeUri);
+        al.deleteTopicType(topicTypeUri);
     }
 
 
@@ -254,36 +254,36 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public AssocTypeImpl getAssocType(String uri) {
-        return pl.getAssocType(uri).instantiate();
+        return al.getAssocType(uri).instantiate();
     }
 
     @Override
     public AssocTypeImpl getAssocTypeImplicitly(long assocId) {
-        return pl.getAssocTypeImplicitly(assocId).instantiate();
+        return al.getAssocTypeImplicitly(assocId).instantiate();
     }
 
     // ---
 
     @Override
     public List<AssocType> getAllAssocTypes() {
-        return pl.instantiate(pl.getAllAssocTypes());
+        return al.instantiate(al.getAllAssocTypes());
     }
 
     // ---
 
     @Override
     public AssocTypeImpl createAssocType(AssocTypeModel model) {
-        return pl.createAssocType((AssocTypeModelImpl) model).instantiate();
+        return al.createAssocType((AssocTypeModelImpl) model).instantiate();
     }
 
     @Override
     public void updateAssocType(AssocTypeModel updateModel) {
-        pl.updateAssocType((AssocTypeModelImpl) updateModel);
+        al.updateAssocType((AssocTypeModelImpl) updateModel);
     }
 
     @Override
     public void deleteAssocType(String assocTypeUri) {
-        pl.deleteAssocType(assocTypeUri);
+        al.deleteAssocType(assocTypeUri);
     }
 
 
@@ -292,7 +292,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic createRoleType(TopicModel model) {
-        return pl.createRoleType((TopicModelImpl) model).instantiate();
+        return al.createRoleType((TopicModelImpl) model).instantiate();
     }
 
 
@@ -301,7 +301,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public DMXObject getObject(long id) {
-        return pl.getObject(id).instantiate();
+        return al.getObject(id).instantiate();
     }
 
 
@@ -338,34 +338,34 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getProperty(long id, String propUri) {
-        return pl.fetchProperty(id, propUri);
+        return al.fetchProperty(id, propUri);
     }
 
     @Override
     public boolean hasProperty(long id, String propUri) {
-        return pl.hasProperty(id, propUri);
+        return al.hasProperty(id, propUri);
     }
 
     // ---
 
     @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return pl.instantiate(pl.getTopicsByProperty(propUri, propValue));
+        return al.instantiate(al.getTopicsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.instantiate(pl.getTopicsByPropertyRange(propUri, from, to));
+        return al.instantiate(al.getTopicsByPropertyRange(propUri, from, to));
     }
 
     @Override
     public List<Assoc> getAssocsByProperty(String propUri, Object propValue) {
-        return pl.instantiate(pl.getAssocsByProperty(propUri, propValue));
+        return al.instantiate(al.getAssocsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Assoc> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.instantiate(pl.getAssocsByPropertyRange(propUri, from, to));
+        return al.instantiate(al.getAssocsByPropertyRange(propUri, from, to));
     }
 
     // ---
@@ -378,7 +378,7 @@ public class CoreServiceImpl implements CoreService {
         for (Topic topic : getAllTopics()) {
             if (topic.hasProperty(propUri)) {
                 Object value = topic.getProperty(propUri);
-                pl.indexTopicProperty(topic.getId(), propUri, value);
+                al.indexTopicProperty(topic.getId(), propUri, value);
                 added++;
             }
             topics++;
@@ -395,7 +395,7 @@ public class CoreServiceImpl implements CoreService {
         for (Assoc assoc : getAllAssocs()) {
             if (assoc.hasProperty(propUri)) {
                 Object value = assoc.getProperty(propUri);
-                pl.indexAssocProperty(assoc.getId(), propUri, value);
+                al.indexAssocProperty(assoc.getId(), propUri, value);
                 added++;
             }
             assocs++;
@@ -410,7 +410,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public DMXTransaction beginTx() {
-        return pl.beginTx();
+        return al.beginTx();
     }
 
     // ---
@@ -432,7 +432,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getDatabaseVendorObject() {
-        return pl.getDatabaseVendorObject();
+        return al.getDatabaseVendorObject();
     }
 
     // ---
@@ -472,7 +472,7 @@ public class CoreServiceImpl implements CoreService {
         DMXTransaction tx = beginTx();
         try {
             logger.info("----- Setting up the database -----");
-            boolean isCleanInstall = pl.init();
+            boolean isCleanInstall = al.init();
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
@@ -485,7 +485,7 @@ public class CoreServiceImpl implements CoreService {
             // Note: we don't put finish() in a finally clause here because
             // in case of error the database has to be shut down.
             tx.finish();
-            pl.shutdown();
+            al.shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
     }
@@ -520,12 +520,12 @@ public class CoreServiceImpl implements CoreService {
             // Note: createTopicInstantiation() creates the associations by *low-level* (storage) calls.
             // That's why the associations can be created *before* their type (here: "dmx.core.instantiation")
             // is fully constructed (the type's data type is not yet associated => step 2).
-            pl.createTopicInstantiation(t.getId(), t.getTypeUri());
-            pl.createTopicInstantiation(a.getId(), a.getTypeUri());
-            pl.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
-            pl.createTopicInstantiation(text.getId(), text.getTypeUri());
-            pl.createTopicInstantiation(composition.getId(), composition.getTypeUri());
-            pl.createTopicInstantiation(instn.getId(), instn.getTypeUri());
+            al.createTopicInstantiation(t.getId(), t.getTypeUri());
+            al.createTopicInstantiation(a.getId(), a.getTypeUri());
+            al.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
+            al.createTopicInstantiation(text.getId(), text.getTypeUri());
+            al.createTopicInstantiation(composition.getId(), composition.getTypeUri());
+            al.createTopicInstantiation(instn.getId(), instn.getTypeUri());
             //
             // 2) Postponed data type association
             //
@@ -567,8 +567,8 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _createTopic(TopicModelImpl model) {
-        pl.storeTopic(model);
-        pl.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
+        al.storeTopic(model);
+        al.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
     }
 
     /**
@@ -580,7 +580,7 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
             mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
         );
-        pl.storeAssoc(assoc);
-        pl.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
+        al.storeAssoc(assoc);
+        al.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
     }
 }

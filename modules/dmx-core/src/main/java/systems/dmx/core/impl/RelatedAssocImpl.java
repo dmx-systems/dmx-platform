@@ -6,14 +6,14 @@ import systems.dmx.core.RelatedAssoc;
 
 
 /**
- * An Assoc-Assoc pair that is attached to the {@link PersistenceLayer}.
+ * An Assoc-Assoc pair that is attached to the {@link AccessLayer}.
  */
 class RelatedAssocImpl extends AssocImpl implements RelatedAssoc {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssocImpl(RelatedAssocModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    RelatedAssocImpl(RelatedAssocModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

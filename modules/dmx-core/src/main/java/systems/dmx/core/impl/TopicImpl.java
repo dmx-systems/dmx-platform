@@ -22,8 +22,8 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicImpl(TopicModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    TopicImpl(TopicModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -38,12 +38,12 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
     @Override
     public final void update(TopicModel updateModel) {
-        pl.updateTopic(getModel(), (TopicModelImpl) updateModel);
+        al.updateTopic(getModel(), (TopicModelImpl) updateModel);
     }
 
     @Override
     public final void delete() {
-        pl.deleteTopic(getModel());
+        al.deleteTopic(getModel());
     }
 
     // ---
@@ -93,7 +93,7 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     @Override
     public final RelatedAssoc getRelatedAssoc(String assocTypeUri, String myRoleTypeUri,
                                               String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = pl.getTopicRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = al.getTopicRelatedAssoc(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
@@ -101,7 +101,7 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     @Override
     public final List<RelatedAssoc> getRelatedAssocs(String assocTypeUri, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersAssocTypeUri) {
-        return pl.instantiate(pl.getTopicRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return al.instantiate(al.getTopicRelatedAssocs(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
@@ -110,12 +110,12 @@ class TopicImpl extends DMXObjectImpl implements Topic {
     @Override
     public final Assoc getAssoc(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                 long othersTopicId) {
-        AssocModelImpl assoc = pl.getAssoc(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
+        AssocModelImpl assoc = al.getAssoc(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public final List<Assoc> getAssocs() {
-        return pl.instantiate(pl.getTopicAssocs(getId()));
+        return al.instantiate(al.getTopicAssocs(getId()));
     }
 }

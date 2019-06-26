@@ -71,7 +71,7 @@ class MigrationManager {
      * Determines the core migrations to be run, and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int installedModelVersion = dmx.pl.fetchMigrationNr();
+        int installedModelVersion = dmx.al.fetchMigrationNr();
         int requiredModelVersion = CORE_MODEL_VERSION;
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
@@ -144,7 +144,7 @@ class MigrationManager {
         try {
             logger.info("Updating installed model: version " + mi.migrationNr);
             if (mi.migrationType.equals("core")) {
-                dmx.pl.storeMigrationNr(mi.migrationNr);
+                dmx.al.storeMigrationNr(mi.migrationNr);
             } else {
                 mi.plugin.setMigrationNr(mi.migrationNr);
             }

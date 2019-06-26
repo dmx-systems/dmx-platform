@@ -22,7 +22,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -32,8 +32,8 @@ class TransactionFactory implements ResourceFilterFactory {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TransactionFactory(PersistenceLayer pl) {
-        this.pl = pl;
+    TransactionFactory(AccessLayer al) {
+        this.al = al;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -74,7 +74,7 @@ class TransactionFactory implements ResourceFilterFactory {
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
                     logger.fine("### Begining transaction of " + info(method));
-                    DMXTransaction tx = pl.beginTx();
+                    DMXTransaction tx = al.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
                 }

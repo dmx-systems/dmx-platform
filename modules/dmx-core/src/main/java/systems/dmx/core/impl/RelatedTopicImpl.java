@@ -6,14 +6,14 @@ import systems.dmx.core.RelatedTopic;
 
 
 /**
- * A Topic-Assoc pair that is attached to the {@link PersistenceLayer}.
+ * A Topic-Assoc pair that is attached to the {@link AccessLayer}.
  */
 class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicImpl(RelatedTopicModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    RelatedTopicImpl(RelatedTopicModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

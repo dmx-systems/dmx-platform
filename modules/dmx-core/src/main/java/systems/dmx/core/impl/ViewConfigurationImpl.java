@@ -10,7 +10,7 @@ import systems.dmx.core.model.ViewConfigurationModel;
 
 
 /**
- * A view configuration that is attached to the {@link PersistenceLayer}.
+ * A view configuration that is attached to the {@link AccessLayer}.
  */
 class ViewConfigurationImpl implements ViewConfiguration {
 
@@ -27,16 +27,16 @@ class ViewConfigurationImpl implements ViewConfiguration {
      */
     private PlayerModel configurable;
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
     private ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationImpl(PlayerModel configurable, ViewConfigurationModelImpl model, PersistenceLayer pl) {
+    ViewConfigurationImpl(PlayerModel configurable, ViewConfigurationModelImpl model, AccessLayer al) {
         this.configurable = configurable;
         this.model = model;
-        this.pl = pl;
-        this.mf = pl.mf;
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -47,7 +47,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     @Override
     public Iterable<Topic> getConfigTopics() {
-        return pl.instantiate(model.getConfigTopics());
+        return al.instantiate(model.getConfigTopics());
     }
 
     @Override
@@ -98,6 +98,6 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     private void _addConfigTopic(TopicModelImpl configTopic) {
         model.addConfigTopic(configTopic);                                  // update memory
-        pl.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
+        al.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
     }
 }

@@ -12,7 +12,7 @@ abstract class PlayerModelImpl implements PlayerModel {
     long id = -1;           // id of the player (a topic, or an association)
     String roleTypeUri;     // is never null
 
-    PersistenceLayer pl;
+    AccessLayer al;
     ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -21,11 +21,11 @@ abstract class PlayerModelImpl implements PlayerModel {
     PlayerModelImpl() {
     }
 
-    PlayerModelImpl(long playerId, String roleTypeUri, PersistenceLayer pl) {
+    PlayerModelImpl(long playerId, String roleTypeUri, AccessLayer al) {
         this.id = playerId;
         setRoleTypeUri(roleTypeUri);
-        this.pl = pl;
-        this.mf = pl.mf;
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

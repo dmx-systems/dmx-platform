@@ -30,16 +30,16 @@ class TypeStorage {
 
     private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
     private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeStorage(PersistenceLayer pl) {
-        this.pl = pl;
-        this.mf = pl.mf;
+    TypeStorage(AccessLayer al) {
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // --------------------------------------------------------------------------------------------------------- Methods
@@ -97,7 +97,7 @@ class TypeStorage {
             endlessRecursionDetection.check(topicTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
+            TopicModelImpl typeTopic = al.fetchTopic("uri", new SimpleValue(topicTypeUri));
             checkTopicType(topicTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -128,7 +128,7 @@ class TypeStorage {
             endlessRecursionDetection.check(assocTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
+            TopicModelImpl typeTopic = al.fetchTopic("uri", new SimpleValue(assocTypeUri));
             checkAssocType(assocTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -203,7 +203,7 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
+            RelatedTopicModel dataType = al.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
                 "dmx.core.default", "dmx.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic associated to " + className + " \"" + typeUri + "\"");
@@ -219,7 +219,7 @@ class TypeStorage {
     // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
-            pl.createAssoc("dmx.core.composition",
+            al.createAssoc("dmx.core.composition",
                 mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
                 mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
             );
@@ -403,7 +403,7 @@ class TypeStorage {
     void storeCompDef(CompDefModelImpl compDef) {
         try {
             // 1) create association
-            pl.createAssoc(addPlayerIds(compDef));
+            al.createAssoc(addPlayerIds(compDef));
             //
             // 2) cardinality
             // Note: if the underlying association was a comp def before it has cardinality assignments already.
@@ -500,7 +500,7 @@ class TypeStorage {
         if (cardinality != null) {
             return cardinality;
         } else {
-            return mf.newRelatedTopicModel(pl.fetchTopic("uri", new SimpleValue("dmx.core.one")));  // ### FIXME
+            return mf.newRelatedTopicModel(al.fetchTopic("uri", new SimpleValue("dmx.core.one")));  // ### FIXME
         }
     }
 
@@ -535,17 +535,17 @@ class TypeStorage {
     // ---
 
     private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
-        return pl.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
+        return al.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
-        return pl.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
+        return al.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
             "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
-        return pl.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
+        return al.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
             "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
@@ -614,14 +614,14 @@ class TypeStorage {
     // ---
 
     private void storeSequenceStart(long typeId, long compDefId) {
-        pl.createAssoc("dmx.core.composition",
+        al.createAssoc("dmx.core.composition",
             mf.newTopicPlayerModel(typeId, "dmx.core.type"),
             mf.newAssocPlayerModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predCompDefId, long succCompDefId) {
-        pl.createAssoc("dmx.core.sequence",
+        al.createAssoc("dmx.core.sequence",
             mf.newAssocPlayerModel(predCompDefId, "dmx.core.predecessor"),
             mf.newAssocPlayerModel(succCompDefId, "dmx.core.successor")
         );
@@ -658,7 +658,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
+            return viewConfigModel(al.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
@@ -667,7 +667,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(pl.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
+            return viewConfigModel(al.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);
@@ -727,8 +727,8 @@ class TypeStorage {
     }
 
     TopicModel storeViewConfigTopic(PlayerModel configurable, TopicModelImpl configTopic) {
-        TopicModel topic = pl.createTopic(configTopic);
-        pl.createAssoc("dmx.core.composition",
+        TopicModel topic = al.createTopic(configTopic);
+        al.createAssoc("dmx.core.composition",
             configurable,
             mf.newTopicPlayerModel(configTopic.id, "dmx.core.child")
         );

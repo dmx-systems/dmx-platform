@@ -52,7 +52,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     TopicImpl instantiate() {
-        return new TopicImpl(this, pl);
+        return new TopicImpl(this, al);
     }
 
     @Override
@@ -64,12 +64,12 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final TopicTypeModelImpl getType() {
-        return pl.typeStorage.getTopicType(typeUri);
+        return al.typeStorage.getTopicType(typeUri);
     }
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return pl.fetchTopicAssocs(id);
+        return al.fetchTopicAssocs(id);
     }
 
     // ---
@@ -77,62 +77,62 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     @Override
     final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---
 
     @Override
     final void storeUri() {
-        pl.storeTopicUri(id, uri);
+        al.storeTopicUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        pl.storeTopicTypeUri(id, typeUri);
+        al.storeTopicTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        pl.storeTopicValue(id, value, typeUri, isHtml());
+        al.storeTopicValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        pl.storeTopicProperty(id, propUri, propValue, addToIndex);
+        al.storeTopicProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
     final void removeProperty(String propUri) {
-        pl.removeTopicProperty(id, propUri);
+        al.removeTopicProperty(id, propUri);
     }
 
     // ---
 
     @Override
     final void _delete() {
-        pl._deleteTopic(id);
+        al._deleteTopic(id);
     }
 
     // ---
 
     @Override
     final <M extends DMXObjectModelImpl> M checkReadAccess() {
-        pl.checkTopicReadAccess(id);
+        al.checkTopicReadAccess(id);
         return (M) this;
     }
 
     @Override
     final void checkWriteAccess() {
-        pl.checkTopicWriteAccess(id);
+        al.checkTopicWriteAccess(id);
     }
 
     // ---
@@ -229,7 +229,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
         // remove current assignment
         fetchInstantiation().delete();
         // create new assignment
-        pl.createTopicInstantiation(id, typeUri);
+        al.createTopicInstantiation(id, typeUri);
     }
 
     // Note: this method works only for instances, not for types.

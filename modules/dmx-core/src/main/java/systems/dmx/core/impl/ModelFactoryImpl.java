@@ -44,7 +44,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    PersistenceLayer pl;
+    AccessLayer al;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -226,7 +226,7 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     DMXObjectModelImpl newDMXObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                          ChildTopicsModel childTopics) {
-        return new DMXObjectModelImpl(id, uri, typeUri, value, (ChildTopicsModelImpl) childTopics, pl());
+        return new DMXObjectModelImpl(id, uri, typeUri, value, (ChildTopicsModelImpl) childTopics, al());
     }
 
     DMXObjectModelImpl newDMXObjectModel(JSONObject object) throws JSONException {
@@ -402,17 +402,17 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicPlayerModelImpl newTopicPlayerModel(long topicId, String roleTypeUri) {
-        return new TopicPlayerModelImpl(topicId, roleTypeUri, pl());
+        return new TopicPlayerModelImpl(topicId, roleTypeUri, al());
     }
 
     @Override
     public TopicPlayerModelImpl newTopicPlayerModel(String topicUri, String roleTypeUri) {
-        return new TopicPlayerModelImpl(topicUri, roleTypeUri, pl());
+        return new TopicPlayerModelImpl(topicUri, roleTypeUri, al());
     }
 
     @Override
     public TopicPlayerModelImpl newTopicPlayerModel(long topicId, String topicUri, String roleTypeUri) {
-        return new TopicPlayerModelImpl(topicId, topicUri, roleTypeUri, pl());
+        return new TopicPlayerModelImpl(topicId, topicUri, roleTypeUri, al());
     }
 
     @Override
@@ -437,7 +437,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssocPlayerModelImpl newAssocPlayerModel(long assocId, String roleTypeUri) {
-        return new AssocPlayerModelImpl(assocId, roleTypeUri, pl());
+        return new AssocPlayerModelImpl(assocId, roleTypeUri, al());
     }    
 
     @Override
@@ -787,7 +787,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ViewConfigurationModelImpl newViewConfigurationModel() {
-        return new ViewConfigurationModelImpl(new HashMap(), pl());
+        return new ViewConfigurationModelImpl(new HashMap(), al());
     }    
 
     @Override
@@ -796,7 +796,7 @@ public class ModelFactoryImpl implements ModelFactory {
         for (TopicModel configTopic : configTopics) {
             _configTopics.put(configTopic.getTypeUri(), (TopicModelImpl) configTopic);
         }
-        return new ViewConfigurationModelImpl(_configTopics, pl());
+        return new ViewConfigurationModelImpl(_configTopics, al());
     }    
 
     /**
@@ -812,7 +812,7 @@ public class ModelFactoryImpl implements ModelFactory {
                     _configTopics.put(configTopic.getTypeUri(), configTopic);
                 }
             }
-            return new ViewConfigurationModelImpl(_configTopics, pl());
+            return new ViewConfigurationModelImpl(_configTopics, al());
         } catch (Exception e) {
             throw parsingFailed(configTopics, e, "ViewConfigurationModelImpl");
         }
@@ -906,10 +906,10 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private PersistenceLayer pl() {
-        if (pl == null) {
-            throw new RuntimeException("Before using the ModelFactory a PersistenceLayer must be set");
+    private AccessLayer al() {
+        if (al == null) {
+            throw new RuntimeException("Before using the ModelFactory a AccessLayer must be set");
         }
-        return pl;
+        return al;
     }
 }

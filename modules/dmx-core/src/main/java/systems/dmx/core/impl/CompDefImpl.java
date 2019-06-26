@@ -14,8 +14,8 @@ class CompDefImpl extends AssocImpl implements CompDef {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    CompDefImpl(CompDefModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    CompDefImpl(CompDefModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -73,15 +73,15 @@ class CompDefImpl extends AssocImpl implements CompDef {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        PlayerModel configurable = pl.typeStorage.newCompDefPlayer(getId());   // ### ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
+        PlayerModel configurable = al.typeStorage.newCompDefPlayer(getId());   // ### ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), al);
     }
 
     // ---
 
     @Override
     public void update(CompDefModel updateModel) {
-        model.update((CompDefModelImpl) updateModel);     // ### FIXME: call through pl for access control
+        model.update((CompDefModelImpl) updateModel);     // ### FIXME: call through al for access control
     }
 
     // ---

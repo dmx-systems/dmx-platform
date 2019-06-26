@@ -12,8 +12,8 @@ class TopicTypeImpl extends DMXTypeImpl implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicTypeImpl(TopicTypeModelImpl model, PersistenceLayer pl) {
-        super(model, pl);
+    TopicTypeImpl(TopicTypeModelImpl model, AccessLayer al) {
+        super(model, al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -33,7 +33,7 @@ class TopicTypeImpl extends DMXTypeImpl implements TopicType {
 
     @Override
     public void update(TopicTypeModel updateModel) {
-        model.update((TopicTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
+        model.update((TopicTypeModelImpl) updateModel);     // ### FIXME: call through al for access control
     }
 
 
@@ -42,6 +42,6 @@ class TopicTypeImpl extends DMXTypeImpl implements TopicType {
 
     @Override
     TopicTypeModelImpl _getModel() {
-        return pl._getTopicType(getUri());
+        return al._getTopicType(getUri());
     }
 }

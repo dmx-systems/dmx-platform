@@ -84,9 +84,9 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
             // Note: the resolved topic must be fetched including its child topics.
             // They might be required for label calculation and/or at client-side. ### TODO?
             if (isReferenceById()) {
-                topic = pl.fetchTopic(id);    // .loadChildTopics();  // TODO?
+                topic = al.fetchTopic(id);    // .loadChildTopics();  // TODO?
             } else if (isReferenceByUri()) {
-                topic = pl.fetchTopic("uri", new SimpleValue(uri));
+                topic = al.fetchTopic("uri", new SimpleValue(uri));
                 if (topic == null) {
                     throw new RuntimeException("Topic with URI \"" + uri + "\" not found");
                 }

@@ -27,18 +27,18 @@ class ChildTopicsImpl implements ChildTopics {
 
     private DMXObjectModelImpl parent;      // the parent object this ChildTopics belongs to
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
     private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsImpl(ChildTopicsModelImpl model, DMXObjectModelImpl parent, PersistenceLayer pl) {
+    ChildTopicsImpl(ChildTopicsModelImpl model, DMXObjectModelImpl parent, AccessLayer al) {
         this.model = model;
         this.parent = parent;
-        this.pl = pl;
-        this.mf = pl.mf;
+        this.al = al;
+        this.mf = al.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -380,7 +380,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     private RelatedTopic instantiate(RelatedTopicModel model) {
         try {
-            return new RelatedTopicImpl((RelatedTopicModelImpl) model, pl);
+            return new RelatedTopicImpl((RelatedTopicModelImpl) model, al);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
         }

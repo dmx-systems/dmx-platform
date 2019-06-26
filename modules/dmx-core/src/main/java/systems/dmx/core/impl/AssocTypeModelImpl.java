@@ -53,7 +53,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     AssocTypeImpl instantiate() {
-        return new AssocTypeImpl(clone().filterReadableCompDefs(), pl);
+        return new AssocTypeImpl(clone().filterReadableCompDefs(), al);
     }
 
 
@@ -62,7 +62,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     List<AssocModelImpl> getAllInstances() {
-        return pl.fetchAssocs("typeUri", new SimpleValue(uri));
+        return al.fetchAssocs("typeUri", new SimpleValue(uri));
     }
 
     // ---

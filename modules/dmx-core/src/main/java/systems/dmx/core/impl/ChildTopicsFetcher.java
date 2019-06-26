@@ -13,14 +13,14 @@ class ChildTopicsFetcher {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private PersistenceLayer pl;
+    private AccessLayer al;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsFetcher(PersistenceLayer pl) {
-        this.pl = pl;
+    ChildTopicsFetcher(AccessLayer al) {
+        this.al = al;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -83,7 +83,7 @@ class ChildTopicsFetcher {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel compDef) {
-        return pl.fetchRelatedTopic(
+        return al.fetchRelatedTopic(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",
@@ -92,7 +92,7 @@ class ChildTopicsFetcher {
     }
 
     private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
-        return pl.fetchRelatedTopics(
+        return al.fetchRelatedTopics(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",
