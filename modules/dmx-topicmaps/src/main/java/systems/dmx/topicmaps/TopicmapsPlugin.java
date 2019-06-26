@@ -167,7 +167,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addTopicToTopicmap(@PathParam("id") final long topicmapId,
                                    @PathParam("topic_id") final long topicId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
@@ -191,7 +191,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addAssocToTopicmap(@PathParam("id") final long topicmapId,
                                    @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
@@ -216,7 +216,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("topic_id") final long topicId,
                                           @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {

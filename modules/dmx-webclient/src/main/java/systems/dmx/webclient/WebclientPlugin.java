@@ -42,6 +42,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private boolean hasWebclientLaunched = false;
+    private long time = System.currentTimeMillis();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -54,16 +55,17 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         String webclientUrl = getWebclientUrl();
         //
         if (hasWebclientLaunched == true) {
-            logger.info("### Launching webclient (url=\"" + webclientUrl + "\") SKIPPED -- already launched");
+            logger.info("### Launching DMX Webclient (" + webclientUrl + ") SKIPPED -- already launched");
             return;
         }
         //
         try {
-            logger.info("### Launching webclient (url=\"" + webclientUrl + "\")");
+            logger.info("DMX platform started in " + (System.currentTimeMillis() - time) / 1000f + " sec");
+            logger.info("### Launching DMX Webclient: " + webclientUrl);
             Desktop.getDesktop().browse(new URI(webclientUrl));
             hasWebclientLaunched = true;
         } catch (Exception e) {
-            logger.warning("### Launching webclient failed (" + e + ")");
+            logger.warning("### Launching DMX Webclient failed: " + e);
             logger.warning("### To launch it manually: " + webclientUrl);
         }
     }
@@ -166,7 +168,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     private void _updateTypeCacheAndAddDirective(DMXType type, long compDefId, Topic viewConfigTopic, Directive dir) {
-        logger.info("### Updating view config of type \"" + type.getUri() + "\" (compDefId=" + compDefId + ")");
+        logger.info("### Updating view config of type \"" + type.getUri() + "\", compDefId=" + compDefId);
         updateTypeCache(type.getModel(), compDefId, viewConfigTopic.getModel());
         Directives.get().add(dir, type);        // ### TODO: should be implicit
     }
