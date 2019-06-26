@@ -7,7 +7,6 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.core.storage.spi.DMXStorage;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -79,8 +78,8 @@ class StorageDecorator {
 
     // ---
 
-    final Iterator<TopicModelImpl> fetchAllTopics() {
-        return (Iterator<TopicModelImpl>) storage.fetchAllTopics();
+    final Iterable<TopicModelImpl> fetchAllTopics() {
+        return (Iterable<TopicModelImpl>) storage.fetchAllTopics();
     }
 
     // ---
@@ -220,8 +219,8 @@ class StorageDecorator {
 
     // ---
 
-    final Iterator<AssocModelImpl> fetchAllAssocs() {
-        return (Iterator<AssocModelImpl>) storage.fetchAllAssocs();
+    final Iterable<AssocModelImpl> fetchAllAssocs() {
+        return (Iterable<AssocModelImpl>) storage.fetchAllAssocs();
     }
 
     final List<PlayerModel> fetchPlayerModels(long assocId) {

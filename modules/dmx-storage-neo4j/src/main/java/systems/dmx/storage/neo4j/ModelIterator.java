@@ -72,8 +72,8 @@ abstract class ModelIterable<M extends DMXObjectModel> implements Iterable<M> {
 
     private class ModelIterator implements Iterator<M> {
 
-        Iterator<Node> i = nodes.iterator();
-        Node next = null;       // next matching node; updated by fetchNext()
+        private Iterator<Node> i = nodes.iterator();
+        private Node next;      // next matching node; updated by fetchNext()
 
         @Override
         public boolean hasNext() {

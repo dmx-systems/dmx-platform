@@ -5,47 +5,51 @@ import java.util.Iterator;
 
 
 /**
- * A wrapper iterable that skips unreadables from an underlying DMXObjectModel iterator.
+ * A wrapper iterable that skips unreadables from an underlying DMXObjectModel iterable.
  */
 class ReadableIterable<M extends DMXObjectModelImpl> implements Iterable<M> {
 
-    private Iterator<M> objects;    // underlying iterator
-    private Iterator<M> i;          // wrapper iterator
-    private M next;                 // next readable object; updated by findNext()
+    private Iterable<M> models;     // underlying iterable
 
-    ReadableIterable(Iterator<M> objects) {
-        this.objects = objects;
-        this.i = new Iterator() {
-
-            @Override
-            public boolean hasNext() {
-                findNext();
-                return next != null;
-            }
-
-            @Override
-            public M next() {
-                return next;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
+    ReadableIterable(Iterable<M> models) {
+        this.models = models;
     }
 
     @Override
     public Iterator<M> iterator() {
-        return i;       // FIXME: return new Iterator instance
+        return new ReadableIterator();
     }
 
-    private void findNext() {
-        next = null;
-        while (objects.hasNext() && next == null) {
-            M model = objects.next();
-            if (model.isReadable()) {
-                next = model;
+    // ---------------------------------------------------------------------------------------------------- Nested Class
+
+    private class ReadableIterator implements Iterator<M> {
+
+        private Iterator<M> i = models.iterator();
+        private M next;             // next readable object; updated by findNext()
+
+        @Override
+        public boolean hasNext() {
+            findNext();
+            return next != null;
+        }
+
+        @Override
+        public M next() {
+            return next;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void findNext() {
+            next = null;
+            while (i.hasNext() && next == null) {
+                M model = i.next();
+                if (model.isReadable()) {
+                    next = model;
+                }
             }
         }
     }

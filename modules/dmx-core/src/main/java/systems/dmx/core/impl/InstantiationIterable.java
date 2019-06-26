@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 
 /**
- * A wrapper iterable that instantiates models from an underlying DMXObjectModel iterator.
+ * A wrapper iterable that instantiates models from an underlying DMXObjectModel iterable.
  */
 class InstantiationIterable<O extends DMXObjectImpl, M extends DMXObjectModelImpl> implements Iterable<O> {
 
