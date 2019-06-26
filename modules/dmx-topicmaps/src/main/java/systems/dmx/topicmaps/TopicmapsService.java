@@ -22,7 +22,7 @@ public interface TopicmapsService extends TopicmapsConstants {
     /**
      * @return  the created Topicmap topic.
      */
-    Topic createTopicmap(String name, String topicmapTypeUri, boolean isPrivate);
+    Topic createTopicmap(String name, String topicmapTypeUri);
 
     // ---
 

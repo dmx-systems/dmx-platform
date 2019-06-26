@@ -89,15 +89,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public boolean hasPermission(String username, Operation operation, long objectId) {
         String typeUri = null;
         try {
-            typeUri = getTypeUri(objectId);
-            //
-            // Note: private topicmaps are treated special. The topicmap's workspace assignment doesn't matter here.
-            // Also "operation" doesn't matter as READ/WRITE access is always granted/denied together.
-            if (typeUri.equals("dmx.topicmaps.topicmap") && isTopicmapPrivate(objectId)) {
-                return isCreator(username, objectId);
-            }
-            //
             long workspaceId;
+            typeUri = getTypeUri(objectId);
             if (typeUri.equals("dmx.workspaces.workspace")) {
                 workspaceId = objectId;
             } else {
@@ -110,8 +103,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             //
             return _hasPermission(username, operation, workspaceId);
         } catch (Exception e) {
-            throw new RuntimeException("Checking permission for object " + objectId + " failed (typeUri=\"" + typeUri +
-                "\", " + userInfo(username) + ", operation=" + operation + ")", e);
+            throw new RuntimeException("Checking permission for object " + objectId + " failed, typeUri=\"" + typeUri +
+                "\", " + userInfo(username) + ", operation=" + operation, e);
         }
     }
 
@@ -182,8 +175,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             }
             return usernameTopic.instantiate();
         } catch (Exception e) {
-            throw new RuntimeException("Checking credentials for user \"" + cred.username +
-                "\" failed (usernameTopic=" + usernameTopic + ")", e);
+            throw new RuntimeException("Checking credentials for user \"" + cred.username + "\" failed, " +
+                "usernameTopic=" + usernameTopic, e);
         }
     }
 
@@ -375,8 +368,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public void deleteAssocMapcontext(Assoc assoc) {
         if (!assoc.getTypeUri().equals(TOPICMAP_CONTEXT)) {
-            throw new RuntimeException("Assoc " + assoc.getId() + " not eligible for privileged deletion (" + assoc +
-                ")");
+            throw new RuntimeException("Assoc " + assoc.getId() + " not eligible for privileged deletion, assoc=" +
+                assoc);
         }
         ((AssocImpl) assoc).getModel().delete();
     }
@@ -469,7 +462,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
-                usernameTopic.getSimpleValue() + "\" (usernameTopic=" + usernameTopic + ")");
+                usernameTopic.getSimpleValue() + "\", usernameTopic=" + usernameTopic);
         }
         return userAccount;
     }
@@ -484,7 +477,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
-                userAccount.getSimpleValue() + "\" (userAccount=" + userAccount + ")");
+                userAccount.getSimpleValue() + "\", userAccount=" + userAccount);
         }
         return password;
     }
@@ -552,25 +545,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = getTypeUri(workspaceId);
         if (!typeUri.equals("dmx.workspaces.workspace")) {
-            throw new RuntimeException("Object " + workspaceId + " is not a workspace (but of type \"" + typeUri +
-                "\")");
+            throw new RuntimeException("Object " + workspaceId + " is not a workspace, but a \"" + typeUri + "\"");
         }
-    }
-
-    // ---
-
-    private boolean isTopicmapPrivate(long topicmapId) {
-        TopicModel privateFlag = al.fetchTopicRelatedTopic(topicmapId, "dmx.core.composition", "dmx.core.parent",
-            "dmx.core.child", "dmx.topicmaps.private");
-        if (privateFlag == null) {
-            // Note: migrated topicmaps might not have a Private child topic ### TODO: throw exception?
-            return false;   // treat as non-private
-        }
-        return privateFlag.getSimpleValue().booleanValue();
-    }
-
-    private boolean isCreator(String username, long objectId) {
-        return username != null ? username.equals(getCreator(objectId)) : false;
     }
 
     // ---

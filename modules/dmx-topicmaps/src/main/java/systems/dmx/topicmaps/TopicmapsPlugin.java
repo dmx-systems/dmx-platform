@@ -82,15 +82,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public Topic createTopicmap(@QueryParam("name") String name,
-                                @QueryParam("topicmap_type_uri") String topicmapTypeUri,
-                                @QueryParam("private") boolean isPrivate) {
+                                @QueryParam("topicmap_type_uri") String topicmapTypeUri) {
         try {
-            logger.info("Creating topicmap \"" + name + "\" (topicmapTypeUri=\"" + topicmapTypeUri + "\", isPrivate=" +
-                isPrivate +")");
+            logger.info("Creating topicmap \"" + name + "\", topicmapTypeUri=\"" + topicmapTypeUri + "\"");
             Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
                 .put("dmx.topicmaps.topicmap_name", name)
                 .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
-                .put("dmx.topicmaps.private", isPrivate)
             ));
             // init topicmap state
             ViewProps viewProps = mf.newViewProps();
@@ -100,8 +97,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
             return topicmapTopic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topicmap \"" + name + "\" failed (topicmapTypeUri=\"" +
-                topicmapTypeUri + "\", isPrivate=" + isPrivate +")", e);
+            throw new RuntimeException("Creating topicmap \"" + name + "\" failed, topicmapTypeUri=\"" +
+                topicmapTypeUri + "\"", e);
         }
     }
 
@@ -112,7 +109,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("children") boolean includeChildren) {
         try {
-            logger.info("Fetching topicmap " + topicmapId + " (includeChildren=" + includeChildren + ")");
+            logger.info("Fetching topicmap " + topicmapId + ", includeChildren=" + includeChildren);
             // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
@@ -182,8 +179,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 }
             });
         } catch (Exception e) {
-            throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
+            throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed, " +
+                "viewProps=" + viewProps, e);
         }
     }
 
@@ -206,8 +203,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 }
             });
         } catch (Exception e) {
-            throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
+            throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed, " +
+                "viewProps=" + viewProps, e);
         }
     }
 
@@ -242,7 +239,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             });
         } catch (Exception e) {
             throw new RuntimeException("Adding related topic " + topicId + " (assocId=" + assocId + ") to topicmap " +
-                topicmapId + " failed (viewProps=" + viewProps + ")", e);
+                topicmapId + " failed, viewProps=" + viewProps, e);
         }
     }
 
@@ -318,7 +315,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 _setAssocVisibility(topicmapId, assocId, visibility, assocMapcontext);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Setting visibility of assoc " + assocId + " from topicmap " + topicmapId +
+            throw new RuntimeException("Setting visibility of assoc " + assocId + " in topicmap " + topicmapId +
                 " failed", e);
         }
     }
@@ -372,8 +369,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 .put(PROP_ZOOM, zoom)
                 .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
-            throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed (panX=" + panX +
-                ", panY=" + panY + ", zoom=" + zoom + ")", e);
+            throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed, panX=" + panX +
+                ", panY=" + panY + ", zoom=" + zoom, e);
         }
     }
 
@@ -397,7 +394,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer) {
         logger.info("### Unregistering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
         if (!viewmodelCustomizers.remove(customizer)) {
-            throw new RuntimeException("Unregistering viewmodel customizer failed (customizer=" + customizer + ")");
+            throw new RuntimeException("Unregistering viewmodel customizer failed, customizer=" + customizer);
         }
     }
 
@@ -614,8 +611,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             viewProps.store(fetchTopicMapcontext(topicmapId, topicId));
         } catch (Exception e) {
-            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
+            throw new RuntimeException("Storing view props of topic " + topicId + " failed, viewProps=" + viewProps, e);
         }
     }
 
@@ -626,8 +622,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             viewProps.store(fetchAssocMapcontext(topicmapId, assocId));
         } catch (Exception e) {
-            throw new RuntimeException("Storing view properties of association " + assocId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
+            throw new RuntimeException("Storing view props of assoc " + assocId + " failed, viewProps=" + viewProps, e);
         }
     }
 
@@ -636,7 +631,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Assoc fetchTopicMapcontext(long topicmapId, long topicId) {
         Assoc topicmapContext = getTopicMapcontext(topicmapId, topicId);
         if (topicmapContext == null) {
-            throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
+            throw new RuntimeException("Topic " + topicId + " not contained in topicmap " + topicmapId);
         }
         return topicmapContext;
     }
@@ -644,7 +639,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Assoc fetchAssocMapcontext(long topicmapId, long assocId) {
         Assoc topicmapContext = getAssocMapcontext(topicmapId, assocId);
         if (topicmapContext == null) {
-            throw new RuntimeException("Assoc " + assocId + " is not contained in topicmap " + topicmapId);
+            throw new RuntimeException("Assoc " + assocId + " not contained in topicmap " + topicmapId);
         }
         return topicmapContext;
     }
@@ -686,8 +681,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             customizer.enrichViewProps(topic, viewProps);
         } catch (Exception e) {
-            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed " +
-                "(customizer=\"" + customizer.getClass().getName() + "\")", e);
+            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed, " +
+                "customizer=\"" + customizer.getClass().getName() + "\"", e);
         }
     }
 

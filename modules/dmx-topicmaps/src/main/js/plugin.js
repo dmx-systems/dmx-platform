@@ -83,8 +83,7 @@ export default ({store}) => {
       create: (name, data) => {
         store.dispatch('createTopicmap', {
           name,
-          topicmapTypeUri: data.topicmapTypeUri,
-          isPrivate: false      // TODO
+          topicmapTypeUri: data.topicmapTypeUri
         })
       }
     }],

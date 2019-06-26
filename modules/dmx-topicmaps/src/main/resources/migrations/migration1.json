@@ -19,11 +19,6 @@
       "dataTypeUri": "dmx.core.text"
     },
     {
-      "value":       "Private",                 // TODO: implement in webclient
-      "uri":         "dmx.topicmaps.private",
-      "dataTypeUri": "dmx.core.boolean"
-    },
-    {
       "value":       "Topicmap",
       "uri":         "dmx.topicmaps.topicmap",
       "dataTypeUri": "dmx.core.identity",
@@ -38,10 +33,6 @@
         },
         {
           "childTypeUri":        "dmx.topicmaps.topicmap_type_uri",
-          "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.topicmaps.private",
           "childCardinalityUri": "dmx.core.one"
         }
       ],
