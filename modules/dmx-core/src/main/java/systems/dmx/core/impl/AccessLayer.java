@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *
  * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
  */
-public final class AccessLayer extends StorageDecorator {
+public final class AccessLayer {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -31,6 +31,7 @@ public final class AccessLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    StorageDecorator db;
     TypeStorage typeStorage;
     EventManager em;
     ModelFactoryImpl mf;
@@ -39,11 +40,11 @@ public final class AccessLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AccessLayer(DMXStorage storage) {
-        super(storage);
+    public AccessLayer(DMXStorage db) {
+        this.db = new StorageDecorator(db);
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
-        this.mf = (ModelFactoryImpl) storage.getModelFactory();
+        this.mf = (ModelFactoryImpl) db.getModelFactory();
         this.typeStorage = new TypeStorage(this);
         //
         // Note: this is a constructor side effect. This is a cyclic dependency.
@@ -61,7 +62,7 @@ public final class AccessLayer extends StorageDecorator {
 
     TopicModelImpl getTopic(long topicId) {
         try {
-            return fetchTopic(topicId).checkReadAccess();
+            return db.fetchTopic(topicId).checkReadAccess();
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -69,7 +70,7 @@ public final class AccessLayer extends StorageDecorator {
 
     TopicModelImpl getTopicByUri(String uri) {
         try {
-            TopicModelImpl topic = fetchTopicByUri(uri);
+            TopicModelImpl topic = db.fetchTopicByUri(uri);
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, uri=\"" + uri + "\"", e);
@@ -78,7 +79,7 @@ public final class AccessLayer extends StorageDecorator {
 
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
-            TopicModelImpl topic = fetchTopic(key, value);
+            TopicModelImpl topic = db.fetchTopic(key, value);
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
@@ -87,7 +88,7 @@ public final class AccessLayer extends StorageDecorator {
 
     List<TopicModelImpl> getTopicsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(fetchTopics(key, value));
+            return filterReadables(db.fetchTopics(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -103,7 +104,7 @@ public final class AccessLayer extends StorageDecorator {
 
     List<TopicModelImpl> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return filterReadables(queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return filterReadables(db.queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed, searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\"", e);
@@ -111,7 +112,7 @@ public final class AccessLayer extends StorageDecorator {
     }
 
     Iterable<TopicModelImpl> getAllTopics() {
-        return new ReadableIterable(fetchAllTopics());
+        return new ReadableIterable(db.fetchAllTopics());
     }
 
     // ---
@@ -144,7 +145,7 @@ public final class AccessLayer extends StorageDecorator {
             model.preCreate();
             //
             // 1) store in DB
-            storeTopic(model);
+            db.storeTopic(model);
             if (model.getType().isSimple()) {
                 model.storeSimpleValue();
             }
@@ -174,7 +175,7 @@ public final class AccessLayer extends StorageDecorator {
     void updateTopic(TopicModelImpl updateModel) {
         try {
             updateTopic(
-                fetchTopic(updateModel.getId()),
+                db.fetchTopic(updateModel.getId()),
                 updateModel
             );
         } catch (Exception e) {
@@ -198,7 +199,7 @@ public final class AccessLayer extends StorageDecorator {
      */
     void deleteTopic(long topicId) {
         try {
-            deleteTopic(fetchTopic(topicId));
+            deleteTopic(db.fetchTopic(topicId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching and deleting topic " + topicId + " failed", e);
         }
@@ -219,7 +220,7 @@ public final class AccessLayer extends StorageDecorator {
 
     AssocModelImpl getAssoc(long assocId) {
         try {
-            return fetchAssoc(assocId).checkReadAccess();
+            return db.fetchAssoc(assocId).checkReadAccess();
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc " + assocId + " failed", e);
         }
@@ -227,7 +228,7 @@ public final class AccessLayer extends StorageDecorator {
 
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
-            AssocModelImpl assoc = fetchAssoc(key, value);
+            AssocModelImpl assoc = db.fetchAssoc(key, value);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);
@@ -236,7 +237,7 @@ public final class AccessLayer extends StorageDecorator {
 
     List<AssocModelImpl> getAssocsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(fetchAssocs(key, value));
+            return filterReadables(db.fetchAssocs(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -247,7 +248,7 @@ public final class AccessLayer extends StorageDecorator {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
-            AssocModelImpl assoc = fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            AssocModelImpl assoc = db.fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, " + info, e);
@@ -260,7 +261,7 @@ public final class AccessLayer extends StorageDecorator {
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         try {
             logger.info(info);
-            AssocModelImpl assoc = fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+            AssocModelImpl assoc = db.fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
                 assocRoleTypeUri);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
@@ -292,7 +293,7 @@ public final class AccessLayer extends StorageDecorator {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
-            return filterReadables(fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+            return filterReadables(db.fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs between topics " + topic1Id + " and " + topic2Id +
                 " failed, assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
@@ -303,11 +304,11 @@ public final class AccessLayer extends StorageDecorator {
     // ---
 
     Iterable<AssocModelImpl> getAllAssocs() {
-        return new ReadableIterable(fetchAllAssocs());
+        return new ReadableIterable(db.fetchAllAssocs());
     }
 
     List<PlayerModel> getPlayerModels(long assocId) {
-        return fetchPlayerModels(assocId);
+        return db.fetchPlayerModels(assocId);
     }
 
     // ---
@@ -329,7 +330,7 @@ public final class AccessLayer extends StorageDecorator {
             model.preCreate();
             //
             // 1) store in DB
-            storeAssoc(model);
+            db.storeAssoc(model);
             AssocModelImpl _model = updateValues(model, null);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
             //
@@ -356,7 +357,7 @@ public final class AccessLayer extends StorageDecorator {
 
     void updateAssoc(AssocModelImpl updateModel) {
         try {
-            AssocModelImpl model = fetchAssoc(updateModel.getId());
+            AssocModelImpl model = db.fetchAssoc(updateModel.getId());
             updateAssoc(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
@@ -384,9 +385,9 @@ public final class AccessLayer extends StorageDecorator {
      */
     void deleteAssoc(long assocId) {
         try {
-            deleteAssoc(fetchAssoc(assocId));
+            deleteAssoc(db.fetchAssoc(assocId));
         } catch (IllegalStateException e) {
-            // Note: fetchAssoc() might throw IllegalStateException and is no problem.
+            // Note: db.fetchAssoc() might throw IllegalStateException and is no problem.
             // This happens when the association is deleted already. In this case nothing needs to be performed.
             //
             // Compare to DMXObjectModelImpl.delete()
@@ -421,8 +422,8 @@ public final class AccessLayer extends StorageDecorator {
                 mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicPlayerModel(topicId, "dmx.core.instance")
             );
-            storeAssoc(assoc);   // direct storage calls used here ### explain
-            storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            db.storeAssoc(assoc);   // direct storage calls used here ### explain
+            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
             createAssocInstantiation(assoc.id, assoc.typeUri);
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
@@ -436,8 +437,8 @@ public final class AccessLayer extends StorageDecorator {
                 mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssocPlayerModel(assocId, "dmx.core.instance")
             );
-            storeAssoc(assoc);   // direct storage calls used here ### explain
-            storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            db.storeAssoc(assoc);   // direct storage calls used here ### explain
+            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId + " with association type \"" +
                 assocTypeUri + "\" failed", e);
@@ -531,7 +532,7 @@ public final class AccessLayer extends StorageDecorator {
     void updateTopicType(TopicTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            TopicModelImpl topic = fetchTopic(updateModel.getId());
+            TopicModelImpl topic = db.fetchTopic(updateModel.getId());
             topic.checkWriteAccess();
             _getTopicType(topic.getUri()).update(updateModel);
         } catch (Exception e) {
@@ -542,7 +543,7 @@ public final class AccessLayer extends StorageDecorator {
     void updateAssocType(AssocTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            TopicModelImpl topic = fetchTopic(updateModel.getId());
+            TopicModelImpl topic = db.fetchTopic(updateModel.getId());
             topic.checkWriteAccess();
             _getAssocType(topic.getUri()).update(updateModel);
         } catch (Exception e) {
@@ -612,7 +613,7 @@ public final class AccessLayer extends StorageDecorator {
     // === Generic Object ===
 
     DMXObjectModelImpl getObject(long id) {
-        return fetchObject(id).checkReadAccess();
+        return db.fetchObject(id).checkReadAccess();
     }
 
 
@@ -623,64 +624,64 @@ public final class AccessLayer extends StorageDecorator {
 
     List<RelatedTopicModelImpl> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
     RelatedAssocModelImpl getTopicRelatedAssoc(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = db.fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getTopicAssocs(long topicId) {
-        return filterReadables(fetchTopicAssocs(topicId));
+        return filterReadables(db.fetchTopicAssocs(topicId));
     }
 
     // --- Assoc Source ---
 
     List<RelatedTopicModelImpl> getAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
     RelatedAssocModelImpl getAssocRelatedAssoc(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = db.fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getAssocAssocs(long assocId) {
-        return filterReadables(fetchAssocAssocs(assocId));
+        return filterReadables(db.fetchAssocAssocs(assocId));
     }
 
     // --- Object Source ---
 
     RelatedTopicModelImpl getRelatedTopic(long objectId, String assocTypeUri, String myRoleTypeUri,
                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        RelatedTopicModelImpl topic = fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedTopicModelImpl topic = db.fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
         return topic != null ? topic.checkReadAccess() : null;
     }
 
     List<RelatedTopicModelImpl> getRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
@@ -689,19 +690,19 @@ public final class AccessLayer extends StorageDecorator {
     // === Properties ===
 
     List<TopicModelImpl> getTopicsByProperty(String propUri, Object propValue) {
-        return filterReadables(fetchTopicsByProperty(propUri, propValue));
+        return filterReadables(db.fetchTopicsByProperty(propUri, propValue));
     }
 
     List<TopicModelImpl> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(fetchTopicsByPropertyRange(propUri, from, to));
+        return filterReadables(db.fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     List<AssocModelImpl> getAssocsByProperty(String propUri, Object propValue) {
-        return filterReadables(fetchAssocsByProperty(propUri, propValue));
+        return filterReadables(db.fetchAssocsByProperty(propUri, propValue));
     }
 
     List<AssocModelImpl> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(fetchAssocsByPropertyRange(propUri, from, to));
+        return filterReadables(db.fetchAssocsByPropertyRange(propUri, from, to));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -772,8 +773,8 @@ public final class AccessLayer extends StorageDecorator {
             topicTypeUris.add("dmx.core.assoc_type");
             topicTypeUris.add("dmx.core.meta_type");
             // add regular types
-            for (TopicModelImpl topicType : filterReadables(fetchTopics("typeUri",
-                                                                        new SimpleValue("dmx.core.topic_type")))) {
+            for (TopicModelImpl topicType : filterReadables(db.fetchTopics("typeUri",
+                                                                           new SimpleValue("dmx.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -785,8 +786,8 @@ public final class AccessLayer extends StorageDecorator {
     private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModelImpl assocType : filterReadables(fetchTopics("typeUri",
-                                                                        new SimpleValue("dmx.core.assoc_type")))) {
+            for (TopicModelImpl assocType : filterReadables(db.fetchTopics("typeUri",
+                                                                           new SimpleValue("dmx.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;
@@ -814,7 +815,7 @@ public final class AccessLayer extends StorageDecorator {
     }
 
     private String typeUri(long objectId) {
-        return (String) fetchProperty(objectId, "typeUri");
+        return (String) db.fetchProperty(objectId, "typeUri");
     }
 
     private void bootstrapTypeCache() {

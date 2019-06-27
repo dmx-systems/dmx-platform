@@ -184,7 +184,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return al.fetchAssocAssocs(id);
+        return al.db.fetchAssocAssocs(id);
     }
 
     // ---
@@ -192,49 +192,49 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     @Override
     final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.fetchAssocRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchAssocRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---
 
     @Override
     final void storeUri() {
-        al.storeAssocUri(id, uri);
+        al.db.storeAssocUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        al.storeAssocTypeUri(id, typeUri);
+        al.db.storeAssocTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        al.storeAssocValue(id, value, typeUri, isHtml());
+        al.db.storeAssocValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        al.storeAssocProperty(id, propUri, propValue, addToIndex);
+        al.db.storeAssocProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
     final void removeProperty(String propUri) {
-        al.removeAssocProperty(id, propUri);
+        al.db.removeAssocProperty(id, propUri);
     }
 
     // ---
 
     @Override
     final void _delete() {
-        al._deleteAssoc(id);
+        al.db._deleteAssoc(id);
     }
 
     // ---
@@ -369,7 +369,7 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     void updateRoleTypeUri(PlayerModelImpl player, String roleTypeUri) {
         player.setRoleTypeUri(roleTypeUri);                         // update memory
-        al.storeRoleTypeUri(id, player.id, player.roleTypeUri);     // update DB
+        al.db.storeRoleTypeUri(id, player.id, player.roleTypeUri);     // update DB
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

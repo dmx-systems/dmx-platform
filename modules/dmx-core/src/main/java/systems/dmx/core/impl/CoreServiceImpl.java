@@ -338,12 +338,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getProperty(long id, String propUri) {
-        return al.fetchProperty(id, propUri);
+        return al.db.fetchProperty(id, propUri);
     }
 
     @Override
     public boolean hasProperty(long id, String propUri) {
-        return al.hasProperty(id, propUri);
+        return al.db.hasProperty(id, propUri);
     }
 
     // ---
@@ -378,7 +378,7 @@ public class CoreServiceImpl implements CoreService {
         for (Topic topic : getAllTopics()) {
             if (topic.hasProperty(propUri)) {
                 Object value = topic.getProperty(propUri);
-                al.indexTopicProperty(topic.getId(), propUri, value);
+                al.db.indexTopicProperty(topic.getId(), propUri, value);
                 added++;
             }
             topics++;
@@ -395,7 +395,7 @@ public class CoreServiceImpl implements CoreService {
         for (Assoc assoc : getAllAssocs()) {
             if (assoc.hasProperty(propUri)) {
                 Object value = assoc.getProperty(propUri);
-                al.indexAssocProperty(assoc.getId(), propUri, value);
+                al.db.indexAssocProperty(assoc.getId(), propUri, value);
                 added++;
             }
             assocs++;
@@ -410,7 +410,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public DMXTransaction beginTx() {
-        return al.beginTx();
+        return al.db.beginTx();
     }
 
     // ---
@@ -432,7 +432,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getDatabaseVendorObject() {
-        return al.getDatabaseVendorObject();
+        return al.db.getDatabaseVendorObject();
     }
 
     // ---
@@ -472,7 +472,7 @@ public class CoreServiceImpl implements CoreService {
         DMXTransaction tx = beginTx();
         try {
             logger.info("----- Setting up the database -----");
-            boolean isCleanInstall = al.init();
+            boolean isCleanInstall = al.db.init();
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
@@ -485,7 +485,7 @@ public class CoreServiceImpl implements CoreService {
             // Note: we don't put finish() in a finally clause here because
             // in case of error the database has to be shut down.
             tx.finish();
-            al.shutdown();
+            al.db.shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
     }
@@ -567,8 +567,8 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _createTopic(TopicModelImpl model) {
-        al.storeTopic(model);
-        al.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
+        al.db.storeTopic(model);
+        al.db.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
     }
 
     /**
@@ -580,7 +580,7 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
             mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
         );
-        al.storeAssoc(assoc);
-        al.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
+        al.db.storeAssoc(assoc);
+        al.db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
     }
 }

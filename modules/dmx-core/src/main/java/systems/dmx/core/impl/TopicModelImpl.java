@@ -69,7 +69,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return al.fetchTopicAssocs(id);
+        return al.db.fetchTopicAssocs(id);
     }
 
     // ---
@@ -77,49 +77,49 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     @Override
     final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---
 
     @Override
     final void storeUri() {
-        al.storeTopicUri(id, uri);
+        al.db.storeTopicUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        al.storeTopicTypeUri(id, typeUri);
+        al.db.storeTopicTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        al.storeTopicValue(id, value, typeUri, isHtml());
+        al.db.storeTopicValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        al.storeTopicProperty(id, propUri, propValue, addToIndex);
+        al.db.storeTopicProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
     final void removeProperty(String propUri) {
-        al.removeTopicProperty(id, propUri);
+        al.db.removeTopicProperty(id, propUri);
     }
 
     // ---
 
     @Override
     final void _delete() {
-        al._deleteTopic(id);
+        al.db._deleteTopic(id);
     }
 
     // ---

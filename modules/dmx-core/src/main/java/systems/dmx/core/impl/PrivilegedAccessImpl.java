@@ -222,7 +222,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
                 return false;
             }
             // Note: direct storage access is required here
-            AssocModel membership = al.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
+            AssocModel membership = al.db.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
                 workspaceId, "dmx.core.default", "dmx.core.default");
             return membership != null;
         } catch (Exception e) {
@@ -233,7 +233,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public String getCreator(long objectId) {
-        return al.hasProperty(objectId, PROP_CREATOR) ? (String) al.fetchProperty(objectId, PROP_CREATOR) : null;
+        return al.db.hasProperty(objectId, PROP_CREATOR) ? (String) al.db.fetchProperty(objectId, PROP_CREATOR) : null;
     }
 
 
@@ -317,8 +317,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public long getAssignedWorkspaceId(long objectId) {
         try {
             long workspaceId = -1;
-            if (al.hasProperty(objectId, PROP_WORKSPACE_ID)) {
-                workspaceId = (Long) al.fetchProperty(objectId, PROP_WORKSPACE_ID);
+            if (al.db.hasProperty(objectId, PROP_WORKSPACE_ID)) {
+                workspaceId = (Long) al.db.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
@@ -381,7 +381,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
         try {
-            RelatedTopicModelImpl configTopic = al.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
+            RelatedTopicModelImpl configTopic = al.db.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
                 ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
             if (configTopic == null) {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
@@ -458,7 +458,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModelImpl userAccount = al.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
+        RelatedTopicModelImpl userAccount = al.db.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
             "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
@@ -473,7 +473,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = al.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
+        RelatedTopicModel password = al.db.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
             "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
@@ -534,7 +534,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = al.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
+        TopicModel sharingMode = al.db.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
             "dmx.core.child", "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
@@ -553,15 +553,15 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String getOwner(long workspaceId) {
         // Note: direct storage access is required here
-        if (!al.hasProperty(workspaceId, PROP_OWNER)) {
+        if (!al.db.hasProperty(workspaceId, PROP_OWNER)) {
             throw new RuntimeException("No owner is assigned to workspace " + workspaceId);
         }
-        return (String) al.fetchProperty(workspaceId, PROP_OWNER);
+        return (String) al.db.fetchProperty(workspaceId, PROP_OWNER);
     }
 
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
-        return (String) al.fetchProperty(objectId, "typeUri");
+        return (String) al.db.fetchProperty(objectId, "typeUri");
     }
 
     // ---
@@ -614,7 +614,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
     private TopicModelImpl fetchTopic(String key, Object value) {
-        return al.fetchTopic(key, new SimpleValue(value));
+        return al.db.fetchTopic(key, new SimpleValue(value));
     }
 
     /**
@@ -623,7 +623,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  a list, possibly empty.
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
-        return al.queryTopics(key, new SimpleValue(value));
+        return al.db.queryTopics(key, new SimpleValue(value));
     }
 
     /**
@@ -634,7 +634,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      */
     private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
         List<TopicModelImpl> topics = new ArrayList();
-        for (TopicModelImpl topic : al.fetchTopicsByProperty(PROP_OWNER, username)) {
+        for (TopicModelImpl topic : al.db.fetchTopicsByProperty(PROP_OWNER, username)) {
             if (topic.getTypeUri().equals(typeUri)) {
                 topics.add(topic);
             }
