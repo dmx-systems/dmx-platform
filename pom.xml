@@ -217,12 +217,6 @@
                 <version>4.10</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>3.1</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -230,10 +224,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
         </dependency>
     </dependencies>
 
@@ -331,7 +321,6 @@
                 <!-- We don't want to build the distribution with every reactor build. -->
                 <!-- To build the distribution use "mvn clean install -P dist".        -->
                 <module>modules/dmx-hot-deploy</module>
-                <module>modules/dmx-module</module>
                 <module>modules/dmx-plugin</module>
                 <module>modules/dmx-provision</module>
             </modules>
@@ -419,7 +408,6 @@
                 <module>modules/dmx-test</module>
                 <!-- POM projects -->
                 <module>modules/dmx-hot-deploy</module>
-                <module>modules/dmx-module</module>
                 <module>modules/dmx-plugin</module>
                 <module>modules/dmx-provision</module>
                 <module>modules/dmx-distribution</module>

@@ -65,7 +65,7 @@ class PluginManager {
             addToActivatedPlugins(plugin);
             //
             if (checkAllPluginsActivated()) {
-                logger.info("########## All Plugins Active ##########");
+                logger.info("########## All DMX plugins active ##########");
                 dmx.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
             }
         } else {

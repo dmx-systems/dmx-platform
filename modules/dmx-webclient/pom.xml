@@ -33,7 +33,9 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>systems.dmx.webclient.WebclientPlugin</Bundle-Activator>
+                        <Bundle-Activator>
+                            systems.dmx.webclient.WebclientPlugin
+                        </Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>

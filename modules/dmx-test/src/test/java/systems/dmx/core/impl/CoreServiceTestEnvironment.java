@@ -7,7 +7,6 @@ import systems.dmx.core.util.JavaUtils;
 import org.junit.After;
 import org.junit.Before;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 
@@ -31,9 +30,8 @@ public class CoreServiceTestEnvironment {
 
     @Before
     public void setup() {
-        File dbPath = JavaUtils.createTempDirectory("dmx-test-");
         mf = new ModelFactoryImpl();
-        db = CoreActivator.openDB(DATABASE_FACTORY, dbPath.getAbsolutePath());
+        db = CoreActivator.openDB(DATABASE_FACTORY, JavaUtils.createTempDirectory("dmx-test-").getAbsolutePath());
         dmx = new CoreServiceImpl(new AccessLayer(db), null);     // bundleContext=null
     }
 

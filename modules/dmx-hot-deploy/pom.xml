@@ -11,10 +11,8 @@
     <packaging>pom</packaging>
 
     <description>
-        DMX modules and plugins (= OSGi bundles) derive the hot deployment feature from this parent POM.
-        Once a DMX module or plugin is build it is copied to the `bundle-deploy` directory.
-
-        Bundle fragmemts can be build by directly deriving from this POM.
+        Parent POM for all OSGI bundle (fragment) projects that want to be hot deployed.
+        Hot deployment is realized by copying the build artifact to the `bundle-deploy` directory.
     </description>
 
     <parent>
