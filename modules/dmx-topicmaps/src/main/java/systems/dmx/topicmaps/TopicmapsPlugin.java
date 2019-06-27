@@ -82,17 +82,17 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public Topic createTopicmap(@QueryParam("name") String name,
-                                @QueryParam("topicmap_type_uri") String topicmapTypeUri) {
+                                @QueryParam("topicmap_type_uri") String topicmapTypeUri,
+                                ViewProps viewProps) {
         try {
-            logger.info("Creating topicmap \"" + name + "\", topicmapTypeUri=\"" + topicmapTypeUri + "\"");
+            logger.info("Creating topicmap \"" + name + "\", topicmapTypeUri=\"" + topicmapTypeUri + "\", viewProps=" +
+                viewProps);
             Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
                 .put("dmx.topicmaps.topicmap_name", name)
                 .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
             ));
             // init topicmap state
-            ViewProps viewProps = mf.newViewProps();
-            getTopicmapType(topicmapTypeUri).initTopicmapState(viewProps);
-            viewProps.store(topicmapTopic);
+            getTopicmapType(topicmapTypeUri).initTopicmapState(topicmapTopic, viewProps, dmx);
             //
             me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
             return topicmapTopic;
