@@ -29,7 +29,7 @@ public class CoreServiceTestEnvironment {
 
     protected Logger logger = Logger.getLogger(getClass().getName());
 
-    private DMXStorage storage;
+    private DMXStorage db;
     private File dbPath;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -38,29 +38,33 @@ public class CoreServiceTestEnvironment {
     public void setup() {
         dbPath = JavaUtils.createTempDirectory("dmx-test-");
         mf = new ModelFactoryImpl();
-        storage = openDB(dbPath.getAbsolutePath());
-        dmx = new CoreServiceImpl(new AccessLayer(storage), null);     // bundleContext=null
+        db = openDB(dbPath.getAbsolutePath());
+        dmx = new CoreServiceImpl(new AccessLayer(db), null);     // bundleContext=null
     }
 
     @After
     public void shutdown() {
-        if (storage != null) {
-            storage.shutdown();
+        if (db != null) {
+            logger.info("### Shutting down the database");
+            db.shutdown();
         }
         dmx.shutdown();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // copy in CoreActivator (dmx-core)
     private DMXStorage openDB(String databasePath) {
         try {
-            logger.info("Instantiating the storage layer\n    databasePath=\"" + databasePath +
-                "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
+            logger.info("##### Opening the database #####\n  databaseFactory=\"" + DATABASE_FACTORY +
+                "\"\n  databasePath=\"" + databasePath + "\"");
             DMXStorageFactory factory = (DMXStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
-            return factory.newDMXStorage(databasePath, mf);
+            DMXStorage db = factory.newDMXStorage(databasePath, mf);
+            logger.info("### Database opened successfully");
+            return db;
         } catch (Exception e) {
-            throw new RuntimeException("Instantiating the storage layer failed (databasePath=\"" + databasePath +
-                "\", databaseFactory=\"" + DATABASE_FACTORY + "\"", e);
+            throw new RuntimeException("Opening the database failed, databaseFactory=\"" + DATABASE_FACTORY +
+                "\", databasePath=\"" + databasePath + "\"", e);
         }
     }
 }

@@ -12,12 +12,19 @@
 
     <parent>
         <groupId>systems.dmx</groupId>
-        <artifactId>dmx-plugin</artifactId>
+        <artifactId>dmx-hot-deploy</artifactId>
         <version>5.0-beta-4-SNAPSHOT</version>
-        <relativePath>../dmx-plugin/pom.xml</relativePath>
+        <relativePath>../dmx-hot-deploy/pom.xml</relativePath>
     </parent>
 
     <dependencies>
+        <!-- DMX Core -->
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-core</artifactId>
+            <version>5.0-beta-4-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Neo4j -->
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -51,9 +58,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>
-                            systems.dmx.storage.neo4j.Neo4jStorageActivator
-                        </Bundle-Activator>
+                        <Fragment-Host>systems.dmx.core</Fragment-Host>
                         <Import-Package>
                             !ch.qos.logback.*, !org.slf4j.*, !com.sun.*, !sun.misc.*, *
                         </Import-Package>

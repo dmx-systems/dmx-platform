@@ -100,7 +100,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
     void shutdown() {
         try {
             if (server != null) {
-                logger.info("##### Stopping Jetty WebSocket server #####");
+                logger.info("### Stopping Jetty WebSocket server");
                 worker.interrupt();
                 server.stop();
             } else {

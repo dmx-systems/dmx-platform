@@ -6,6 +6,7 @@ import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
+import systems.dmx.core.storage.spi.DMXStorageFactory;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -20,15 +21,24 @@ import java.util.logging.Logger;
 
 public class CoreActivator implements BundleActivator {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String DATABASE_FACTORY = "systems.dmx.storage.neo4j.Neo4jStorageFactory";
+
+    private static final String DATABASE_PATH = System.getProperty("dmx.database.path", "dmx-db");
+    // Note: the default value is required in case no config file is in effect. This applies when DM is started
+    // via feature:install from Karaf. The default value must match the value defined in project POM.
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private static BundleContext bundleContext;
 
-    // consumed services
-    private DMXStorage storageService;
+    private DMXStorage db;
+    private static ModelFactory mf = new ModelFactoryImpl();    // FIXME: instantiate along with db?
+
+    // consumed service
     private static HttpService httpService;
 
-    private ServiceTracker storageServiceTracker;
     private ServiceTracker httpServiceTracker;
 
     // provided service
@@ -52,9 +62,8 @@ public class CoreActivator implements BundleActivator {
             logger.info("========== Starting \"DMX Core\" ==========");
             this.bundleContext = bundleContext;
             //
-            registerModelFactory();
+            db = openDB(DATABASE_PATH);
             //
-            (storageServiceTracker = createServiceTracker(DMXStorage.class)).open();
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while starting \"DMX Core\":", e);
@@ -68,14 +77,15 @@ public class CoreActivator implements BundleActivator {
     public void stop(BundleContext bundleContext) {
         try {
             logger.info("========== Stopping \"DMX Core\" ==========");
-            storageServiceTracker.close();
             httpServiceTracker.close();
             //
             if (dmx != null) {
                 dmx.shutdown();
             }
-            // Note: we do not shutdown the DB here.
-            // The DB shuts down itself through the storage bundle's stop() method.
+            if (db != null) {
+                logger.info("### Shutting down the database");
+                db.shutdown();
+            }
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while stopping \"DMX Core\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
@@ -90,7 +100,7 @@ public class CoreActivator implements BundleActivator {
     }
 
     public static ModelFactory getModelFactory() {
-        return getService(ModelFactory.class);
+        return mf;
     }
 
     public static HttpService getHttpService() {
@@ -111,9 +121,19 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void registerModelFactory() {
-        logger.info("Registering ModelFactory service at OSGi framework");
-        bundleContext.registerService(ModelFactory.class.getName(), new ModelFactoryImpl(), null);
+    // copy in CoreServiceTestEnvironment (dmx-test)
+    private DMXStorage openDB(String databasePath) {
+        try {
+            logger.info("##### Opening the database #####\n  databaseFactory=\"" + DATABASE_FACTORY +
+                "\"\n  databasePath=\"" + databasePath + "\"");
+            DMXStorageFactory factory = (DMXStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
+            DMXStorage db = factory.newDMXStorage(databasePath, mf);
+            logger.info("### Database opened successfully");
+            return db;
+        } catch (Exception e) {
+            throw new RuntimeException("Opening the database failed, databaseFactory=\"" + DATABASE_FACTORY +
+                "\", databasePath=\"" + databasePath + "\"", e);
+        }
     }
 
     // ---
@@ -155,11 +175,7 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     private void addService(Object service) {
-        if (service instanceof DMXStorage) {
-            logger.info("Adding storage service to DMX Core");
-            storageService = (DMXStorage) service;
-            checkRequirementsForActivation();
-        } else if (service instanceof HttpService) {
+        if (service instanceof HttpService) {
             logger.info("Adding HTTP service to DMX Core");
             httpService = (HttpService) service;
             checkRequirementsForActivation();
@@ -167,10 +183,7 @@ public class CoreActivator implements BundleActivator {
     }
 
     private void removeService(Object service) {
-        if (service == storageService) {
-            logger.info("Removing storage service from DMX Core");
-            storageService = null;
-        } else if (service == httpService) {
+        if (service == httpService) {
             logger.info("Removing HTTP service from DMX Core");
             httpService = null;
         }
@@ -179,8 +192,8 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     private void checkRequirementsForActivation() {
-        if (storageService != null && httpService != null) {
-            dmx = new CoreServiceImpl(new AccessLayer(storageService), bundleContext);
+        if (httpService != null) {
+            dmx = new CoreServiceImpl(new AccessLayer(db), bundleContext);
             //
             logger.info("Registering DMX core service at OSGi framework");
             bundleContext.registerService(CoreService.class.getName(), dmx, null);
