@@ -23,6 +23,7 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    // TODO: make it a config prop
     private static final String DATABASE_FACTORY = "systems.dmx.storage.neo4j.Neo4jStorageFactory";
 
     private static final String DATABASE_PATH = System.getProperty("dmx.database.path", "dmx-db");
@@ -38,13 +39,12 @@ public class CoreActivator implements BundleActivator {
 
     // consumed service
     private static HttpService httpService;
-
     private ServiceTracker httpServiceTracker;
 
     // provided service
     private CoreServiceImpl dmx;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static Logger logger = Logger.getLogger(CoreActivator.class.getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -62,7 +62,7 @@ public class CoreActivator implements BundleActivator {
             logger.info("========== Starting \"DMX Core\" ==========");
             this.bundleContext = bundleContext;
             //
-            db = openDB(DATABASE_PATH);
+            db = openDB(DATABASE_FACTORY, DATABASE_PATH);
             //
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
@@ -79,6 +79,7 @@ public class CoreActivator implements BundleActivator {
             logger.info("========== Stopping \"DMX Core\" ==========");
             httpServiceTracker.close();
             //
+            // copy in CoreServiceTestEnvironment.shutdown()
             if (dmx != null) {
                 dmx.shutdown();
             }
@@ -117,26 +118,23 @@ public class CoreActivator implements BundleActivator {
         return serviceObject;
     }
 
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // copy in CoreServiceTestEnvironment (dmx-test)
-    private DMXStorage openDB(String databasePath) {
+    public static DMXStorage openDB(String databaseFactory, String databasePath) {
         try {
-            logger.info("##### Opening the database #####\n  databaseFactory=\"" + DATABASE_FACTORY +
-                "\"\n  databasePath=\"" + databasePath + "\"");
-            DMXStorageFactory factory = (DMXStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
+            logger.info("##### Opening the database\n  databaseFactory=\"" + databaseFactory + "\"\n  databasePath=\"" +
+                databasePath + "\"");
+            DMXStorageFactory factory = (DMXStorageFactory) Class.forName(databaseFactory).newInstance();
             DMXStorage db = factory.newDMXStorage(databasePath, mf);
-            logger.info("### Database opened successfully");
+            logger.info("Database opened successfully");
             return db;
         } catch (Exception e) {
-            throw new RuntimeException("Opening the database failed, databaseFactory=\"" + DATABASE_FACTORY +
+            throw new RuntimeException("Opening the database failed, databaseFactory=\"" + databaseFactory +
                 "\", databasePath=\"" + databasePath + "\"", e);
         }
     }
 
-    // ---
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
     private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //

@@ -1,11 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.util.JavaUtils;
-
-import systems.dmx.core.service.CoreService;
-import systems.dmx.core.service.ModelFactory;
+import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.storage.spi.DMXStorage;
-import systems.dmx.core.storage.spi.DMXStorageFactory;
+import systems.dmx.core.util.JavaUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,48 +20,32 @@ public class CoreServiceTestEnvironment {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // providing the test subclasses access to the core service and logger
-    protected CoreServiceImpl dmx;
-    protected ModelFactoryImpl mf;
-
-    protected Logger logger = Logger.getLogger(getClass().getName());
+    protected CoreServiceImpl dmx;      // accessed by test subclasses
+    protected ModelFactoryImpl mf;      // accessed by test subclasses
 
     private DMXStorage db;
-    private File dbPath;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Before
     public void setup() {
-        dbPath = JavaUtils.createTempDirectory("dmx-test-");
+        File dbPath = JavaUtils.createTempDirectory("dmx-test-");
         mf = new ModelFactoryImpl();
-        db = openDB(dbPath.getAbsolutePath());
+        db = CoreActivator.openDB(DATABASE_FACTORY, dbPath.getAbsolutePath());
         dmx = new CoreServiceImpl(new AccessLayer(db), null);     // bundleContext=null
     }
 
     @After
     public void shutdown() {
+        // copy in CoreActivator.stop()
+        if (dmx != null) {
+            dmx.shutdown();
+        }
         if (db != null) {
             logger.info("### Shutting down the database");
             db.shutdown();
-        }
-        dmx.shutdown();
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // copy in CoreActivator (dmx-core)
-    private DMXStorage openDB(String databasePath) {
-        try {
-            logger.info("##### Opening the database #####\n  databaseFactory=\"" + DATABASE_FACTORY +
-                "\"\n  databasePath=\"" + databasePath + "\"");
-            DMXStorageFactory factory = (DMXStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
-            DMXStorage db = factory.newDMXStorage(databasePath, mf);
-            logger.info("### Database opened successfully");
-            return db;
-        } catch (Exception e) {
-            throw new RuntimeException("Opening the database failed, databaseFactory=\"" + DATABASE_FACTORY +
-                "\", databasePath=\"" + databasePath + "\"", e);
         }
     }
 }

@@ -86,12 +86,12 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     private void init() {
         try {
-            logger.info("##### Starting Jetty WebSocket server #####");
+            logger.info("##### Starting Jetty WebSocket server");
             server = new WebSocketsServer(WEBSOCKETS_PORT);
             server.start();
             worker.start();
             // ### server.join();
-            logger.info("### Jetty WebSocket server started successfully");
+            logger.info("Jetty WebSocket server started successfully");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Starting Jetty WebSocket server failed", e);
         }

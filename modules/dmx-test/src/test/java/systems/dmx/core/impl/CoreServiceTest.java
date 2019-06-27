@@ -65,7 +65,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         TopicType topicType = dmx.getTopicType("dmx.core.plugin");
         assertEquals("dmx.core.plugin",     topicType.getUri());
         assertEquals("dmx.core.topic_type", topicType.getTypeUri());
-        assertEquals("dmx.core.composite",  topicType.getDataTypeUri());
+        assertEquals("dmx.core.identity",   topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getCompDefs().size());
         CompDef compDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
         assertEquals("dmx.core.composition_def",     compDef.getTypeUri());
