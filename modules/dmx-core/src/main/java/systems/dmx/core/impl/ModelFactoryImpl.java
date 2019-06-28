@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: should methods return model *impl* objects? -> Yes!
+// Note: instantiated by CoreActivator
 public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants

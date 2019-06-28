@@ -368,8 +368,8 @@ class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     // ---
 
     void updateRoleTypeUri(PlayerModelImpl player, String roleTypeUri) {
-        player.setRoleTypeUri(roleTypeUri);                         // update memory
-        al.db.storeRoleTypeUri(id, player.id, player.roleTypeUri);     // update DB
+        player.setRoleTypeUri(roleTypeUri);                             // update memory
+        al.db.storeRoleTypeUri(id, player.id, player.roleTypeUri);      // update DB
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

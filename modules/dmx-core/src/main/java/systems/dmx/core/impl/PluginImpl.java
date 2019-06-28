@@ -390,7 +390,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
                         " to " + pluginContext + ":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown through the OSGi container it would not print out the stacktrace.
+                    // If thrown against OSGi container it would not print out the stacktrace.
                 }
                 return service;
             }
@@ -404,7 +404,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
                         " from " + pluginContext + ":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown through the OSGi container it would not print out the stacktrace.
+                    // If thrown against OSGi container it would not print out the stacktrace.
                 }
             }
         };
@@ -943,7 +943,7 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.log(Level.SEVERE, "An error occurred while handling PLUGIN_ACTIVATED event from \"" + pluginUri +
                 "\" for " + this + ":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown through the OSGi container it would not print out the stacktrace.
+            // If thrown against OSGi container it would not print out the stacktrace.
         }
     }
 
