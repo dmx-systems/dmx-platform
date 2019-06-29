@@ -202,7 +202,7 @@ class ValueIntegrator {
         // Note: in order to be reused a topic must be readable. If an unreadable topic exists the persistence layer
         // must not throw AccessControlException as this would abort value integration. Instead we do direct DB access
         // and check for readability explicitly.
-        TopicModelImpl topic = al.db.fetchTopic(type.getUri(), newValue);
+        TopicModelImpl topic = al.db.fetchTopic(type.getUri(), newValue.value());
         if (topic != null && topic.isReadable()) {
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {

@@ -97,7 +97,7 @@ class TypeStorage {
             endlessRecursionDetection.check(topicTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = al.db.fetchTopic("uri", new SimpleValue(topicTypeUri));
+            TopicModelImpl typeTopic = al.db.fetchTopic("uri", topicTypeUri);
             checkTopicType(topicTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -128,7 +128,7 @@ class TypeStorage {
             endlessRecursionDetection.check(assocTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = al.db.fetchTopic("uri", new SimpleValue(assocTypeUri));
+            TopicModelImpl typeTopic = al.db.fetchTopic("uri", assocTypeUri);
             checkAssocType(assocTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -203,7 +203,7 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = al.db.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
+            RelatedTopicModel dataType = al.sd.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
                 "dmx.core.default", "dmx.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic associated to " + className + " \"" + typeUri + "\"");
@@ -500,7 +500,7 @@ class TypeStorage {
         if (cardinality != null) {
             return cardinality;
         } else {
-            return mf.newRelatedTopicModel(al.db.fetchTopic("uri", new SimpleValue("dmx.core.one")));  // ### FIXME
+            return mf.newRelatedTopicModel(al.db.fetchTopic("uri", "dmx.core.one"));    // ### FIXME
         }
     }
 
@@ -535,17 +535,17 @@ class TypeStorage {
     // ---
 
     private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
-        return al.db.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
+        return al.sd.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
-        return al.db.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
+        return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
             "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
-        return al.db.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
+        return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
             "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
@@ -658,7 +658,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
+            return viewConfigModel(al.sd.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
@@ -667,7 +667,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
+            return viewConfigModel(al.sd.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);

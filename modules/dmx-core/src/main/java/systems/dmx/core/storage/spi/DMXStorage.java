@@ -20,9 +20,21 @@ public interface DMXStorage {
 
     // === Topics ===
 
+    /**
+     * @return  The fetched topic.
+     *          Note: its child topics are not fetched.
+     */
     TopicModelImpl fetchTopic(long topicId);
 
-    TopicModel fetchTopic(String key, Object value);
+    /**
+     * Looks up a single topic by exact value.
+     *
+     * @return  The fetched topic, or <code>null</code> if no such topic exists.
+     *          Note: its child topics are not fetched.
+     *
+     * @throws  RuntimeException    if more than one topic is found.
+     */
+    TopicModelImpl fetchTopic(String key, Object value);
 
     List<? extends TopicModel> fetchTopics(String key, Object value);
 

@@ -83,7 +83,7 @@ class ChildTopicsFetcher {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel compDef) {
-        return al.db.fetchRelatedTopic(
+        return al.sd.fetchRelatedTopic(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",
@@ -92,7 +92,7 @@ class ChildTopicsFetcher {
     }
 
     private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
-        return al.db.fetchRelatedTopics(
+        return al.sd.fetchRelatedTopics(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",

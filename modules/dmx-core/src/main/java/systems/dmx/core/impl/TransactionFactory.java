@@ -74,7 +74,7 @@ class TransactionFactory implements ResourceFilterFactory {
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
                     logger.fine("### Begining transaction of " + info(method));
-                    DMXTransaction tx = al.db.beginTx();
+                    DMXTransaction tx = al.sd.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
                 }

@@ -126,7 +126,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public TopicModel fetchTopic(String key, Object value) {
+    public TopicModelImpl fetchTopic(String key, Object value) {
         try {
             Node node = topicContentExact.get(key, value).getSingle();
             return node != null ? buildTopic(node) : null;

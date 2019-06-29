@@ -38,30 +38,6 @@ class StorageDecorator {
 
     // === Topics ===
 
-    /**
-     * @return  The fetched topic.
-     *          Note: its child topics are not fetched.
-     */
-    final TopicModelImpl fetchTopic(long topicId) {
-        return storage.fetchTopic(topicId);
-    }
-
-    final TopicModelImpl fetchTopicByUri(String uri) {
-        return fetchTopic("uri", new SimpleValue(uri));
-    }
-
-    /**
-     * Looks up a single topic by exact value.
-     *
-     * @return  The fetched topic, or <code>null</code> if no such topic exists.
-     *          Note: its child topics are not fetched.
-     *
-     * @throws  RuntimeException    if more than one topic is found.
-     */
-    final TopicModelImpl fetchTopic(String key, SimpleValue value) {
-        return (TopicModelImpl) storage.fetchTopic(key, value.value());
-    }
-
     final List<TopicModelImpl> fetchTopics(String key, SimpleValue value) {
         return (List<TopicModelImpl>) storage.fetchTopics(key, value.value());
     }

@@ -31,7 +31,8 @@ public final class AccessLayer {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    StorageDecorator db;
+    StorageDecorator sd;    // TODO: drop
+    DMXStorage db;
     TypeStorage typeStorage;
     EventManager em;
     ModelFactoryImpl mf;
@@ -41,7 +42,8 @@ public final class AccessLayer {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public AccessLayer(DMXStorage db) {
-        this.db = new StorageDecorator(db);
+        this.db = db;
+        this.sd = new StorageDecorator(db);
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) db.getModelFactory();
@@ -70,7 +72,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByUri(String uri) {
         try {
-            TopicModelImpl topic = db.fetchTopicByUri(uri);
+            TopicModelImpl topic = db.fetchTopic("uri", uri);
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, uri=\"" + uri + "\"", e);
@@ -79,7 +81,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
-            TopicModelImpl topic = db.fetchTopic(key, value);
+            TopicModelImpl topic = db.fetchTopic(key, value.value());
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
@@ -88,7 +90,7 @@ public final class AccessLayer {
 
     List<TopicModelImpl> getTopicsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(db.fetchTopics(key, value));
+            return filterReadables(sd.fetchTopics(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -104,7 +106,7 @@ public final class AccessLayer {
 
     List<TopicModelImpl> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return filterReadables(db.queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return filterReadables(sd.queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed, searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\"", e);
@@ -112,7 +114,7 @@ public final class AccessLayer {
     }
 
     Iterable<TopicModelImpl> getAllTopics() {
-        return new ReadableIterable(db.fetchAllTopics());
+        return new ReadableIterable(sd.fetchAllTopics());
     }
 
     // ---
@@ -145,7 +147,7 @@ public final class AccessLayer {
             model.preCreate();
             //
             // 1) store in DB
-            db.storeTopic(model);
+            sd.storeTopic(model);
             if (model.getType().isSimple()) {
                 model.storeSimpleValue();
             }
@@ -220,7 +222,7 @@ public final class AccessLayer {
 
     AssocModelImpl getAssoc(long assocId) {
         try {
-            return db.fetchAssoc(assocId).checkReadAccess();
+            return sd.fetchAssoc(assocId).checkReadAccess();
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc " + assocId + " failed", e);
         }
@@ -228,7 +230,7 @@ public final class AccessLayer {
 
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
-            AssocModelImpl assoc = db.fetchAssoc(key, value);
+            AssocModelImpl assoc = sd.fetchAssoc(key, value);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);
@@ -237,7 +239,7 @@ public final class AccessLayer {
 
     List<AssocModelImpl> getAssocsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(db.fetchAssocs(key, value));
+            return filterReadables(sd.fetchAssocs(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -248,7 +250,7 @@ public final class AccessLayer {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
-            AssocModelImpl assoc = db.fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            AssocModelImpl assoc = sd.fetchAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, " + info, e);
@@ -261,7 +263,7 @@ public final class AccessLayer {
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         try {
             logger.info(info);
-            AssocModelImpl assoc = db.fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+            AssocModelImpl assoc = sd.fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
                 assocRoleTypeUri);
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
@@ -293,7 +295,7 @@ public final class AccessLayer {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
-            return filterReadables(db.fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+            return filterReadables(sd.fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs between topics " + topic1Id + " and " + topic2Id +
                 " failed, assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
@@ -304,11 +306,11 @@ public final class AccessLayer {
     // ---
 
     Iterable<AssocModelImpl> getAllAssocs() {
-        return new ReadableIterable(db.fetchAllAssocs());
+        return new ReadableIterable(sd.fetchAllAssocs());
     }
 
     List<PlayerModel> getPlayerModels(long assocId) {
-        return db.fetchPlayerModels(assocId);
+        return sd.fetchPlayerModels(assocId);
     }
 
     // ---
@@ -330,7 +332,7 @@ public final class AccessLayer {
             model.preCreate();
             //
             // 1) store in DB
-            db.storeAssoc(model);
+            sd.storeAssoc(model);
             AssocModelImpl _model = updateValues(model, null);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
             //
@@ -357,7 +359,7 @@ public final class AccessLayer {
 
     void updateAssoc(AssocModelImpl updateModel) {
         try {
-            AssocModelImpl model = db.fetchAssoc(updateModel.getId());
+            AssocModelImpl model = sd.fetchAssoc(updateModel.getId());
             updateAssoc(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
@@ -385,7 +387,7 @@ public final class AccessLayer {
      */
     void deleteAssoc(long assocId) {
         try {
-            deleteAssoc(db.fetchAssoc(assocId));
+            deleteAssoc(sd.fetchAssoc(assocId));
         } catch (IllegalStateException e) {
             // Note: db.fetchAssoc() might throw IllegalStateException and is no problem.
             // This happens when the association is deleted already. In this case nothing needs to be performed.
@@ -422,8 +424,8 @@ public final class AccessLayer {
                 mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicPlayerModel(topicId, "dmx.core.instance")
             );
-            db.storeAssoc(assoc);   // direct storage calls used here ### explain
-            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            sd.storeAssoc(assoc);   // direct storage calls used here ### explain
+            sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
             createAssocInstantiation(assoc.id, assoc.typeUri);
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
@@ -437,8 +439,8 @@ public final class AccessLayer {
                 mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssocPlayerModel(assocId, "dmx.core.instance")
             );
-            db.storeAssoc(assoc);   // direct storage calls used here ### explain
-            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            sd.storeAssoc(assoc);   // direct storage calls used here ### explain
+            sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId + " with association type \"" +
                 assocTypeUri + "\" failed", e);
@@ -613,7 +615,7 @@ public final class AccessLayer {
     // === Generic Object ===
 
     DMXObjectModelImpl getObject(long id) {
-        return db.fetchObject(id).checkReadAccess();
+        return sd.fetchObject(id).checkReadAccess();
     }
 
 
@@ -624,64 +626,64 @@ public final class AccessLayer {
 
     List<RelatedTopicModelImpl> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(db.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(sd.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
     RelatedAssocModelImpl getTopicRelatedAssoc(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = db.fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = sd.fetchTopicRelatedAssoc(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(db.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(sd.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getTopicAssocs(long topicId) {
-        return filterReadables(db.fetchTopicAssocs(topicId));
+        return filterReadables(sd.fetchTopicAssocs(topicId));
     }
 
     // --- Assoc Source ---
 
     List<RelatedTopicModelImpl> getAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(db.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(sd.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
     RelatedAssocModelImpl getAssocRelatedAssoc(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssocModelImpl assoc = db.fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedAssocModelImpl assoc = sd.fetchAssocRelatedAssoc(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
         return assoc != null ? assoc.checkReadAccess() : null;
     }
 
     List<RelatedAssocModelImpl> getAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(db.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(sd.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getAssocAssocs(long assocId) {
-        return filterReadables(db.fetchAssocAssocs(assocId));
+        return filterReadables(sd.fetchAssocAssocs(assocId));
     }
 
     // --- Object Source ---
 
     RelatedTopicModelImpl getRelatedTopic(long objectId, String assocTypeUri, String myRoleTypeUri,
                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        RelatedTopicModelImpl topic = db.fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedTopicModelImpl topic = sd.fetchRelatedTopic(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
         return topic != null ? topic.checkReadAccess() : null;
     }
 
     List<RelatedTopicModelImpl> getRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(db.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(sd.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
@@ -690,19 +692,19 @@ public final class AccessLayer {
     // === Properties ===
 
     List<TopicModelImpl> getTopicsByProperty(String propUri, Object propValue) {
-        return filterReadables(db.fetchTopicsByProperty(propUri, propValue));
+        return filterReadables(sd.fetchTopicsByProperty(propUri, propValue));
     }
 
     List<TopicModelImpl> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(db.fetchTopicsByPropertyRange(propUri, from, to));
+        return filterReadables(sd.fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     List<AssocModelImpl> getAssocsByProperty(String propUri, Object propValue) {
-        return filterReadables(db.fetchAssocsByProperty(propUri, propValue));
+        return filterReadables(sd.fetchAssocsByProperty(propUri, propValue));
     }
 
     List<AssocModelImpl> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(db.fetchAssocsByPropertyRange(propUri, from, to));
+        return filterReadables(sd.fetchAssocsByPropertyRange(propUri, from, to));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -773,7 +775,7 @@ public final class AccessLayer {
             topicTypeUris.add("dmx.core.assoc_type");
             topicTypeUris.add("dmx.core.meta_type");
             // add regular types
-            for (TopicModelImpl topicType : filterReadables(db.fetchTopics("typeUri",
+            for (TopicModelImpl topicType : filterReadables(sd.fetchTopics("typeUri",
                                                                            new SimpleValue("dmx.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
@@ -786,7 +788,7 @@ public final class AccessLayer {
     private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModelImpl assocType : filterReadables(db.fetchTopics("typeUri",
+            for (TopicModelImpl assocType : filterReadables(sd.fetchTopics("typeUri",
                                                                            new SimpleValue("dmx.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
@@ -815,7 +817,7 @@ public final class AccessLayer {
     }
 
     private String typeUri(long objectId) {
-        return (String) db.fetchProperty(objectId, "typeUri");
+        return (String) sd.fetchProperty(objectId, "typeUri");
     }
 
     private void bootstrapTypeCache() {
