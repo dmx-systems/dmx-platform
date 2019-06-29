@@ -11,7 +11,7 @@ import java.util.List;
 
 
 
-class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
+public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

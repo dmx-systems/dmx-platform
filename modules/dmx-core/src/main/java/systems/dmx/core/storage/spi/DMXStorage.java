@@ -1,5 +1,6 @@
 package systems.dmx.core.storage.spi;
 
+import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
@@ -19,7 +20,7 @@ public interface DMXStorage {
 
     // === Topics ===
 
-    TopicModel fetchTopic(long topicId);
+    TopicModelImpl fetchTopic(long topicId);
 
     TopicModel fetchTopic(String key, Object value);
 

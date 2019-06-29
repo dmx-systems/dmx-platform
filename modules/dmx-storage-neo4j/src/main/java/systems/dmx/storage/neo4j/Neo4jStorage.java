@@ -1,5 +1,7 @@
 package systems.dmx.storage.neo4j;
 
+import systems.dmx.core.impl.ModelFactoryImpl;
+import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -80,13 +82,13 @@ public class Neo4jStorage implements DMXStorage {
     private Index<Node> assocContentFulltext;   // assoc value (index modes FULLTEXT or FULLTEXT_KEY)
     private Index<Node> assocMetadata;
 
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    Neo4jStorage(String databasePath, ModelFactory mf) {
+    Neo4jStorage(String databasePath, ModelFactoryImpl mf) {
         try {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new RelationtypeCache(neo4j);
@@ -119,7 +121,7 @@ public class Neo4jStorage implements DMXStorage {
     // === Topics ===
 
     @Override
-    public TopicModel fetchTopic(long topicId) {
+    public TopicModelImpl fetchTopic(long topicId) {
         return buildTopic(fetchTopicNode(topicId));
     }
 
@@ -901,7 +903,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // --- Neo4j -> DMX Bridge ---
 
-    TopicModel buildTopic(Node topicNode) {
+    TopicModelImpl buildTopic(Node topicNode) {
         try {
             return mf.newTopicModel(
                 topicNode.getId(),

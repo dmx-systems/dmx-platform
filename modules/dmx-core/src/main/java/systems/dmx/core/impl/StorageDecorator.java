@@ -43,7 +43,7 @@ class StorageDecorator {
      *          Note: its child topics are not fetched.
      */
     final TopicModelImpl fetchTopic(long topicId) {
-        return (TopicModelImpl) storage.fetchTopic(topicId);
+        return storage.fetchTopic(topicId);
     }
 
     final TopicModelImpl fetchTopicByUri(String uri) {

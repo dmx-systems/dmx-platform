@@ -1,6 +1,6 @@
 package systems.dmx.core.storage.spi;
 
-import systems.dmx.core.service.ModelFactory;
+import systems.dmx.core.impl.ModelFactoryImpl;
 
 
 
@@ -9,5 +9,5 @@ import systems.dmx.core.service.ModelFactory;
  */
 public interface DMXStorageFactory {
 
-    DMXStorage newDMXStorage(String databasePath, ModelFactory mf);
+    DMXStorage newDMXStorage(String databasePath, ModelFactoryImpl mf);
 }

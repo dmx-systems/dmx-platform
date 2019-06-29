@@ -35,7 +35,7 @@ public class CoreActivator implements BundleActivator {
     private static BundleContext bundleContext;
 
     private DMXStorage db;
-    private static ModelFactory mf = new ModelFactoryImpl();    // FIXME: instantiate along with db?
+    private static ModelFactoryImpl mf = new ModelFactoryImpl();    // FIXME: instantiate along with db?
 
     // consumed service
     private static HttpService httpService;
