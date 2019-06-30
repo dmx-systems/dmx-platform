@@ -1,8 +1,8 @@
 package systems.dmx.storage.neo4j;
 
+import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.TopicModel;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -12,14 +12,14 @@ import java.util.NoSuchElementException;
 
 
 
-class TopicModelIterable extends ModelIterable<TopicModel> {
+class TopicModelIterable extends ModelIterable<TopicModelImpl> {
 
     TopicModelIterable(Neo4jStorage storage) {
         super(storage, NodeType.TOPIC);
     }
 
     @Override
-    TopicModel buildModel(Node node) {
+    TopicModelImpl buildModel(Node node) {
         return storage.buildTopic(node);
     }
 }

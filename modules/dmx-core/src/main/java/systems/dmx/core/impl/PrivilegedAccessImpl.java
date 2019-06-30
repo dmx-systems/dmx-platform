@@ -623,7 +623,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  a list, possibly empty.
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
-        return al.sd.queryTopics(key, new SimpleValue(value));
+        return al.db.queryTopics(key, value);
     }
 
     /**

@@ -2,6 +2,7 @@ package systems.dmx.storage.neo4j;
 
 import systems.dmx.core.impl.AccessLayer;
 import systems.dmx.core.impl.ModelFactoryImpl;
+import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -151,7 +152,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void testFulltextIndex() {
-        List<TopicModel> topics;
+        List<TopicModelImpl> topics;
         // By default a Lucene index is case-insensitive:
         topics = db.queryTopics("Dmx"); assertEquals(2, topics.size());
         topics = db.queryTopics("dmx"); assertEquals(2, topics.size());
@@ -170,7 +171,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void testFulltextIndexWithHTML() {
-        List<TopicModel> topics;
+        List<TopicModelImpl> topics;
         // Lucene's Whitespace Analyzer (default for a Neo4j "fulltext" index) regards HTML as belonging to the word
         topics = db.queryTopics("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
         topics = db.queryTopics("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
@@ -180,7 +181,7 @@ public class Neo4jStorageTest {
         topics = db.queryTopics("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
     }
 
-    private void assertUri(List<TopicModel> singletonList, String topicUri) {
+    private void assertUri(List<TopicModelImpl> singletonList, String topicUri) {
         assertEquals(topicUri, singletonList.get(0).getUri());
     }
 

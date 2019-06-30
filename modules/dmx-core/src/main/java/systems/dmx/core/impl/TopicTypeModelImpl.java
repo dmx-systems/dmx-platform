@@ -62,7 +62,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     List<TopicModelImpl> getAllInstances() {
-        return al.sd.fetchTopics("typeUri", new SimpleValue(uri));
+        return al.db.fetchTopics("typeUri", uri);
     }
 
     // ---

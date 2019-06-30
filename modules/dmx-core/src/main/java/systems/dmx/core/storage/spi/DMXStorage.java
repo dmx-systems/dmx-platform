@@ -36,13 +36,17 @@ public interface DMXStorage {
      */
     TopicModelImpl fetchTopic(String key, Object value);
 
-    List<? extends TopicModel> fetchTopics(String key, Object value);
+    List<TopicModelImpl> fetchTopics(String key, Object value);
 
-    List<TopicModel> queryTopics(Object value);
+    List<TopicModelImpl> queryTopics(Object value);
 
-    List<? extends TopicModel> queryTopics(String key, Object value);
+    /**
+     * @return  The fetched topics.
+     *          Note: their child topics are not fetched.
+     */
+    List<TopicModelImpl> queryTopics(String key, Object value);
 
-    Iterable<? extends TopicModel> fetchAllTopics();
+    Iterable<TopicModelImpl> fetchAllTopics();
 
     // ---
 

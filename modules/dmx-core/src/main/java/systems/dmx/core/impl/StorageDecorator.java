@@ -38,28 +38,6 @@ class StorageDecorator {
 
     // === Topics ===
 
-    final List<TopicModelImpl> fetchTopics(String key, SimpleValue value) {
-        return (List<TopicModelImpl>) storage.fetchTopics(key, value.value());
-    }
-
-    // ---
-
-    /**
-     * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
-     */
-    final List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
-        return (List<TopicModelImpl>) storage.queryTopics(key, value.value());
-    }
-
-    // ---
-
-    final Iterable<TopicModelImpl> fetchAllTopics() {
-        return (Iterable<TopicModelImpl>) storage.fetchAllTopics();
-    }
-
-    // ---
-
     /**
      * Creates a topic.
      * <p>

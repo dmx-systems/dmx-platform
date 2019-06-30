@@ -136,17 +136,17 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<TopicModel> fetchTopics(String key, Object value) {
+    public List<TopicModelImpl> fetchTopics(String key, Object value) {
         return buildTopics(topicContentExact.query(key, value));
     }
 
     @Override
-    public List<TopicModel> queryTopics(Object value) {
+    public List<TopicModelImpl> queryTopics(Object value) {
         return queryTopics(null, value);
     }
 
     @Override
-    public List<TopicModel> queryTopics(String key, Object value) {
+    public List<TopicModelImpl> queryTopics(String key, Object value) {
         if (key == null) {
             key = KEY_FULLTEXT;
         }
@@ -159,7 +159,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterable<TopicModel> fetchAllTopics() {
+    public Iterable<TopicModelImpl> fetchAllTopics() {
         return new TopicModelIterable(this);
     }
 
@@ -466,12 +466,12 @@ public class Neo4jStorage implements DMXStorage {
     // ---
 
     @Override
-    public List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
+    public List<TopicModelImpl> fetchTopicsByProperty(String propUri, Object propValue) {
         return buildTopics(queryIndexByProperty(topicContentExact, propUri, propValue));
     }
 
     @Override
-    public List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
+    public List<TopicModelImpl> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
         return buildTopics(queryIndexByPropertyRange(topicContentExact, propUri, from, to));
     }
 
@@ -918,8 +918,8 @@ public class Neo4jStorage implements DMXStorage {
         }
     }
 
-    private List<TopicModel> buildTopics(Iterable<Node> topicNodes) {
-        List<TopicModel> topics = new ArrayList();
+    private List<TopicModelImpl> buildTopics(Iterable<Node> topicNodes) {
+        List<TopicModelImpl> topics = new ArrayList();
         for (Node topicNode : topicNodes) {
             topics.add(buildTopic(topicNode));
         }
