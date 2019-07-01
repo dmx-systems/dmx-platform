@@ -63,14 +63,12 @@ class StorageDecorator {
         }
     }
 
-    // ---
-
     /**
      * Convenience method (checks singularity).
      */
     final AssocModelImpl fetchAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
                                                         String topicRoleTypeUri, String assocRoleTypeUri) {
-        List<AssocModelImpl> assocs = fetchAssocsBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
+        List<AssocModelImpl> assocs = storage.fetchAssocsBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
             topicRoleTypeUri, assocRoleTypeUri);
         switch (assocs.size()) {
         case 0:
@@ -82,64 +80,6 @@ class StorageDecorator {
                 "\" associations (topicId=" + topicId + ", assocId=" + assocId + ", " +
                 "topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\")");
         }
-    }
-
-    final List<AssocModelImpl> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
-                                                               String topicRoleTypeUri, String assocRoleTypeUri) {
-        return (List<AssocModelImpl>) storage.fetchAssocsBetweenTopicAndAssoc(assocTypeUri, topicId, assocId,
-            topicRoleTypeUri, assocRoleTypeUri);
-    }
-
-    // ---
-
-    final Iterable<AssocModelImpl> fetchAllAssocs() {
-        return (Iterable<AssocModelImpl>) storage.fetchAllAssocs();
-    }
-
-    final List<PlayerModel> fetchPlayerModels(long assocId) {
-        return storage.fetchPlayerModels(assocId);
-    }
-
-    // ---
-
-    final void storeAssoc(AssocModel model) {
-        storage.storeAssoc(model);
-    }
-
-    /**
-     * Stores and indexes the association's URI.
-     */
-    final void storeAssocUri(long assocId, String uri) {
-        storage.storeAssocUri(assocId, uri);
-    }
-
-    final void storeAssocTypeUri(long assocId, String assocTypeUri) {
-        storage.storeAssocTypeUri(assocId, assocTypeUri);
-    }
-
-    final void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
-        storage.storeRoleTypeUri(assocId, playerId, roleTypeUri);
-    }
-
-    /**
-     * Stores and indexes an association value.
-     */
-    final void storeAssocValue(long assocId, SimpleValue value, String indexKey, boolean isHtmlValue) {
-        storage.storeAssocValue(assocId, value, indexKey, isHtmlValue);
-    }
-
-    // ---
-
-    final void _deleteAssoc(long assocId) {
-        storage.deleteAssoc(assocId);
-    }
-
-
-
-    // === Generic Object ===
-
-    final DMXObjectModelImpl fetchObject(long id) {
-        return (DMXObjectModelImpl) storage.fetchObject(id);
     }
 
 

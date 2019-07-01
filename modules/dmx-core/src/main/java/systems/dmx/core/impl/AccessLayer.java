@@ -306,11 +306,11 @@ public final class AccessLayer {
     // ---
 
     Iterable<AssocModelImpl> getAllAssocs() {
-        return new ReadableIterable(sd.fetchAllAssocs());
+        return new ReadableIterable(db.fetchAllAssocs());
     }
 
     List<PlayerModel> getPlayerModels(long assocId) {
-        return sd.fetchPlayerModels(assocId);
+        return db.fetchPlayerModels(assocId);
     }
 
     // ---
@@ -332,7 +332,7 @@ public final class AccessLayer {
             model.preCreate();
             //
             // 1) store in DB
-            sd.storeAssoc(model);
+            db.storeAssoc(model);
             AssocModelImpl _model = updateValues(model, null);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
             //
@@ -424,8 +424,8 @@ public final class AccessLayer {
                 mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicPlayerModel(topicId, "dmx.core.instance")
             );
-            sd.storeAssoc(assoc);   // direct storage calls used here ### explain
-            sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            db.storeAssoc(assoc);   // direct storage calls used here ### explain
+            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
             createAssocInstantiation(assoc.id, assoc.typeUri);
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
@@ -439,8 +439,8 @@ public final class AccessLayer {
                 mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssocPlayerModel(assocId, "dmx.core.instance")
             );
-            sd.storeAssoc(assoc);   // direct storage calls used here ### explain
-            sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
+            db.storeAssoc(assoc);   // direct storage calls used here ### explain
+            db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId + " with association type \"" +
                 assocTypeUri + "\" failed", e);
@@ -615,7 +615,7 @@ public final class AccessLayer {
     // === Generic Object ===
 
     DMXObjectModelImpl getObject(long id) {
-        return sd.fetchObject(id).checkReadAccess();
+        return db.fetchObject(id).checkReadAccess();
     }
 
 

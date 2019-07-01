@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 
 
-class DMXObjectModelImpl implements DMXObjectModel {
+public class DMXObjectModelImpl implements DMXObjectModel {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

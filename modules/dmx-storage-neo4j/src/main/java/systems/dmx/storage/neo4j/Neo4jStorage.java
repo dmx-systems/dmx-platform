@@ -1,6 +1,7 @@
 package systems.dmx.storage.neo4j;
 
 import systems.dmx.core.impl.AssocModelImpl;
+import systems.dmx.core.impl.DMXObjectModelImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
@@ -263,7 +264,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public Iterable<AssocModel> fetchAllAssocs() {
+    public Iterable<AssocModelImpl> fetchAllAssocs() {
         return new AssocModelIterable(this);
     }
 
@@ -363,7 +364,7 @@ public class Neo4jStorage implements DMXStorage {
     // === Generic Object ===
 
     @Override
-    public DMXObjectModel fetchObject(long id) {
+    public DMXObjectModelImpl fetchObject(long id) {
         Node node = fetchNode(id);
         NodeType nodeType = NodeType.of(node);
         switch (nodeType) {

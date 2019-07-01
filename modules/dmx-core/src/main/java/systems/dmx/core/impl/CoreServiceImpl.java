@@ -580,7 +580,7 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
             mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
         );
-        al.sd.storeAssoc(assoc);
-        al.sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);         // isHtml=false
+        al.db.storeAssoc(assoc);
+        al.db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);         // isHtml=false
     }
 }

@@ -1,7 +1,7 @@
 package systems.dmx.storage.neo4j;
 
+import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
-import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
 
 import org.neo4j.graphdb.Node;
@@ -26,14 +26,14 @@ class TopicModelIterable extends ModelIterable<TopicModelImpl> {
 
 
 
-class AssocModelIterable extends ModelIterable<AssocModel> {
+class AssocModelIterable extends ModelIterable<AssocModelImpl> {
 
     AssocModelIterable(Neo4jStorage storage) {
         super(storage, NodeType.ASSOC);
     }
 
     @Override
-    AssocModel buildModel(Node node) {
+    AssocModelImpl buildModel(Node node) {
         return storage.buildAssoc(node);
     }
 }

@@ -206,18 +206,18 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void storeUri() {
-        al.sd.storeAssocUri(id, uri);
+        al.db.storeAssocUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        al.sd.storeAssocTypeUri(id, typeUri);
+        al.db.storeAssocTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        al.sd.storeAssocValue(id, value, typeUri, isHtml());
+        al.db.storeAssocValue(id, value, typeUri, isHtml());
     }
 
     @Override
@@ -234,7 +234,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void _delete() {
-        al.sd._deleteAssoc(id);
+        al.db.deleteAssoc(id);
     }
 
     // ---
@@ -369,7 +369,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     void updateRoleTypeUri(PlayerModelImpl player, String roleTypeUri) {
         player.setRoleTypeUri(roleTypeUri);                             // update memory
-        al.sd.storeRoleTypeUri(id, player.id, player.roleTypeUri);      // update DB
+        al.db.storeRoleTypeUri(id, player.id, player.roleTypeUri);      // update DB
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

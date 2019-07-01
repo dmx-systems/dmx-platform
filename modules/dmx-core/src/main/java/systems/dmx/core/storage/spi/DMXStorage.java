@@ -1,9 +1,9 @@
 package systems.dmx.core.storage.spi;
 
 import systems.dmx.core.impl.AssocModelImpl;
+import systems.dmx.core.impl.DMXObjectModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -118,10 +118,10 @@ public interface DMXStorage {
     List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                         String roleTypeUri2);
 
-    List<? extends AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
-                                                               String topicRoleTypeUri, String assocRoleTypeUri);
+    List<AssocModelImpl> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                         String topicRoleTypeUri, String assocRoleTypeUri);
 
-    Iterable<? extends AssocModel> fetchAllAssocs();
+    Iterable<AssocModelImpl> fetchAllAssocs();
 
     List<PlayerModel> fetchPlayerModels(long assocId);
 
@@ -129,6 +129,9 @@ public interface DMXStorage {
 
     void storeAssoc(AssocModel assocModel);
 
+    /**
+     * Stores and indexes the association's URI.
+     */
     void storeAssocUri(long assocId, String uri);
 
     void storeAssocTypeUri(long assocId, String assocTypeUri);
@@ -151,7 +154,7 @@ public interface DMXStorage {
 
     // === Generic Object ===
 
-    DMXObjectModel fetchObject(long id);
+    DMXObjectModelImpl fetchObject(long id);
 
 
 
