@@ -338,12 +338,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getProperty(long id, String propUri) {
-        return al.sd.fetchProperty(id, propUri);
+        return al.db.fetchProperty(id, propUri);
     }
 
     @Override
     public boolean hasProperty(long id, String propUri) {
-        return al.sd.hasProperty(id, propUri);
+        return al.db.hasProperty(id, propUri);
     }
 
     // ---
@@ -378,7 +378,7 @@ public class CoreServiceImpl implements CoreService {
         for (Topic topic : getAllTopics()) {
             if (topic.hasProperty(propUri)) {
                 Object value = topic.getProperty(propUri);
-                al.sd.indexTopicProperty(topic.getId(), propUri, value);
+                al.db.indexTopicProperty(topic.getId(), propUri, value);
                 added++;
             }
             topics++;
@@ -395,7 +395,7 @@ public class CoreServiceImpl implements CoreService {
         for (Assoc assoc : getAllAssocs()) {
             if (assoc.hasProperty(propUri)) {
                 Object value = assoc.getProperty(propUri);
-                al.sd.indexAssocProperty(assoc.getId(), propUri, value);
+                al.db.indexAssocProperty(assoc.getId(), propUri, value);
                 added++;
             }
             assocs++;
@@ -410,7 +410,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public DMXTransaction beginTx() {
-        return al.sd.beginTx();
+        return al.db.beginTx();
     }
 
     // ---
@@ -432,7 +432,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Object getDatabaseVendorObject() {
-        return al.sd.getDatabaseVendorObject();
+        return al.db.getDatabaseVendorObject();
     }
 
     // ---
@@ -485,7 +485,7 @@ public class CoreServiceImpl implements CoreService {
             // Note: we don't put finish() in a finally clause here because
             // in case of error the database has to be shut down.
             tx.finish();
-            al.sd.shutdown();
+            al.db.shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
     }

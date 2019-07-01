@@ -110,8 +110,13 @@ public interface DMXStorage {
 
     List<AssocModelImpl> fetchAssocs(String key, Object value);
 
-    List<? extends AssocModel> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                              String roleTypeUri2);
+    /**
+     * Returns the associations between two topics. If no such association exists an empty set is returned.
+     *
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
+     */
+    List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                        String roleTypeUri2);
 
     List<? extends AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
                                                                String topicRoleTypeUri, String assocRoleTypeUri);
@@ -234,13 +239,13 @@ public interface DMXStorage {
 
     // ---
 
-    List<? extends TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
+    List<TopicModelImpl> fetchTopicsByProperty(String propUri, Object propValue);
 
-    List<? extends TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
+    List<TopicModelImpl> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<? extends AssocModel> fetchAssocsByProperty(String propUri, Object propValue);
+    List<AssocModelImpl> fetchAssocsByProperty(String propUri, Object propValue);
 
-    List<? extends AssocModel> fetchAssocsByPropertyRange(String propUri, Number from, Number to);
+    List<AssocModelImpl> fetchAssocsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

@@ -222,12 +222,12 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        al.sd.storeAssocProperty(id, propUri, propValue, addToIndex);
+        al.db.storeAssocProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
     final void removeProperty(String propUri) {
-        al.sd.removeAssocProperty(id, propUri);
+        al.db.deleteAssocProperty(id, propUri);
     }
 
     // ---

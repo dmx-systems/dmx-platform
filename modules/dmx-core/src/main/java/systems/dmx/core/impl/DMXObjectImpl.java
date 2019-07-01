@@ -213,12 +213,12 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final Object getProperty(String propUri) {
-        return al.sd.fetchProperty(getId(), propUri);
+        return al.db.fetchProperty(getId(), propUri);
     }
 
     @Override
     public final boolean hasProperty(String propUri) {
-        return al.sd.hasProperty(getId(), propUri);
+        return al.db.hasProperty(getId(), propUri);
     }
 
     @Override
@@ -237,7 +237,7 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final Object getDatabaseVendorObject() {
-        return al.sd.getDatabaseVendorObject(getId());
+        return al.db.getDatabaseVendorObject(getId());
     }
 
 

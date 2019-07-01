@@ -233,7 +233,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public String getCreator(long objectId) {
-        return al.sd.hasProperty(objectId, PROP_CREATOR) ? (String) al.sd.fetchProperty(objectId, PROP_CREATOR) : null;
+        return al.db.hasProperty(objectId, PROP_CREATOR) ? (String) al.db.fetchProperty(objectId, PROP_CREATOR) : null;
     }
 
 
@@ -317,8 +317,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public long getAssignedWorkspaceId(long objectId) {
         try {
             long workspaceId = -1;
-            if (al.sd.hasProperty(objectId, PROP_WORKSPACE_ID)) {
-                workspaceId = (Long) al.sd.fetchProperty(objectId, PROP_WORKSPACE_ID);
+            if (al.db.hasProperty(objectId, PROP_WORKSPACE_ID)) {
+                workspaceId = (Long) al.db.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
@@ -553,15 +553,15 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String getOwner(long workspaceId) {
         // Note: direct storage access is required here
-        if (!al.sd.hasProperty(workspaceId, PROP_OWNER)) {
+        if (!al.db.hasProperty(workspaceId, PROP_OWNER)) {
             throw new RuntimeException("No owner is assigned to workspace " + workspaceId);
         }
-        return (String) al.sd.fetchProperty(workspaceId, PROP_OWNER);
+        return (String) al.db.fetchProperty(workspaceId, PROP_OWNER);
     }
 
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
-        return (String) al.sd.fetchProperty(objectId, "typeUri");
+        return (String) al.db.fetchProperty(objectId, "typeUri");
     }
 
     // ---
@@ -634,7 +634,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      */
     private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
         List<TopicModelImpl> topics = new ArrayList();
-        for (TopicModelImpl topic : al.sd.fetchTopicsByProperty(PROP_OWNER, username)) {
+        for (TopicModelImpl topic : al.db.fetchTopicsByProperty(PROP_OWNER, username)) {
             if (topic.getTypeUri().equals(typeUri)) {
                 topics.add(topic);
             }

@@ -295,7 +295,7 @@ public final class AccessLayer {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
-            return filterReadables(sd.fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+            return filterReadables(db.fetchAssocs(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs between topics " + topic1Id + " and " + topic2Id +
                 " failed, assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
@@ -692,19 +692,19 @@ public final class AccessLayer {
     // === Properties ===
 
     List<TopicModelImpl> getTopicsByProperty(String propUri, Object propValue) {
-        return filterReadables(sd.fetchTopicsByProperty(propUri, propValue));
+        return filterReadables(db.fetchTopicsByProperty(propUri, propValue));
     }
 
     List<TopicModelImpl> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(sd.fetchTopicsByPropertyRange(propUri, from, to));
+        return filterReadables(db.fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     List<AssocModelImpl> getAssocsByProperty(String propUri, Object propValue) {
-        return filterReadables(sd.fetchAssocsByProperty(propUri, propValue));
+        return filterReadables(db.fetchAssocsByProperty(propUri, propValue));
     }
 
     List<AssocModelImpl> getAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return filterReadables(sd.fetchAssocsByPropertyRange(propUri, from, to));
+        return filterReadables(db.fetchAssocsByPropertyRange(propUri, from, to));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -815,7 +815,7 @@ public final class AccessLayer {
     }
 
     private String typeUri(long objectId) {
-        return (String) sd.fetchProperty(objectId, "typeUri");
+        return (String) db.fetchProperty(objectId, "typeUri");
     }
 
     private void bootstrapTypeCache() {

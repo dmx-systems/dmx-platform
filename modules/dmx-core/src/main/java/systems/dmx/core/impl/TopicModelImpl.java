@@ -112,7 +112,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final void removeProperty(String propUri) {
-        al.sd.removeTopicProperty(id, propUri);
+        al.db.deleteTopicProperty(id, propUri);
     }
 
     // ---

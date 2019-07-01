@@ -50,7 +50,7 @@ class StorageDecorator {
      */
     final AssocModelImpl fetchAssoc(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                        String roleTypeUri2) {
-        List<AssocModelImpl> assocs = fetchAssocs(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+        List<AssocModelImpl> assocs = storage.fetchAssocs(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
         switch (assocs.size()) {
         case 0:
             return null;
@@ -61,17 +61,6 @@ class StorageDecorator {
                 "\" associations (topicId1=" + topicId1 + ", topicId2=" + topicId2 + ", " +
                 "roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\")");
         }
-    }
-
-    /**
-     * Returns the associations between two topics. If no such association exists an empty set is returned.
-     *
-     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
-     */
-    final List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                              String roleTypeUri2) {
-        return (List<AssocModelImpl>) storage.fetchAssocs(assocTypeUri, topicId1, topicId2, roleTypeUri1,
-            roleTypeUri2);
     }
 
     // ---
@@ -380,67 +369,7 @@ class StorageDecorator {
 
 
 
-    // === Properties ===
-
-    final Object fetchProperty(long id, String propUri) {
-        return storage.fetchProperty(id, propUri);
-    }
-
-    final boolean hasProperty(long id, String propUri) {
-        return storage.hasProperty(id, propUri);
-    }
-
-    // ---
-
-    final List<TopicModelImpl> fetchTopicsByProperty(String propUri, Object propValue) {
-        return (List<TopicModelImpl>) storage.fetchTopicsByProperty(propUri, propValue);
-    }
-
-    final List<TopicModelImpl> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return (List<TopicModelImpl>) storage.fetchTopicsByPropertyRange(propUri, from, to);
-    }
-
-    final List<AssocModelImpl> fetchAssocsByProperty(String propUri, Object propValue) {
-        return (List<AssocModelImpl>) storage.fetchAssocsByProperty(propUri, propValue);
-    }
-
-    final List<AssocModelImpl> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return (List<AssocModelImpl>) storage.fetchAssocsByPropertyRange(propUri, from, to);
-    }
-
-    // ---
-
-    final void storeAssocProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
-        storage.storeAssocProperty(assocId, propUri, propValue, addToIndex);
-    }
-
-    // ---
-
-    final void indexTopicProperty(long topicId, String propUri, Object propValue) {
-        storage.indexTopicProperty(topicId, propUri, propValue);
-    }
-
-    final void indexAssocProperty(long assocId, String propUri, Object propValue) {
-        storage.indexAssocProperty(assocId, propUri, propValue);
-    }
-
-    // ---
-
-    final void removeTopicProperty(long topicId, String propUri) {
-        storage.deleteTopicProperty(topicId, propUri);
-    }
-
-    final void removeAssocProperty(long assocId, String propUri) {
-        storage.deleteAssocProperty(assocId, propUri);
-    }
-
-
-
     // === DB ===
-
-    final DMXTransaction beginTx() {
-        return storage.beginTx();
-    }
 
     /**
      * Initializes the database.
@@ -457,27 +386,13 @@ class StorageDecorator {
         return isCleanInstall;
     }
 
-    final void shutdown() {
-        storage.shutdown();
-    }
-
     // ---
 
     final int fetchMigrationNr() {
-        return (Integer) fetchProperty(0, "core_migration_nr");
+        return (Integer) storage.fetchProperty(0, "core_migration_nr");
     }
 
     final void storeMigrationNr(int migrationNr) {
         storage.storeTopicProperty(0, "core_migration_nr", migrationNr, false);     // addToIndex=false
-    }
-
-    // ---
-
-    final Object getDatabaseVendorObject() {
-        return storage.getDatabaseVendorObject();
-    }
-
-    final Object getDatabaseVendorObject(long objectId) {
-        return storage.getDatabaseVendorObject(objectId);
     }
 }
