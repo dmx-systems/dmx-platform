@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
+public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

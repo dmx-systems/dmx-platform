@@ -1,5 +1,6 @@
 package systems.dmx.storage.neo4j;
 
+import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
@@ -228,24 +229,24 @@ public class Neo4jStorage implements DMXStorage {
     // === Associations ===
 
     @Override
-    public AssocModel fetchAssoc(long assocId) {
+    public AssocModelImpl fetchAssoc(long assocId) {
         return buildAssoc(fetchAssocNode(assocId));
     }
 
     @Override
-    public AssocModel fetchAssoc(String key, Object value) {
+    public AssocModelImpl fetchAssoc(String key, Object value) {
         Node node = assocContentExact.get(key, value).getSingle();
         return node != null ? buildAssoc(node) : null;
     }
 
     @Override
-    public List<AssocModel> fetchAssocs(String key, Object value) {
+    public List<AssocModelImpl> fetchAssocs(String key, Object value) {
         return buildAssocs(assocContentExact.query(key, value));
     }
 
     @Override
-    public List<AssocModel> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                           String roleTypeUri2) {
+    public List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                               String roleTypeUri2) {
         return queryAssocIndex(assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
             roleTypeUri2, NodeType.TOPIC, topicId2, null
@@ -253,8 +254,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<AssocModel> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
-                                                            String topicRoleTypeUri, String assocRoleTypeUri) {
+    public List<AssocModelImpl> fetchAssocsBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId,
+                                                                String topicRoleTypeUri, String assocRoleTypeUri) {
         return queryAssocIndex(assocTypeUri,
             topicRoleTypeUri, NodeType.TOPIC, topicId, null,
             assocRoleTypeUri, NodeType.ASSOC, assocId, null
@@ -476,12 +477,12 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<AssocModel> fetchAssocsByProperty(String propUri, Object propValue) {
+    public List<AssocModelImpl> fetchAssocsByProperty(String propUri, Object propValue) {
         return buildAssocs(queryIndexByProperty(assocContentExact, propUri, propValue));
     }
 
     @Override
-    public List<AssocModel> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
+    public List<AssocModelImpl> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
         return buildAssocs(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
     }
 
@@ -795,7 +796,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    private List<AssocModel> queryAssocIndex(String assocTypeUri,
+    private List<AssocModelImpl> queryAssocIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         return buildAssocs(assocMetadata.query(buildAssocQuery(assocTypeUri,
@@ -928,7 +929,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // ---
 
-    AssocModel buildAssoc(Node assocNode) {
+    AssocModelImpl buildAssoc(Node assocNode) {
         try {
             List<PlayerModel> playerModels = buildPlayerModels(assocNode);
             return mf.newAssocModel(
@@ -945,8 +946,8 @@ public class Neo4jStorage implements DMXStorage {
         }
     }
 
-    private List<AssocModel> buildAssocs(Iterable<Node> assocNodes) {
-        List<AssocModel> assocs = new ArrayList();
+    private List<AssocModelImpl> buildAssocs(Iterable<Node> assocNodes) {
+        List<AssocModelImpl> assocs = new ArrayList();
         for (Node assocNode : assocNodes) {
             assocs.add(buildAssoc(assocNode));
         }
@@ -1117,7 +1118,7 @@ public class Neo4jStorage implements DMXStorage {
     // --- DMX Helper ---
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private List<RelatedTopicModel> buildRelatedTopics(List<AssocModel> assocs, long playerId) {
+    private List<RelatedTopicModel> buildRelatedTopics(List<AssocModelImpl> assocs, long playerId) {
         List<RelatedTopicModel> relTopics = new ArrayList();
         for (AssocModel assoc : assocs) {
             relTopics.add(mf.newRelatedTopicModel(
@@ -1130,7 +1131,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private List<RelatedAssocModel> buildRelatedAssocs(List<AssocModel> assocs, long playerId) {
+    private List<RelatedAssocModel> buildRelatedAssocs(List<AssocModelImpl> assocs, long playerId) {
         List<RelatedAssocModel> relAssocs = new ArrayList();
         for (AssocModel assoc : assocs) {
             relAssocs.add(mf.newRelatedAssocModel(

@@ -1,5 +1,6 @@
 package systems.dmx.core.storage.spi;
 
+import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -67,6 +68,9 @@ public interface DMXStorage {
      */
     void storeTopic(TopicModel topicModel);
 
+    /**
+     * Stores and indexes the topic's URI.
+     */
     void storeTopicUri(long topicId, String uri);
 
     void storeTopicTypeUri(long topicId, String topicTypeUri);
@@ -81,17 +85,30 @@ public interface DMXStorage {
 
     // ---
 
+    /**
+     * Deletes the topic.
+     * <p>
+     * Prerequisite: the topic has no relations.
+     */
     void deleteTopic(long topicId);
 
 
 
     // === Associations ===
 
-    AssocModel fetchAssoc(long assocId);
+    AssocModelImpl fetchAssoc(long assocId);
 
-    AssocModel fetchAssoc(String key, Object value);
+    /**
+     * Looks up a single association by exact value.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association is found a runtime exception is thrown.
+     *
+     * @return  The fetched association.
+     *          Note: its child topics are not fetched.
+     */
+    AssocModelImpl fetchAssoc(String key, Object value);
 
-    List<? extends AssocModel> fetchAssocs(String key, Object value);
+    List<AssocModelImpl> fetchAssocs(String key, Object value);
 
     List<? extends AssocModel> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                               String roleTypeUri2);

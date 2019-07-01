@@ -147,7 +147,7 @@ public final class AccessLayer {
             model.preCreate();
             //
             // 1) store in DB
-            sd.storeTopic(model);
+            db.storeTopic(model);
             if (model.getType().isSimple()) {
                 model.storeSimpleValue();
             }
@@ -222,7 +222,7 @@ public final class AccessLayer {
 
     AssocModelImpl getAssoc(long assocId) {
         try {
-            return sd.fetchAssoc(assocId).checkReadAccess();
+            return db.fetchAssoc(assocId).checkReadAccess();
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc " + assocId + " failed", e);
         }
@@ -230,7 +230,7 @@ public final class AccessLayer {
 
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
-            AssocModelImpl assoc = sd.fetchAssoc(key, value);
+            AssocModelImpl assoc = db.fetchAssoc(key, value.value());
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);
@@ -239,7 +239,7 @@ public final class AccessLayer {
 
     List<AssocModelImpl> getAssocsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(sd.fetchAssocs(key, value));
+            return filterReadables(db.fetchAssocs(key, value.value()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -359,7 +359,7 @@ public final class AccessLayer {
 
     void updateAssoc(AssocModelImpl updateModel) {
         try {
-            AssocModelImpl model = sd.fetchAssoc(updateModel.getId());
+            AssocModelImpl model = db.fetchAssoc(updateModel.getId());
             updateAssoc(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
@@ -387,7 +387,7 @@ public final class AccessLayer {
      */
     void deleteAssoc(long assocId) {
         try {
-            deleteAssoc(sd.fetchAssoc(assocId));
+            deleteAssoc(db.fetchAssoc(assocId));
         } catch (IllegalStateException e) {
             // Note: db.fetchAssoc() might throw IllegalStateException and is no problem.
             // This happens when the association is deleted already. In this case nothing needs to be performed.

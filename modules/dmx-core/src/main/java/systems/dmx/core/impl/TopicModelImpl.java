@@ -91,23 +91,23 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final void storeUri() {
-        al.sd.storeTopicUri(id, uri);
+        al.db.storeTopicUri(id, uri);
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        al.sd.storeTopicTypeUri(id, typeUri);
+        al.db.storeTopicTypeUri(id, typeUri);
     }
 
     @Override
     final void storeSimpleValue() {
-        al.sd.storeTopicValue(id, value, typeUri, isHtml());
+        al.db.storeTopicValue(id, value, typeUri, isHtml());
     }
 
     @Override
     final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
-        al.sd.storeTopicProperty(id, propUri, propValue, addToIndex);
+        al.db.storeTopicProperty(id, propUri, propValue, addToIndex);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final void _delete() {
-        al.sd._deleteTopic(id);
+        al.db.deleteTopic(id);
     }
 
     // ---

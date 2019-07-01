@@ -36,77 +36,7 @@ class StorageDecorator {
 
 
 
-    // === Topics ===
-
-    /**
-     * Creates a topic.
-     * <p>
-     * Actually only the topic URI and type URI are stored and indexed.
-     * The topic value is not stored.
-     *
-     * @return  FIXDOC ### the created topic. Note:
-     *          - the topic URI   is initialzed and     persisted.
-     *          - the topic value is initialzed but not persisted.
-     *          - the type URI    is initialzed but not persisted.
-     */
-    final void storeTopic(TopicModel model) {
-        storage.storeTopic(model);
-    }
-
-    /**
-     * Stores and indexes the topic's URI.
-     */
-    final void storeTopicUri(long topicId, String uri) {
-        storage.storeTopicUri(topicId, uri);
-    }
-
-    final void storeTopicTypeUri(long topicId, String topicTypeUri) {
-        storage.storeTopicTypeUri(topicId, topicTypeUri);
-    }
-
-    /**
-     * Stores and indexes a topic value.
-     */
-    final void storeTopicValue(long topicId, SimpleValue value, String indexKey, boolean isHtmlValue) {
-        storage.storeTopicValue(topicId, value, indexKey, isHtmlValue);
-    }
-
-    // ---
-
-    /**
-     * Deletes the topic.
-     * <p>
-     * Prerequisite: the topic has no relations.
-     */
-    final void _deleteTopic(long topicId) {
-        storage.deleteTopic(topicId);
-    }
-
-
-
     // === Associations ===
-
-    final AssocModelImpl fetchAssoc(long assocId) {
-        return (AssocModelImpl) storage.fetchAssoc(assocId);
-    }
-
-    /**
-     * Looks up a single association by exact value.
-     * If no such association exists <code>null</code> is returned.
-     * If more than one association is found a runtime exception is thrown.
-     *
-     * @return  The fetched association.
-     *          Note: its child topics are not fetched.
-     */
-    final AssocModelImpl fetchAssoc(String key, SimpleValue value) {
-        return (AssocModelImpl) storage.fetchAssoc(key, value.value());
-    }
-
-    final List<AssocModelImpl> fetchAssocs(String key, SimpleValue value) {
-        return (List<AssocModelImpl>) storage.fetchAssocs(key, value.value());
-    }
-
-    // ---
 
     /**
      * Convenience method (checks singularity).
@@ -479,10 +409,6 @@ class StorageDecorator {
     }
 
     // ---
-
-    final void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
-        storage.storeTopicProperty(topicId, propUri, propValue, addToIndex);
-    }
 
     final void storeAssocProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
         storage.storeAssocProperty(assocId, propUri, propValue, addToIndex);

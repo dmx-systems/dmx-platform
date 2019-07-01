@@ -567,8 +567,8 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _createTopic(TopicModelImpl model) {
-        al.sd.storeTopic(model);
-        al.sd.storeTopicValue(model.id, model.value, model.typeUri, false);            // isHtml=false
+        al.db.storeTopic(model);
+        al.db.storeTopicValue(model.id, model.value, model.typeUri, false);         // isHtml=false
     }
 
     /**
@@ -581,6 +581,6 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
         );
         al.sd.storeAssoc(assoc);
-        al.sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);      // isHtml=false
+        al.sd.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);         // isHtml=false
     }
 }
