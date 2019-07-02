@@ -2,14 +2,13 @@ package systems.dmx.core.storage.spi;
 
 import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.DMXObjectModelImpl;
+import systems.dmx.core.impl.ModelFactoryImpl;
+import systems.dmx.core.impl.RelatedAssocModelImpl;
+import systems.dmx.core.impl.RelatedTopicModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
-import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedAssocModel;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.service.ModelFactory;
 
 import java.util.List;
 
@@ -66,7 +65,7 @@ public interface DMXStorage {
      *                          - an empty URI ("") in case <code>null</code> was passed.
      *                          - an empty simple value ("") in case <code>null</code> was passed.
      */
-    void storeTopic(TopicModel topicModel);
+    void storeTopic(TopicModelImpl topicModel);
 
     /**
      * Stores and indexes the topic's URI.
@@ -127,7 +126,7 @@ public interface DMXStorage {
 
     // ---
 
-    void storeAssoc(AssocModel assocModel);
+    void storeAssoc(AssocModelImpl assocModel);
 
     /**
      * Stores and indexes the association's URI.
@@ -160,29 +159,9 @@ public interface DMXStorage {
 
     // === Traversal ===
 
-    List<? extends AssocModel> fetchTopicAssocs(long topicId);
+    List<AssocModelImpl> fetchTopicAssocs(long topicId);
 
-    List<? extends AssocModel> fetchAssocAssocs(long assocId);
-
-    // ---
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     */
-    List<? extends RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri);
-
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     */
-    List<? extends RelatedAssocModel> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                   String othersRoleTypeUri, String othersAssocTypeUri);
+    List<AssocModelImpl> fetchAssocAssocs(long assocId);
 
     // ---
 
@@ -191,18 +170,50 @@ public interface DMXStorage {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their child topics are not fetched.
      */
-    List<? extends RelatedTopicModel> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri);
+    List<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their child topics are not fetched.
      */
-    List<? extends RelatedAssocModel> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersAssocTypeUri);
+    List<RelatedAssocModelImpl> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersAssocTypeUri);
+
+    // ---
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their child topics are not fetched.
+     */
+    List<RelatedTopicModelImpl> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTopicTypeUri);
+
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their child topics are not fetched.
+     */
+    List<RelatedAssocModelImpl> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 
@@ -212,9 +223,12 @@ public interface DMXStorage {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched topics.
+     *          Note: their child topics are not fetched.
      */
-    List<? extends RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
-                                                         String othersRoleTypeUri, String othersTopicTypeUri);
+    List<RelatedTopicModelImpl> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
      * @param   objectId            id of a topic or an association
@@ -222,9 +236,12 @@ public interface DMXStorage {
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
+     *
+     * @return  The fetched associations.
+     *          Note: their child topics are not fetched.
      */
-    List<? extends RelatedAssocModel> fetchRelatedAssocs(long objectId, String assocTypeUri, String myRoleTypeUri,
-                                                         String othersRoleTypeUri, String othersAssocTypeUri);
+    List<RelatedAssocModelImpl> fetchRelatedAssocs(long objectId, String assocTypeUri, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersAssocTypeUri);
 
 
 
@@ -286,5 +303,5 @@ public interface DMXStorage {
 
     // ---
 
-    ModelFactory getModelFactory();
+    ModelFactoryImpl getModelFactory();
 }

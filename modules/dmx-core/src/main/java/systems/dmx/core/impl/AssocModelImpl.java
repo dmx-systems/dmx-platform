@@ -184,7 +184,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return al.sd.fetchAssocAssocs(id);
+        return al.db.fetchAssocAssocs(id);
     }
 
     // ---
@@ -199,7 +199,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.sd.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---

@@ -9,7 +9,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel {
+public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

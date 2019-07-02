@@ -1,17 +1,14 @@
 package systems.dmx.storage.neo4j;
 
 import systems.dmx.core.impl.AccessLayer;
+import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
+import systems.dmx.core.impl.RelatedTopicModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
-import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.storage.spi.DMXTransaction;
-import systems.dmx.core.util.JavaUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,7 +57,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void fetchAssoc() {
-        AssocModel assoc = db.fetchAssoc(assocId);
+        AssocModelImpl assoc = db.fetchAssoc(assocId);
         assertNotNull(assoc);
         //
         PlayerModel player1 = assoc.getPlayerByRole("dmx.core.type");
@@ -72,39 +69,38 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverse() {
-        TopicModel topic = db.fetchTopic("uri", "dmx.core.data_type");
+        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
         assertNotNull(topic);
         //
-        List<? extends RelatedTopicModel> topics = db.fetchTopicRelatedTopics(topic.getId(),
+        List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
             "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
         assertEquals(1, topics.size());
         //
-        TopicModel type = topics.get(0);
+        TopicModelImpl type = topics.get(0);
         assertEquals("dmx.core.topic_type", type.getUri());
         assertEquals("Topic Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseBidirectional() {
-        TopicModel topic = db.fetchTopic("uri", "dmx.core.topic_type");
+        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.topic_type");
         assertNotNull(topic);
         //
-        List<? extends RelatedTopicModel> topics = db.fetchTopicRelatedTopics(topic.getId(),
+        List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
             "dmx.core.instantiation", "dmx.core.type", "dmx.core.instance", "dmx.core.topic_type");
         assertEquals(1, topics.size());
         //
-        TopicModel type = topics.get(0);
+        TopicModelImpl type = topics.get(0);
         assertEquals("dmx.core.data_type", type.getUri());
         assertEquals("Data Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseWithWideFilter() {
-        TopicModel topic = db.fetchTopic("uri", "dmx.core.data_type");
+        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
         assertNotNull(topic);
         //
-        List<? extends RelatedTopicModel> topics = db.fetchTopicRelatedTopics(topic.getId(), null, null, null,
-            null);
+        List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
         assertEquals(1, topics.size());
     }
 
@@ -112,14 +108,14 @@ public class Neo4jStorageTest {
     public void deleteAssoc() {
         DMXTransaction tx = db.beginTx();
         try {
-            TopicModel topic = db.fetchTopic("uri", "dmx.core.data_type");
+            TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
             assertNotNull(topic);
             //
-            List<? extends RelatedTopicModel> topics = db.fetchTopicRelatedTopics(topic.getId(),
+            List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
                 "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
             assertEquals(1, topics.size());
             //
-            AssocModel assoc = topics.get(0).getRelatingAssoc();
+            AssocModelImpl assoc = topics.get(0).getRelatingAssoc();
             assertNotNull(assoc);
             //
             db.deleteAssoc(assoc.getId());
@@ -138,7 +134,7 @@ public class Neo4jStorageTest {
     public void deleteAssocAndFetchAgain() {
         DMXTransaction tx = db.beginTx();
         try {
-            AssocModel assoc = db.fetchAssoc(assocId);
+            AssocModelImpl assoc = db.fetchAssoc(assocId);
             assertNotNull(assoc);
             //
             db.deleteAssoc(assoc.getId());
@@ -187,7 +183,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void testExactIndexWithQuery() {
-        List<? extends TopicModel> topics;
+        List<TopicModelImpl> topics;
         topics = db.fetchTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
         topics = db.fetchTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
         // => in contrast to Lucene docs a wildcard can be used as the first character of a search
@@ -201,7 +197,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void testExactIndexWithGet() {
-        TopicModel topic;
+        TopicModelImpl topic;
         topic = db.fetchTopic("uri", "dmx.core.data_type"); assertNotNull(topic);
         topic = db.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
         // => DMXStorage's get-singular method supports no wildcards.
@@ -212,15 +208,15 @@ public class Neo4jStorageTest {
 
     @Test
     public void fetchAllTopics() {
-        Iterable<? extends TopicModel> topics = db.fetchAllTopics();
+        Iterable<TopicModelImpl> topics = db.fetchAllTopics();
         int count = 0;
-        for (TopicModel topic : topics) {
+        for (TopicModelImpl topic : topics) {
             count++;
         }
         assertEquals(10, count);
         // reuse iterable
         count = 0;
-        for (TopicModel topic : topics) {
+        for (TopicModelImpl topic : topics) {
             count++;
         }
         assertEquals(10, count);
@@ -228,15 +224,15 @@ public class Neo4jStorageTest {
 
     @Test
     public void fetchAllAssocs() {
-        Iterable<? extends AssocModel> assocs = db.fetchAllAssocs();
+        Iterable<AssocModelImpl> assocs = db.fetchAllAssocs();
         int count = 0;
-        for (AssocModel assoc : assocs) {
+        for (AssocModelImpl assoc : assocs) {
             count++;
         }
         assertEquals(1, count);
         // reuse iterable
         count = 0;
-        for (AssocModel assoc : assocs) {
+        for (AssocModelImpl assoc : assocs) {
             count++;
         }
         assertEquals(1, count);
@@ -246,7 +242,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndex() {
-        List<? extends TopicModel> topics;
+        List<TopicModelImpl> topics;
         // Note: The same type must be used for indexing and querying.
         // That is, you can't index a value as a Long and then query the index using an Integer.
         topics = db.fetchTopicsByProperty("score", 12L);  assertEquals(0, topics.size());
@@ -256,7 +252,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndexRange() {
-        List<? extends TopicModel> topics;
+        List<TopicModelImpl> topics;
         topics = db.fetchTopicsByPropertyRange("score", 1L, 1000L);  assertEquals(3, topics.size());
         topics = db.fetchTopicsByPropertyRange("score", 23L, 23L);   assertEquals(2, topics.size());
         topics = db.fetchTopicsByPropertyRange("score", 23L, 1234L); assertEquals(4, topics.size());
@@ -308,7 +304,7 @@ public class Neo4jStorageTest {
     }
 
     private long createTopic(String uri, String typeUri, String value, boolean isHtmlValue) {
-        TopicModel topic = mf.newTopicModel(uri, typeUri, new SimpleValue(value));
+        TopicModelImpl topic = mf.newTopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
         db.storeTopic(topic);
@@ -330,7 +326,7 @@ public class Neo4jStorageTest {
 
     private long createAssoc(String typeUri, String topicUri1, String roleTypeUri1,
                                              String topicUri2, String roleTypeUri2) {
-        AssocModel assoc = mf.newAssocModel(typeUri,
+        AssocModelImpl assoc = mf.newAssocModel(typeUri,
             mf.newTopicPlayerModel(topicUri1, roleTypeUri1),
             mf.newTopicPlayerModel(topicUri2, roleTypeUri2)
         );

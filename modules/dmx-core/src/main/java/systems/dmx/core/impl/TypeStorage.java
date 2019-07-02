@@ -658,7 +658,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            return viewConfigModel(al.sd.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
+            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
@@ -667,7 +667,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(al.sd.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
+            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);

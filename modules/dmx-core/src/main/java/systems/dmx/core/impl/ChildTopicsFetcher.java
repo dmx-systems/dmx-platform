@@ -92,7 +92,7 @@ class ChildTopicsFetcher {
     }
 
     private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
-        return al.sd.fetchRelatedTopics(
+        return al.db.fetchRelatedTopics(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             "dmx.core.parent", "dmx.core.child",

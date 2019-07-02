@@ -4,7 +4,7 @@ import systems.dmx.core.model.RelatedAssocModel;
 
 
 
-class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAssocModel {
+public class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAssocModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

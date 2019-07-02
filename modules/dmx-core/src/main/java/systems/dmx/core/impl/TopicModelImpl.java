@@ -69,7 +69,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final List<AssocModelImpl> getAssocs() {
-        return al.sd.fetchTopicAssocs(id);
+        return al.db.fetchTopicAssocs(id);
     }
 
     // ---
@@ -84,7 +84,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
-        return al.sd.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+        return al.db.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ---

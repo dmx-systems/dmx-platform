@@ -31,8 +31,8 @@ public final class AccessLayer {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    StorageDecorator sd;    // TODO: drop
     DMXStorage db;
+    StorageDecorator sd;
     TypeStorage typeStorage;
     EventManager em;
     ModelFactoryImpl mf;
@@ -626,7 +626,7 @@ public final class AccessLayer {
 
     List<RelatedTopicModelImpl> getTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(sd.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
@@ -639,19 +639,19 @@ public final class AccessLayer {
 
     List<RelatedAssocModelImpl> getTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(sd.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchTopicRelatedAssocs(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getTopicAssocs(long topicId) {
-        return filterReadables(sd.fetchTopicAssocs(topicId));
+        return filterReadables(db.fetchTopicAssocs(topicId));
     }
 
     // --- Assoc Source ---
 
     List<RelatedTopicModelImpl> getAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(sd.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchAssocRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
@@ -664,12 +664,12 @@ public final class AccessLayer {
 
     List<RelatedAssocModelImpl> getAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersAssocTypeUri) {
-        return filterReadables(sd.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchAssocRelatedAssocs(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri));
     }
 
     List<AssocModelImpl> getAssocAssocs(long assocId) {
-        return filterReadables(sd.fetchAssocAssocs(assocId));
+        return filterReadables(db.fetchAssocAssocs(assocId));
     }
 
     // --- Object Source ---
@@ -683,7 +683,7 @@ public final class AccessLayer {
 
     List<RelatedTopicModelImpl> getRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                  String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(sd.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return filterReadables(db.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 
