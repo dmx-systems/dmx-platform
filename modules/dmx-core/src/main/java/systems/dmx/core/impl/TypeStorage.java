@@ -203,8 +203,8 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = al.sd.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
-                "dmx.core.default", "dmx.core.data_type");
+            RelatedTopicModel dataType = al.sd.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.parent",
+                "dmx.core.child", "dmx.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic associated to " + className + " \"" + typeUri + "\"");
             }
@@ -220,8 +220,8 @@ class TypeStorage {
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
             al.createAssoc("dmx.core.composition",
-                mf.newTopicPlayerModel(typeUri,     "dmx.core.type"),
-                mf.newTopicPlayerModel(dataTypeUri, "dmx.core.default")
+                mf.newTopicPlayerModel(typeUri,     "dmx.core.parent"),
+                mf.newTopicPlayerModel(dataTypeUri, "dmx.core.child")
             );
         } catch (Exception e) {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
@@ -536,17 +536,17 @@ class TypeStorage {
 
     private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
         return al.sd.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
-            "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
+            "dmx.core.sequence_start", "dmx.core.composition_def");
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
         return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
-            "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
+            "dmx.core.successor", "dmx.core.composition_def");
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
         return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
-            "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
+            "dmx.core.predecessor", "dmx.core.composition_def");
     }
 
     // --- Store ---

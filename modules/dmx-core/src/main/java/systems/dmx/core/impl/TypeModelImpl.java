@@ -529,7 +529,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void storeDataTypeUri() {
         // remove current assignment
-        getRelatedTopic("dmx.core.composition", "dmx.core.type", "dmx.core.default", "dmx.core.data_type")
+        getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child", "dmx.core.data_type")
             .getRelatingAssoc().delete();
         // create new assignment
         al.typeStorage.storeDataType(uri, dataTypeUri);
