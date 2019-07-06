@@ -402,7 +402,16 @@ class TypeStorage {
 
     void storeCompDef(CompDefModelImpl compDef) {
         try {
-            al.createAssoc(addPlayerIds(compDef));
+            // Note: the passed "compDef" is what is stored in type cache. The value integrator (as called by
+            // createAssoc()) does not update that model in-place.
+            AssocModelImpl assoc = al.createAssoc(addPlayerIds(compDef));
+            // We must explicitly update the type cache with the integration result (as returned by createAssoc()).
+            // Both values are needed, the simple one (as being displayed in webclient's type editor), and the composite
+            // one (as its relating assocs are needed when revealing a comp def child topic in webclient).
+            // TODO: remove this side effect
+            compDef.value       = assoc.value;
+            compDef.childTopics = assoc.childTopics;
+            //
             storeViewConfig(compDef);
         } catch (Exception e) {
             throw new RuntimeException("Storing comp def \"" + compDef.getCompDefUri() + "\" failed (parent type \"" +
