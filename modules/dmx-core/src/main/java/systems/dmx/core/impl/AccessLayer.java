@@ -336,12 +336,15 @@ public final class AccessLayer {
             AssocModelImpl _model = updateValues(model, null);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
             //
-            // 2) transfer value
-            // Note: postCreate() creates and caches the comp def based on "model". Cached comp defs need an
-            // up-to-date value (as being displayed in webclient's type editor). The value is calculated while
-            // value integration. We must transfer that value to "model".
+            // 2) value transfer
+            // Note: this is needed when storing an assoc which underlies a comp def. The passed "model" is what is
+            // stored in type cache. Cached comp defs need an up-to-date value. The value is calculated while value
+            // integration. We must transfer that value to "model".
+            // Both is needed the simple value (as being displayed in webclient's type editor), and the composite value
+            // (as its relating assocs are needed when revealing a child topic in webclient).
             // TODO: rethink this solution.
-            model.value = _model.value;
+            model.value       = _model.value;
+            model.childTopics = _model.childTopics;
             //
             // Note: the postCreate() hook is invoked on the update model, *not* on the value integration result
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment

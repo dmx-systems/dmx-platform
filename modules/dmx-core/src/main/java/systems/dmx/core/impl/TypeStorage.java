@@ -402,16 +402,7 @@ class TypeStorage {
 
     void storeCompDef(CompDefModelImpl compDef) {
         try {
-            // 1) create association
             al.createAssoc(addPlayerIds(compDef));
-            //
-            // 2) cardinality
-            // Note: if the underlying association was a comp def before it has cardinality assignments already.
-            // These must be removed before assigning new cardinality. ### TODO?
-            // ### removeCardinalityAssignmentIfExists(compDefId, CHILD_CARDINALITY);
-            // ### associateCardinality(compDefId, CHILD_CARDINALITY, compDef.getChildCardinalityUri());
-            //
-            // 3) view config
             storeViewConfig(compDef);
         } catch (Exception e) {
             throw new RuntimeException("Storing comp def \"" + compDef.getCompDefUri() + "\" failed (parent type \"" +
