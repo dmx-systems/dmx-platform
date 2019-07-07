@@ -134,23 +134,23 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<TopicModelImpl> fetchTopics(String key, Object value) {
+    public List<TopicModelImpl> queryTopics(String key, Object value) {
         return buildTopics(topicContentExact.query(key, value));
     }
 
     @Override
-    public List<TopicModelImpl> queryTopics(Object value) {
-        return queryTopics(null, value);
+    public List<TopicModelImpl> queryTopicsFulltext(Object value) {
+        return queryTopicsFulltext(null, value);
     }
 
     @Override
-    public List<TopicModelImpl> queryTopics(String key, Object value) {
+    public List<TopicModelImpl> queryTopicsFulltext(String key, Object value) {
         if (key == null) {
             key = KEY_FULLTEXT;
         }
         if (value == null) {
-            throw new IllegalArgumentException("Tried to call queryTopics() with a null value Object (key=\"" + key +
-                "\")");
+            throw new IllegalArgumentException("Tried to call queryTopicsFulltext() with a null value Object (key=\"" +
+                key + "\")");
         }
         //
         return buildTopics(topicContentFulltext.query(key, value));
@@ -237,7 +237,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<AssocModelImpl> fetchAssocs(String key, Object value) {
+    public List<AssocModelImpl> queryAssocs(String key, Object value) {
         return buildAssocs(assocContentExact.query(key, value));
     }
 

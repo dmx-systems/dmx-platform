@@ -91,8 +91,8 @@ public class WebservicePlugin extends PluginActivator {
     // ### TODO: change URI template
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
-    public List<Topic> getTopicsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.getTopicsByValue(key, value);
+    public List<Topic> queryTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dmx.queryTopics(key, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
@@ -106,8 +106,9 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
-    public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field") String fieldUri) {
-        return dmx.searchTopics(searchTerm, fieldUri);
+    public List<Topic> queryTopicsFulltext(@QueryParam("search") String searchTerm,
+                                           @QueryParam("field")  String fieldUri) {
+        return dmx.queryTopicsFulltext(searchTerm, fieldUri);
     }
 
     @POST
@@ -160,8 +161,8 @@ public class WebservicePlugin extends PluginActivator {
     // ### TODO: change URI template
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
-    public List<Assoc> getAssocsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.getAssocsByValue(key, value);
+    public List<Assoc> queryAssocs(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dmx.queryAssocs(key, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter

@@ -62,7 +62,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     List<AssocModelImpl> getAllInstances() {
-        return al.db.fetchAssocs("typeUri", uri);
+        return al.db.queryAssocs("typeUri", uri);
     }
 
     // ---

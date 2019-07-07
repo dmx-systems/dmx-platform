@@ -623,7 +623,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @return  a list, possibly empty.
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
-        return al.db.queryTopics(key, value);
+        return al.db.queryTopicsFulltext(key, value);   // ### FIXME: is fulltext access wanted?
     }
 
     /**

@@ -58,7 +58,7 @@ public interface CoreService {
      * Looks up a single topic by exact value.
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #getTopicsByValue(String,SimpleValue)}
+     * Compare to {@link #queryTopics(String,SimpleValue)}
      *
      * @return  the topic, or <code>null</code> if no such topic exists.
      *
@@ -71,7 +71,7 @@ public interface CoreService {
      * <p>
      * Wildcards like "*" in String values are interpreted.
      */
-    List<Topic> getTopicsByValue(String key, SimpleValue value);
+    List<Topic> queryTopics(String key, SimpleValue value);
 
     List<Topic> getTopicsByType(String topicTypeUri);
 
@@ -81,7 +81,7 @@ public interface CoreService {
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
      *                      ### TODO: rename parameter to "key"/"typeUri"?
      */
-    List<Topic> searchTopics(String searchTerm, String fieldUri);
+    List<Topic> queryTopicsFulltext(String searchTerm, String fieldUri);
 
     Iterable<Topic> getAllTopics();
 
@@ -103,7 +103,7 @@ public interface CoreService {
      * Looks up a single association by exact value.
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #getAssocsByValue(String,SimpleValue)}
+     * Compare to {@link #queryAssocs(String,SimpleValue)}
      *
      * @return  the association, or <code>null</code> if no such association exists.
      *
@@ -116,7 +116,7 @@ public interface CoreService {
      * <p>
      * Wildcards like "*" in String values <i>are</i> interpreted.
      */
-    List<Assoc> getAssocsByValue(String key, SimpleValue value);
+    List<Assoc> queryAssocs(String key, SimpleValue value);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.

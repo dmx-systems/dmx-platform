@@ -150,31 +150,31 @@ public class Neo4jStorageTest {
     public void testFulltextIndex() {
         List<TopicModelImpl> topics;
         // By default a Lucene index is case-insensitive:
-        topics = db.queryTopics("Dmx"); assertEquals(2, topics.size());
-        topics = db.queryTopics("dmx"); assertEquals(2, topics.size());
-        topics = db.queryTopics("DMX"); assertEquals(2, topics.size());
+        topics = db.queryTopicsFulltext("Dmx"); assertEquals(2, topics.size());
+        topics = db.queryTopicsFulltext("dmx"); assertEquals(2, topics.size());
+        topics = db.queryTopicsFulltext("DMX"); assertEquals(2, topics.size());
         // Lucene's default operator is OR:
-        topics = db.queryTopics("collaboration platform");         assertEquals(1, topics.size());
-        topics = db.queryTopics("collaboration plaXXXform");       assertEquals(1, topics.size());
-        topics = db.queryTopics("collaboration AND plaXXXform");   assertEquals(0, topics.size());
-        topics = db.queryTopics("collaboration AND platform");     assertEquals(1, topics.size());
+        topics = db.queryTopicsFulltext("collaboration platform");         assertEquals(1, topics.size());
+        topics = db.queryTopicsFulltext("collaboration plaXXXform");       assertEquals(1, topics.size());
+        topics = db.queryTopicsFulltext("collaboration AND plaXXXform");   assertEquals(0, topics.size());
+        topics = db.queryTopicsFulltext("collaboration AND platform");     assertEquals(1, topics.size());
         // Phrases are set in ".."
-        topics = db.queryTopics("\"collaboration platform\"");     assertEquals(0, topics.size());
-        topics = db.queryTopics("\"platform for collaboration\""); assertEquals(1, topics.size());
+        topics = db.queryTopicsFulltext("\"collaboration platform\"");     assertEquals(0, topics.size());
+        topics = db.queryTopicsFulltext("\"platform for collaboration\""); assertEquals(1, topics.size());
         // Within phrases wildcards do not work:
-        topics = db.queryTopics("\"platform * collaboration\"");   assertEquals(0, topics.size());
+        topics = db.queryTopicsFulltext("\"platform * collaboration\"");   assertEquals(0, topics.size());
     }
 
     @Test
     public void testFulltextIndexWithHTML() {
         List<TopicModelImpl> topics;
         // Lucene's Whitespace Analyzer (default for a Neo4j "fulltext" index) regards HTML as belonging to the word
-        topics = db.queryTopics("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
-        topics = db.queryTopics("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
-        topics = db.queryTopics("*Haskell*");      assertEquals(2, topics.size());
-        topics = db.queryTopics("<b>Haskell");     assertEquals(0, topics.size());
-        topics = db.queryTopics("<b>Haskell*");    assertEquals(1, topics.size()); assertUri(topics, "note-3");
-        topics = db.queryTopics("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
+        topics = db.queryTopicsFulltext("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = db.queryTopicsFulltext("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = db.queryTopicsFulltext("*Haskell*");      assertEquals(2, topics.size());
+        topics = db.queryTopicsFulltext("<b>Haskell");     assertEquals(0, topics.size());
+        topics = db.queryTopicsFulltext("<b>Haskell*");    assertEquals(1, topics.size()); assertUri(topics, "note-3");
+        topics = db.queryTopicsFulltext("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
     }
 
     private void assertUri(List<TopicModelImpl> singletonList, String topicUri) {
@@ -184,14 +184,14 @@ public class Neo4jStorageTest {
     @Test
     public void testExactIndexWithQuery() {
         List<TopicModelImpl> topics;
-        topics = db.fetchTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
-        topics = db.fetchTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
+        topics = db.queryTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
+        topics = db.queryTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
         // => in contrast to Lucene docs a wildcard can be used as the first character of a search
         // http://lucene.apache.org/core/old_versioned_docs/versions/3_5_0/queryparsersyntax.html
         //
-        topics = db.fetchTopics("uri", "dmx.core.*");   assertEquals(2, topics.size());
-        topics = db.fetchTopics("uri", "dmx.*.*");      assertEquals(2, topics.size());
-        topics = db.fetchTopics("uri", "dmx.*.*_type"); assertEquals(2, topics.size());
+        topics = db.queryTopics("uri", "dmx.core.*");   assertEquals(2, topics.size());
+        topics = db.queryTopics("uri", "dmx.*.*");      assertEquals(2, topics.size());
+        topics = db.queryTopics("uri", "dmx.*.*_type"); assertEquals(2, topics.size());
         // => more than one wildcard can be used in a search
     }
 

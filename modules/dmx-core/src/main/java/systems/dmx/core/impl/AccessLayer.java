@@ -88,9 +88,9 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> getTopicsByValue(String key, SimpleValue value) {
+    List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
         try {
-            return filterReadables(db.fetchTopics(key, value.value()));
+            return filterReadables(db.queryTopics(key, value.value()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -104,9 +104,9 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> searchTopics(String searchTerm, String fieldUri) {
+    List<TopicModelImpl> queryTopicsFulltext(String searchTerm, String fieldUri) {
         try {
-            return filterReadables(db.queryTopics(fieldUri, searchTerm));
+            return filterReadables(db.queryTopicsFulltext(fieldUri, searchTerm));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed, searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\"", e);
@@ -237,9 +237,9 @@ public final class AccessLayer {
         }
     }
 
-    List<AssocModelImpl> getAssocsByValue(String key, SimpleValue value) {
+    List<AssocModelImpl> queryAssocs(String key, SimpleValue value) {
         try {
-            return filterReadables(db.fetchAssocs(key, value.value()));
+            return filterReadables(db.queryAssocs(key, value.value()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
         }
@@ -768,7 +768,7 @@ public final class AccessLayer {
             topicTypeUris.add("dmx.core.assoc_type");
             topicTypeUris.add("dmx.core.meta_type");
             // add regular types
-            for (TopicModelImpl topicType : filterReadables(db.fetchTopics("typeUri", "dmx.core.topic_type"))) {
+            for (TopicModelImpl topicType : filterReadables(db.queryTopics("typeUri", "dmx.core.topic_type"))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -780,7 +780,7 @@ public final class AccessLayer {
     private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModelImpl assocType : filterReadables(db.fetchTopics("typeUri", "dmx.core.assoc_type"))) {
+            for (TopicModelImpl assocType : filterReadables(db.queryTopics("typeUri", "dmx.core.assoc_type"))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;

@@ -1288,7 +1288,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private List<Topic> getTopicInstances(String topicTypeUri) {
-        return dmx.getTopicsByValue("typeUri", new SimpleValue(topicTypeUri));
+        return dmx.queryTopics("typeUri", new SimpleValue(topicTypeUri));   // TODO: Lucene query actually wanted?
     }
 
     private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {

@@ -36,15 +36,15 @@ public interface DMXStorage {
      */
     TopicModelImpl fetchTopic(String key, Object value);
 
-    List<TopicModelImpl> fetchTopics(String key, Object value);
+    List<TopicModelImpl> queryTopics(String key, Object value);
 
-    List<TopicModelImpl> queryTopics(Object value);
+    List<TopicModelImpl> queryTopicsFulltext(Object value);
 
     /**
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    List<TopicModelImpl> queryTopics(String key, Object value);
+    List<TopicModelImpl> queryTopicsFulltext(String key, Object value);
 
     Iterable<TopicModelImpl> fetchAllTopics();
 
@@ -107,7 +107,7 @@ public interface DMXStorage {
      */
     AssocModelImpl fetchAssoc(String key, Object value);
 
-    List<AssocModelImpl> fetchAssocs(String key, Object value);
+    List<AssocModelImpl> queryAssocs(String key, Object value);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.

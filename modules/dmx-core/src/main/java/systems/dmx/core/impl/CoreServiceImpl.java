@@ -94,8 +94,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Topic> getTopicsByValue(String key, SimpleValue value) {
-        return al.instantiate(al.getTopicsByValue(key, value));
+    public List<Topic> queryTopics(String key, SimpleValue value) {
+        return al.instantiate(al.queryTopics(key, value));
     }
 
     @Override
@@ -104,8 +104,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Topic> searchTopics(String searchTerm, String fieldUri) {
-        return al.instantiate(al.searchTopics(searchTerm, fieldUri));
+    public List<Topic> queryTopicsFulltext(String searchTerm, String fieldUri) {
+        return al.instantiate(al.queryTopicsFulltext(searchTerm, fieldUri));
     }
 
     @Override
@@ -146,8 +146,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Assoc> getAssocsByValue(String key, SimpleValue value) {
-        return al.instantiate(al.getAssocsByValue(key, value));
+    public List<Assoc> queryAssocs(String key, SimpleValue value) {
+        return al.instantiate(al.queryAssocs(key, value));
     }
 
     @Override
