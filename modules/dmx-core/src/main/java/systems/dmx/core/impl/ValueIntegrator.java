@@ -198,12 +198,17 @@ class ValueIntegrator {
      * @return  the fetched or created topic; never null.
      */
     private TopicModelImpl unifySimple() {
+        TopicModelImpl topic;
         SimpleValue newValue = newValues.getSimpleValue();
-        // Note: in order to be reused a topic must be readable. If an unreadable topic exists the persistence layer
-        // must not throw AccessControlException as this would abort value integration. Instead we do direct DB access
-        // and check for readability explicitly.
-        TopicModelImpl topic = al.db.fetchTopic(type.getUri(), newValue.value());
-        if (topic != null && topic.isReadable()) {
+        // Note: only readable topics can be reused
+        List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue);
+        int size = topics.size();
+        if (size > 0) {
+            topic = topics.get(0);
+            if (size > 1) {
+                logger.warning("ValueIntegrator ambiguity: there are " + size + " readable \"" + newValue +
+                    "\" topics (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(topics) + ") => using " + topic.id);
+            }
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
             topic = createSimpleTopic();
@@ -596,18 +601,19 @@ class ValueIntegrator {
                 break;
             }
         }
-        switch (candidates.size()) {
-        case 0:
-            // logger.info("### no composite found, childValues=" + childValues);
-            return createCompositeTopic(childValues);
-        case 1:
+        int size = candidates.size();
+        if (size > 0) {
             DMXObjectModelImpl comp = candidates.get(0);
+            if (size > 1) {
+                logger.warning("ValueIntegrator ambiguity: there are " + candidates.size() + " parents (typeUri=\"" +
+                    type.uri + "\", " + DMXUtils.idList(candidates) + ") which have the same " + childValues.values()
+                    .size() + " child topics => using " + comp.id + ", child topics " + childValues.values());
+            }
             // logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
-        default:
-            throw new RuntimeException("ValueIntegrator ambiguity: there are " + candidates.size() +
-                " parents (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(candidates) +
-                ") which have the same " + childValues.values().size() + " child topics " + childValues.values());
+        } else {
+            // logger.info("### no composite found, childValues=" + childValues);
+            return createCompositeTopic(childValues);
         }
     }
 
