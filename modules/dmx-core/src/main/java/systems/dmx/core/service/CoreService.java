@@ -54,6 +54,8 @@ public interface CoreService {
      */
     Topic getTopicByUri(String uri);
 
+    List<Topic> getTopicsByType(String topicTypeUri);
+
     /**
      * Looks up a single topic by exact value.
      * <p>
@@ -67,13 +69,19 @@ public interface CoreService {
     Topic getTopicByValue(String key, SimpleValue value);
 
     /**
+     * Looks up topics by exact value.
+     * <p>
+     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
+     * Compare to {@link #queryTopics(String,SimpleValue)}
+     */
+    List<Topic> getTopicsByValue(String key, SimpleValue value);
+
+    /**
      * Looks up topics by key and value.
      * <p>
      * Wildcards like "*" in String values are interpreted.
      */
     List<Topic> queryTopics(String key, SimpleValue value);
-
-    List<Topic> getTopicsByType(String topicTypeUri);
 
     /**
      * Performs a fulltext search.

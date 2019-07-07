@@ -8,7 +8,6 @@ import systems.dmx.core.impl.RelatedTopicModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
 
 import java.util.List;
 
@@ -35,6 +34,8 @@ public interface DMXStorage {
      * @throws  RuntimeException    if more than one topic is found.
      */
     TopicModelImpl fetchTopic(String key, Object value);
+
+    List<TopicModelImpl> fetchTopics(String key, Object value);
 
     List<TopicModelImpl> queryTopics(String key, Object value);
 

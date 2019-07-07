@@ -134,6 +134,11 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
+    public List<TopicModelImpl> fetchTopics(String key, Object value) {
+        return buildTopics(topicContentExact.get(key, value));
+    }
+
+    @Override
     public List<TopicModelImpl> queryTopics(String key, Object value) {
         return buildTopics(topicContentExact.query(key, value));
     }

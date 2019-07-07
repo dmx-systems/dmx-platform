@@ -79,6 +79,14 @@ public final class AccessLayer {
         }
     }
 
+    List<TopicModelImpl> getTopicsByType(String topicTypeUri) {
+        try {
+            return filterReadables(_getTopicType(topicTypeUri).getAllInstances());
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics by type failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
+        }
+    }
+
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
             TopicModelImpl topic = db.fetchTopic(key, value.value());
@@ -88,19 +96,19 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
+    List<TopicModelImpl> getTopicsByValue(String key, SimpleValue value) {
         try {
-            return filterReadables(db.queryTopics(key, value.value()));
+            return filterReadables(db.fetchTopics(key, value.value()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
-    List<TopicModelImpl> getTopicsByType(String topicTypeUri) {
+    List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
         try {
-            return filterReadables(_getTopicType(topicTypeUri).getAllInstances());
+            return filterReadables(db.queryTopics(key, value.value()));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching topics by type failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
+            throw new RuntimeException("Querying topics failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 
@@ -108,8 +116,8 @@ public final class AccessLayer {
         try {
             return filterReadables(db.queryTopicsFulltext(fieldUri, searchTerm));
         } catch (Exception e) {
-            throw new RuntimeException("Searching topics failed, searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\"", e);
+            throw new RuntimeException("Querying topics fulltext failed, searchTerm=\"" + searchTerm +
+                "\", fieldUri=\"" + fieldUri + "\"", e);
         }
     }
 
@@ -241,7 +249,7 @@ public final class AccessLayer {
         try {
             return filterReadables(db.queryAssocs(key, value.value()));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching assocs failed, key=\"" + key + "\", value=" + value, e);
+            throw new RuntimeException("Querying assocs failed, key=\"" + key + "\", value=" + value, e);
         }
     }
 

@@ -88,19 +88,24 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public List<Topic> getTopicsByType(String topicTypeUri) {
+        return al.instantiate(al.getTopicsByType(topicTypeUri));
+    }
+
+    @Override
     public Topic getTopicByValue(String key, SimpleValue value) {
         TopicModelImpl topic = al.getTopicByValue(key, value);
         return topic != null ? topic.instantiate() : null;
     }
 
     @Override
-    public List<Topic> queryTopics(String key, SimpleValue value) {
-        return al.instantiate(al.queryTopics(key, value));
+    public List<Topic> getTopicsByValue(String key, SimpleValue value) {
+        return al.instantiate(al.getTopicsByValue(key, value));
     }
 
     @Override
-    public List<Topic> getTopicsByType(String topicTypeUri) {
-        return al.instantiate(al.getTopicsByType(topicTypeUri));
+    public List<Topic> queryTopics(String key, SimpleValue value) {
+        return al.instantiate(al.queryTopics(key, value));
     }
 
     @Override
