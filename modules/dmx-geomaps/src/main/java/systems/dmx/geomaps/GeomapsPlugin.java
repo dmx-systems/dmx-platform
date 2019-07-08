@@ -193,6 +193,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     @Override
     public void init() {
         topicmapsService.registerTopicmapType(new GeomapType());
+        // FIXME: unregister
     }
 
 

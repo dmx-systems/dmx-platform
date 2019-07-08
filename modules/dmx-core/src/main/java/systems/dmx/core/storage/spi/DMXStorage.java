@@ -27,6 +27,7 @@ public interface DMXStorage {
 
     /**
      * Looks up a single topic by exact value.
+    // ### TODO: drop it from SPI as is pure convenience
      *
      * @return  The fetched topic, or <code>null</code> if no such topic exists.
      *          Note: its child topics are not fetched.
@@ -37,8 +38,10 @@ public interface DMXStorage {
 
     List<TopicModelImpl> fetchTopics(String key, Object value);
 
+    // ### TODO: drop it as actually not used?
     List<TopicModelImpl> queryTopics(String key, Object value);
 
+    // ### TODO: drop it from SPI as is pure convenience
     List<TopicModelImpl> queryTopicsFulltext(Object value);
 
     /**

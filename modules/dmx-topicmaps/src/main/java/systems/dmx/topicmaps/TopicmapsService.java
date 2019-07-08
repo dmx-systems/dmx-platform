@@ -14,7 +14,7 @@ public interface TopicmapsService extends TopicmapsConstants {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    static final String DEFAULT_TOPICMAP_NAME     = "untitled";
+    static final String DEFAULT_TOPICMAP_NAME = "untitled";
     static final String DEFAULT_TOPICMAP_TYPE_URI = TOPICMAP;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -110,7 +110,7 @@ public interface TopicmapsService extends TopicmapsConstants {
 
     void registerTopicmapType(TopicmapType topicmapType);
 
-    // ### TODO: unregister needed? Might a topicmap type hold a stale dmx instance?
+    // ### TODO: unregisterTopicmapType(), needed when a maptype plugin shuts down
 
     // ---
 

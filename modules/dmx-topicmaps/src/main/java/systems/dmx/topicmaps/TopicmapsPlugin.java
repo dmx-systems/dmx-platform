@@ -91,14 +91,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 .put("dmx.topicmaps.topicmap_name", name)
                 .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
             ));
-            // init topicmap state
             getTopicmapType(topicmapTypeUri).initTopicmapState(topicmapTopic, viewProps, dmx);
             //
             me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
             return topicmapTopic;
         } catch (Exception e) {
             throw new RuntimeException("Creating topicmap \"" + name + "\" failed, topicmapTypeUri=\"" +
-                topicmapTypeUri + "\"", e);
+                topicmapTypeUri + "\", viewProps=" + viewProps, e);
         }
     }
 
@@ -691,7 +690,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private TopicmapType getTopicmapType(String topicmapTypeUri) {
         TopicmapType topicmapType = topicmapTypes.get(topicmapTypeUri);
         if (topicmapType == null) {
-            throw new RuntimeException("Topicmap type \"" + topicmapTypeUri + "\" not registered");
+            throw new RuntimeException("Topicmap type \"" + topicmapTypeUri + "\" is unknown");
         }
         return topicmapType;
     }

@@ -275,7 +275,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public Topic getWorkspace(String uri) {
-        TopicModelImpl workspace = fetchTopic("uri", uri);
+        TopicModelImpl workspace = al.db.fetchTopic("uri", uri);
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }
@@ -299,7 +299,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         if (systemWorkspaceId == -1) {
             // Note: fetching the System workspace topic though the Core service would involve a permission check
             // and run in a vicious circle. So direct storage access is required here.
-            TopicModel workspace = fetchTopic("uri", SYSTEM_WORKSPACE_URI);
+            TopicModel workspace = al.db.fetchTopic("uri", SYSTEM_WORKSPACE_URI);
             // Note: the Access Control plugin creates the System workspace before it performs its first permission
             // check.
             if (workspace == null) {
@@ -569,7 +569,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
-        return fetchTopic(TYPE_USERNAME, username);
+        return al.db.fetchTopic(TYPE_USERNAME, username);
     }
 
     private TopicModelImpl _getUsernameTopicOrThrow(String username) {
@@ -584,7 +584,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String _getUsername(String emailAddress) {
         String username = null;
-        for (TopicModelImpl emailAddressTopic : queryTopics(TYPE_EMAIL_ADDRESS, emailAddress)) {
+        for (TopicModelImpl emailAddressTopic : al.db.fetchTopics(TYPE_EMAIL_ADDRESS, emailAddress)) {
             TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
                 "dmx.core.child", "dmx.core.parent", TYPE_USERNAME);
             if (usernameTopic != null) {
@@ -607,24 +607,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
 
     // === Direct Storage Access ===
-
-    /**
-     * Fetches a topic by key/value.
-     *
-     * @return  the topic, or <code>null</code> if no such topic exists.
-     */
-    private TopicModelImpl fetchTopic(String key, Object value) {
-        return al.db.fetchTopic(key, value);
-    }
-
-    /**
-     * Queries topics by key/value.
-     *
-     * @return  a list, possibly empty.
-     */
-    private List<TopicModelImpl> queryTopics(String key, Object value) {
-        return al.db.queryTopicsFulltext(key, value);   // ### FIXME: is fulltext access wanted?
-    }
 
     /**
      * Fetches topics by owner, and filter by type.

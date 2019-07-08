@@ -200,11 +200,13 @@ class ValueIntegrator {
     private TopicModelImpl unifySimple() {
         TopicModelImpl topic;
         SimpleValue newValue = newValues.getSimpleValue();
-        // Note: only readable topics can be reused
+        // Note: only readable topics can be reused (access control is applied)
         List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue);
         int size = topics.size();
         if (size > 0) {
             topic = topics.get(0);
+            // Note: values are not globally unique due to asymmetric access realms (user A's content might be readable
+            // by user B but not vice versa)
             if (size > 1) {
                 logger.warning("ValueIntegrator ambiguity: there are " + size + " readable \"" + newValue +
                     "\" topics (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(topics) + ") => using " + topic.id);
@@ -604,6 +606,8 @@ class ValueIntegrator {
         int size = candidates.size();
         if (size > 0) {
             DMXObjectModelImpl comp = candidates.get(0);
+            // Note: values are not globally unique due to asymmetric access realms (user A's content might be readable
+            // by user B but not vice versa)
             if (size > 1) {
                 logger.warning("ValueIntegrator ambiguity: there are " + candidates.size() + " parents (typeUri=\"" +
                     type.uri + "\", " + DMXUtils.idList(candidates) + ") which have the same " + childValues.values()
