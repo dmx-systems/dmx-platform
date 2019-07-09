@@ -176,11 +176,6 @@ public class DMXObjectModelImpl implements DMXObjectModel {
     @Override
     public JSONObject toJSON() {
         try {
-            // Note: for models used for topic/association enrichment (e.g. timestamps) default values must be set
-            // in case they are not fully initialized.
-            // ### TODO: remove this side effect! Note that toJSON() is also used for logging!
-            setDefaults();
-            //
             return new JSONObject()
                 .put("id", id)
                 .put("uri", uri)
@@ -587,20 +582,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         return getType().getDataTypeUri().equals("dmx.core.html");
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // ### TODO: a principal copy exists in Neo4jStorage.
-    // Should this be package private? Should Neo4jStorage have access to the Core's impl package?
-    private void setDefaults() {
-        if (getUri() == null) {
-            setUri("");
-        }
-        if (getSimpleValue() == null) {
-            setSimpleValue("");
-        }
-    }
 
 
 
