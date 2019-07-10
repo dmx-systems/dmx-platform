@@ -34,7 +34,8 @@ export default {
     topics () {
       // Note 1: while initial rendering no workspace is selected yet
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
-      return this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
+      const topics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
+      return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
     }
   },
 
