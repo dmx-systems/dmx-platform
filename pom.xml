@@ -309,7 +309,6 @@
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-accesscontrol</module>
                 <module>modules/dmx-facets</module>
-                <module>modules/dmx-help-menu</module>
                 <module>modules/dmx-geomaps</module>
                 <module>modules/dmx-timestamps</module>
                 <module>modules/dmx-caching</module>
@@ -382,7 +381,6 @@
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-accesscontrol</module>
                 <module>modules/dmx-facets</module>
-                <module>modules/dmx-help-menu</module>
                 <module>modules/dmx-geomaps</module>
                 <module>modules/dmx-timestamps</module>
                 <module>modules/dmx-caching</module>
