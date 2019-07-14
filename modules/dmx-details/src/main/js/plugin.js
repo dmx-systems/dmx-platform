@@ -24,6 +24,7 @@ export default ({store}) => ({
         object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
         writable:        state => state.writable,
         visible:         state => state.details.visible,
+        pinned:          state => state.details.pinned,
         tab:             state => state.details.tab,
         mode:            state => state.details.mode,
         markerIds:       (_, getters) => getters && getters.visibleTopicIds,
@@ -44,6 +45,7 @@ export default ({store}) => ({
         'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
         'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
         'related-icon-click':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
+        'pin':                 pinned          =>  store.dispatch('setDetailPanelPinned', pinned),
         'close':               ()              =>  store.dispatch('stripSelectionFromRoute')
       }
     }

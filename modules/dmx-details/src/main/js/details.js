@@ -1,6 +1,7 @@
 const state = {
 
   visible: false,     // Detail panel visibility
+  pinned: false,      // Pin toggle state
 
   tab: 'info',        // Selected tab: 'info', 'related', 'meta', 'view'.
                       // Note: form edit takes place in "info" tab, while 'mode' is set to 'form'.
@@ -19,6 +20,10 @@ const actions = {
       throw Error(`boolean expexted, got ${typeof visible}`)
     }
     state.visible = visible
+  },
+
+  setDetailPanelPinned (_, pinned) {
+    state.pinned = pinned
   },
 
   selectDetail (_, detail) {
