@@ -1,16 +1,21 @@
 <template>
-  <el-dropdown class="dm5-help-menu" size="medium" trigger="click">
+  <el-dropdown class="dm5-help-menu" size="medium" trigger="click" @command="handle">
     <el-button type="text" class="fa fa-question-circle">
       <span class="el-icon-arrow-down el-icon--right"></span>
     </el-button>
     <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item>Help</el-dropdown-item>
+      <el-dropdown-item command="openHelpDialog">Help</el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
 </template>
 
 <script>
 export default {
+  methods: {
+    handle (command) {
+      this.$store.dispatch(command)
+    }
+  }
 }
 </script>
 
