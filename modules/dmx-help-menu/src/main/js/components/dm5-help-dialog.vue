@@ -9,7 +9,7 @@
         </div>
         <div style="margin-left: 3em">
           <div class="field-label">Released</div>
-          July 14, 2019
+          July 15, 2019
         </div>
       </div>
     </div>

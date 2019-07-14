@@ -72,18 +72,12 @@ store.registerModule('routerModule', {
       })
     },
 
-    callTopicRoute ({rootState}, id) {
-      router.push({
-        name: rootState.details.visible ? 'topicDetail' : 'topic',
-        params: {topicId: id}
-      })
+    callTopicRoute (_, id) {
+      callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
     },
 
-    callAssocRoute ({rootState}, id) {
-      router.push({
-        name: rootState.details.visible ? 'assocDetail' : 'assoc',
-        params: {assocId: id}
-      })
+    callAssocRoute (_, id) {
+      callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
     },
 
     stripSelectionFromRoute () {
@@ -128,6 +122,22 @@ store.registerModule('routerModule', {
     }
   }
 })
+
+function callObjectRoute (id, paramName, routeName, detailRouteName) {
+  const location = {
+    params: {[paramName]: id}
+  }
+  if (store.state.details.visible) {
+    location.name = detailRouteName
+    // Note: if the detail panel is visible but empty there is no "detail" segment in the current URL
+    if (!router.currentRoute.params.detail) {
+      location.params.detail = 'info'
+    }
+  } else {
+    location.name = routeName
+  }
+  router.push(location)
+}
 
 // TODO: why does the watcher kick in when an initial URL is present?
 // Since when is it this way?
@@ -275,7 +285,7 @@ function navigate (to, from) {
   const detail = to.params.detail
   const oldDetail = from.params.detail
   if (detail != oldDetail) {
-    store.dispatch('setDetailPanelVisibility', detail !== undefined)
+    store.dispatch('setDetailPanelVisibility', detail !== undefined || store.state.details.pinned)
     if (detail) {
       store.dispatch('selectDetail', detail)
       if (!oldDetail && oldId === newId) {

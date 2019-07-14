@@ -22,8 +22,13 @@ const actions = {
     state.visible = visible
   },
 
-  setDetailPanelPinned (_, pinned) {
+  setDetailPanelPinned ({rootState}, pinned) {
     state.pinned = pinned
+    // When unpinning an empty detail panel close it.
+    // Note: no route change is involved.
+    if (!pinned && !rootState.object) {
+      state.visible = false
+    }
   },
 
   selectDetail (_, detail) {
