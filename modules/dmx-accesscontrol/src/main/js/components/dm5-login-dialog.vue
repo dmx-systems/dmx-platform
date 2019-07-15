@@ -68,6 +68,7 @@ export default {
         credentials: this.credentials,
         authMethod:  this.authMethod
       }).then(success => {
+        this.credentials.password = ''
         if (success) {
           this.message = 'Login OK'
           this.close()
