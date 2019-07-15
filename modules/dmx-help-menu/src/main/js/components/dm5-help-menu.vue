@@ -10,7 +10,7 @@
       <el-dropdown-item>
         <el-link href="https://forum.dmx.systems" target="_blank" :underline="false">Forum</el-link>
       </el-dropdown-item>
-      <el-dropdown-item command="openHelpDialog" divided>
+      <el-dropdown-item command="openAboutBox" divided>
         About DMX
       </el-dropdown-item>
     </el-dropdown-menu>

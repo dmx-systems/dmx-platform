@@ -1,15 +1,15 @@
 const state = {
-  dialogVisibility: false      // Help dialog visibility
+  aboutBoxVisibility: false
 }
 
 const actions = {
 
-  openHelpDialog () {
-    state.dialogVisibility = true
+  openAboutBox () {
+    state.aboutBoxVisibility = true
   },
 
-  closeHelpDialog () {
-    state.dialogVisibility = false
+  closeAboutBox () {
+    state.aboutBoxVisibility = false
   }
 }
 

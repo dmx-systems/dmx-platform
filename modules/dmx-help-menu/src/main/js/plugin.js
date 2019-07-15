@@ -11,7 +11,7 @@ export default {
       mount: 'toolbar-right'
     },
     {
-      comp: require('./components/dm5-help-dialog').default,
+      comp: require('./components/dm5-about-box').default,
       mount: 'webclient'
     }
   ]
