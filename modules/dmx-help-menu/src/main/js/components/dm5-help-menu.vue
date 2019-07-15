@@ -4,7 +4,15 @@
       <span class="el-icon-arrow-down el-icon--right"></span>
     </el-button>
     <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item command="openHelpDialog">Help</el-dropdown-item>
+      <el-dropdown-item>
+        <el-link href="https://docs.dmx.systems" target="_blank" :underline="false">Documentation</el-link>
+      </el-dropdown-item>
+      <el-dropdown-item>
+        <el-link href="https://forum.dmx.systems" target="_blank" :underline="false">Forum</el-link>
+      </el-dropdown-item>
+      <el-dropdown-item command="openHelpDialog" divided>
+        About DMX
+      </el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
 </template>
@@ -13,7 +21,9 @@
 export default {
   methods: {
     handle (command) {
-      this.$store.dispatch(command)
+      if (command) {
+        this.$store.dispatch(command)
+      }
     }
   }
 }

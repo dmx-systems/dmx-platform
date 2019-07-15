@@ -110,7 +110,7 @@ button {
   padding: 0px 8px !important;                    /* was 0px 15px */
 }
 
-.el-radio {
+.el-radio, .el-link {
   font-weight: unset !important;                  /* was 500 */
 }
 
