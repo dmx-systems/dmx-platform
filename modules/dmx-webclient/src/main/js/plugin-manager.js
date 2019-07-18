@@ -9,6 +9,7 @@ export default () => {
   //     dmx-search must be inited *before* any plugin which registers extra menu items.
   //  2. dmx-accesscontrol must be inited *before* dmx-workspaces.
   //     dmx-workspaces watches dmx-accesscontrol's "username" store state.
+  initPlugin(require('modules/dmx-base/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
