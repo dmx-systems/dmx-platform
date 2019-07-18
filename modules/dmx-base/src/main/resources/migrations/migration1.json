@@ -4,11 +4,6 @@
       "value":       "URL",
       "uri":         "dmx.base.url",
       "dataTypeUri": "dmx.core.text"
-    },
-    {
-      "value":       "Description",
-      "uri":         "dmx.base.description",
-      "dataTypeUri": "dmx.core.html"
     }
   ]
 }
