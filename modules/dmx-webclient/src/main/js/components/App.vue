@@ -1,5 +1,5 @@
 <template>
-  <router-view></router-view>
+  <router-view @contextmenu.native.prevent></router-view>
   <!--
     Note: the Vue template compiler is not available as we use the Vue runtime.
     So we can't put <router-view> in index.html but must render the root component
