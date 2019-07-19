@@ -51,6 +51,7 @@
   --detail-panel-padding: 12px;               /* left/right padding for detail panel tab panes */
   --detail-panel-padding-all: 29px 12px 12px 12px;
   --highlight-color: #409eff;                 /* matches --color-primary */
+  --highlight-color-2: #66b1ff;               /* matches --color-primary-light-2 */
   --background-color: #f5f7fa;                /* matches --background-color-base (used for detail panel background) */
   --background-color-darker: #ebeef5;
   --color-danger: #f56c6c;                    /* matches --color-danger */
