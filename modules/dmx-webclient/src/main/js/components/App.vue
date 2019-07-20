@@ -11,8 +11,8 @@
 export default {
   methods: {
     contextmenu (e) {
-      console.log('contextmenu', e)
-      if (e.target.classList.contains('el-dialog__body')) {
+      console.log('contextmenu', e.target.classList, e.target.parentNode.classList)
+      if (e.target.parentNode.classList.contains('el-dialog')) {
         console.log('preventDefault()')
         e.preventDefault()
       }
