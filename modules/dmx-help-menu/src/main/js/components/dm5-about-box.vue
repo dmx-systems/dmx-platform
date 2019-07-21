@@ -8,7 +8,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        July 20, 2019
+        July 21, 2019
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -16,7 +16,7 @@
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2019<el-link href="https://dmx.systems" type="primary" target="_blank">DMX Systems</el-link>
+        2019<el-link href="https://dmx.systems" type="primary" :underline="false" target="_blank">DMX Systems</el-link>
       </div>
     </div>
   </el-dialog>

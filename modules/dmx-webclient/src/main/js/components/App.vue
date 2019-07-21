@@ -11,9 +11,17 @@
 export default {
   methods: {
     contextmenu (e) {
-      console.log('contextmenu', e.target.classList, e.target.parentNode.classList)
+      // Windows workaround to suppress the browser context menu when right-clicking the canvas (in order to open the
+      // search/create dialog). Note: on Windows the target of the "contextmenu" event is not the canvas then (as it is
+      // on other platforms) but a direct child element of the search/create dialog (sometimes it's el-dialog__body,
+      // sometimes el-dialog__header). This event target says: the dialog is the cause for the event; but in reality the
+      // event is the cause for displaying the dialog in the first place. This makes no sense. I don't understand
+      // Windows browser.
+      // Note: on Windows we must prevent default only at (or near to) body element. Preventing directly at canvas
+      // element (or its parent) has no effect. Note also: preventing already in capture phase makes no difference.
+      // Also all of this makes no sense to me.
+      console.log('contextmenu', e.target)
       if (e.target.parentNode.classList.contains('el-dialog')) {
-        console.log('preventDefault()')
         e.preventDefault()
       }
     }
@@ -71,7 +79,6 @@ export default {
   --color-danger: #f56c6c;                    /* matches --color-danger */
   --border-color: #dcdfe6;                    /* matches --border-color-base */
   --border-color-lighter: #ebeef5;            /* matches --border-color-lighter */
-  --shadow-hover: inset 0px 0px 0px 1px;
 }
 
 html {
