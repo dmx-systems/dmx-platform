@@ -7,13 +7,13 @@
     <name>DMX Date/Time</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-datetime</artifactId>
-    <version>5.0-beta-4-SNAPSHOT</version>
+    <version>5.0-beta-4</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0-beta-4-SNAPSHOT</version>
+        <version>5.0-beta-4</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 </project>

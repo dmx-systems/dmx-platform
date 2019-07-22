@@ -11,7 +11,7 @@ import systems.dmx.core.service.accesscontrol.Credentials;
 /**
  * Create "admin" user account.
  * <p>
- * Part of DMX 5.0-beta-3
+ * Part of DMX 5.0-beta-4
  * Runs ALWAYS
  * <p>
  * Note: both must exist already, the "Login enabled" config topic type (created in migration 1), and the

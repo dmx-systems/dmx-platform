@@ -1,4 +1,6 @@
-> Note that DeepaMehta 5 is rebranded as "DMX". DeepaMehta 5 and DMX is the same; same code, same features, same license. The master branch represents DeepaMehta 5. DeepaMehta 5 is still beta, with no upgrade path guaranteed. The current stable is DeepaMehta 4. For DeepaMehta 4 switch to the [dm4 branch](https://github.com/jri/deepamehta/tree/dm4).
+> Note that DeepaMehta 5 is rebranded "DMX". DeepaMehta 5 and DMX is the same; same code, same features, similar free software license (AGPL-3.0 resp. GPL-3.0). The master branch represents DeepaMehta 5. For DeepaMehta 4 switch to the [dm4 branch](https://github.com/jri/deepamehta/tree/dm4).
+
+> The `deepamehta` GitHub repo is a mirror repo. The master repo is `dmx-platform`, hosted at the DMX company's [GitLab](https://git.dmx.systems/dmx-platform/dmx-platform). The accompanying `dm5-` GitHub repos are named `dmx-` at GitLab. These GitHub repos are mirror repos as well. The `dm5` GitHub repo is named `dmx-api` at GitLab.
 
 
 DeepaMehta 5
@@ -16,9 +18,9 @@ Project website:
 Company website:  
 <https://dmx.systems>
 
-Live demo (login as "admin" with no password):  
-<https://demo.dmx.systems> (latest release)  
-<https://dev.dmx.systems> (latest snapshot, content is reset regularly)
+Live demo:  
+<https://demo.dmx.systems> (latest stable release)  
+<https://dev.dmx.systems> (latest snapshot; login as "admin" with no password; content is regularly deleted)
 
 Download:  
 <https://download.dmx.systems> (releases)  
@@ -27,18 +29,15 @@ Download:
 Documentation:  
 <https://docs.dmx.systems>
 
-Forum (new!):  
+Forum:  
 <https://forum.dmx.systems>
-
-Mailing lists (will be closed soon in favor of forum):  
-<https://lists.deepamehta.de>
 
 Issues:  
 <https://github.com/jri/deepamehta/issues> (read/write)  
 <https://git.dmx.systems/dmx-platform/dmx-platform/issues> (read only)
 
 Source code:  
-<https://github.com/jri/deepamehta>
+<https://git.dmx.systems/dmx-platform/dmx-platform>
 
 Continuous integration:  
 <https://git.dmx.systems/dmx-platform/dmx-platform/pipelines>
@@ -49,7 +48,7 @@ Continuous integration:
 Copyright (C) 2000-2018 Jörg Richter <jri@dmx.berlin> et al.  
 Copyright (C) 2019 DMX Systems <https://dmx.systems>
 
-DeepaMehta is available freely under the GNU Affero General Public License, version 3.
+DeepaMehta 5 is available freely under the GNU Affero General Public License, version 3.
 
 All third party components incorporated into the DeepaMehta Software are licensed under the original license provided by the owner of the applicable component.
 
@@ -60,4 +59,4 @@ DeepaMehta is under heavy development. While you can do productive work with it,
 
 
 ------------
-May 29, 2019
+Jul 22, 2019

@@ -13,7 +13,7 @@ import systems.dmx.core.service.Migration;
  * Create "System" and "Administration" workspaces.
  * Set owner of "System", "Administration", and "DMX" workspaces.
  * <p>
- * Part of DMX 5.0-beta-3
+ * Part of DMX 5.0-beta-4
  * Runs ALWAYS
  * <p>
  * Note: the "admin" user account is created in migration 3. At this moment both must exist, the "Login enabled"

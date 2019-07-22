@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Note: while a "clean install" the Core types, and other types created before Webclient is activated, are repaired.
  * While "update" all existing types are repaired, including the ones created by installed 3rd-party modules.
  * <p>
- * Part of DMX 5.0-beta-3
+ * Part of DMX 5.0-beta-4
  * Runs ALWAYS
  */
 public class Migration3 extends Migration {
