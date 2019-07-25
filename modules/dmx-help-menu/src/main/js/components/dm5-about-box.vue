@@ -4,11 +4,11 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.0-beta-4
+        5.0-beta-5-SNAPSHOT
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        July 22, 2019
+        July 25, 2019
       </div>
       <div class="field">
         <div class="field-label">License</div>
