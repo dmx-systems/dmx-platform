@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import dm5 from 'dm5'
 
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    console.log('visibilitychange', 'workspace', state.workspaceId)
+    updateWorkspaceCookie()
+  }
+})
+
 const state = {
 
   workspaceId: undefined,           // ID of selected workspace (number)
@@ -120,7 +127,7 @@ export default {
   actions
 }
 
-// Actions
+// Actions helper
 
 function selectFirstWorkspace (dispatch) {
   selectWorkspace(state.workspaceTopics[0].id, dispatch)
@@ -137,7 +144,7 @@ function selectWorkspace (id, dispatch) {
 function _selectWorkspace (id, dispatch) {
   // console.log('_selectWorkspace', id)
   state.workspaceId = id
-  dm5.utils.setCookie('dmx_workspace_id', id)
+  updateWorkspaceCookie()
   return dispatch('fetchTopicmapTopics')     // data for topicmap selector
 }
 
@@ -159,6 +166,10 @@ function findWorkspaceTopic (id, callback) {
 
 function isWorkspaceReadable () {
   return state.workspaceTopics.find(workspace => workspace.id === state.workspaceId)
+}
+
+function updateWorkspaceCookie () {
+  dm5.utils.setCookie('dmx_workspace_id', state.workspaceId)
 }
 
 // Process directives

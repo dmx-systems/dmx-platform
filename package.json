@@ -22,7 +22,7 @@
     "dm5-topic-list": "0.13.0",
     "dm5-topicmap-panel": "0.23.0",
     "dm5-websocket": "0.4.0",
-    "element-ui": "^2.11.0",
+    "element-ui": "^2.11.1",
     "font-awesome": "^4.7.0",
     "leaflet": "^1.5.1",
     "vue": "^2.6.10",
@@ -47,7 +47,7 @@
     "style-loader": "^0.23.1",
     "vue-loader": "^15.7.1",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.37.0",
+    "webpack": "^4.38.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2"
