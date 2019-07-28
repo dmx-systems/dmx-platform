@@ -3,7 +3,6 @@ import dm5 from 'dm5'
 
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    console.log('visibilitychange', 'workspace', state.workspaceId)
     updateWorkspaceCookie()
   }
 })
@@ -169,6 +168,7 @@ function isWorkspaceReadable () {
 }
 
 function updateWorkspaceCookie () {
+  console.log('dmx_workspace_id', state.workspaceId)
   dm5.utils.setCookie('dmx_workspace_id', state.workspaceId)
 }
 
