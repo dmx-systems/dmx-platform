@@ -21,7 +21,7 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     String pluginUri;
-    String sessionId;
+    String clientId;
 
     /**
      * The underlying Jetty WebSocket connection.
@@ -35,9 +35,9 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    WebSocketConnection(String pluginUri, String sessionId, WebSocketConnectionPool pool, CoreService dmx) {
+    WebSocketConnection(String pluginUri, String clientId, WebSocketConnectionPool pool, CoreService dmx) {
         this.pluginUri = pluginUri;
-        this.sessionId = sessionId;
+        this.clientId = clientId;
         this.pool = pool;
         this.dmx = dmx;
     }
@@ -48,14 +48,14 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     @Override
     public void onOpen(Connection connection) {
-        logger.info("Opening a WebSocket connection for plugin \"" + pluginUri + "\" (session " + sessionId + ")");
+        logger.info("Opening a WebSocket connection for plugin \"" + pluginUri + "\" (client " + clientId + ")");
         this.connection = connection;
         pool.add(this);
     }
 
     @Override
     public void onClose(int code, String message) {
-        logger.info("Closing a WebSocket connection of plugin \"" + pluginUri + "\" (session " + sessionId + ")");
+        logger.info("Closing a WebSocket connection of plugin \"" + pluginUri + "\" (client " + clientId + ")");
         pool.remove(this);
     }
 

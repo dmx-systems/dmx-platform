@@ -13,7 +13,7 @@ class WebSocketConnectionPool {
 
     /**
      * 1st hash: plugin URI
-     * 2nd hash: session ID
+     * 2nd hash: client ID
      */
     private Map<String, Map<String, WebSocketConnection>> pool = new ConcurrentHashMap();
 
@@ -34,15 +34,15 @@ class WebSocketConnectionPool {
         return connections != null ? connections.values() : null;
     }
 
-    WebSocketConnection getConnection(String pluginUri, String sessionId) {
+    WebSocketConnection getConnection(String pluginUri, String clientId) {
         Map<String, WebSocketConnection> connections = pool.get(pluginUri);
         if (connections == null) {
             logger.warning("No WebSocket connection open for plugin \"" + pluginUri + "\"");
             return null;
         }
-        WebSocketConnection connection = connections.get(sessionId);
+        WebSocketConnection connection = connections.get(clientId);
         if (connection == null) {
-            logger.warning("No WebSocket connection open for session \"" + sessionId + "\" (plugin \"" + pluginUri +
+            logger.warning("No WebSocket connection open for client \"" + clientId + "\" (plugin \"" + pluginUri +
                 "\")");
         }
         return connection;
@@ -55,7 +55,7 @@ class WebSocketConnectionPool {
             connections = new ConcurrentHashMap();
             pool.put(pluginUri, connections);
         }
-        connections.put(connection.sessionId, connection);
+        connections.put(connection.clientId, connection);
     }
 
     void remove(WebSocketConnection connection) {

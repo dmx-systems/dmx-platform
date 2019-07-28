@@ -11,7 +11,8 @@ import java.util.Map;
 
 
 /**
- * Cookies obtained from request headers.
+ * Cookies contained in the thread-local ContainerRequest.
+ * To obtain a Cookies object call Cookies.get().
  */
 public class Cookies {
 
@@ -72,6 +73,10 @@ public class Cookies {
 
     // ---
 
+    /**
+     * Returns a Cookies object representing the cookies contained in the thread-local ContainerRequest.
+     * If called outside request scope an empty Cookies object is returned.
+     */
     public static Cookies get() {
         ContainerRequest request = threadLocalRequest.get();
         if (request != null) {

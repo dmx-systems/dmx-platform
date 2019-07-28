@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.WebSocketsService;
 import systems.dmx.core.util.JavaUtils;
@@ -11,7 +12,6 @@ import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketHandler;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
@@ -61,7 +61,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
         if (request == null) {
             throw new IllegalArgumentException("request is null");
         }
-        broadcast(pluginUri, message, getConnection(request, pluginUri));
+        broadcast(pluginUri, message, getConnection(pluginUri));
     }
 
     @Override
@@ -69,7 +69,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
         if (request == null) {
             throw new IllegalArgumentException("request is null");
         }
-        WebSocketConnection connection = getConnection(request, pluginUri);
+        WebSocketConnection connection = getConnection(pluginUri);
         if (connection != null) {
             queueMessage(connection, message);
         }
@@ -114,22 +114,13 @@ class WebSocketsServiceImpl implements WebSocketsService {
     // ---
 
     /**
-     * @return  the WebSocket connection that is associated with the given request (based on its session cookie),
-     *          or null if no such session exists or if called outside request scope (e.g. while system startup).
-     *
-     * @throws  RuntimeException    if no valid session is associated with the request.
+     * @return  the WebSocket connection that is associated with the current request (based on its "dmx_client_id"
+     *          cookie), or null if no such cookie exists or if called outside request scope (e.g. while system
+     *          startup).
      */
-    private WebSocketConnection getConnection(HttpServletRequest request, String pluginUri) {
-        try {
-            HttpSession session = request.getSession(false);
-            if (session == null) {
-                throw new RuntimeException("No valid session associated with the request");
-            }
-            return pool.getConnection(pluginUri, session.getId());
-        } catch (IllegalStateException e) {
-            // Note: this happens if "request" is accessed outside request scope, e.g. while system startup.
-            return null;
-        }
+    private WebSocketConnection getConnection(String pluginUri) {
+        String clientId = clientId();
+        return clientId != null ? pool.getConnection(pluginUri, clientId) : null;
     }
 
     /**
@@ -150,13 +141,16 @@ class WebSocketsServiceImpl implements WebSocketsService {
         worker.queueMessage(connection, message);
     }
 
+    private String clientId() {
+        Cookies cookies = Cookies.get();
+        return cookies.has("dmx_client_id") ? cookies.get("dmx_client_id") : null;
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     private class WebSocketsServer extends Server {
-
-        private int counter = 0;     // counts anonymous connections
 
         private WebSocketsServer(int port) {
             // add connector
@@ -168,30 +162,32 @@ class WebSocketsServiceImpl implements WebSocketsService {
             setHandler(new WebSocketHandler() {
                 @Override
                 public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-                    checkProtocol(protocol);
-                    return new WebSocketConnection(protocol, sessionId(request), pool, dmx);
+                    try {
+                        checkProtocol(protocol);
+                        return new WebSocketConnection(protocol, clientId(request), pool, dmx);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Opening a WebSocket connection " +
+                            (protocol != null ? "for plugin \"" + protocol + "\" " : "") + "failed", e);
+                    }
                 }
             });
         }
 
         private void checkProtocol(String pluginUri) {
-            try {
-                if (pluginUri == null) {
-                    throw new RuntimeException("A plugin URI is missing in the WebSocket handshake -- Add your " +
-                        "plugin's URI as the 2nd argument to the JavaScript WebSocket constructor");
-                } else {
-                    dmx.getPlugin(pluginUri);   // check plugin URI, throws if invalid
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Opening a WebSocket connection " +
-                    (pluginUri != null ? "for plugin \"" + pluginUri + "\" " : "") + "failed", e);
+            if (pluginUri == null) {
+                throw new RuntimeException("A plugin URI is missing in the WebSocket handshake -- Add your " +
+                    "plugin's URI as the 2nd argument to the JavaScript WebSocket constructor");
+            } else {
+                dmx.getPlugin(pluginUri);   // check plugin URI, throws if invalid
             }
         }
 
-        private String sessionId(HttpServletRequest request) {
-            String sessionId = JavaUtils.cookieValue(request, "JSESSIONID");
-            // TODO: drop anonymous connections
-            return sessionId != null ? sessionId : "anonymous-" + counter++;
+        private String clientId(HttpServletRequest request) {
+            String clientId = JavaUtils.cookieValue(request, "dmx_client_id");
+            if (clientId == null) {
+                throw new RuntimeException("Missing \"dmx_client_id\" cookie");
+            }
+            return clientId;
         }
     }
 
