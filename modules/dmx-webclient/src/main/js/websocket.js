@@ -2,7 +2,7 @@ import DM5WebSocket from 'dm5-websocket'
 import store from './store/webclient'
 import dm5 from 'dm5'
 
-const clientId = uuid()
+const clientId = newClientId()
 updateClientIdCookie()
 
 document.addEventListener('visibilitychange', () => {
@@ -19,9 +19,8 @@ function dispatcher (message) {
   store.dispatch('_' + message.type, message.args)
 }
 
-function uuid () {
-  // TODO: return real UUID (type 4); move to utils.js
-  return Math.floor(10000 * Math.random())
+function newClientId () {
+  return Math.floor(Number.MAX_SAFE_INTEGER * Math.random())
 }
 
 function updateClientIdCookie () {
