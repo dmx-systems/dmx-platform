@@ -3,6 +3,7 @@ package systems.dmx.webservice;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.DMXType;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
@@ -35,6 +36,7 @@ import javax.ws.rs.core.Context;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -405,6 +407,32 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
+    // ***********************
+    // *** Object REST API ***
+    // ***********************
+
+
+
+    @GET
+    @Path("/object/{id}/related_topics")
+    public List<RelatedTopic> getRelatedTopicsWithoutChilds(@PathParam("id") long objectId) {
+        DMXObject object = dmx.getObject(objectId);
+        List<RelatedTopic> relTopics = object.getRelatedTopics();
+        Iterator<RelatedTopic> i = relTopics.iterator();
+        int removed = 0;
+        while (i.hasNext()) {
+            RelatedTopic relTopic = i.next();
+            if (isDirectModelledChildTopic(object, relTopic)) {
+                i.remove();
+                removed++;
+            }
+        }
+        logger.fine("### " + removed + " topics are removed from result set of object " + objectId);
+        return relTopics;
+    }
+
+
+
     // **********************
     // *** Multi REST API ***
     // **********************
@@ -493,6 +521,34 @@ public class WebservicePlugin extends PluginActivator {
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }
+    }
+
+    // ---
+
+    private boolean isDirectModelledChildTopic(DMXObject parentObject, RelatedTopic childTopic) {
+        // association definition
+        if (hasCompDef(parentObject, childTopic)) {
+            // role types
+            Assoc assoc = childTopic.getRelatingAssoc();
+            return assoc.matches("dmx.core.parent", parentObject.getId(), "dmx.core.child", childTopic.getId());
+        }
+        return false;
+    }
+
+    private boolean hasCompDef(DMXObject parentObject, RelatedTopic childTopic) {
+        // Note: the user might have no explicit READ permission for the type.
+        // DMXObject's getType() has *implicit* READ permission.
+        DMXType parentType = parentObject.getType();
+        //
+        String childTypeUri = childTopic.getTypeUri();
+        String assocTypeUri = childTopic.getRelatingAssoc().getTypeUri();
+        String compDefUri = childTypeUri + "#" + assocTypeUri;
+        if (parentType.hasCompDef(compDefUri)) {
+            return true;
+        } else if (parentType.hasCompDef(childTypeUri)) {
+            return parentType.getCompDef(childTypeUri).getInstanceLevelAssocTypeUri().equals(assocTypeUri);
+        }
+        return false;
     }
 
     // ---
