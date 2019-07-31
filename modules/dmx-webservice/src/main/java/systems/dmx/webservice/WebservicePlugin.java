@@ -530,7 +530,7 @@ public class WebservicePlugin extends PluginActivator {
         return hasCompDef(parentObject, childTopic) && childTopic.getRelatingAssoc().matches(
             "dmx.core.parent", parentObject.getId(),
             "dmx.core.child", childTopic.getId()
-        )
+        );
     }
 
     private boolean hasCompDef(DMXObject parentObject, RelatedTopic childTopic) {
