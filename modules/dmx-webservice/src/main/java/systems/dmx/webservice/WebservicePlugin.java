@@ -526,20 +526,17 @@ public class WebservicePlugin extends PluginActivator {
     // ---
 
     private boolean isDirectModelledChildTopic(DMXObject parentObject, RelatedTopic childTopic) {
-        // association definition
-        if (hasCompDef(parentObject, childTopic)) {
-            // role types
-            Assoc assoc = childTopic.getRelatingAssoc();
-            return assoc.matches("dmx.core.parent", parentObject.getId(), "dmx.core.child", childTopic.getId());
-        }
-        return false;
+        // check comp def and role types
+        return hasCompDef(parentObject, childTopic) && childTopic.getRelatingAssoc().matches(
+            "dmx.core.parent", parentObject.getId(),
+            "dmx.core.child", childTopic.getId()
+        )
     }
 
     private boolean hasCompDef(DMXObject parentObject, RelatedTopic childTopic) {
         // Note: the user might have no explicit READ permission for the type.
         // DMXObject's getType() has *implicit* READ permission.
         DMXType parentType = parentObject.getType();
-        //
         String childTypeUri = childTopic.getTypeUri();
         String assocTypeUri = childTopic.getRelatingAssoc().getTypeUri();
         String compDefUri = childTypeUri + "#" + assocTypeUri;

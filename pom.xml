@@ -249,6 +249,12 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.3.7</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <!-- Write Artifact ID to manifest -->
+                            <Artifact-Id>${project.artifactId}</Artifact-Id>
+                        </instructions>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
