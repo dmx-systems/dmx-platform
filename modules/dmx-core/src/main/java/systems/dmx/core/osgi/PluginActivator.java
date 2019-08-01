@@ -49,7 +49,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
             // Note: logging "this" requires "pluginName" to be initialzed already
             this.bundleContext = context;
             this.bundle = context.getBundle();
-            this.pluginName = (String) bundle.getHeaders().get("Bundle-Name");
+            this.pluginName = bundle.getHeaders().get("Bundle-Name");
             //
             logger.info("========== Starting " + this + " ==========");
             plugin = new PluginImpl(this);

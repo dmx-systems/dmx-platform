@@ -138,7 +138,7 @@ class PluginManager {
      */
     private boolean isDMXPlugin(Bundle bundle) {
         try {
-            String activatorClassName = (String) bundle.getHeaders().get("Bundle-Activator");
+            String activatorClassName = bundle.getHeaders().get("Bundle-Activator");
             if (activatorClassName != null) {
                 Class activatorClass = bundle.loadClass(activatorClassName);    // throws ClassNotFoundException
                 return PluginActivator.class.isAssignableFrom(activatorClass);

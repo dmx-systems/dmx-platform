@@ -3,6 +3,7 @@ package systems.dmx.core.service;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.QueryResult;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -86,10 +87,10 @@ public interface CoreService {
     /**
      * Performs a fulltext search.
      *
-     * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
-     *                      ### TODO: rename parameter to "key"/"typeUri"?
+     * @param   query       A Lucene search query.
+     * @param   typeUri     Only topics of this type are searched. If null all topics are searched.
      */
-    List<Topic> queryTopicsFulltext(String searchTerm, String fieldUri);
+    QueryResult queryTopicsFulltext(String query, String typeUri);
 
     Iterable<Topic> getAllTopics();
 

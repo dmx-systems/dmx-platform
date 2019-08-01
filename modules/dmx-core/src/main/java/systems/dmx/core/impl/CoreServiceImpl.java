@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.QueryResult;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -109,8 +110,11 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Topic> queryTopicsFulltext(String searchTerm, String fieldUri) {
-        return al.instantiate(al.queryTopicsFulltext(searchTerm, fieldUri));
+    public QueryResult queryTopicsFulltext(String query, String typeUri) {
+        return new QueryResult(
+            query,
+            al.instantiate(al.queryTopicsFulltext(query, typeUri))
+        );
     }
 
     @Override

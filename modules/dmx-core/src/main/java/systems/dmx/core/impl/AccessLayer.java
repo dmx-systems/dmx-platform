@@ -112,12 +112,12 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> queryTopicsFulltext(String searchTerm, String fieldUri) {
+    List<TopicModelImpl> queryTopicsFulltext(String query, String typeUri) {
         try {
-            return filterReadables(db.queryTopicsFulltext(fieldUri, searchTerm));
+            return filterReadables(db.queryTopicsFulltext(typeUri, query));
         } catch (Exception e) {
-            throw new RuntimeException("Querying topics fulltext failed, searchTerm=\"" + searchTerm +
-                "\", fieldUri=\"" + fieldUri + "\"", e);
+            throw new RuntimeException("Querying topics fulltext failed, query=\"" + query + "\", typeUri=\"" +
+                typeUri + "\"", e);
         }
     }
 
