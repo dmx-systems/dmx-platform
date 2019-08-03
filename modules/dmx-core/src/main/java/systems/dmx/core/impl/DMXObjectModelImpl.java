@@ -180,8 +180,8 @@ public class DMXObjectModelImpl implements DMXObjectModel {
                 .put("id", id)
                 .put("uri", uri)
                 .put("typeUri", typeUri)
-                .put("value", value.value())
-                .put("children", childTopics.toJSON());
+                .put("value", value != null ? value.value() : null)     // value might be null in update models;
+                .put("children", childTopics.toJSON());                 // serialization is also used for log messages
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }
