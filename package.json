@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",
-    "dm5-cytoscape-renderer": "0.22.0",
+    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
@@ -47,7 +47,7 @@
     "style-loader": "^0.23.1",
     "vue-loader": "^15.7.1",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.38.0",
+    "webpack": "^4.39.1",
     "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2"
