@@ -131,6 +131,7 @@ const actions = {
     // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
+  // TODO: drop it? Meanwhile selection state is updated for *all* cached topicmaps by dm5-topicmap-panel
   unselectIf ({getters}, id) {
     // console.log('unselectIf', id)
     getters.selection.remove(id)
