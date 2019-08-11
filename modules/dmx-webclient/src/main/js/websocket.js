@@ -5,6 +5,7 @@ import dm5 from 'dm5'
 const clientId = newClientId()
 updateClientIdCookie()
 
+window.addEventListener('focus', updateClientIdCookie)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     updateClientIdCookie()
