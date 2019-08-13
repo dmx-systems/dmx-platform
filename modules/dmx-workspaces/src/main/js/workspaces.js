@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import dm5 from 'dm5'
 
-document.addEventListener('focus', updateWorkspaceCookie)
+window.addEventListener('focus', updateWorkspaceCookie)
 
 const state = {
 
