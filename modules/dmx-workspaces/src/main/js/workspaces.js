@@ -1,11 +1,7 @@
 import Vue from 'vue'
 import dm5 from 'dm5'
 
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    updateWorkspaceCookie()
-  }
-})
+document.addEventListener('focus', updateWorkspaceCookie)
 
 const state = {
 

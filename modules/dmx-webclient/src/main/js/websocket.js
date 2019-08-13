@@ -6,11 +6,6 @@ const clientId = newClientId()
 updateClientIdCookie()
 
 window.addEventListener('focus', updateClientIdCookie)
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    updateClientIdCookie()
-  }
-})
 
 /* eslint no-new: 0 */
 
