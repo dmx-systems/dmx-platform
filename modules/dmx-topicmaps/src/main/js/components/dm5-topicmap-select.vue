@@ -2,7 +2,7 @@
   <div class="dm5-topicmap-select">
     <el-select v-model="topicmapId">
       <el-option-group label="Topicmap">
-        <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+        <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
       </el-option-group>
     </el-select>
     <el-button type="text" class="fa fa-info-circle" title="Reveal Topicmap Topic" @click="revealTopicmapTopic">
@@ -31,7 +31,7 @@ export default {
       return this.$store.state.workspaces.workspaceId
     },
 
-    topics () {
+    topicmapTopics () {
       // Note 1: while initial rendering no workspace is selected yet
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
       const topics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]

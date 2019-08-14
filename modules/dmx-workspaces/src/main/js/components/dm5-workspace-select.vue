@@ -25,7 +25,9 @@ export default {
     },
 
     workspaceTopics () {
-      return this.$store.state.workspaces.workspaceTopics
+      // Note: while initial rendering the workspace topics might not yet loaded
+      const topics = this.$store.state.workspaces.workspaceTopics
+      return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
     }
   },
 
