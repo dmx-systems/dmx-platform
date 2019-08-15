@@ -6,13 +6,13 @@
     <name>DMX Features</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-features</artifactId>
-    <version>5.0-beta-5-SNAPSHOT</version>
+    <version>5.0-beta-5</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.0-beta-5-SNAPSHOT</version>
+        <version>5.0-beta-5</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

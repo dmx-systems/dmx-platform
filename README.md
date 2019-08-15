@@ -20,7 +20,7 @@ Company website:
 
 Live demo:  
 <https://demo.dmx.systems> (latest stable release)  
-<https://dev.dmx.systems> (latest snapshot; login as "admin" with no password; content is regularly deleted)
+<https://dev.dmx.systems> (latest snapshot; login as "admin" with no password; content is deleted regularly)
 
 Download:  
 <https://download.dmx.systems> (releases)  
@@ -59,4 +59,4 @@ DeepaMehta is under heavy development. While you can do productive work with it,
 
 
 ------------
-Jul 22, 2019
+Aug 13, 2019
