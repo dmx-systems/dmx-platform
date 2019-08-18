@@ -85,10 +85,20 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
     @GET
+    @Path("/topic/by_type/{topic_type_uri}")
+    public List<Topic> getTopicsByType(@PathParam("topic_type_uri") String topicTypeUri) {
+        return dmx.getTopicsByType(topicTypeUri);
+    }
+
+    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
+    @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.getTopicByValue(key, value);
     }
+
+    // TODO: getTopicsByValue()
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
@@ -96,14 +106,6 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> queryTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.queryTopics(key, value);
-    }
-
-    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template
-    @GET
-    @Path("/topic/by_type/{topic_type_uri}")
-    public List<Topic> getTopicsByType(@PathParam("topic_type_uri") String topicTypeUri) {
-        return dmx.getTopicsByType(topicTypeUri);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
