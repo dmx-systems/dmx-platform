@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "dm5": "0.33.0",
-    "dm5-cytoscape-renderer": "0.23.0",
+    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "0.27.0",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-search-widget": "0.26.0",
