@@ -206,14 +206,28 @@ function isSelected (id) {
 }
 
 function confirmDeletion (idLists) {
-  return Vue.prototype.$confirm(`You're about to delete multiple items`, 'Warning', {
+  const _size = size(idLists)
+  if (!_size) {
+    throw Error('confirmDeletion() called with empty idLists')
+  }
+  let message, buttonText
+  if (_size > 1) {
+    message = "You're about to delete multiple items"
+    buttonText = `Delete ${_size} items`
+  } else {
+    message = `You're about to delete ${idLists.topicIds.length ? 'a topic' : 'an association'}`
+    buttonText = 'Delete'
+  }
+  return Vue.prototype.$confirm(message, 'Warning', {
     type: 'warning',
-    confirmButtonText: `Delete ${size(idLists)} items`,
+    confirmButtonText: buttonText,
+    confirmButtonClass: 'el-button--danger',
     showClose: false
   })
 }
 
 // copy in cytoscape-view.js (module dm5-cytoscape-renderer)
+// TODO: unify selection models (see selection.js in dmx-topicmaps module)
 function size (idLists) {
   return idLists.topicIds.length + idLists.assocIds.length
 }
