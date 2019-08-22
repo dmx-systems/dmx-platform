@@ -42,7 +42,7 @@ class WebSocketConnectionPool {
         }
         WebSocketConnection connection = connections.get(clientId);
         if (connection == null) {
-            logger.warning("No WebSocket connection open for client \"" + clientId + "\" (plugin \"" + pluginUri +
+            logger.warning("No WebSocket connection open for client ID " + clientId + " (plugin \"" + pluginUri +
                 "\")");
         }
         return connection;

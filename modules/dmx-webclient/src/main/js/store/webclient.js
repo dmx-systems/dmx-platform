@@ -65,14 +65,16 @@ const actions = {
   },
 
   deleteMulti ({dispatch}, idLists) {
-    // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
-    // update client state + sync view (for immediate visual feedback)
-    idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
-    idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
-    // update server state
-    dm5.restClient.deleteMulti(idLists).then(object => {
-      dispatch('_processDirectives', object.directives)
-    })
+    confirmDeletion(idLists).then(() => {
+      // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
+      // update client state + sync view (for immediate visual feedback)
+      idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
+      idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
+      // update server state
+      dm5.restClient.deleteMulti(idLists).then(object => {
+        dispatch('_processDirectives', object.directives)
+      })
+    }).catch(() => {})    // suppress unhandled rejection on cancel
   },
 
   // ---
@@ -201,6 +203,19 @@ function displayObjectIf (object) {
 function isSelected (id) {
   const object = state.object
   return object && object.id === id
+}
+
+function confirmDeletion (idLists) {
+  return Vue.prototype.$confirm(`You're about to delete multiple items`, 'Warning', {
+    type: 'warning',
+    confirmButtonText: `Delete ${size(idLists)} items`,
+    showClose: false
+  })
+}
+
+// copy in cytoscape-view.js (module dm5-cytoscape-renderer)
+function size (idLists) {
+  return idLists.topicIds.length + idLists.assocIds.length
 }
 
 //

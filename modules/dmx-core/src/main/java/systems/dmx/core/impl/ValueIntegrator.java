@@ -505,7 +505,6 @@ class ValueIntegrator {
                 }
                 oldValue = findTopic(oldValues, originalId);
             }
-            //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;

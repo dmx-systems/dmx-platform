@@ -101,7 +101,7 @@ public class WebservicePlugin extends PluginActivator {
     // TODO: getTopicsByValue()
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template
+    // ### TODO: change URI template, use query params (like queryTopicsFulltext())
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> queryTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {

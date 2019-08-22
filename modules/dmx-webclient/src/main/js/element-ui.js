@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import {
   Button, Input, Select, Option, OptionGroup, Checkbox, Radio, RadioGroup, Dropdown, DropdownMenu, DropdownItem, Link,
-  Dialog, Tabs, TabPane, Autocomplete, ColorPicker, Loading, Notification
+  Dialog, MessageBox, Tabs, TabPane, Autocomplete, ColorPicker, Loading, Notification
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
@@ -33,5 +33,10 @@ Vue.use(Autocomplete)
 Vue.use(ColorPicker)
 
 Vue.use(Loading.directive)
+
+Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$alert = MessageBox.alert;
+Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$prompt = MessageBox.prompt;
 
 Vue.prototype.$notify = Notification
