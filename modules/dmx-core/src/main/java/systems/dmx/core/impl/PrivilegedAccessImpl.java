@@ -60,6 +60,9 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private static final String ADMINISTRATION_WORKSPACE_URI = "dmx.workspaces.administration";
     private static final String SYSTEM_WORKSPACE_URI = "dmx.workspaces.system";
 
+    // ### TODO: copy in Credentials.java
+    private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
+
     private long systemWorkspaceId = -1;    // initialized lazily
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -438,10 +441,13 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      *
-     * @param   password    The encoded password.
+     * @param   password    The SHA256 encoded password.
      */
     private boolean matches(TopicModel usernameTopic, String password) {
-        String _password = getPasswordTopic(usernameTopic).getSimpleValue().toString();  // encoded
+        String _password = getPasswordTopic(usernameTopic).getSimpleValue().toString();     // SHA256 encoded
+        if (!_password.startsWith(ENCODED_PASSWORD_PREFIX)) {
+            throw new RuntimeException("Stored password is not SHA256 encoded");
+        }
         return _password.equals(password);
     }
 
