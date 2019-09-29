@@ -8,15 +8,19 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Sep 23, 2019
+        Sep 29, 2019
       </div>
       <div class="field">
         <div class="field-label">License</div>
-        AGPL-3.0
+        <el-link href="https://www.gnu.org/licenses/agpl-3.0.html" type="primary" :underline="false" target="agpl">
+          AGPL-3.0
+        </el-link>
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2019<el-link href="https://dmx.systems" type="primary" :underline="false" target="_blank">DMX Systems</el-link>
+        2019&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
+          DMX Systems
+        </el-link>
       </div>
     </div>
   </el-dialog>
@@ -53,7 +57,6 @@ export default {
 
 .dm5-about-box .el-link {
   vertical-align: unset;      /* Element UI default is "middle" */
-  margin-left: 0.6em;
 }
 
 .dm5-about-box .field + .field {
