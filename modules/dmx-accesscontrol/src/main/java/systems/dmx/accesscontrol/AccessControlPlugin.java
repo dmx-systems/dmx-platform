@@ -108,6 +108,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String AUTHENTICATION_REALM = "DMX";
 
+    // ### TODO: copy in Credentials.java
+    private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
+
     // Type URIs
     private static final String LOGIN_ENABLED_TYPE = "dmx.accesscontrol.login_enabled";
     private static final String MEMBERSHIP_TYPE    = "dmx.accesscontrol.membership";
@@ -571,6 +574,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
+        // encode password
+        if (topic.getTypeUri().equals("dmx.accesscontrol.user_account")) {
+            Topic passwordTopic = topic.getChildTopics().getTopic("dmx.accesscontrol.password");
+            String password = passwordTopic.getSimpleValue().toString();
+            passwordTopic.setSimpleValue(encodePassword(password));
+        }
+        //
         setModifier(topic);
     }
 
@@ -628,6 +638,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
+    }
+
+    // ### TODO: copy in Credentials.java
+    private String encodePassword(String password) {
+        return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }
 
     private boolean isMembership(AssocModel assoc) {
