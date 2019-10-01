@@ -56,12 +56,18 @@ public interface WorkspacesService {
     // ---
 
     /**
-     * Assigns the given object to the given workspace.
+     * Assigns an object to a workspace.
      */
     void assignToWorkspace(DMXObject object, long workspaceId);
 
     /**
-     * Assigns the given type and all its view configuration topics to the given workspace.
+     * Assigns a type as well as its "parts" to a workspace. In particular:
+     * <ul>
+     * <li>the type</li>
+     * <li>the type's view config</li>
+     * <li>the direct comp defs (not recursively)</li>
+     * <li>the direct comp def's view configs</li>
+     * </ul>
      */
     void assignTypeToWorkspace(DMXType type, long workspaceId);
 

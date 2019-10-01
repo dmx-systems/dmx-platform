@@ -10,6 +10,7 @@ import systems.dmx.config.ConfigTarget;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -574,11 +575,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
-        // encode password
         if (topic.getTypeUri().equals("dmx.accesscontrol.user_account")) {
-            Topic passwordTopic = topic.getChildTopics().getTopic("dmx.accesscontrol.password");
+            // encode password
+            RelatedTopic passwordTopic = topic.getChildTopics().getTopic("dmx.accesscontrol.password");
             String password = passwordTopic.getSimpleValue().toString();
             passwordTopic.setSimpleValue(encodePassword(password));
+            // reassign workspace
+            long workspaceId = getPrivateWorkspace().getId();
+            wsService.assignToWorkspace(passwordTopic, workspaceId);
+            wsService.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
         }
         //
         setModifier(topic);
