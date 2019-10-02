@@ -20,6 +20,7 @@ export default {
       // Note: on Windows we must prevent default only at (or near to) body element. Preventing directly at canvas
       // element (or its parent) has no effect. Note also: preventing already in capture phase makes no difference.
       // Also all of this makes no sense to me.
+      console.log('contextmenu', e.target.classList, e.target.parentNode.classList)
       if (e.target.parentNode.classList.contains('el-dialog')) {
         e.preventDefault()
       }
