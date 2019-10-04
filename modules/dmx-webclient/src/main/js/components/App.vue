@@ -1,5 +1,5 @@
 <template>
-  <router-view @contextmenu.native="contextmenu"></router-view>
+  <router-view @contextmenu.native="contextmenu" @mouseup.native="contextmenu"></router-view>
   <!--
     Note: the Vue template compiler is not available as we use the Vue runtime.
     So we can't put <router-view> in index.html but must render the root component
@@ -20,7 +20,7 @@ export default {
       // Note: on Windows we must prevent default only at (or near to) body element. Preventing directly at canvas
       // element (or its parent) has no effect. Note also: preventing already in capture phase makes no difference.
       // Also all of this makes no sense to me.
-      console.log('contextmenu', e.target.classList, e.target.parentNode.classList)
+      console.log('contextmenu/mouseup', e.type, e.target.classList, e.target.parentNode.classList)
       if (e.target.parentNode.classList.contains('el-dialog')) {
         e.preventDefault()
       }
