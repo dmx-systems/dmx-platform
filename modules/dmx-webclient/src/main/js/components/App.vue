@@ -1,33 +1,11 @@
 <template>
-  <router-view @contextmenu.capture.native="contextmenu"></router-view>
+  <router-view></router-view>
   <!--
     Note: the Vue template compiler is not available as we use the Vue runtime.
     So we can't put <router-view> in index.html but must render the root component
     (= this one) via render function (see main.js).
   -->
 </template>
-
-<script>
-export default {
-  methods: {
-    contextmenu (e) {
-      // Windows workaround to suppress the browser context menu when right-clicking the canvas (in order to open the
-      // search/create dialog). Note: on Windows the target of the "contextmenu" event is not the canvas then (as it is
-      // on other platforms) but a direct child element of the search/create dialog (sometimes it's el-dialog__body,
-      // sometimes el-dialog__header). This event target says: the dialog is the cause for the event; but in reality the
-      // event is the cause for displaying the dialog in the first place. This makes no sense. I don't understand
-      // Windows browser.
-      // Note: on Windows we must prevent default only at (or near to) body element. Preventing directly at canvas
-      // element (or its parent) has no effect. Note also: preventing already in capture phase makes no difference.
-      // Also all of this makes no sense to me.
-      // console.log('contextmenu', e.target.tagName, e.target.classList, e.target.parentNode.classList)
-      /* if (e.target.tagName === 'CANVAS' || e.target.parentNode.classList.contains('el-dialog')) {
-        e.preventDefault()
-      } */
-    }
-  }
-}
-</script>
 
 <style>
 :root {

@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2019/10/04')
+console.log('[DMX] 2019/10/05')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
@@ -72,19 +72,20 @@ Promise.all([
   store.dispatch('initialNavigation')
 })
 
-// Windows workaround to suppress the browser context menu on right-click.
-// Note: on Windows the target of the "contextmenu" event is not the canvas then (as it is on other platforms) but
-// - the search dialog
-// - the delete message box
-// - the delete message box wrapper
-// Note: in contrast to the search dialog the latter 2 are not childs of <dm5-webclient> component, so we must attach
+// 7) Windows workaround to suppress the browser's native context menu on
+// - right-clicking the canvas (to invoke search/create dialog)
+// - right-clicking a topic/assoc (to invoke Cytoscape context menu command)
+// Note: in contrast to other platforms on Windows the target of the "contextmenu" event is not the canvas but
+// - the search/create dialog
+// - the message box wrapper of the delete warning
+// Note: in contrast to the dialog the message box is not a child of <dm5-webclient> component, so we attach
 // the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
-  console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
+  // console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
   const inSearchDialog = e.target.parentNode.classList.contains('el-dialog')
   const messageBoxWrapper = document.querySelector('.el-message-box__wrapper')
   const inMessageBox = messageBoxWrapper && messageBoxWrapper.contains(e.target)
-  console.log(inSearchDialog, inMessageBox)
+  // console.log(inSearchDialog, inMessageBox)
   if (inSearchDialog || inMessageBox) {
     e.preventDefault()
   }
