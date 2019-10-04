@@ -74,4 +74,11 @@ Promise.all([
 
 document.body.addEventListener('contextmenu', e => {
   console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
-})
+  const inSearchDialog = e.target.parentNode.classList.contains('el-dialog')
+  const inMessageBox   = e.target.parentNode.classList.contains('el-message-box')
+  const inMessageBoxWrapper = e.target.classList.contains('el-message-box__wrapper')
+  console.log(inSearchDialog, inMessageBox, inMessageBoxWrapper)
+  if (inSearchDialog || inMessageBox || inMessageBoxWrapper) {
+    e.preventDefault()
+  }
+}, true)
