@@ -72,6 +72,13 @@ Promise.all([
   store.dispatch('initialNavigation')
 })
 
+// Windows workaround to suppress the browser context menu on right-click.
+// Note: on Windows the target of the "contextmenu" event is not the canvas then (as it is on other platforms) but
+// - the search dialog
+// - the delete message box
+// - the delete message box wrapper
+// Note: in contrast to the search dialog the latter 2 are not childs of <dm5-webclient> component, so we must attach
+// the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
   console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
   const inSearchDialog = e.target.parentNode.classList.contains('el-dialog')
@@ -81,4 +88,4 @@ document.body.addEventListener('contextmenu', e => {
   if (inSearchDialog || inMessageBox || inMessageBoxWrapper) {
     e.preventDefault()
   }
-}, true)
+})
