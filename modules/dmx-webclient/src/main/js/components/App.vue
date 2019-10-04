@@ -1,5 +1,5 @@
 <template>
-  <router-view @contextmenu.native="contextmenu"></router-view>
+  <router-view @contextmenu.capture.native="contextmenu"></router-view>
   <!--
     Note: the Vue template compiler is not available as we use the Vue runtime.
     So we can't put <router-view> in index.html but must render the root component
