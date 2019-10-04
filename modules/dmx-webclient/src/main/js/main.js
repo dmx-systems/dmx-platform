@@ -71,3 +71,7 @@ Promise.all([
 ]).then(() => {
   store.dispatch('initialNavigation')
 })
+
+document.body.addEventListener('contextmenu', e => {
+  console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
+})
