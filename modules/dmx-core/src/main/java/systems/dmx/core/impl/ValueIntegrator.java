@@ -250,6 +250,8 @@ class ValueIntegrator {
             //
             Object childTopic = integrateChildValue(newChildValue, compDefUri);
             // childTopic: UnifiedValue or List<UnifiedValue>; never null
+            // TODO: why never put "many" in emptyValues?
+            // TODO: drop "emptyValues" completely?
             if (isOne(compDefUri) && ((UnifiedValue) childTopic).value == null) {
                 emptyValues.add(compDefUri);
             } else {
@@ -340,8 +342,11 @@ class ValueIntegrator {
         } else {
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {
-                return !childValues.isEmpty() ?
-                    unifyChildTopics(identityChildTopics(childValues, identityCompDefUris), identityCompDefUris) : null;
+                if (childValues.isEmpty()) {
+                    return null;
+                }
+                Map<String, Object> childTopics = identityChildTopics(childValues, identityCompDefUris);
+                return !childTopics.isEmpty() ? unifyChildTopics(childTopics, identityCompDefUris) : null;
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
                 // Note: for value-types this is fixed meanwhile, but not for identity-types.
@@ -361,31 +366,29 @@ class ValueIntegrator {
      *                                      value: UnifiedValue or List<UnifiedValue>
      * @param   identityCompDefUris     not empty
      *
-     * @return  A map of the identity child topics; not empty
+     * @return  A map of the identity child topics; may be empty
      *              key: compDefUri
      *              value: UnifiedValue
      */
-    private Map<String, Object> identityChildTopics(Map<String, Object> childValues,
-                                                    List<String> identityCompDefUris) {
+    private Map<String, Object> identityChildTopics(Map<String, Object> childValues, List<String> identityCompDefUris) {
         try {
             Map<String, Object> identityChildTopics = new HashMap();
             for (String compDefUri : identityCompDefUris) {
                 if (!isOne(compDefUri)) {
                     throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
                 }
+                // Note: being in the empty value list is not an error.
+                // Consider e.g. an embedded identity form left empty by the user.
+                if (isEmptyValue(compDefUri)) {
+                    continue;
+                }
                 UnifiedValue childTopic = (UnifiedValue) childValues.get(compDefUri);
                 if (childTopic == null) {
                     throw new RuntimeException("Identity value \"" + compDefUri + "\" is missing in " +
-                        childValues.keySet() + " (childTopic=null)");
-                }
-                if (childTopic.value == null) {
-                    // FIXME: can this happen?
-                    throw new RuntimeException("Identity value \"" + compDefUri + "\" is missing in " +
-                        childValues.keySet() + " (childTopic.value=null)");
+                        childValues.keySet());
                 }
                 identityChildTopics.put(compDefUri, childTopic);
             }
-            // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
             return identityChildTopics;
         } catch (Exception e) {
             throw new RuntimeException("Selecting identity children " + identityCompDefUris + " failed, childValues=" +
@@ -633,6 +636,9 @@ class ValueIntegrator {
      *                              value: UnifiedValue or List<UnifiedValue>
      */
     private List<? extends TopicModelImpl> parentCandidates(Map<String, Object> childValues) {
+        if (childValues.isEmpty()) {
+            throw new IllegalArgumentException("Can't determine parent candidates from no values");
+        }
         // TODO: drop "emptyValues" and search for the first non-null value.value
         String compDefUri = childValues.keySet().iterator().next();
         // logger.fine("### compDefUri=\"" + compDefUri + "\", childValues=" + childValues);
