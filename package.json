@@ -18,7 +18,7 @@
     "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "0.28.0",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
-    "dm5-search-widget": "0.26.0",
+    "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topic-list": "0.13.0",
     "dm5-topicmap-panel": "0.24.0",
     "dm5-websocket": "0.4.0",
