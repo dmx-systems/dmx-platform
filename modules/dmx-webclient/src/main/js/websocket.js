@@ -20,6 +20,6 @@ function newClientId () {
 }
 
 function updateClientIdCookie () {
-  console.log('dmx_client_id', clientId)
+  // console.log('dmx_client_id', clientId)
   dm5.utils.setCookie('dmx_client_id', clientId)
 }

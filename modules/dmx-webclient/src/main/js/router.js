@@ -258,7 +258,7 @@ function navigate (to, from) {
   } else {
     p = Promise.resolve()
   }
-  // 2) selection
+  // 2) topic/assoc selection
   const topicId = id(to.params.topicId)
   const assocId = id(to.params.assocId)
   const oldTopicId = id(from.params.topicId)
@@ -281,7 +281,7 @@ function navigate (to, from) {
       p.then(() => store.dispatch('unsetSelection', oldId))
     }
   }
-  // 3) detail
+  // 3) detail panel
   const detail = to.params.detail
   const oldDetail = from.params.detail
   if (detail != oldDetail) {
