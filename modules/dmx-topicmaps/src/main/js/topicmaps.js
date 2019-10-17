@@ -241,18 +241,22 @@ const actions = {
    * @param   noSelect  Optional: if trueish the programmatic topic selection is suppressed.
    */
   revealTopic ({dispatch}, {topic, pos, noSelect}) {
-    dispatch('renderTopic', {topic, pos})                     // dispatch into topicmap renderer
-    !noSelect && dispatch('callTopicRoute', topic.id)         // dispatch into app
+    // Note: in case selection is requested (noSelect=falsish) auto-panning is performed through route change
+    // (see "renderAsSelected" action in topicmap-model, dm5-cytoscape-renderer module)
+    dispatch('renderTopic', {topic, pos, autoPan: noSelect})        // dispatch into topicmap renderer
+    !noSelect && dispatch('callTopicRoute', topic.id)               // dispatch into app
   },
 
   revealAssoc ({dispatch}, {assoc, noSelect}) {
-    dispatch('renderAssoc', assoc)                            // dispatch into topicmap renderer
-    !noSelect && dispatch('callAssocRoute', assoc.id)         // dispatch into app
+    dispatch('renderAssoc', assoc)                                  // dispatch into topicmap renderer
+    !noSelect && dispatch('callAssocRoute', assoc.id)               // dispatch into app
   },
 
-  revealRelatedTopic ({dispatch}, {relTopic, noSelect}) {
-    dispatch('renderRelatedTopic', relTopic)                  // dispatch into topicmap renderer
-    !noSelect && dispatch('callTopicRoute', relTopic.id)      // dispatch into app
+  revealRelatedTopic ({getters, dispatch}, {relTopic, noSelect}) {
+    // Note: in case selection is requested (noSelect=falsish) auto-panning is performed through route change
+    // (see "renderAsSelected" action in topicmap-model, dm5-cytoscape-renderer module)
+    dispatch('renderRelatedTopic', {relTopic, autoPan: noSelect})   // dispatch into topicmap renderer
+    !noSelect && dispatch('callTopicRoute', relTopic.id)            // dispatch into app
   },
 
   createAssoc ({dispatch}, {playerId1, playerId2}) {
