@@ -11,12 +11,16 @@ public class QueryResult implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public String query;
+    public String topicTypeUri;
+    public boolean searchChildTopics;
     public List<Topic> topics;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public QueryResult(String query, List<Topic> topics) {
+    public QueryResult(String query, String topicTypeUri, boolean searchChildTopics, List<Topic> topics) {
         this.query = query;
+        this.topicTypeUri = topicTypeUri;
+        this.searchChildTopics = searchChildTopics;
         this.topics = topics;
     }
 
@@ -27,6 +31,8 @@ public class QueryResult implements JSONEnabled {
         try {
             return new JSONObject()
                 .put("query", query)
+                .put("topicTypeUri", topicTypeUri)
+                .put("searchChildTopics", searchChildTopics)
                 .put("topics", DMXUtils.toJSONArray(topics));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);

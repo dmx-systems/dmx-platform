@@ -87,10 +87,12 @@ public interface CoreService {
     /**
      * Performs a fulltext search.
      *
-     * @param   query       A Lucene search query.
-     * @param   typeUri     Only topics of this type are searched. If null all topics are searched.
+     * @param   query               A Lucene search query.
+     * @param   topicTypeUri        Only topics of this type are searched. If null all topics are searched.
+     * @param   searchChildTopics   If true the topic's child topics are searched as well. Only works if "topicTypeUri"
+     *                              is given.
      */
-    QueryResult queryTopicsFulltext(String query, String typeUri);
+    QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics);
 
     Iterable<Topic> getAllTopics();
 

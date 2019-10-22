@@ -2,7 +2,7 @@
   <div class="dm5-icon-picker">
     <div v-if="infoMode" class="fa icon">{{object.value}}</div>
     <div v-else>
-      <el-button @click="open" class="fa icon">{{object.value}}</el-button>
+      <el-button class="fa icon" @click="open">{{object.value}}</el-button>
       <el-dialog :visible.sync="visible">
         <fa-search @icon-select="select"></fa-search>
       </el-dialog>
