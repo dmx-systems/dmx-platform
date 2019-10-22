@@ -89,7 +89,7 @@ public interface CoreService {
      *
      * @param   query               A Lucene search query.
      * @param   topicTypeUri        Only topics of this type are searched. If null all topics are searched.
-     * @param   searchChildTopics   If true the topic's child topics are searched as well. Only works if "topicTypeUri"
+     * @param   searchChildTopics   If true the topic's child topics are searched as well. Works only if "topicTypeUri"
      *                              is given.
      */
     QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics);

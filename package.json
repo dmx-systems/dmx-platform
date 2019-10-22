@@ -14,7 +14,7 @@
     "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json modules/dmx-webclient/src/main/resources/web"
   },
   "dependencies": {
-    "dm5": "0.35.0",
+    "dm5": "https://github.com/jri/dm5.git",
     "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "0.28.0",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
