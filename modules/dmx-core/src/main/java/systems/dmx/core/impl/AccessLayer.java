@@ -116,8 +116,13 @@ public final class AccessLayer {
         try {
             logger.info("Querying topics fulltext, query=\"" + query + "\", topicTypeUri=\"" +
                 topicTypeUri + "\", searchChildTopics=" + searchChildTopics);
-            // TODO: searchChildTopics
-            return filterReadables(db.queryTopicsFulltext(topicTypeUri, query));
+            List<TopicModelImpl> topics;
+            if (topicTypeUri != null && searchChildTopics) {
+                topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, query));
+            } else {
+                topics = db.queryTopicsFulltext(topicTypeUri, query);
+            }
+            return filterReadables(topics);
         } catch (Exception e) {
             throw new RuntimeException("Querying topics fulltext failed, query=\"" + query + "\", topicTypeUri=\"" +
                 topicTypeUri + "\", searchChildTopics=" + searchChildTopics, e);
@@ -711,8 +716,6 @@ public final class AccessLayer {
         return filterReadables(db.fetchAssocsByPropertyRange(propUri, from, to));
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
 
 
     // === Access Control ===
@@ -769,7 +772,38 @@ public final class AccessLayer {
 
 
 
-    // ===
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Returns parent topics of the given type as found by child-to-parent traversal starting at the given child topics.
+     */
+    List<TopicModelImpl> parentTopics(String topicTypeUri, List<TopicModelImpl> childTopics) {
+        List<TopicModelImpl> parentTopics = new ArrayList();
+        for (TopicModelImpl childTopic : childTopics) {
+            for (TopicModelImpl parentTopic : parentTopics(topicTypeUri, childTopic)) {
+                if (!parentTopics.contains(parentTopic)) {
+                    // FIXME: don't include parent topic if any child topic is not readable
+                    parentTopics.add(parentTopic);
+                }
+            }
+        }
+        return parentTopics;
+    }
+
+    List<TopicModelImpl> parentTopics(String topicTypeUri, TopicModelImpl childTopic) {
+        List<TopicModelImpl> parentTopics = new ArrayList();
+        if (childTopic.typeUri.equals(topicTypeUri)) {
+            parentTopics.add(childTopic);
+        } else {
+            for (TopicModelImpl parentTopic : childTopic.getRelatedTopics((String) null, "dmx.core.child",
+                                                                                         "dmx.core.parent", null)) {
+                parentTopics.addAll(parentTopics(topicTypeUri, parentTopic));
+            }
+        }
+        return parentTopics;
+    }
+
+    // ---
 
     private List<String> getTopicTypeUris() {
         try {
