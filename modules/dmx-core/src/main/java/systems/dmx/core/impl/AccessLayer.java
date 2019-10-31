@@ -782,7 +782,6 @@ public final class AccessLayer {
         for (TopicModelImpl childTopic : childTopics) {
             for (TopicModelImpl parentTopic : parentTopics(topicTypeUri, childTopic)) {
                 if (!parentTopics.contains(parentTopic)) {
-                    // FIXME: don't include parent topic if any child topic is not readable
                     parentTopics.add(parentTopic);
                 }
             }
@@ -792,6 +791,7 @@ public final class AccessLayer {
 
     List<TopicModelImpl> parentTopics(String topicTypeUri, TopicModelImpl childTopic) {
         List<TopicModelImpl> parentTopics = new ArrayList();
+        // FIXME: check child topic read permission
         if (childTopic.typeUri.equals(topicTypeUri)) {
             parentTopics.add(childTopic);
         } else {

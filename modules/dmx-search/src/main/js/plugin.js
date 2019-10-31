@@ -41,7 +41,8 @@ export default ({store}) => {
   }
 
   function createTopic ({topicType, value}) {
-    const topicModel = topicType.newTopicModel(value)
+    // Note: for value integration to work at least all identity fields must be filled
+    const topicModel = new dm5.Topic(topicType.newTopicModel(value)).fillChildren()
     // console.log('createTopic', topicModel)
     dm5.restClient.createTopic(topicModel).then(topic => {
       console.log('Created', topic)
