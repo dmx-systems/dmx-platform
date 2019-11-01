@@ -21,6 +21,8 @@ const state = {
                               //   {
                               //     topicmapId: Selection
                               //   }
+                              // A Selection instance exists for every loaded topicmap topic.
+                              // To get the Selection instance of the selected topicmap use the "selection" getter.
 
   topicmapTypes: {}           // Registered topicmap types:
                               //   {
@@ -332,10 +334,15 @@ const actions = {
       // update view
       const selection = getters.selection
       if (selection.isSingle()) {
-        dispatch('renderAsSelected', {
-          id: selection.getObjectId(),
-          showDetails: getters.showInmapDetails
-        })
+        const objectId = selection.getObjectId()
+        if (state.topicmap.hasObject(objectId)) {
+          dispatch('renderAsSelected', {
+            id: objectId,
+            showDetails: getters.showInmapDetails
+          })
+        } else {
+          dispatch('stripSelectionFromRoute')
+        }
       } else {
         // Note: a multi selection is visually restored by _displayTopicmap() already
       }
@@ -461,6 +468,9 @@ const getters = {
     return topicmapId
   },
 
+  /**
+   * Selection instance of the selected topicmap.
+   */
   selection: (state, getters) => {
     const topicmapId = getters.topicmapId     // FIXME: undefined?
     // console.log('# selection getter', topicmapId, state.selections[topicmapId])
