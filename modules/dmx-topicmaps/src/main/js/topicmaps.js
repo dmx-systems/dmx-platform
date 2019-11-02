@@ -334,10 +334,10 @@ const actions = {
       // update view
       const selection = getters.selection
       if (selection.isSingle()) {
-        const objectId = selection.getObjectId()
-        if (state.topicmap.hasObject(objectId)) {
+        const id = selection.getObjectId()
+        if (state.topicmap.hasObject(id)) {
           dispatch('renderAsSelected', {
-            id: objectId,
+            id,
             showDetails: getters.showInmapDetails
           })
         } else {

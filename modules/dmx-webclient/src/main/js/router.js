@@ -46,6 +46,14 @@ const router = new VueRouter({
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  // console.log('router.beforeEach', to, from)
+  if (['topicDetail', 'assocDetail'].includes(from.name) && from.params.detail === 'edit') {
+    console.log('isDirty', document.querySelector('.dm5-detail-panel').__vue__.isDirty())
+  }
+  next()
+})
+
 export default router
 
 store.registerModule('routerModule', {
