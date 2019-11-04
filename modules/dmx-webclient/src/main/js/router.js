@@ -131,14 +131,26 @@ store.registerModule('routerModule', {
   }
 })
 
+/**
+ * Redirects to the "topic"/"assoc" route while retaining the selected detail tab (if any).
+ *
+ * Falls back to "info" tab in 2 cases: when we're coming from ...
+ *   - form mode (we don't want stay in form mode when user selects another topic/assoc)
+ *   - empty (pinned) detail panel (we don't want restore the tab that was selected before emptying the panel)
+ */
 function callObjectRoute (id, paramName, routeName, detailRouteName) {
   const location = {
     params: {[paramName]: id}
   }
+  // Note: normally the route is the source of truth. But there is an app state not represented in the route: an empty
+  // (pinned) detail panel. We detect that by inspecting both, the "details.visible" app state AND the route's "detail"
+  // segment.
   if (store.state.details.visible) {
     location.name = detailRouteName
-    // Note: if the detail panel is visible but empty there is no "detail" segment in the current URL
-    if (!router.currentRoute.params.detail) {
+    // fallback to "info" tab
+    // Note: when the detail panel is empty there is no "detail" route segment
+    const detail = router.currentRoute.params.detail
+    if (!detail || detail === 'edit') {
       location.params.detail = 'info'
     }
   } else {

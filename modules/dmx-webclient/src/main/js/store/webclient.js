@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { MessageBox } from 'element-ui'
 import dm5 from 'dm5'
 
 Vue.use(Vuex)
@@ -218,7 +219,7 @@ function confirmDeletion (idLists) {
     message = `You're about to delete ${idLists.topicIds.length ? 'a topic' : 'an association'}`
     buttonText = 'Delete'
   }
-  return Vue.prototype.$confirm(message, 'Warning', {
+  return MessageBox.confirm(message, 'Warning', {
     type: 'warning',
     confirmButtonText: buttonText,
     confirmButtonClass: 'el-button--danger',
