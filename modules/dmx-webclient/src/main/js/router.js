@@ -50,7 +50,9 @@ const router = new VueRouter({
 // a global guard checks for unsaved changes
 router.beforeEach((to, from, next) => {
   // console.log('router.beforeEach', to, from)
-  if (['topicDetail', 'assocDetail'].includes(from.name) && from.params.detail === 'edit') {
+  // Note: at router instantiation time the details plugin is not yet initialized
+  // TODO: rethink router instantiation time
+  if (store.state.details && store.state.details.visible && objectId(to) !== objectId(from)) {
     const detailPanel = document.querySelector('.dm5-detail-panel').__vue__
     const isDirty = detailPanel.isDirty()
     console.log('isDirty', isDirty, store.state.object.id)
@@ -433,4 +435,8 @@ function id (v) {
   } else if (v !== undefined && v !== null) {
     throw Error(`id() expects one of [number|string|undefined|null], got ${v}`)
   }
+}
+
+function objectId(route) {
+  return route.params.assocId || route.params.topicId     // Note: 0 is a valid topic ID
 }
