@@ -6,6 +6,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { MessageBox } from 'element-ui'
 import Webclient from './components/dm5-webclient'
 import store from './store/webclient'
 import dm5 from 'dm5'
@@ -46,12 +47,40 @@ const router = new VueRouter({
   ]
 })
 
+// a global guard checks for unsaved changes
 router.beforeEach((to, from, next) => {
   // console.log('router.beforeEach', to, from)
   if (['topicDetail', 'assocDetail'].includes(from.name) && from.params.detail === 'edit') {
-    console.log('isDirty', document.querySelector('.dm5-detail-panel').__vue__.isDirty())
+    const detailPanel = document.querySelector('.dm5-detail-panel').__vue__
+    const isDirty = detailPanel.isDirty()
+    console.log('isDirty', isDirty, store.state.object.id)
+    if (isDirty) {
+      MessageBox.confirm('There are unsaved changes', 'Warning', {
+        type: 'warning',
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Discard Changes',
+        distinguishCancelAndClose: true
+      }).then(action => {   // -> Save
+        detailPanel.save()
+        next()
+      }).catch(action => {
+        switch (action) {
+        case 'cancel':      // -> Discard Changes
+          next()
+          break;
+        case 'close':       // -> Abort Navigation
+          next(false)
+          break;
+        default:
+          throw Error(`unexpected MessageBox action: "${action}"`)
+        }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
   }
-  next()
 })
 
 export default router
