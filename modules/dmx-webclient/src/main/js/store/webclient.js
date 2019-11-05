@@ -10,7 +10,8 @@ let compCount = 0
 const state = {
 
   object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
-                            // This object is displayed in detail panel or in-map. Its ID appears in the browser URL.
+                            // This object is displayed in detail panel or as in-map details. Its ID appears in the
+                            // browser URL.
                             // Undefined if there is no selection or a multi-selection.
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.

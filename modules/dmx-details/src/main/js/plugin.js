@@ -53,10 +53,15 @@ export default ({store}) => {
   }
 
   function tabClick (tab) {
-    // clicking 1st tab while in form mode is a no-op
     const details = store.state.details
-    if (tab === 'info' && details.tab === 'info' && details.mode === 'form') {
-      return
+    // clicking 1st tab while in form mode
+    if (tab === 'info' && details.mode === 'form') {
+      // 1st tab is selected already -> no-op
+      if (details.tab === 'info') {
+        return
+      }
+      // another tab is currently selected -> resume editing
+      tab = 'edit'
     }
     //
     store.dispatch('callDetailRoute', tab)
