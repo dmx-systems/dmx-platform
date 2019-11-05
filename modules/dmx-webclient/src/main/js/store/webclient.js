@@ -10,12 +10,12 @@ let compCount = 0
 const state = {
 
   object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
-                            // This object is displayed in the detail panel. Its ID appears in the browser URL.
+                            // This object is displayed in detail panel or in-map. Its ID appears in the browser URL.
                             // Undefined if there is no selection or a multi-selection.
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  detailRenderers: {        // Registered detail renderers:
+  detailRenderers: {        // Registered detail renderers; comprises object renderers and value renderers:
     object: {},             //   {
     value: {}               //     typeUri: component
   },                        //   }

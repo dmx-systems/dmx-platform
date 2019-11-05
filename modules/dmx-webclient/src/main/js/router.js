@@ -94,10 +94,17 @@ store.registerModule('routerModule', {
       })
     },
 
-    callDetailRoute (_, detail) {
-      const object = store.state.object
+    /**
+     * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
+     *
+     * Prerequisite: a single selection
+     *
+     * @param   detail    "info", "related", "meta", "view" or "edit"
+     */
+    callDetailRoute ({rootState}, detail) {
+      const object = rootState.object
       if (!object) {
-        throw Error('callDetailRoute() when nothing is selected')
+        throw Error('callDetailRoute() when there is no single selection')
       }
       router.push({
         name: object.isTopic() ? 'topicDetail' : 'assocDetail',
@@ -105,6 +112,12 @@ store.registerModule('routerModule', {
       })
     },
 
+    /**
+     * Redirects to "topicDetail" route.
+     *
+     * @param   id        a topic ID
+     * @param   detail    "info", "related", "meta", "view" or "edit"
+     */
     callTopicDetailRoute (_, {id, detail}) {
       router.push({
         name: 'topicDetail',
@@ -112,6 +125,12 @@ store.registerModule('routerModule', {
       })
     },
 
+    /**
+     * Redirects to "assocDetail" route.
+     *
+     * @param   id        an assoc ID
+     * @param   detail    "info", "related", "meta", "view" or "edit"
+     */
     callAssocDetailRoute (_, {id, detail}) {
       router.push({
         name: 'assocDetail',
@@ -119,10 +138,10 @@ store.registerModule('routerModule', {
       })
     },
 
-    stripDetailFromRoute () {
-      const object = store.state.object
+    stripDetailFromRoute ({rootState}) {
+      const object = rootState.object
       if (!object) {
-        throw Error('stripDetailFromRoute() when nothing is selected')
+        throw Error('stripDetailFromRoute() when there is no single selection')
       }
       router.push({
         name: object.isTopic() ? 'topic' : 'assoc'
@@ -132,7 +151,7 @@ store.registerModule('routerModule', {
 })
 
 /**
- * Redirects to the "topic"/"assoc" route while retaining the selected detail tab (if any).
+ * Redirects to "topic"/"assoc" route while retaining the selected detail tab (if any).
  *
  * Falls back to "info" tab in 2 cases: when we're coming from ...
  *   - form mode (we don't want stay in form mode when user selects another topic/assoc)
