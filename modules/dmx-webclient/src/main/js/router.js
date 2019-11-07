@@ -71,7 +71,7 @@ router.beforeEach((to, from, next) => {
           next()
           break;
         case 'close':       // -> Abort Navigation
-          restoreSelection(to, from)
+          restoreSelection(from)
           next(false)
           break;
         default:
@@ -438,28 +438,28 @@ function id (v) {
   }
 }
 
-const FUN = {
+const SETTER = {
   topicDetail: 'setTopic',
   assocDetail: 'setAssoc'
 }
 
 /**
- * Restores the selection according to the "from" route
+ * Restores the selection according to the given route
  */
-function restoreSelection (to, from) {
-  const setter = FUN[from.name]
+function restoreSelection (route) {
+  const setter = SETTER[route.name]
   if (!setter) {
-    throw Error(`unexpected from route: "${from.name}"`)
+    throw Error(`unexpected route: "${route.name}"`)
   }
-  const fromId = objectId(from)
-  const toId = objectId(to)
-  // update model
-  store.getters.selection[setter](fromId)
+  const id = objectId(route)
+  const selection = store.getters.selection
   // update view
-  store.dispatch('_renderAsSelected', fromId)
-  if (toId !== undefined) {                                   // Note: 0 is a valid topic ID
-    store.dispatch('_renderAsUnselected', toId)
-  }
+  selection.forEachId(id => {
+    store.dispatch('_renderAsUnselected', id)
+  })
+  store.dispatch('_renderAsSelected', id)
+  // update model
+  selection[setter](id)
 }
 
 /**
