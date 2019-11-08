@@ -52,7 +52,8 @@ router.beforeEach((to, from, next) => {
   // console.log('router.beforeEach', to, from)
   // Note: at router instantiation time the details plugin is not yet initialized
   // TODO: rethink router instantiation time
-  if (store.state.details && store.state.details.visible && objectId(to) !== objectId(from)) {
+  if (store.state.details && store.state.details.visible && (topicmapId(to) !== topicmapId(from) ||
+                                                             objectId(to)   !== objectId(from))) {
     const detailPanel = document.querySelector('.dm5-detail-panel').__vue__
     const isDirty = detailPanel.isDirty()
     console.log('isDirty', isDirty, store.state.object.id)
@@ -418,26 +419,6 @@ function fetchAssoc (id, p) {
   })
 }
 
-/**
- * Converts the given value into Number.
- *
- * @return  the number, or undefined if `undefined` or `null` is given.
- *          Never returns `null`.
- *
- * @throws  if the given value is not one of Number/String/undefined/null.
- */
-function id (v) {
-  // Note: Number(undefined) is NaN, and NaN != NaN is true!
-  // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')
-  if (typeof v === 'number') {
-    return v
-  } else if (typeof v === 'string') {
-    return Number(v)
-  } else if (v !== undefined && v !== null) {
-    throw Error(`id() expects one of [number|string|undefined|null], got ${v}`)
-  }
-}
-
 const SETTER = {
   topicDetail: 'setTopic',
   assocDetail: 'setAssoc'
@@ -466,8 +447,29 @@ function restoreSelection (route) {
  * @return  an ID (type Number) or undefined
  */
 function objectId(route) {
-  const id = route.params.assocId || route.params.topicId     // Note: 0 is a valid topic ID; check assoc ID first
-  if (id !== undefined) {
-    return Number(id)
+  return id(route.params.assocId || route.params.topicId)     // Note: 0 is a valid topic ID; check assoc ID first
+}
+
+function topicmapId(route) {
+  return id(route.params.topicmapId)
+}
+
+/**
+ * Converts the given value into Number.
+ *
+ * @return  the number, or undefined if `undefined` or `null` is given.
+ *          Never returns `null`.
+ *
+ * @throws  if the given value is not one of Number/String/undefined/null.
+ */
+function id (v) {
+  // Note: Number(undefined) is NaN, and NaN != NaN is true!
+  // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')
+  if (typeof v === 'number') {
+    return v
+  } else if (typeof v === 'string') {
+    return Number(v)
+  } else if (v !== undefined && v !== null) {
+    throw Error(`id() expects one of [number|string|undefined|null], got ${v}`)
   }
 }
