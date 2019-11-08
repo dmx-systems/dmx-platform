@@ -47,13 +47,16 @@ const router = new VueRouter({
   ]
 })
 
-// a global guard checks for unsaved changes
+// use a global guard to perform dirty check
 router.beforeEach((to, from, next) => {
-  // console.log('router.beforeEach', to, from)
+  // Perform a dirty check if all conditions apply:
+  //   - the detail panel is visible (in-map details are NOT dirty checked; TODO?)
+  //   - there is a selection (the detail panel is not empty)
+  //   - in the route there is a topicmap change or a selection change (or both)
   // Note: at router instantiation time the details plugin is not yet initialized
   // TODO: rethink router instantiation time
-  if (store.state.details && store.state.details.visible && (topicmapId(to) !== topicmapId(from) ||
-                                                             objectId(to)   !== objectId(from))) {
+  if (store.state.details && store.state.details.visible && store.state.object &&
+      (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
     const detailPanel = document.querySelector('.dm5-detail-panel').__vue__
     const isDirty = detailPanel.isDirty()
     console.log('isDirty', isDirty, store.state.object.id)
