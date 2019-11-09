@@ -447,6 +447,11 @@ const actions = {
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           deleteTopicmap(topic, getters, rootState, dispatch)
         }
+        //
+        removeFromAllSelections(dir.arg.id)
+        break
+      case "DELETE_ASSOCIATION":
+        removeFromAllSelections(dir.arg.id)
         break
       }
     })
@@ -577,6 +582,10 @@ function selectionHandler (dispatch) {
       dispatch('stripSelectionFromRoute')
     }
   }
+}
+
+function removeFromAllSelections (id) {
+  Object.values(state.selections).forEach(selection => selection.remove(id))
 }
 
 // ---
