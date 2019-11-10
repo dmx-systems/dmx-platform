@@ -63,12 +63,11 @@ const actions = {
    * - "selectedTopicmapId" state is up-to-date
    * - topicmap cookie is up-to-date.
    *
-   * Note: these states are *not* yet up-to-date:
+   * Note: this state is *not* yet up-to-date:
    * - "topicmap" (updated only once topicmap retrieval is complete)
-   * - "writable" (updated only once permission retrieval is complete)
    *
    * @returns   a promise resolved once topicmap rendering is complete.
-   *            At this time the "topicmap" and "writable" states are up-to-date.
+   *            At this time the "topicmap" state is up-to-date.
    */
   displayTopicmap ({getters, rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
@@ -328,10 +327,13 @@ const actions = {
   },
 
   reloadTopicmap ({getters, rootState, dispatch}) {
-    console.log('reloadTopicmap', _topicmapId(getters))
+    const topicmapId = _topicmapId(getters)
+    console.log('reloadTopicmap', topicmapId)
+    // update state
     dispatch('clearTopicmapCache')
+    emptyAllSelectionsExcept(topicmapId)      // should be ouside this action; is included here for pragmatic reasons
+    // update view
     _displayTopicmap(getters, rootState, dispatch).then(() => {
-      // update view
       const selection = getters.selection
       if (selection.isSingle()) {
         const id = selection.getObjectId()
@@ -461,10 +463,12 @@ const actions = {
 const getters = {
 
   /**
-   * ID of the selected topicmap. Its calculation is based on "workspaceId" state (see workspaces module) and
-   * "selectedTopicmapId" state.
-   * Undefined if no workspace and/or no topicmap is selected. Note: at the moment the webclient components are
-   * instantiated no workspace and no topicmap is selected
+   * ID of the selected topicmap.
+   *
+   * Calculation is based on "workspaceId" state (see workspaces module) and "selectedTopicmapId" state.
+   *
+   * Undefined if no workspace and/or no topicmap is selected.
+   * Note: at the moment the webclient components are instantiated no workspace and no topicmap is selected.
    */
   topicmapId: (state, getters, rootState) => {
     const workspaceId = __workspaceId(rootState)
@@ -500,7 +504,33 @@ export default {
   getters
 }
 
-// Actions
+// Process directives
+
+/**
+ * Processes an UPDATE_TOPIC directive.
+ * Updates the topicmap menu when a topicmap is renamed.
+ */
+function updateTopicmap (topic) {
+  // console.log('updateTopicmap', topic)
+  // update state
+  findTopicmapTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
+}
+
+/**
+ * Processes a DELETE_TOPIC directive.
+ */
+function deleteTopicmap (topic, getters, rootState, dispatch) {
+  // update state
+  findTopicmapTopic(topic.id, (topics, i) => topics.splice(i, 1))
+  delete state.selections[topic.id]
+  // redirect
+  console.log('deleteTopicmap', topic.id, _topicmapId(getters))
+  if (topic.id === _topicmapId(getters)) {
+    _selectTopicmap(firstTopicmapTopic(rootState).id, dispatch)
+  }
+}
+
+// Actions Helper
 
 function _selectTopicmap (id, dispatch) {
   const selection = state.selections[id]
@@ -530,7 +560,7 @@ function _selectTopicmap (id, dispatch) {
  * - the workspace's topicmap topics are available ("topicmapTopics" state is up-to-date)
  *
  * @returns   a promise resolved once topicmap rendering is complete.
- *            At this time the "topicmap" and "writable" states are up-to-date as well.
+ *            At this time the "topicmap" state is up-to-date as well.
  */
 function _displayTopicmap (getters, rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
@@ -563,31 +593,6 @@ function _syncUnselectMulti (selection, dispatch) {
   }
 }
 
-function initSelection (id, dispatch) {
-  if (state.selections[id]) {
-    throw Error(`'selections' state for topicmap ${id} already initialized`)
-  }
-  state.selections[id] = new Selection(selectionHandler(dispatch))
-}
-
-function selectionHandler (dispatch) {
-  return selection => {
-    // console.log('handleSelection', selection.topicIds, selection.assocIds)
-    if (selection.isSingle()) {
-      dispatch(
-        selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute',
-        selection.getObjectId()
-      )
-    } else {
-      dispatch('stripSelectionFromRoute')
-    }
-  }
-}
-
-function removeFromAllSelections (id) {
-  Object.values(state.selections).forEach(selection => selection.remove(id))
-}
-
 // ---
 
 function unselectIfCascade(id, dispatch) {
@@ -596,32 +601,6 @@ function unselectIfCascade(id, dispatch) {
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
     unselectIfCascade(assoc.id, dispatch)      // recursion
   })
-}
-
-// Process directives
-
-/**
- * Processes an UPDATE_TOPIC directive.
- * Updates the topicmap menu when a topicmap is renamed.
- */
-function updateTopicmap (topic) {
-  // console.log('updateTopicmap', topic)
-  // update state
-  findTopicmapTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
-}
-
-/**
- * Processes a DELETE_TOPIC directive.
- */
-function deleteTopicmap (topic, getters, rootState, dispatch) {
-  // update state
-  findTopicmapTopic(topic.id, (topics, i) => topics.splice(i, 1))
-  delete state.selections[topic.id]
-  // redirect
-  console.log('deleteTopicmap', topic.id, _topicmapId(getters))
-  if (topic.id === _topicmapId(getters)) {
-    _selectTopicmap(firstTopicmapTopic(rootState).id, dispatch)
-  }
 }
 
 // State helper
@@ -659,6 +638,41 @@ function findTopicmapTopic (id, callback) {
       break
     }
   }
+}
+
+// ---
+
+function initSelection (id, dispatch) {
+  if (state.selections[id]) {
+    throw Error(`'selections' state for topicmap ${id} already initialized`)
+  }
+  state.selections[id] = new Selection(selectionHandler(dispatch))
+}
+
+function selectionHandler (dispatch) {
+  return selection => {
+    // console.log('handleSelection', selection.topicIds, selection.assocIds)
+    if (selection.isSingle()) {
+      dispatch(
+        selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute',
+        selection.getObjectId()
+      )
+    } else {
+      dispatch('stripSelectionFromRoute')
+    }
+  }
+}
+
+function removeFromAllSelections (id) {
+  Object.values(state.selections).forEach(selection => selection.remove(id))
+}
+
+function emptyAllSelectionsExcept (topicmapId) {
+  Object.keys(state.selections).forEach(_topicmapId => {
+    if (_topicmapId !== topicmapId) {
+      state.selections[_topicmapId].empty()
+    }
+  })
 }
 
 // ---
