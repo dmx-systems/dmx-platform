@@ -337,7 +337,7 @@ const actions = {
       const selection = getters.selection
       if (selection.isSingle()) {
         const id = selection.getObjectId()
-        if (state.topicmap.hasObject(id)) {
+        if (state.topicmap.hasVisibleObject(id)) {
           dispatch('renderAsSelected', {
             id,
             showDetails: getters.showInmapDetails
