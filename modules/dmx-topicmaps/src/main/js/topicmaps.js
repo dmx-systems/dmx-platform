@@ -669,7 +669,8 @@ function removeFromAllSelections (id) {
 
 function emptyAllSelectionsExcept (topicmapId) {
   Object.keys(state.selections).forEach(_topicmapId => {
-    if (_topicmapId !== topicmapId) {
+    // Note: Object.keys() always returns string keys. So we use non-strict equality here.
+    if (_topicmapId != topicmapId) {
       state.selections[_topicmapId].empty()
     }
   })
