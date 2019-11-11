@@ -330,8 +330,7 @@ const actions = {
     const topicmapId = _topicmapId(getters)
     console.log('reloadTopicmap', topicmapId)
     // update state
-    dispatch('clearTopicmapCache')
-    emptyAllSelectionsExcept(topicmapId)      // should be ouside this action; is included here for pragmatic reasons
+    dispatch('clearTopicmapCache', topicmapId)
     // update view
     _displayTopicmap(getters, rootState, dispatch).then(() => {
       const selection = getters.selection
@@ -349,6 +348,16 @@ const actions = {
         // Note: a multi selection is visually restored by _displayTopicmap() already
       }
     })
+  },
+
+  /**
+   * @param   topicmapId    optional: ID of the topicmap whose topic/assoc selection will not be removed.
+   */
+  clearTopicmapCache (_, topicmapId) {
+    // Note: when the topicmap cache is cleared (see dm5-topicmap-panel module) here we remove all topicmap selection
+    // states as we can't know if the selected topic/assoc is still contained in the topicmap when loaded with changed
+    // authorization.
+    emptyAllSelectionsExcept(topicmapId)
   },
 
   /**
