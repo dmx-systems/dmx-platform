@@ -19,7 +19,7 @@
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
-    "dm5-topic-list": "0.13.0",
+    "dm5-topic-list": "https://github.com/jri/dm5-topic-list.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "0.4.0",
     "element-ui": "^2.12.0",

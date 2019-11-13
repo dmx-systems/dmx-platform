@@ -59,7 +59,7 @@ router.beforeEach((to, from, next) => {
       (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
     const detailPanel = document.querySelector('.dm5-detail-panel').__vue__
     const isDirty = detailPanel.isDirty()
-    console.log('isDirty', isDirty, store.state.object.id)
+    // console.log('isDirty', isDirty, store.state.object.id)
     if (isDirty) {
       MessageBox.confirm('There are unsaved changes', 'Warning', {
         type: 'warning',
