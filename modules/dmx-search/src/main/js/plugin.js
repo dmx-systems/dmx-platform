@@ -14,7 +14,6 @@ export default ({store}) => {
         mount: 'webclient',
         props: {
           visible:        state => state.search.visible,
-          pos:            state => state.search.pos,
           extraMenuItems: state => state.search.extraMenuItems,
           createEnabled:  state => state.workspaces.isWritable,
           markerIds:      (_, getters) => getters && getters.visibleTopicIds,
