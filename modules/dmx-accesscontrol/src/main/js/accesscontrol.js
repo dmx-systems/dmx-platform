@@ -16,7 +16,6 @@ const actions = {
       const username = credentials.username
       console.log('Login', username)
       setUsername(username)
-      dm5.permCache.clear()
       dispatch('loggedIn')
       return true
     }).catch(error => {
@@ -31,7 +30,6 @@ const actions = {
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
     dm5.restClient.logout().then(() => {
       setUsername()
-      dm5.permCache.clear()
       dispatch('loggedOut')
     })
   },

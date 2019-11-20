@@ -24,7 +24,7 @@
     "dm5-websocket": "0.4.0",
     "element-ui": "^2.12.0",
     "font-awesome": "^4.7.0",
-    "leaflet": "^1.5.1",
+    "leaflet": "^1.6.0",
     "vue": "^2.6.10",
     "vue-font-awesome-search": "1.1.0",
     "vue-router": "3.0.7",

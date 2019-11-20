@@ -1,5 +1,3 @@
-import dm5 from 'dm5'
-
 const state = {
 
   visible: false,             // search widget visibility
