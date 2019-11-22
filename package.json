@@ -1,6 +1,6 @@
 {
   "name": "dm5-webclient",
-  "version": "5.0.0-beta.5",
+  "version": "5.0.0-beta.6",
   "description": "The DeepaMehta 5 Webclient",
   "author": "Jörg Richter <jri@dmx.berlin>",
   "license": "AGPL-3.0",
@@ -14,13 +14,13 @@
     "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json modules/dmx-webclient/src/main/resources/web"
   },
   "dependencies": {
-    "dm5": "https://github.com/jri/dm5.git",
-    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
-    "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
-    "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
-    "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
-    "dm5-topic-list": "https://github.com/jri/dm5-topic-list.git",
-    "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
+    "dm5": "0.36.0",
+    "dm5-cytoscape-renderer": "0.25.0",
+    "dm5-detail-panel": "0.29.0",
+    "dm5-object-renderer": "0.20.0",
+    "dm5-search-widget": "0.27.0",
+    "dm5-topic-list": "0.14.0",
+    "dm5-topicmap-panel": "0.25.0",
     "dm5-websocket": "0.4.0",
     "element-ui": "^2.12.0",
     "font-awesome": "^4.7.0",

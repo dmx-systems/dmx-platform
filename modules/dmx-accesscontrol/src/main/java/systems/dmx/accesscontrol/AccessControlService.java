@@ -86,7 +86,7 @@ public interface AccessControlService {
      * Note: a user can have more than one private workspace.
      * This method returns only the first one.
      *
-     * @return  IllegalStateException   if no user is logged in.
+     * @throws  IllegalStateException   if no user is logged in.
      * @throws  RuntimeException        if the logged in user has no private workspace.
      *
      * @return  The logged in user's private workspace (a topic of type "Workspace").
