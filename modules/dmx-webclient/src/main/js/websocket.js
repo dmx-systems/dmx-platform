@@ -2,6 +2,9 @@ import DM5WebSocket from 'dm5-websocket'
 import store from './store/webclient'
 import dm5 from 'dm5'
 
+// TODO: move the "Client ID" aspect to dm5-websocket module.
+// The developer should not required to care about.
+
 const clientId = newClientId()
 updateClientIdCookie()
 
