@@ -21,7 +21,7 @@
     "dm5-search-widget": "0.27.0",
     "dm5-topic-list": "0.14.0",
     "dm5-topicmap-panel": "0.25.0",
-    "dm5-websocket": "0.4.0",
+    "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.13.0",
     "font-awesome": "^4.7.0",
     "leaflet": "^1.6.0",
