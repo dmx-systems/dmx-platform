@@ -5,23 +5,14 @@ const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
   username: undefined,      // the logged in user (string); falsish if no user is logged in
-  authMethods: ['Basic'],   // names of installed auth methods (array of string)
   visible: false            // Login dialog visibility
 }
 
 const actions = {
 
-  login ({dispatch}, {credentials, authMethod}) {
-    return dm5.restClient.login(credentials, authMethod).then(() => {
-      const username = credentials.username
-      console.log('Login', username)
-      setUsername(username)
-      dispatch('loggedIn')
-      return true
-    }).catch(error => {
-      console.log('Login failed', error)
-      return false
-    })
+  loggedIn (_, username) {
+    console.log('Login', username)
+    setUsername(username)
   },
 
   logout ({dispatch}) {
@@ -51,10 +42,6 @@ const actions = {
 
 dm5.restClient.getUsername().then(username => {
   state.username = username
-})
-dm5.restClient.getAuthorizationMethods().then(authMethods => {
-  console.log('[DMX] Installed auth methods', authMethods)
-  state.authMethods = state.authMethods.concat(authMethods)
 })
 
 // helper
