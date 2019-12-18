@@ -17,6 +17,7 @@
     "dm5": "0.36.0",
     "dm5-cytoscape-renderer": "0.25.0",
     "dm5-detail-panel": "0.29.0",
+    "dm5-login-dialog": "https://github.com/jri/dm5-login-dialog.git",
     "dm5-object-renderer": "0.20.0",
     "dm5-search-widget": "0.27.0",
     "dm5-topic-list": "0.14.0",
