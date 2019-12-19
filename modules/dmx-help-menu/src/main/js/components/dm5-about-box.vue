@@ -8,7 +8,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Dec 16, 2019
+        Dec 19, 2019
       </div>
       <div class="field">
         <div class="field-label">License</div>
