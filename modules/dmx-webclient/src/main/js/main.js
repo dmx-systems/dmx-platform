@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2020/01/07')
+console.log('[DMX] 2020/01/10')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
@@ -81,7 +81,7 @@ Promise.all([
 // Note: in contrast to the dialog the message box is not a child of <dm5-webclient> component, so we attach
 // the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
-  console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
+  // console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
   // search dialog
   const inSearchDialog = document.querySelector('.dm5-search-widget').parentNode.contains(e.target)
   // message box
@@ -89,7 +89,7 @@ document.body.addEventListener('contextmenu', e => {
   const messageBoxWrapper = document.querySelector('.el-message-box__wrapper')
   const inMessageBox = messageBoxWrapper && messageBoxWrapper.contains(e.target)
   //
-  console.log(inSearchDialog, inMessageBox)
+  // console.log(inSearchDialog, inMessageBox)
   if (inSearchDialog || inMessageBox) {
     e.preventDefault()
   }
