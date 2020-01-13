@@ -18,7 +18,6 @@ export default () => {
   initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-help-menu/src/main/js/plugin.js').default)
-  initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
   //
   // while development add your plugins here
   // initPlugin(require('modules-external/my-plugin/src/main/js/plugin.js').default)

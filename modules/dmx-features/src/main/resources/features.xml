@@ -44,7 +44,6 @@
         <bundle>mvn:systems.dmx/deepamehta-events/${project.version}</bundle>
         <bundle>mvn:systems.dmx/deepamehta-datetime/${project.version}</bundle>
         <bundle>mvn:systems.dmx/deepamehta-webbrowser/${project.version}</bundle>
-        <bundle>mvn:systems.dmx/deepamehta-geomaps/${project.version}</bundle>
     </feature>
 
 </features>
