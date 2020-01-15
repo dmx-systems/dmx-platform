@@ -37,7 +37,10 @@ module.exports = (env = {}) => {
         },
         {
           test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
-          loader: 'file-loader'
+          loader: 'file-loader',
+          options: {
+            esModule: false   // Note: since file-loader 5.0 "esModule" is true by default.
+          }                   // Does not work with <img src"..."> element in vue template.
         }
       ]
     },
