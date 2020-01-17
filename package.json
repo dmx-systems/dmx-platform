@@ -29,7 +29,7 @@
     "vue": "^2.6.11",
     "vue-font-awesome-search": "1.1.0",
     "vue-router": "3.0.7",
-    "vue2-leaflet": "^2.4.2",
+    "vue2-leaflet": "2.2.1",
     "vuedraggable": "^2.23.2",
     "vuex": "^3.1.2"
   },
@@ -45,7 +45,7 @@
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.9.0",
-    "style-loader": "^1.1.2",
+    "style-loader": "^1.1.3",
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.41.5",
