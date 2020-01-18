@@ -25,11 +25,9 @@
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.13.0",
     "font-awesome": "^4.7.0",
-    "leaflet": "^1.6.0",
     "vue": "^2.6.11",
     "vue-font-awesome-search": "1.1.0",
     "vue-router": "3.0.7",
-    "vue2-leaflet": "2.2.1",
     "vuedraggable": "^2.23.2",
     "vuex": "^3.1.2"
   },
