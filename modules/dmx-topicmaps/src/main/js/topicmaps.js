@@ -4,7 +4,9 @@ import Selection from './selection'
 
 const state = {
 
-  topicmap: undefined,        // the rendered topicmap (dm5.Topicmap)
+  topicmap: undefined,        // The rendered topicmap (dm5.Topicmap).
+                              // Set by _displayTopicmap()
+                              // TODO: undefined for non-standard topicmaps, e.g. Geomap
 
   topicmapTopics: {},         // Per-workspace loaded topicmap topics (including children):
                               //   {
@@ -24,7 +26,7 @@ const state = {
                               // A Selection instance exists for every loaded topicmap topic.
                               // To get the Selection instance of the selected topicmap use the "selection" getter.
 
-  topicmapTypes: {}           // Registered topicmap types:
+  topicmapTypes: {},          // Registered topicmap types:
                               //   {
                               //     topicmapTypeUri: {
                               //       uri:
@@ -32,6 +34,13 @@ const state = {
                               //       renderer:
                               //     }
                               //   }
+
+  contextCommands: {
+    topic: [],
+    topic_danger: [],
+    assoc: [],
+    assoc_danger: []
+  }
 }
 
 const actions = {
@@ -394,6 +403,13 @@ const actions = {
 
   registerTopicmapType (_, topicmapType) {
     state.topicmapTypes[topicmapType.uri] = topicmapType
+  },
+
+  registerContextCommands (_, commands) {
+    state.contextCommands.topic        = [...state.contextCommands.topic,        ...commands.topic]
+    state.contextCommands.topic_danger = [...state.contextCommands.topic_danger, ...commands.topic_danger]
+    state.contextCommands.assoc        = [...state.contextCommands.assoc,        ...commands.assoc]
+    state.contextCommands.assoc_danger = [...state.contextCommands.assoc_danger, ...commands.assoc_danger]
   },
 
   //
