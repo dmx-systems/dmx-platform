@@ -66,6 +66,12 @@ function initPlugin (pluginConfig) {
   registerDetailRenderers(_pluginConfig.objectRenderers, 'object')
   registerDetailRenderers(_pluginConfig.valueRenderers,  'value')
   //
+  // context commands
+  const contextCommands = _pluginConfig.contextCommands
+  if (contextCommands) {
+    store.dispatch('registerContextCommands', contextCommands)
+  }
+  //
   // extra menu items
   const extraMenuItems = _pluginConfig.extraMenuItems
   if (extraMenuItems) {
