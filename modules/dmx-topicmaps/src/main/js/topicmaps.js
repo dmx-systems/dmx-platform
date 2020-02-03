@@ -406,10 +406,11 @@ const actions = {
   },
 
   registerContextCommands (_, commands) {
-    state.contextCommands.topic        = [...state.contextCommands.topic,        ...commands.topic]
-    state.contextCommands.topic_danger = [...state.contextCommands.topic_danger, ...commands.topic_danger]
-    state.contextCommands.assoc        = [...state.contextCommands.assoc,        ...commands.assoc]
-    state.contextCommands.assoc_danger = [...state.contextCommands.assoc_danger, ...commands.assoc_danger]
+    ['topic', 'topic_danger', 'assoc', 'assoc_danger'].forEach(prop => {
+      if (commands[prop]) {
+        state.contextCommands[prop] = [...state.contextCommands[prop], ...commands[prop]]
+      }
+    })
   },
 
   //
