@@ -278,7 +278,6 @@ public final class AccessLayer {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         try {
-            logger.info(info);
             AssocModelImpl assoc = sd.fetchAssocBetweenTopicAndAssoc(assocTypeUri, topicId, assocId, topicRoleTypeUri,
                 assocRoleTypeUri);
             return assoc != null ? assoc.checkReadAccess() : null;
