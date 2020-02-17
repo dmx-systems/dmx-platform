@@ -3,7 +3,12 @@ import dm5 from 'dm5'
 import axios from 'axios'
 import Vue from 'vue'
 
-export default () => {
+let extraElementUI
+
+export default (_extraElementUI) => {
+  //
+  extraElementUI = _extraElementUI
+  //
   // Init order notes:
   //  1. dmx-search provides the registerExtraMenuItems() action.
   //     dmx-search must be inited *before* any plugin which registers extra menu items.
@@ -55,6 +60,10 @@ function initPlugin (pluginConfig) {
       store.watch(watcher.getter, watcher.callback)
     })
   }
+  // extra Element UI components
+  if (_pluginConfig.extraElementUI) {
+    extraElementUI()
+  }
   // webclient components
   const components = _pluginConfig.components    // TODO: rename prop to "webclient"
   if (components) {
@@ -71,7 +80,6 @@ function initPlugin (pluginConfig) {
   if (contextCommands) {
     store.dispatch('registerContextCommands', contextCommands)
   }
-  //
   // extra menu items
   const extraMenuItems = _pluginConfig.extraMenuItems
   if (extraMenuItems) {

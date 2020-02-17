@@ -5,11 +5,11 @@ import store from './store/webclient'
 import router from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
+import extraElementUI from './element-ui'
 import 'font-awesome/css/font-awesome.css'
-import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2020/02/16')
+console.log('[DMX] 2020/02/17')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
@@ -37,7 +37,7 @@ const root = new Vue({
 // Note: in production mode external plugins are loaded asynchronously. Mounting can only start once loading completes.
 // In contrast external plugins in *development mode* as well as standard plugins (both modes) are "linked" into the
 // Webclient at build time. At runtime no asynchronicity is involved.
-loadPlugins()
+loadPlugins(extraElementUI)
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
