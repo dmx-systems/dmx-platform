@@ -135,6 +135,9 @@
         <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- OSGi Container -->
+        <org.osgi.framework.bootdelegation>javax.xml.*,org.xml.*,org.w3c.dom</org.osgi.framework.bootdelegation>
     </properties>
 
     <dependencyManagement>
