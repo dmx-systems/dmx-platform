@@ -408,7 +408,7 @@ const actions = {
   registerContextCommands (_, commands) {
     ['topic', 'topic_danger', 'assoc', 'assoc_danger'].forEach(prop => {
       if (commands[prop]) {
-        state.contextCommands[prop] = [...state.contextCommands[prop], ...commands[prop]]
+        state.contextCommands[prop] = state.contextCommands[prop].concat(commands[prop])
       }
     })
   },
