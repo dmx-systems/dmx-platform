@@ -715,23 +715,23 @@ class ValueIntegrator {
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
-        ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
-        al.createSingleTopic(model, false);       // firePostCreate=false
-        logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
-        for (String compDefUri : childValues.keySet()) {
-            if (isOne(compDefUri)) {
-                TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
-                AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);         // update DB
-                childTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
-            } else {
-                for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
-                    TopicModel childTopic = value.value;
-                    AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);     // update DB
-                    childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
+        al.createSingleTopic(model, () -> {
+            logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
+            ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
+            for (String compDefUri : childValues.keySet()) {
+                if (isOne(compDefUri)) {
+                    TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
+                    AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);         // update DB
+                    childTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
+                } else {
+                    for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
+                        TopicModel childTopic = value.value;
+                        AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);     // update DB
+                        childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
+                    }
                 }
             }
-        }
-        al.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
+        });
         return model;
     }
 
@@ -747,10 +747,7 @@ class ValueIntegrator {
             throw new RuntimeException("Tried to create a topic from an assoc model");
         }
         //
-        return al.createSingleTopic(
-            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value),
-            true    // firePostCreate=true
-        );
+        return al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
     }
 
     /**

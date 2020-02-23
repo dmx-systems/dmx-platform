@@ -145,21 +145,25 @@ public final class AccessLayer {
 
     // ---
 
-    // ### TODO: drop "firePostCreate" param
-    TopicModelImpl createSingleTopic(TopicModelImpl model, boolean firePostCreate) {
-        return createSingleTopic(model, null, firePostCreate);   // uriPrefix=null
+    TopicModelImpl createSingleTopic(TopicModelImpl model) {
+        return createSingleTopic(model, null, null);
+    }
+
+    TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix) {
+        return createSingleTopic(model, uriPrefix, null);
+    }
+
+    TopicModelImpl createSingleTopic(TopicModelImpl model, Runnable runnable) {
+        return createSingleTopic(model, null, runnable);
     }
 
     /**
      * Creates a single topic in the DB.
      * No child topics are created.
-     *
-     * ### TODO: drop "firePostCreate" param
      */
-    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, boolean firePostCreate) {
+    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, Runnable runnable) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            //
             model.preCreate();
             //
             // 1) store in DB
@@ -176,11 +180,12 @@ public final class AccessLayer {
                 model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
             //
-            model.postCreate();
-            //
-            if (firePostCreate) {
-                em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
+            if (runnable != null) {
+                runnable.run();
             }
+            //
+            model.postCreate();
+            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
@@ -343,7 +348,6 @@ public final class AccessLayer {
     AssocModelImpl createAssoc(AssocModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
-            //
             model.preCreate();
             //
             // store in DB
@@ -355,7 +359,6 @@ public final class AccessLayer {
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
             // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssocModel.
             model.postCreate();
-            //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, _model.instantiate());
             return _model;
         } catch (Exception e) {
@@ -599,7 +602,7 @@ public final class AccessLayer {
             }
         }
         //
-        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE, true);
+        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---
@@ -843,12 +846,12 @@ public final class AccessLayer {
         // comp defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
-        createSingleTopic(typeTopic, uriPrefix, true);    // create generic topic
+        createSingleTopic(typeTopic, uriPrefix);        // create generic topic
         //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;
         //
-        typeStorage.storeType(model);                     // store type-specific parts
+        typeStorage.storeType(model);                   // store type-specific parts
     }
 
     private String typeUri(long objectId) {
