@@ -137,6 +137,8 @@ public final class AccessLayer {
 
     TopicModelImpl createTopic(TopicModelImpl model) {
         try {
+            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+            model.preCreate();
             return updateValues(model, null);
         } catch (Exception e) {
             throw new RuntimeException("Creating topic failed, model=" + model, e);
@@ -163,9 +165,6 @@ public final class AccessLayer {
      */
     private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, Runnable runnable) {
         try {
-            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            model.preCreate();
-            //
             // 1) store in DB
             db.storeTopic(model);
             if (model.getType().isSimple()) {
