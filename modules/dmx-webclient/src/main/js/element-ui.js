@@ -5,7 +5,7 @@ import {
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
-export default () => import('./element-ui-ext'  /* webpackChunkName: "element-ui-ext" */)
+export default () => import('./element-ui-ext' /* webpackChunkName: "element-ui-ext" */)
 
 // set locale
 locale.use(require('element-ui/lib/locale/lang/en').default)
