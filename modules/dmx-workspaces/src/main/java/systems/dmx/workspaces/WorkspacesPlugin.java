@@ -173,8 +173,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public DirectivesResponse assignToWorkspace(@PathParam("object_id") long objectId,
                                                 @PathParam("workspace_id") long workspaceId) {
         try {
-            checkWorkspaceId(workspaceId);
-            _assignToWorkspace(dmx.getObject(objectId), workspaceId);
+            DMXObject object = dmx.getObject(objectId);
+            checkAssignmentArgs(object, workspaceId);
+            _assignToWorkspace(object, workspaceId);
             return new DirectivesResponse();
         } catch (Exception e) {
             throw new RuntimeException("Assigning object " + objectId + " to workspace " + workspaceId + " failed", e);
@@ -184,7 +185,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
-            checkWorkspaceId(workspaceId);
+            checkAssignmentArgs(object, workspaceId);
             _assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
@@ -194,7 +195,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void assignTypeToWorkspace(DMXType type, long workspaceId) {
         try {
-            checkWorkspaceId(workspaceId);
+            checkAssignmentArgs(type, workspaceId);
             _assignToWorkspace(type, workspaceId);
             // view config topics
             for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
@@ -515,14 +516,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
+     * Checks the args of an assign-to-workspace operation.
+     * 2 checks are performed:
+     *   - the object is writable
+     *   - the workspace ID refers actually to a workspace
      *
-     * ### TODO: principle copy in PrivilegedAccessImpl.checkWorkspaceId()
+     * If any check fails an exception is thrown.
      */
-    private void checkWorkspaceId(long topicId) {
-        String typeUri = dmx.getTopic(topicId).getTypeUri();
+    private void checkAssignmentArgs(DMXObject object, long workspaceId) {
+        object.checkWriteAccess();
+        Topic workspace = dmx.getTopic(workspaceId);
+        String typeUri = workspace.getTypeUri();
         if (!typeUri.equals("dmx.workspaces.workspace")) {
-            throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
+            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
                 "\")");
         }
     }
