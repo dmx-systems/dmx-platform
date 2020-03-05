@@ -233,6 +233,15 @@ abstract class DMXObjectImpl implements DMXObject {
 
 
 
+    // === Permissions ===
+
+    @Override
+    public void checkWriteAccess() {
+        model.checkWriteAccess();
+    }
+
+
+
     // === Misc ===
 
     @Override

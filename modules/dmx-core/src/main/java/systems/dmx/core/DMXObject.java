@@ -169,6 +169,17 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
 
 
+    // === Permissions ===
+
+    /**
+     * Checks if current user has write access to this object.
+     *
+     * @throws  AccessControlException
+     */
+    void checkWriteAccess();
+
+
+
     // === Misc ===
 
     Object getDatabaseVendorObject();

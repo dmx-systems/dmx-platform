@@ -391,6 +391,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
 
     @Override
+    public String toString() {
+        return childTopics.toString();
+    }
+
+    @Override
     public final ChildTopicsModel clone() {
         ChildTopicsModel clone = mf.newChildTopicsModel();
         for (String compDefUri : this) {
