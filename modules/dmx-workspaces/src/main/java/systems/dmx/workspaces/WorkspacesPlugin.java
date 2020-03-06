@@ -516,21 +516,24 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Checks the args of an assign-to-workspace operation.
-     * 2 checks are performed:
-     *   - the object is writable
+     * Checks the args for an assign-to-workspace operation.
+     * 3 checks are performed:
      *   - the workspace ID refers actually to a workspace
+     *   - the workspace is writable
+     *   - the object is writable
      *
      * If any check fails an exception is thrown.
      */
     private void checkAssignmentArgs(DMXObject object, long workspaceId) {
-        object.checkWriteAccess();
         Topic workspace = dmx.getTopic(workspaceId);
         String typeUri = workspace.getTypeUri();
         if (!typeUri.equals("dmx.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
                 "\")");
         }
+        //
+        workspace.checkWriteAccess();   // throws AccessControlException
+        object.checkWriteAccess();      // throws AccessControlException
     }
 
     /**
