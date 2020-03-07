@@ -533,7 +533,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
         //
         workspace.checkWriteAccess();   // throws AccessControlException
-        object.checkWriteAccess();      // throws AccessControlException
+        // object.checkWriteAccess();   // ### FIXME: initial assignment fails as user has no permission yet
     }
 
     /**
