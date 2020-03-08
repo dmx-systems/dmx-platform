@@ -175,7 +175,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             DMXObject object = dmx.getObject(objectId);
             checkAssignmentArgs(object, workspaceId);
-            _assignToWorkspace(object, workspaceId);
+            __assignToWorkspace(object, workspaceId);
             return new DirectivesResponse();
         } catch (Exception e) {
             throw new RuntimeException("Assigning object " + objectId + " to workspace " + workspaceId + " failed", e);
@@ -186,7 +186,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             checkAssignmentArgs(object, workspaceId);
-            _assignToWorkspace(object, workspaceId);
+            __assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
         }
@@ -196,17 +196,17 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void assignTypeToWorkspace(DMXType type, long workspaceId) {
         try {
             checkAssignmentArgs(type, workspaceId);
-            _assignToWorkspace(type, workspaceId);
+            __assignToWorkspace(type, workspaceId);
             // view config topics
             for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
-                _assignToWorkspace(configTopic, workspaceId);
+                __assignToWorkspace(configTopic, workspaceId);
             }
             // comp defs
             for (CompDef compDef : type.getCompDefs()) {
-                _assignToWorkspace(compDef, workspaceId);
+                __assignToWorkspace(compDef, workspaceId);
                 // view config topics (of comp def)
                 for (Topic configTopic : compDef.getViewConfig().getConfigTopics()) {
-                    _assignToWorkspace(configTopic, workspaceId);
+                    __assignToWorkspace(configTopic, workspaceId);
                 }
             }
         } catch (Exception e) {
@@ -370,7 +370,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return;
         }
         //
-        assignToWorkspace(topic, workspaceId);
+        _assignToWorkspace(topic, workspaceId, false);      // checkObject=false
     }
 
     /**
@@ -397,7 +397,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return;
         }
         //
-        assignToWorkspace(assoc, workspaceId);
+        _assignToWorkspace(assoc, workspaceId, false);      // checkObject=false
     }
 
     // ---
@@ -438,7 +438,22 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dmx.getPrivilegedAccess().getAssignedWorkspaceId(objectId);
     }
 
-    private void _assignToWorkspace(DMXObject object, long workspaceId) {
+    /**
+     * Performs argument checks and, if positive, does the actual workspace assignment.
+     */
+    private void _assignToWorkspace(DMXObject object, long workspaceId, boolean checkObject) {
+        try {
+            checkAssignmentArgs(checkObject ? object : null, workspaceId);
+            __assignToWorkspace(object, workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
+        }
+    }
+
+    /**
+     * Performs the actual workspace assignment.
+     */
+    private void __assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
         facetsService.updateFacet(object, "dmx.workspaces.workspace_facet",
             mf.newFacetValueModel("dmx.workspaces.workspace#dmx.workspaces.workspace_assignment").putRef(workspaceId)
@@ -447,6 +462,32 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         //
         // 2) store assignment property
         object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
+    }
+
+    /**
+     * Checks the args for an assign-to-workspace operation.
+     * 3 checks are performed:
+     *   - the workspace ID refers actually to a workspace
+     *   - the workspace is writable
+     *   - the object is writable
+     *
+     * If any check fails an exception is thrown.
+     *
+     * @param   object          the object to check; if null no object check is performed
+     * @param   workspaceId     the workspace ID to check
+     */
+    private void checkAssignmentArgs(DMXObject object, long workspaceId) {
+        Topic workspace = dmx.getTopic(workspaceId);
+        String typeUri = workspace.getTypeUri();
+        if (!typeUri.equals("dmx.workspaces.workspace")) {
+            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
+                "\")");
+        }
+        //
+        workspace.checkWriteAccess();       // throws AccessControlException
+        if (object != null) {
+            object.checkWriteAccess();      // throws AccessControlException
+        }
     }
 
     // ---
@@ -513,27 +554,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 objects.remove();
             }
         }
-    }
-
-    /**
-     * Checks the args for an assign-to-workspace operation.
-     * 3 checks are performed:
-     *   - the workspace ID refers actually to a workspace
-     *   - the workspace is writable
-     *   - the object is writable
-     *
-     * If any check fails an exception is thrown.
-     */
-    private void checkAssignmentArgs(DMXObject object, long workspaceId) {
-        Topic workspace = dmx.getTopic(workspaceId);
-        String typeUri = workspace.getTypeUri();
-        if (!typeUri.equals("dmx.workspaces.workspace")) {
-            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
-                "\")");
-        }
-        //
-        workspace.checkWriteAccess();   // throws AccessControlException
-        // object.checkWriteAccess();   // ### FIXME: initial assignment fails as user has no permission yet
     }
 
     /**
