@@ -369,7 +369,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (workspaceId == -1) {
             return;
         }
-        //
+        // Note: for an object's initial workspace assignment checking the object's WRITE permission would fail
+        // as that permission is granted only by the very workspace assignment we're about to create.
         _assignToWorkspace(topic, workspaceId, false);      // checkObject=false
     }
 
@@ -396,7 +397,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (workspaceId == -1) {
             return;
         }
-        //
+        // Note: for an object's initial workspace assignment checking the object's WRITE permission would fail
+        // as that permission is granted only by the very workspace assignment we're about to create.
         _assignToWorkspace(assoc, workspaceId, false);      // checkObject=false
     }
 
