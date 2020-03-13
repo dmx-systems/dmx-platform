@@ -149,6 +149,7 @@ public class WebservicePlugin extends PluginActivator {
     // === Associations ===
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template "/assoc"
     @GET
     @Path("/association/{id}")
     public Assoc getAssoc(@PathParam("id") long assocId) {
@@ -229,6 +230,8 @@ public class WebservicePlugin extends PluginActivator {
 
 
     // === Topic Types ===
+
+    // ### TODO: change URI templates to "/topic_type" / "/assoc_type"
 
     @GET
     @Path("/topictype/{uri}")

@@ -46,6 +46,7 @@ export default ({store}) => {
           'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
           'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
           'related-icon-click':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
+          'object-id-click':     object          =>  window.open(url(object), '_blank'),
           'pin':                 pinned          =>  store.dispatch('setDetailPanelPinned', pinned)
         }
       }
@@ -65,5 +66,18 @@ export default ({store}) => {
     }
     //
     store.dispatch('callDetailRoute', tab)
+  }
+
+  function url (object) {
+    if (object.typeUri === 'dmx.core.topic_type') {
+      return `/core/topictype/${object.uri}`
+    } else if (object.typeUri === 'dmx.core.assoc_type') {
+      return `/core/assoctype/${object.uri}`
+    } else if (object.isTopic()) {
+      return `/core/topic/${object.id}`
+    } else if (object.isAssoc()) {
+      return `/core/association/${object.id}`
+    }
+    throw Error('unexpected object')
   }
 }
