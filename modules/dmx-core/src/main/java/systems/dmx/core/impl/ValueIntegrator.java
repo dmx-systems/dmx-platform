@@ -500,6 +500,7 @@ class ValueIntegrator {
             TopicModel childTopic = (TopicModel) childValue.value;
             long originalId = childValue.originalId;
             long newId = childTopic != null ? childTopic.getId() : -1;
+            boolean valueEmptied = newId == -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
                 if (oldValues == null) {
@@ -507,12 +508,17 @@ class ValueIntegrator {
                         " when there are no old topics (null)");
                 }
                 oldValue = findTopic(oldValues, originalId);
+            } else if (!valueEmptied && oldValues != null) {
+                oldValue = findTopicOrNull(oldValues, newId);
             }
+            boolean oldValueExists = oldValue != null;
+            boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
+            //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;
-            if (originalId != -1 && (newId == -1 || originalId != newId)) {
-                if (newId == -1) {
+            if (valueChanged) {
+                if (valueEmptied) {
                     logger.fine("### Deleting assignment (compDefUri=\"" + compDefUri + "\") from composite " +
                         parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
@@ -526,7 +532,7 @@ class ValueIntegrator {
             // a new value must be present
             //
             AssocModelImpl assoc = null;
-            if (newId != -1 && (originalId == -1 || originalId != newId)) {
+            if (!valueEmptied && (!oldValueExists || valueChanged)) {
                 // update DB
                 assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
@@ -535,7 +541,7 @@ class ValueIntegrator {
             // 3) update relating assoc
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
-            if (assoc == null && oldValue != null && !deleted) {
+            if (assoc == null && oldValueExists && !deleted) {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
@@ -771,12 +777,21 @@ class ValueIntegrator {
 
     // TODO: make generic utility
     private RelatedTopicModelImpl findTopic(List<RelatedTopicModelImpl> topics, long topicId) {
+        RelatedTopicModelImpl topic = findTopicOrNull(topics, topicId);
+        if (topic == null) {
+            throw new RuntimeException("Topic " + topicId + " not found in " + topics);
+        }
+        return topic;
+    }
+
+    // TODO: make generic utility
+    private RelatedTopicModelImpl findTopicOrNull(List<RelatedTopicModelImpl> topics, long topicId) {
         for (RelatedTopicModelImpl topic : topics) {
             if (topic.id == topicId) {
                 return topic;
             }
         }
-        throw new RuntimeException("Topic " + topicId + " not found in " + topics);
+        return null;
     }
 
     private void removeTopic(List<RelatedTopicModelImpl> topics, long topicId) {
