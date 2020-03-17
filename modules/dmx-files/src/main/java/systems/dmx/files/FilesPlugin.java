@@ -1,5 +1,6 @@
 package systems.dmx.files;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.files.event.CheckDiskQuota;
 import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
@@ -552,7 +553,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
         Topic pathTopic = fetchPathTopic(repoPath);
         if (pathTopic != null) {
-            return pathTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", topicTypeUri);
+            return pathTopic.getRelatedTopic(COMPOSITION, "dmx.core.child", "dmx.core.parent", topicTypeUri);
         }
         return null;
     }
@@ -638,13 +639,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private void createFolderAssoc(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
-            boolean exists = dmx.getAssocs(folderTopicId, topicId, "dmx.core.composition").size() > 0;
+            boolean exists = dmx.getAssocs(folderTopicId, topicId, COMPOSITION).size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
                 Assoc assoc = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Assoc>() {
                     @Override
                     public Assoc call() {
-                        return dmx.createAssoc(mf.newAssocModel("dmx.core.composition",
+                        return dmx.createAssoc(mf.newAssocModel(COMPOSITION,
                             mf.newTopicPlayerModel(folderTopicId, "dmx.core.parent"),
                             mf.newTopicPlayerModel(topicId,       "dmx.core.child")
                         ));

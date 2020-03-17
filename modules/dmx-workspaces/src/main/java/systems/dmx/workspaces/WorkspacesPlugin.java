@@ -7,6 +7,7 @@ import systems.dmx.config.ConfigTarget;
 import systems.dmx.facets.FacetsService;
 import systems.dmx.topicmaps.TopicmapsService;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.CompDef;
@@ -498,14 +499,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // 1) delete instances by type
             // Note: also instances assigned to other workspaces must be deleted
-            for (Topic topicType : getAssignedTopics(workspaceId, "dmx.core.topic_type")) {
+            for (Topic topicType : getAssignedTopics(workspaceId, TOPIC_TYPE)) {
                 String typeUri = topicType.getUri();
                 for (Topic topic : dmx.getTopicsByType(typeUri)) {
                     topic.delete();
                 }
                 dmx.getTopicType(typeUri).delete();
             }
-            for (Topic assocType : getAssignedTopics(workspaceId, "dmx.core.assoc_type")) {
+            for (Topic assocType : getAssignedTopics(workspaceId, ASSOC_TYPE)) {
                 String typeUri = assocType.getUri();
                 for (Assoc assoc : dmx.getAssocsByType(typeUri)) {
                     assoc.delete();

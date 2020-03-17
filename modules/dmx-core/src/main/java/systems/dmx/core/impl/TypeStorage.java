@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
@@ -158,8 +159,8 @@ class TypeStorage {
     private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in DB");
-        } else if (!typeTopic.getTypeUri().equals("dmx.core.topic_type") &&
-                   !typeTopic.getTypeUri().equals("dmx.core.meta_type") &&
+        } else if (!typeTopic.getTypeUri().equals(TOPIC_TYPE) &&
+                   !typeTopic.getTypeUri().equals(META_TYPE) &&
                    !typeTopic.getTypeUri().equals("dmx.core.meta_meta_type")) {
             throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
                 "\" when the caller expects a \"dmx.core.topic_type\"");
@@ -169,7 +170,7 @@ class TypeStorage {
     private void checkAssocType(String assocTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Assoc type \"" + assocTypeUri + "\" not found in DB");
-        } else if (!typeTopic.getTypeUri().equals("dmx.core.assoc_type")) {
+        } else if (!typeTopic.getTypeUri().equals(ASSOC_TYPE)) {
             throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
                 "\" when the caller expects a \"dmx.core.assoc_type\"");
         }
@@ -203,8 +204,8 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = al.sd.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.parent",
-                "dmx.core.child", "dmx.core.data_type");
+            RelatedTopicModel dataType = al.sd.fetchTopicRelatedTopic(typeId, COMPOSITION,
+                "dmx.core.parent", "dmx.core.child", DATA_TYPE);
             if (dataType == null) {
                 throw new RuntimeException("No data type topic associated to " + className + " \"" + typeUri + "\"");
             }
@@ -219,7 +220,7 @@ class TypeStorage {
     // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
-            al.createAssoc("dmx.core.composition",
+            al.createAssoc(COMPOSITION,
                 mf.newTopicPlayerModel(typeUri,     "dmx.core.parent"),
                 mf.newTopicPlayerModel(dataTypeUri, "dmx.core.child")
             );
@@ -318,7 +319,7 @@ class TypeStorage {
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
             // cardinality (must exist in DB)
             ChildTopicsModel childTopics = assoc.getChildTopicsModel();
-            childTopics.put("dmx.core.cardinality", fetchCardinality(assoc));
+            childTopics.put(CARDINALITY, fetchCardinality(assoc));
                         // Note: putRef() would not be sufficient. The assoc model must be fully initialized.
                         // Otherwise update would fail. ### TODO: revise comment
             // custom assoc type
@@ -345,20 +346,17 @@ class TypeStorage {
 
     private RelatedTopicModel fetchCustomAssocType(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic("dmx.core.custom_assoc_type", "dmx.core.parent", "dmx.core.child",
-            "dmx.core.assoc_type");
+        return assoc.getRelatedTopic("dmx.core.custom_assoc_type", "dmx.core.parent", "dmx.core.child", ASSOC_TYPE);
     }
 
     private RelatedTopicModel fetchIsIdentityAttr(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
-            "dmx.core.identity_attr");
+        return assoc.getRelatedTopic(COMPOSITION, "dmx.core.parent", "dmx.core.child", "dmx.core.identity_attr");
     }
 
     private RelatedTopicModel fetchIncludeInLabel(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
-            "dmx.core.include_in_label");
+        return assoc.getRelatedTopic(COMPOSITION, "dmx.core.parent", "dmx.core.child", "dmx.core.include_in_label");
     }
 
     // ---
@@ -461,9 +459,9 @@ class TypeStorage {
 
     TypeModelImpl fetchParentType(AssocModelImpl assoc) {
         TopicModelImpl type = fetchParentTypeTopic(assoc);
-        if (type.typeUri.equals("dmx.core.topic_type")) {
+        if (type.typeUri.equals(TOPIC_TYPE)) {
             return getTopicType(type.uri);
-        } else if (type.typeUri.equals("dmx.core.assoc_type")) {
+        } else if (type.typeUri.equals(ASSOC_TYPE)) {
             return getAssocType(type.uri);
         } else {
             throw new RuntimeException("DB inconsistency: the \"dmx.core.parent_type\" player is not a type " +
@@ -487,8 +485,7 @@ class TypeStorage {
 
     private RelatedTopicModelImpl fetchCardinalityIfExists(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval -> Endless recursion while loading type "dmx.core.composition_def"
-        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
-            "dmx.core.cardinality");
+        return assoc.getRelatedTopic(COMPOSITION, "dmx.core.parent", "dmx.core.child", CARDINALITY);
     }
 
     // Note: if the assoc was an comp def before it has a cardinality assignment already.
@@ -535,17 +532,17 @@ class TypeStorage {
     // ---
 
     private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
-        return al.sd.fetchTopicRelatedAssoc(typeId, "dmx.core.composition", "dmx.core.type",
+        return al.sd.fetchTopicRelatedAssoc(typeId, COMPOSITION, "dmx.core.type",
             "dmx.core.sequence_start", "dmx.core.composition_def");
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
-        return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.predecessor",
+        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, "dmx.core.predecessor",
             "dmx.core.successor", "dmx.core.composition_def");
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
-        return al.sd.fetchAssocRelatedAssoc(compDefId, "dmx.core.sequence", "dmx.core.successor",
+        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, "dmx.core.successor",
             "dmx.core.predecessor", "dmx.core.composition_def");
     }
 
@@ -614,14 +611,14 @@ class TypeStorage {
     // ---
 
     private void storeSequenceStart(long typeId, long compDefId) {
-        al.createAssoc("dmx.core.composition",
+        al.createAssoc(COMPOSITION,
             mf.newTopicPlayerModel(typeId, "dmx.core.type"),
             mf.newAssocPlayerModel(compDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predCompDefId, long succCompDefId) {
-        al.createAssoc("dmx.core.sequence",
+        al.createAssoc(SEQUENCE,
             mf.newAssocPlayerModel(predCompDefId, "dmx.core.predecessor"),
             mf.newAssocPlayerModel(succCompDefId, "dmx.core.successor")
         );
@@ -658,7 +655,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
+            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), COMPOSITION,
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
@@ -667,7 +664,7 @@ class TypeStorage {
 
     private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), "dmx.core.composition",
+            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), COMPOSITION,
                 "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);
@@ -728,7 +725,7 @@ class TypeStorage {
 
     TopicModel storeViewConfigTopic(PlayerModel configurable, TopicModelImpl configTopic) {
         TopicModel topic = al.createTopic(configTopic);
-        al.createAssoc("dmx.core.composition",
+        al.createAssoc(COMPOSITION,
             configurable,
             mf.newTopicPlayerModel(configTopic.id, "dmx.core.child")
         );

@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -292,11 +293,11 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     void preCreate() {
         // Note: auto-typing only works for generic assocs (of type "Association") and for by-ID players.
         // That's why auto-typing does not interfere with comp defs created programmatically (through migration).
-        if (DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
+        if (DMXUtils.associationAutoTyping(this, TOPIC_TYPE, TOPIC_TYPE,
                 "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null ||
-            DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.assoc_type",
+            DMXUtils.associationAutoTyping(this, TOPIC_TYPE, ASSOC_TYPE,
                 "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null) {
-            childTopics.putRef("dmx.core.cardinality", "dmx.core.one");
+            childTopics.putRef(CARDINALITY, "dmx.core.one");
         }
         //
         duplicateCheck();
@@ -475,8 +476,8 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     }
 
     private AssocModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl assocType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
-            "dmx.core.type", "dmx.core.assoc_type");
+        RelatedTopicModelImpl assocType = getRelatedTopic(INSTANTIATION, "dmx.core.instance", "dmx.core.type",
+            ASSOC_TYPE);
         //
         if (assocType == null) {
             throw new RuntimeException("Assoc " + id + " is not associated to an association type");

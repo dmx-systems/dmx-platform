@@ -1,5 +1,6 @@
 package systems.dmx.webclient.migrations;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.service.Migration;
 
@@ -17,28 +18,28 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dmx.core.meta_type",  "\uf1ce");    // fa-circle-o-notch
-        addIconToTopicType("dmx.core.topic_type", "\uf10c");    // fa-circle-o
-        addIconToTopicType("dmx.core.assoc_type", "\uf192");    // fa-dot-circle-o
-        addIconToTopicType("dmx.core.role_type",  "\uf04b");    // fa-play
+        addIconToTopicType(META_TYPE,  "\uf1ce");    // fa-circle-o-notch
+        addIconToTopicType(TOPIC_TYPE, "\uf10c");    // fa-circle-o
+        addIconToTopicType(ASSOC_TYPE, "\uf192");    // fa-dot-circle-o
+        addIconToTopicType(ROLE_TYPE,  "\uf04b");    // fa-play
         addIconToTopicType("dmx.core.plugin",     "\uf12e");    // fa-puzzle-piece
         // colors match dm5-color-picker
         // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
-        addColorToAssocType("dmx.core.association",       "hsl(0, 0%, 80%)");
-        addColorToAssocType("dmx.core.composition",       "hsl(5, 50%, 53%)");
+        addColorToAssocType(ASSOCIATION,       "hsl(0, 0%, 80%)");
+        addColorToAssocType(COMPOSITION,       "hsl(5, 50%, 53%)");
         addColorToAssocType("dmx.core.composition_def",   "hsl(210, 50%, 53%)");
-        addColorToAssocType("dmx.core.instantiation",     "hsl(180, 50%, 53%)");
-        addColorToAssocType("dmx.core.sequence",          "hsl(60, 80%, 53%)");
+        addColorToAssocType(INSTANTIATION,     "hsl(180, 50%, 53%)");
+        addColorToAssocType(SEQUENCE,          "hsl(60, 80%, 53%)");
         addColorToAssocType("dmx.core.custom_assoc_type", "hsl(5, 50%, 53%)");
-        addBackgroundColorToAssocType("dmx.core.association",       "hsl(0, 0%, 97%)");
-        addBackgroundColorToAssocType("dmx.core.composition",       "hsl(5, 80%, 96%)");
+        addBackgroundColorToAssocType(ASSOCIATION,       "hsl(0, 0%, 97%)");
+        addBackgroundColorToAssocType(COMPOSITION,       "hsl(5, 80%, 96%)");
         addBackgroundColorToAssocType("dmx.core.composition_def",   "hsl(210, 80%, 96%)");
-        addBackgroundColorToAssocType("dmx.core.instantiation",     "hsl(180, 80%, 96%)");
-        addBackgroundColorToAssocType("dmx.core.sequence",          "hsl(60, 80%, 96%)");
+        addBackgroundColorToAssocType(INSTANTIATION,     "hsl(180, 80%, 96%)");
+        addBackgroundColorToAssocType(SEQUENCE,          "hsl(60, 80%, 96%)");
         addBackgroundColorToAssocType("dmx.core.custom_assoc_type", "hsl(5, 80%, 96%)");
         //
         AssocType compDef = dmx.getAssocType("dmx.core.composition_def");
-        compDef.getCompDef("dmx.core.cardinality")
+        compDef.getCompDef(CARDINALITY)
             .getViewConfig()
                 .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");
         compDef.getCompDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")

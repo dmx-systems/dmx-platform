@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
@@ -64,7 +65,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void typeDefinition() {
         TopicType topicType = dmx.getTopicType("dmx.core.plugin");
         assertEquals("dmx.core.plugin",     topicType.getUri());
-        assertEquals("dmx.core.topic_type", topicType.getTypeUri());
+        assertEquals(TOPIC_TYPE, topicType.getTypeUri());
         assertEquals("dmx.core.identity",   topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getCompDefs().size());
         CompDef compDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
@@ -75,9 +76,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXObject t1 = compDef.getDMXObjectByRole("dmx.core.parent_type");
         DMXObject t2 = compDef.getDMXObjectByRole("dmx.core.child_type");
         assertEquals("dmx.core.plugin",              t1.getUri());
-        assertEquals("dmx.core.topic_type",          t1.getTypeUri());
+        assertEquals(TOPIC_TYPE,          t1.getTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", t2.getUri());
-        assertEquals("dmx.core.topic_type",          t2.getTypeUri());
+        assertEquals(TOPIC_TYPE,          t2.getTypeUri());
     }
 
     @Test
@@ -503,7 +504,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set Custom Assoc Type (via comp def)
             dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getChildTopics()
-                .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
+                .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION);
             //
             // get Custom Assoc Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
@@ -511,7 +512,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated comp defs
-            assertEquals("dmx.core.association", assocType.getUri());
+            assertEquals(ASSOCIATION, assocType.getUri());
             //
             tx.success();
         } finally {
@@ -526,7 +527,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // set Custom Assoc Type (via association)
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
             dmx.getAssoc(compDefId).getChildTopics()
-                .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", "dmx.core.association");
+                .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION);
             //
             // get Custom Assoc Type
             Topic assocType = dmx.getTopicType("dmx.core.plugin")
@@ -534,7 +535,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated comp defs
-            assertEquals("dmx.core.association", assocType.getUri());
+            assertEquals(ASSOCIATION, assocType.getUri());
             //
             tx.success();
         } finally {
@@ -624,21 +625,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertNotNull(compDef);
         //
         // find comp def 2/3
-        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
                                                                                               // othersAssocTypeUri=null
         logger.info("### comp def ID 2/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 3/3
-        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
                                                                                               // othersAssocTypeUri=null
         logger.info("### comp def ID 3/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // there is no other
-        compDef = compDef.getRelatedAssoc("dmx.core.sequence", "dmx.core.predecessor", "dmx.core.successor", null);
+        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
                                                                                               // othersAssocTypeUri=null
         assertNull(compDef);
     }
@@ -708,10 +709,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getTopicsByType() {
-        Topic type = dmx.getTopicByUri("dmx.core.data_type");
+        Topic type = dmx.getTopicByUri(DATA_TYPE);
         List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
         assertEquals(5, topics1.size());
-        List<Topic> topics2 = getTopicInstances("dmx.core.data_type");
+        List<Topic> topics2 = getTopicInstances(DATA_TYPE);
         assertEquals(5, topics2.size());
     }
 
@@ -720,7 +721,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void getAssocsByType() {
         List<RelatedAssoc> assocs;
         //
-        assocs = getAssocInstancesByTraversal("dmx.core.instantiation");
+        assocs = getAssocInstancesByTraversal(INSTANTIATION);
         assertEquals(66, assocs.size());
         //
         assocs = getAssocInstancesByTraversal("dmx.core.composition_def");
@@ -742,10 +743,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // retype assoc
             Assoc assoc = childTypes.get(0).getRelatingAssoc();
             assertEquals("dmx.core.composition_def", assoc.getTypeUri());
-            assoc.setTypeUri("dmx.core.association");
-            assertEquals("dmx.core.association", assoc.getTypeUri());
+            assoc.setTypeUri(ASSOCIATION);
+            assertEquals(ASSOCIATION, assoc.getTypeUri());
             assoc = dmx.getAssoc(assoc.getId());
-            assertEquals("dmx.core.association", assoc.getTypeUri());
+            assertEquals(ASSOCIATION, assoc.getTypeUri());
             //
             // re-execute query
             childTypes = getChildTypes(type);
@@ -817,10 +818,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // retype the first topic
             Topic topic = topics.get(0);
             assertEquals("dmx.core.plugin", topic.getTypeUri());
-            topic.setTypeUri("dmx.core.data_type");
-            assertEquals("dmx.core.data_type", topic.getTypeUri());
+            topic.setTypeUri(DATA_TYPE);
+            assertEquals(DATA_TYPE, topic.getTypeUri());
             topic = dmx.getTopic(topic.getId());
-            assertEquals("dmx.core.data_type", topic.getTypeUri());
+            assertEquals(DATA_TYPE, topic.getTypeUri());
             //
             // re-execute query
             topics = getTestTopics(t0);
@@ -853,11 +854,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // retype the first association
             Assoc assoc = assocs.get(0);
-            assertEquals("dmx.core.association", assoc.getTypeUri());
-            assoc.setTypeUri("dmx.core.composition");
-            assertEquals("dmx.core.composition", assoc.getTypeUri());
+            assertEquals(ASSOCIATION, assoc.getTypeUri());
+            assoc.setTypeUri(COMPOSITION);
+            assertEquals(COMPOSITION, assoc.getTypeUri());
             assoc = dmx.getAssoc(assoc.getId());
-            assertEquals("dmx.core.composition", assoc.getTypeUri());
+            assertEquals(COMPOSITION, assoc.getTypeUri());
             //
             // re-execute query
             assocs = getTestAssocs(t0);
@@ -880,13 +881,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> topics;
         try {
-            type = dmx.getTopicByUri("dmx.core.data_type");
+            type = dmx.getTopicByUri(DATA_TYPE);
             topics = getTopicInstancesByTraversal(type);
             assertEquals(5, topics.size());
             //
             // retype topic
             Topic topic = topics.get(0);
-            assertEquals("dmx.core.data_type", topic.getTypeUri());
+            assertEquals(DATA_TYPE, topic.getTypeUri());
             topic.setTypeUri("dmx.core.index_mode");
             assertEquals("dmx.core.index_mode", topic.getTypeUri());
             topic = dmx.getTopic(topic.getId());
@@ -1292,18 +1293,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
-        return type.getRelatedTopics("dmx.core.instantiation",
+        return type.getRelatedTopics(INSTANTIATION,
             "dmx.core.type", "dmx.core.instance", type.getUri());
     }
 
     private List<RelatedAssoc> getAssocInstancesByTraversal(String assocTypeUri) {
-        return dmx.getTopicByUri(assocTypeUri).getRelatedAssocs("dmx.core.instantiation",
+        return dmx.getTopicByUri(assocTypeUri).getRelatedAssocs(INSTANTIATION,
             "dmx.core.type", "dmx.core.instance", assocTypeUri);
     }
 
     private List<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics("dmx.core.composition_def", "dmx.core.parent_type", "dmx.core.child_type",
-            "dmx.core.topic_type"
+            TOPIC_TYPE
         );
     }
 
@@ -1336,14 +1337,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private Assoc createAssoc(Topic topic1, Topic topic2) {
-        return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
+        return dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
             mf.newTopicPlayerModel(topic1.getId(), "dmx.core.default"),
             mf.newTopicPlayerModel(topic2.getId(), "dmx.core.default")
         ));
     }
 
     private Assoc createAssoc(Topic topic, Assoc assoc) {
-        return dmx.createAssoc(mf.newAssocModel("dmx.core.association",
+        return dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
             mf.newTopicPlayerModel(topic.getId(), "dmx.core.default"),
             mf.newAssocPlayerModel(assoc.getId(), "dmx.core.default")
         ));
@@ -1352,12 +1353,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private List<RelatedTopic> getTestTopics(Topic topic) {
-        return topic.getRelatedTopics("dmx.core.association",
+        return topic.getRelatedTopics(ASSOCIATION,
             "dmx.core.default", "dmx.core.default", "dmx.core.plugin");
     }
 
     private List<RelatedAssoc> getTestAssocs(Topic topic) {
-        return topic.getRelatedAssocs("dmx.core.association",
-            "dmx.core.default", "dmx.core.default", "dmx.core.association");
+        return topic.getRelatedAssocs(ASSOCIATION,
+            "dmx.core.default", "dmx.core.default", ASSOCIATION);
     }
 }

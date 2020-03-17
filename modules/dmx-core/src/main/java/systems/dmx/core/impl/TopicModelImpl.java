@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.PlayerModel;
@@ -175,7 +176,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     void preDelete() {
-        if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.assoc_type")) {
+        if (typeUri.equals(TOPIC_TYPE) || typeUri.equals(ASSOC_TYPE)) {
             throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
                 "Use a delete-type call instead.");
         }
@@ -235,8 +236,8 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     // Note: this method works only for instances, not for types.
     // This is because a type is not of type "dmx.core.topic_type" but of type "dmx.core.meta_type".
     private AssocModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl topicType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
-            "dmx.core.type", "dmx.core.topic_type");
+        RelatedTopicModelImpl topicType = getRelatedTopic(INSTANTIATION, "dmx.core.instance",
+            "dmx.core.type", TOPIC_TYPE);
         //
         if (topicType == null) {
             throw new RuntimeException("Topic " + id + " is not associated to a topic type");

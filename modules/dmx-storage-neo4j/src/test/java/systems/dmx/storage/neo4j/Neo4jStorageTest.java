@@ -1,5 +1,6 @@
 package systems.dmx.storage.neo4j;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.impl.AccessLayer;
 import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
@@ -69,35 +70,35 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverse() {
-        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
+        TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-            "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
+            INSTANTIATION, "dmx.core.instance", "dmx.core.type", META_TYPE);
         assertEquals(1, topics.size());
         //
         TopicModelImpl type = topics.get(0);
-        assertEquals("dmx.core.topic_type", type.getUri());
+        assertEquals(TOPIC_TYPE, type.getUri());
         assertEquals("Topic Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseBidirectional() {
-        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.topic_type");
+        TopicModelImpl topic = db.fetchTopic("uri", TOPIC_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-            "dmx.core.instantiation", "dmx.core.type", "dmx.core.instance", "dmx.core.topic_type");
+            INSTANTIATION, "dmx.core.type", "dmx.core.instance", TOPIC_TYPE);
         assertEquals(1, topics.size());
         //
         TopicModelImpl type = topics.get(0);
-        assertEquals("dmx.core.data_type", type.getUri());
+        assertEquals(DATA_TYPE, type.getUri());
         assertEquals("Data Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseWithWideFilter() {
-        TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
+        TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
@@ -108,11 +109,11 @@ public class Neo4jStorageTest {
     public void deleteAssoc() {
         DMXTransaction tx = db.beginTx();
         try {
-            TopicModelImpl topic = db.fetchTopic("uri", "dmx.core.data_type");
+            TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
             assertNotNull(topic);
             //
             List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-                "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
+                INSTANTIATION, "dmx.core.instance", "dmx.core.type", META_TYPE);
             assertEquals(1, topics.size());
             //
             AssocModelImpl assoc = topics.get(0).getRelatingAssoc();
@@ -120,8 +121,8 @@ public class Neo4jStorageTest {
             //
             db.deleteAssoc(assoc.getId());
             //
-            topics = db.fetchTopicRelatedTopics(topic.getId(), "dmx.core.instantiation",
-                "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
+            topics = db.fetchTopicRelatedTopics(topic.getId(), INSTANTIATION,
+                "dmx.core.instance", "dmx.core.type", META_TYPE);
             assertEquals(0, topics.size());
             //
             tx.success();
@@ -198,7 +199,7 @@ public class Neo4jStorageTest {
     @Test
     public void testExactIndexWithGet() {
         TopicModelImpl topic;
-        topic = db.fetchTopic("uri", "dmx.core.data_type"); assertNotNull(topic);
+        topic = db.fetchTopic("uri", DATA_TYPE); assertNotNull(topic);
         topic = db.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
         // => DMXStorage's get-singular method supports no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
@@ -265,12 +266,12 @@ public class Neo4jStorageTest {
     private void setupContent() {
         DMXTransaction tx = db.beginTx();
         try {
-            createTopic("dmx.core.topic_type", "dmx.core.meta_type",  "Topic Type");
-            createTopic("dmx.core.data_type",  "dmx.core.topic_type", "Data Type");
+            createTopic(TOPIC_TYPE, META_TYPE,  "Topic Type");
+            createTopic(DATA_TYPE,  TOPIC_TYPE, "Data Type");
             //
-            assocId = createAssoc("dmx.core.instantiation",
-                "dmx.core.topic_type", "dmx.core.type",
-                "dmx.core.data_type", "dmx.core.instance"
+            assocId = createAssoc(INSTANTIATION,
+                TOPIC_TYPE, "dmx.core.type",
+                DATA_TYPE, "dmx.core.instance"
             );
             //
             // Fulltext indexing

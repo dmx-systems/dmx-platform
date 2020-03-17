@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
@@ -137,7 +138,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     // === Read from ChildTopicsModel ===
 
     final String _getCardinalityUri() {
-        TopicModelImpl cardinality = getChildTopicsModel().getTopicOrNull("dmx.core.cardinality");
+        TopicModelImpl cardinality = getChildTopicsModel().getTopicOrNull(CARDINALITY);
         if (cardinality == null) {
             // ### TODO: should a cardinality topic always exist?
             throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Cardinality\" topic");
@@ -215,7 +216,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dmx.core.composition_def")) {
-            return "dmx.core.composition";
+            return COMPOSITION;
         } else {
             throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");
         }

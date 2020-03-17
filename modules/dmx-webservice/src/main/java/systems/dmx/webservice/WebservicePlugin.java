@@ -1,5 +1,6 @@
 package systems.dmx.webservice;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
@@ -561,9 +562,9 @@ public class WebservicePlugin extends PluginActivator {
     private void deleteAnyTopic(long id) {
         Topic t = dmx.getTopic(id);
         String typeUri = t.getTypeUri();
-        if (typeUri.equals("dmx.core.topic_type")) {
+        if (typeUri.equals(TOPIC_TYPE)) {
             dmx.deleteTopicType(t.getUri());
-        } else if (typeUri.equals("dmx.core.assoc_type")) {
+        } else if (typeUri.equals(ASSOC_TYPE)) {
             dmx.deleteAssocType(t.getUri());
         } else {
             dmx.deleteTopic(id);

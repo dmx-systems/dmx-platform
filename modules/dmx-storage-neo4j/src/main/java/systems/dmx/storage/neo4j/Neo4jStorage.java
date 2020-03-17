@@ -1,5 +1,6 @@
 package systems.dmx.storage.neo4j;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.impl.AssocModelImpl;
 import systems.dmx.core.impl.DMXObjectModelImpl;
 import systems.dmx.core.impl.ModelFactoryImpl;
@@ -550,7 +551,7 @@ public class Neo4jStorage implements DMXStorage {
             //
             rootNode.setProperty(KEY_NODE_TYPE, "topic");
             rootNode.setProperty(KEY_VALUE, "Meta Type");
-            storeAndIndexTopicUri(rootNode, "dmx.core.meta_type");
+            storeAndIndexTopicUri(rootNode, META_TYPE);
             storeAndIndexTopicTypeUri(rootNode, "dmx.core.meta_meta_type");
             //
             return true;

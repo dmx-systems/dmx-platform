@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.CompDefModel;
@@ -529,8 +530,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void storeDataTypeUri() {
         // remove current assignment
-        getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child", "dmx.core.data_type")
-            .getRelatingAssoc().delete();
+        getRelatedTopic(COMPOSITION, "dmx.core.parent", "dmx.core.child", DATA_TYPE).getRelatingAssoc().delete();
         // create new assignment
         al.typeStorage.storeDataType(uri, dataTypeUri);
     }

@@ -1,5 +1,6 @@
 package systems.dmx.core.util;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Identifiable;
@@ -202,7 +203,7 @@ public class DMXUtils {
      */
     public static PlayerModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
                                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
-        if (!assoc.getTypeUri().equals("dmx.core.association")) {
+        if (!assoc.getTypeUri().equals(ASSOCIATION)) {
             return null;
         }
         PlayerModel[] players = getPlayerModels(assoc, topicTypeUri1, topicTypeUri2);

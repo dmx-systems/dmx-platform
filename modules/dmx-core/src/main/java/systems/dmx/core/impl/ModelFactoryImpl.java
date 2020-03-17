@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
@@ -280,7 +281,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private String assocTypeUri(String compDefUri) {
         String[] s = compDefUri.split("#");
-        return s.length == 2 ? s[1] : "dmx.core.composition";
+        return s.length == 2 ? s[1] : COMPOSITION;
     }
 
     // ---
@@ -585,13 +586,13 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(String uri, String value, String dataTypeUri) {
-        return new TopicTypeModelImpl(newTypeModel(uri, "dmx.core.topic_type", new SimpleValue(value), dataTypeUri));
+        return new TopicTypeModelImpl(newTypeModel(uri, TOPIC_TYPE, new SimpleValue(value), dataTypeUri));
     }
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(JSONObject topicType) {
         try {
-            return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", "dmx.core.topic_type")));
+            return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", TOPIC_TYPE)));
         } catch (Exception e) {
             throw parsingFailed(topicType, e, "TopicTypeModelImpl");
         }
@@ -610,13 +611,13 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssocTypeModelImpl newAssocTypeModel(String uri, String value, String dataTypeUri) {
-        return new AssocTypeModelImpl(newTypeModel(uri, "dmx.core.assoc_type", new SimpleValue(value), dataTypeUri));
+        return new AssocTypeModelImpl(newTypeModel(uri, ASSOC_TYPE, new SimpleValue(value), dataTypeUri));
     }
 
     @Override
     public AssocTypeModelImpl newAssocTypeModel(JSONObject assocType) {
         try {
-            return new AssocTypeModelImpl(newTypeModel(assocType.put("typeUri", "dmx.core.assoc_type")));
+            return new AssocTypeModelImpl(newTypeModel(assocType.put("typeUri", ASSOC_TYPE)));
         } catch (Exception e) {
             throw parsingFailed(assocType, e, "AssocTypeModelImpl");
         }
@@ -765,7 +766,7 @@ public class ModelFactoryImpl implements ModelFactory {
     private ChildTopicsModel childTopics(String cardinalityUri, String customAssocTypeUri, boolean isIdentityAttr,
                                          boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
-            .putRef("dmx.core.cardinality", cardinalityUri)
+            .putRef(CARDINALITY, cardinalityUri)
             .put("dmx.core.identity_attr", isIdentityAttr)
             .put("dmx.core.include_in_label", includeInLabel);
         //

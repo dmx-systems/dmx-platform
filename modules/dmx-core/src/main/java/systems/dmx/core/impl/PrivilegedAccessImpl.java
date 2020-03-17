@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
@@ -464,7 +465,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModelImpl userAccount = al.sd.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
+        RelatedTopicModelImpl userAccount = al.sd.fetchTopicRelatedTopic(usernameTopic.getId(), COMPOSITION,
             "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
@@ -479,7 +480,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = al.sd.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
+        RelatedTopicModel password = al.sd.fetchTopicRelatedTopic(userAccount.getId(), COMPOSITION,
             "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
@@ -540,8 +541,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = al.sd.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
-            "dmx.core.child", "dmx.workspaces.sharing_mode");
+        TopicModel sharingMode = al.sd.fetchTopicRelatedTopic(workspaceId, COMPOSITION,
+            "dmx.core.parent", "dmx.core.child", "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }

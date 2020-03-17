@@ -1,5 +1,6 @@
 package systems.dmx.events;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
@@ -66,7 +67,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
         //
         // Event -> Address
         PlayerModel[] players = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
-            "dmx.core.composition", "dmx.core.parent", "dmx.core.child");
+            COMPOSITION, "dmx.core.parent", "dmx.core.child");
         if (players != null) {
             long eventId = players[0].getId();
             Topic event = dmx.getTopic(eventId);

@@ -1,5 +1,6 @@
 package systems.dmx.webclient;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXType;
@@ -137,11 +138,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     private void updateTypeCacheAndAddDirective(Topic viewConfigTopic) {
         // type to be updated (topic type or assoc type)
-        Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
+        Topic type = viewConfigTopic.getRelatedTopic(COMPOSITION, "dmx.core.child", "dmx.core.parent", null);
         // ID of the comp def to be updated. -1 if the update does not target an comp def (but a type).
         long compDefId = -1;
         if (type == null) {
-            Assoc compDef = viewConfigTopic.getRelatedAssoc("dmx.core.composition", "dmx.core.child", "dmx.core.parent",
+            Assoc compDef = viewConfigTopic.getRelatedAssoc(COMPOSITION, "dmx.core.child", "dmx.core.parent",
                 "dmx.core.composition_def");
             if (compDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
@@ -151,12 +152,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
         //
         String typeUri = type.getTypeUri();
-        if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
+        if (typeUri.equals(TOPIC_TYPE) || typeUri.equals(META_TYPE)) {
             _updateTypeCacheAndAddDirective(
                 dmx.getTopicType(type.getUri()),
                 compDefId, viewConfigTopic, Directive.UPDATE_TOPIC_TYPE
             );
-        } else if (typeUri.equals("dmx.core.assoc_type")) {
+        } else if (typeUri.equals(ASSOC_TYPE)) {
             _updateTypeCacheAndAddDirective(
                 dmx.getAssocType(type.getUri()),
                 compDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE

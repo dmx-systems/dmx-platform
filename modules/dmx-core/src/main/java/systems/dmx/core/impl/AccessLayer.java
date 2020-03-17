@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
@@ -430,7 +431,7 @@ public final class AccessLayer {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssocModel(INSTANTIATION,
                 mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicPlayerModel(topicId, "dmx.core.instance")
             );
@@ -445,7 +446,7 @@ public final class AccessLayer {
 
     void createAssocInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssocModelImpl assoc = mf.newAssocModel("dmx.core.instantiation",
+            AssocModelImpl assoc = mf.newAssocModel(INSTANTIATION,
                 mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssocPlayerModel(assocId, "dmx.core.instance")
             );
@@ -593,9 +594,9 @@ public final class AccessLayer {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {
-            model.setTypeUri("dmx.core.role_type");
+            model.setTypeUri(ROLE_TYPE);
         } else {
-            if (!typeUri.equals("dmx.core.role_type")) {
+            if (!typeUri.equals(ROLE_TYPE)) {
                 throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
                     "(found: \"" + typeUri + "\")");
             }
@@ -810,11 +811,11 @@ public final class AccessLayer {
         try {
             List<String> topicTypeUris = new ArrayList();
             // add meta types
-            topicTypeUris.add("dmx.core.topic_type");
-            topicTypeUris.add("dmx.core.assoc_type");
-            topicTypeUris.add("dmx.core.meta_type");
+            topicTypeUris.add(TOPIC_TYPE);
+            topicTypeUris.add(ASSOC_TYPE);
+            topicTypeUris.add(META_TYPE);
             // add regular types
-            for (TopicModelImpl topicType : filterReadables(db.fetchTopics("typeUri", "dmx.core.topic_type"))) {
+            for (TopicModelImpl topicType : filterReadables(db.fetchTopics("typeUri", TOPIC_TYPE))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -826,7 +827,7 @@ public final class AccessLayer {
     private List<String> getAssocTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModelImpl assocType : filterReadables(db.fetchTopics("typeUri", "dmx.core.assoc_type"))) {
+            for (TopicModelImpl assocType : filterReadables(db.fetchTopics("typeUri", ASSOC_TYPE))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;

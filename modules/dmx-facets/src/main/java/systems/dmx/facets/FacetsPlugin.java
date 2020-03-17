@@ -1,5 +1,6 @@
 package systems.dmx.facets;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -114,7 +115,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
-        dmx.createAssoc(mf.newAssocModel("dmx.core.instantiation",
+        dmx.createAssoc(mf.newAssocModel(INSTANTIATION,
             mf.newTopicPlayerModel(topicId,      "dmx.core.instance"),
             mf.newTopicPlayerModel(facetTypeUri, "dmx.facets.facet")
         ));

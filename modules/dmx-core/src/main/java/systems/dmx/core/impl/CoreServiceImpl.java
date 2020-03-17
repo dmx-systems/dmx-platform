@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
@@ -502,26 +503,24 @@ public class CoreServiceImpl implements CoreService {
     private void setupBootstrapContent() {
         try {
             // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and assoc types
-            TopicModelImpl t = mf.newTopicModel("dmx.core.topic_type", "dmx.core.meta_type",
-                new SimpleValue("Topic Type"));
-            TopicModelImpl a = mf.newTopicModel("dmx.core.assoc_type", "dmx.core.meta_type",
-                new SimpleValue("Association Type"));
+            TopicModelImpl t = mf.newTopicModel(TOPIC_TYPE, META_TYPE, new SimpleValue("Topic Type"));
+            TopicModelImpl a = mf.newTopicModel(ASSOC_TYPE, META_TYPE, new SimpleValue("Association Type"));
             _createTopic(t);
             _createTopic(a);
             // Create topic type "Data Type"
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
-            TopicModelImpl dataType = mf.newTopicTypeModel("dmx.core.data_type", "Data Type", "dmx.core.text");
+            TopicModelImpl dataType = mf.newTopicTypeModel(DATA_TYPE, "Data Type", "dmx.core.text");
             _createTopic(dataType);
             // Create data type "Text"
-            TopicModelImpl text = mf.newTopicModel("dmx.core.text", "dmx.core.data_type", new SimpleValue("Text"));
+            TopicModelImpl text = mf.newTopicModel("dmx.core.text", DATA_TYPE, new SimpleValue("Text"));
             _createTopic(text);
             // Create association type "Composition" -- needed to associate topic/association types with data types
-            TopicModelImpl composition = mf.newAssocTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
+            TopicModelImpl composition = mf.newAssocTypeModel(COMPOSITION, "Composition", "dmx.core.text");
             _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
-            TopicModelImpl instn = mf.newAssocTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
+            TopicModelImpl instn = mf.newAssocTypeModel(INSTANTIATION, "Instantiation", "dmx.core.text");
             _createTopic(instn);
             //
             // 1) Postponed topic type association
@@ -557,13 +556,13 @@ public class CoreServiceImpl implements CoreService {
             // would fail (not because the association is missed -- it's created meanwhile, but)
             // because this involves fetching the association including its value. The value doesn't exist yet,
             // because its setting forms the begin of this vicious circle.
-            _associateDataType("dmx.core.meta_type",  "dmx.core.text");
-            _associateDataType("dmx.core.topic_type", "dmx.core.text");
-            _associateDataType("dmx.core.assoc_type", "dmx.core.text");
-            _associateDataType("dmx.core.data_type",  "dmx.core.text");
+            _associateDataType(META_TYPE,  "dmx.core.text");
+            _associateDataType(TOPIC_TYPE, "dmx.core.text");
+            _associateDataType(ASSOC_TYPE, "dmx.core.text");
+            _associateDataType(DATA_TYPE,  "dmx.core.text");
             //
-            _associateDataType("dmx.core.composition",   "dmx.core.text");
-            _associateDataType("dmx.core.instantiation", "dmx.core.text");
+            _associateDataType(COMPOSITION,   "dmx.core.text");
+            _associateDataType(INSTANTIATION, "dmx.core.text");
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);
         }
@@ -585,7 +584,7 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssocModelImpl assoc = mf.newAssocModel("dmx.core.composition",
+        AssocModelImpl assoc = mf.newAssocModel(COMPOSITION,
             mf.newTopicPlayerModel(typeUri,     "dmx.core.parent"),
             mf.newTopicPlayerModel(dataTypeUri, "dmx.core.child")
         );
