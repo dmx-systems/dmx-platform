@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
@@ -572,14 +573,14 @@ public class DMXObjectModelImpl implements DMXObjectModel {
     final boolean isSimple() {
         // TODO: add isSimple() to type model
         String dataTypeUri = getType().getDataTypeUri();
-        return dataTypeUri.equals("dmx.core.text")
-            || dataTypeUri.equals("dmx.core.html")
-            || dataTypeUri.equals("dmx.core.number")
-            || dataTypeUri.equals("dmx.core.boolean");
+        return dataTypeUri.equals(TEXT)
+            || dataTypeUri.equals(HTML)
+            || dataTypeUri.equals(NUMBER)
+            || dataTypeUri.equals(BOOLEAN);
     }
 
     final boolean isHtml() {
-        return getType().getDataTypeUri().equals("dmx.core.html");
+        return getType().getDataTypeUri().equals(HTML);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

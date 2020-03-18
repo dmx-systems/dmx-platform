@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.SimpleValue;
@@ -20,7 +21,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     AssocTypeModelImpl(TypeModelImpl type) {
         super(type);
-        if (type.dataTypeUri.equals("dmx.core.value") || type.dataTypeUri.equals("dmx.core.identity")) {
+        if (type.dataTypeUri.equals(VALUE) || type.dataTypeUri.equals(IDENTITY)) {
             throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for an assoc " +
                 "type. Use \"dmx.core.composite\" instead. " + type);
         }

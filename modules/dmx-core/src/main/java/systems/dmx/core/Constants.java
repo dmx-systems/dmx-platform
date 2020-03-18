@@ -21,4 +21,13 @@ public class Constants {
     public static final String COMPOSITION   = "dmx.core.composition";
     public static final String INSTANTIATION = "dmx.core.instantiation";
     public static final String SEQUENCE      = "dmx.core.sequence";
+
+    // data types
+    public static final String TEXT          = "dmx.core.text";
+    public static final String HTML          = "dmx.core.html";
+    public static final String NUMBER        = "dmx.core.number";
+    public static final String BOOLEAN       = "dmx.core.boolean";
+    public static final String COMPOSITE     = "dmx.core.composite";
+    public static final String VALUE         = "dmx.core.value";
+    public static final String IDENTITY      = "dmx.core.identity";
 }

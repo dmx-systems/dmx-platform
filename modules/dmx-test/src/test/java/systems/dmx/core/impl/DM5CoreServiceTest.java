@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -248,8 +249,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void defineLottoModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.identity")
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", IDENTITY)
             .addCompDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
@@ -257,8 +258,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void defineValueLottoModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", VALUE)
             .addCompDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))
@@ -266,8 +267,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void defineSimpleNameIdentityModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
-        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
+        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
             .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.one"
             ))
@@ -275,8 +276,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void defineManyNamesIdentityModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
-        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
+        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
             .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", "dmx.core.many"
             ))

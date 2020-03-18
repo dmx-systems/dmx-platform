@@ -511,16 +511,16 @@ public class CoreServiceImpl implements CoreService {
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
-            TopicModelImpl dataType = mf.newTopicTypeModel(DATA_TYPE, "Data Type", "dmx.core.text");
+            TopicModelImpl dataType = mf.newTopicTypeModel(DATA_TYPE, "Data Type", TEXT);
             _createTopic(dataType);
             // Create data type "Text"
-            TopicModelImpl text = mf.newTopicModel("dmx.core.text", DATA_TYPE, new SimpleValue("Text"));
+            TopicModelImpl text = mf.newTopicModel(TEXT, DATA_TYPE, new SimpleValue("Text"));
             _createTopic(text);
             // Create association type "Composition" -- needed to associate topic/association types with data types
-            TopicModelImpl composition = mf.newAssocTypeModel(COMPOSITION, "Composition", "dmx.core.text");
+            TopicModelImpl composition = mf.newAssocTypeModel(COMPOSITION, "Composition", TEXT);
             _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
-            TopicModelImpl instn = mf.newAssocTypeModel(INSTANTIATION, "Instantiation", "dmx.core.text");
+            TopicModelImpl instn = mf.newAssocTypeModel(INSTANTIATION, "Instantiation", TEXT);
             _createTopic(instn);
             //
             // 1) Postponed topic type association
@@ -556,13 +556,13 @@ public class CoreServiceImpl implements CoreService {
             // would fail (not because the association is missed -- it's created meanwhile, but)
             // because this involves fetching the association including its value. The value doesn't exist yet,
             // because its setting forms the begin of this vicious circle.
-            _associateDataType(META_TYPE,  "dmx.core.text");
-            _associateDataType(TOPIC_TYPE, "dmx.core.text");
-            _associateDataType(ASSOC_TYPE, "dmx.core.text");
-            _associateDataType(DATA_TYPE,  "dmx.core.text");
+            _associateDataType(META_TYPE,  TEXT);
+            _associateDataType(TOPIC_TYPE, TEXT);
+            _associateDataType(ASSOC_TYPE, TEXT);
+            _associateDataType(DATA_TYPE,  TEXT);
             //
-            _associateDataType(COMPOSITION,   "dmx.core.text");
-            _associateDataType(INSTANTIATION, "dmx.core.text");
+            _associateDataType(COMPOSITION,   TEXT);
+            _associateDataType(INSTANTIATION, TEXT);
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);
         }

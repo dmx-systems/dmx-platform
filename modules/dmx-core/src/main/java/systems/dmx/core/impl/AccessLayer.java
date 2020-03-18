@@ -859,8 +859,7 @@ public final class AccessLayer {
     }
 
     private void bootstrapTypeCache() {
-        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dmx.core.meta_meta_type", "Meta Meta Type",
-            "dmx.core.text");
+        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dmx.core.meta_meta_type", "Meta Meta Type", TEXT);
         metaMetaType.setTypeUri("dmx.core.meta_meta_meta_type");
         typeStorage.putInTypeCache(metaMetaType);
     }

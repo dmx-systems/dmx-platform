@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
@@ -844,7 +845,7 @@ class ValueIntegrator {
     }
 
     private boolean isValueType() {
-        return type.getDataTypeUri().equals("dmx.core.value");
+        return type.getDataTypeUri().equals(VALUE);
     }
 
     private boolean isEmptyValue(String compDefUri) {

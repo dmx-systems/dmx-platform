@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicTypeModel;
@@ -20,7 +21,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     TopicTypeModelImpl(TypeModelImpl type) {
         super(type);
-        if (type.dataTypeUri.equals("dmx.core.composite")) {
+        if (type.dataTypeUri.equals(COMPOSITE)) {
             throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for a topic " +
                 "type. Use \"dmx.core.value\" or \"dmx.core.identity\" instead. " + type);
         }
