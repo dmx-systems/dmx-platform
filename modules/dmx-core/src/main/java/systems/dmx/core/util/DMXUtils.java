@@ -166,8 +166,7 @@ public class DMXUtils {
      */
     public static List<Topic> getParentTopics(Topic topic) {
         List<Topic> parentTopics = new ArrayList();
-        List<RelatedTopic> _parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child", "dmx.core.parent",
-            null);
+        List<RelatedTopic> _parentTopics = topic.getRelatedTopics((String) null, CHILD, PARENT, null);
         if (_parentTopics.isEmpty()) {
             parentTopics.add(topic);
         } else {

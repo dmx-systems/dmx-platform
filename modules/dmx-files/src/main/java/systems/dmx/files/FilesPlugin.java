@@ -553,7 +553,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
         Topic pathTopic = fetchPathTopic(repoPath);
         if (pathTopic != null) {
-            return pathTopic.getRelatedTopic(COMPOSITION, "dmx.core.child", "dmx.core.parent", topicTypeUri);
+            return pathTopic.getRelatedTopic(COMPOSITION, CHILD, PARENT, topicTypeUri);
         }
         return null;
     }
@@ -646,8 +646,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                     @Override
                     public Assoc call() {
                         return dmx.createAssoc(mf.newAssocModel(COMPOSITION,
-                            mf.newTopicPlayerModel(folderTopicId, "dmx.core.parent"),
-                            mf.newTopicPlayerModel(topicId,       "dmx.core.child")
+                            mf.newTopicPlayerModel(folderTopicId, PARENT),
+                            mf.newTopicPlayerModel(topicId,       CHILD)
                         ));
                     }
                 });

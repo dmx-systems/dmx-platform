@@ -744,11 +744,11 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private TopicPlayerModel parentPlayer(String parentTypeUri) {
-        return newTopicPlayerModel(parentTypeUri, "dmx.core.parent_type");
+        return newTopicPlayerModel(parentTypeUri, PARENT_TYPE);
     }
 
     private TopicPlayerModel childPlayer(String childTypeUri) {
-        return newTopicPlayerModel(childTypeUri, "dmx.core.child_type");
+        return newTopicPlayerModel(childTypeUri, CHILD_TYPE);
     }
 
     // ---

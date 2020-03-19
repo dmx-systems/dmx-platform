@@ -662,7 +662,7 @@ class ValueIntegrator {
             childTopic = ((List<UnifiedValue>) childValues.get(compDefUri)).get(0).value;
         }
         return al.getTopicRelatedTopics(childTopic.getId(), compDef(compDefUri).getInstanceLevelAssocTypeUri(),
-            "dmx.core.child", "dmx.core.parent", type.getUri());
+            CHILD, PARENT, type.getUri());
     }
 
     /**
@@ -681,8 +681,7 @@ class ValueIntegrator {
             String assocTypeUri = compDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                AssocModelImpl assoc = al.getAssoc(assocTypeUri, parent.id, childTopic.id, "dmx.core.parent",
-                    "dmx.core.child");
+                AssocModelImpl assoc = al.getAssoc(assocTypeUri, parent.id, childTopic.id, PARENT, CHILD);
                 if (assoc != null) {
                     // update memory
                     parent.getChildTopicsModel().put(
@@ -695,7 +694,7 @@ class ValueIntegrator {
                 }
             } else {
                 // TODO: assoc parents?
-                if (!al.getTopicRelatedTopics(parent.id, assocTypeUri, "dmx.core.parent", "dmx.core.child",
+                if (!al.getTopicRelatedTopics(parent.id, assocTypeUri, PARENT, CHILD,
                         compDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (children exist)");
                     i.remove();
@@ -769,8 +768,8 @@ class ValueIntegrator {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return al.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
-            parent.createPlayerModel("dmx.core.parent"),
-            child.createPlayerModel("dmx.core.child")
+            parent.createPlayerModel(PARENT),
+            child.createPlayerModel(CHILD)
         );
     }
 

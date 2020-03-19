@@ -432,8 +432,8 @@ public final class AccessLayer {
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
             AssocModelImpl assoc = mf.newAssocModel(INSTANTIATION,
-                mf.newTopicPlayerModel(topicTypeUri, "dmx.core.type"),
-                mf.newTopicPlayerModel(topicId, "dmx.core.instance")
+                mf.newTopicPlayerModel(topicTypeUri, TYPE),
+                mf.newTopicPlayerModel(topicId, INSTANCE)
             );
             db.storeAssoc(assoc);   // direct storage calls used here ### explain
             db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
@@ -447,8 +447,8 @@ public final class AccessLayer {
     void createAssocInstantiation(long assocId, String assocTypeUri) {
         try {
             AssocModelImpl assoc = mf.newAssocModel(INSTANTIATION,
-                mf.newTopicPlayerModel(assocTypeUri, "dmx.core.type"),
-                mf.newAssocPlayerModel(assocId, "dmx.core.instance")
+                mf.newTopicPlayerModel(assocTypeUri, TYPE),
+                mf.newAssocPlayerModel(assocId, INSTANCE)
             );
             db.storeAssoc(assoc);   // direct storage calls used here ### explain
             db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);     // isHtml=false
@@ -797,8 +797,7 @@ public final class AccessLayer {
         if (childTopic.typeUri.equals(topicTypeUri)) {
             parentTopics.add(childTopic);
         } else {
-            for (TopicModelImpl parentTopic : childTopic.getRelatedTopics((String) null, "dmx.core.child",
-                                                                                         "dmx.core.parent", null)) {
+            for (TopicModelImpl parentTopic : childTopic.getRelatedTopics((String) null, CHILD, PARENT, null)) {
                 parentTopics.addAll(parentTopics(topicTypeUri, parentTopic));
             }
         }

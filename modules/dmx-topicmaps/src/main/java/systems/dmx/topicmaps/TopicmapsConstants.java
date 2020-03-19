@@ -1,7 +1,10 @@
 package systems.dmx.topicmaps;
 
+import static systems.dmx.core.Constants.*;
 
 
+
+// TODO: make it a class
 public interface TopicmapsConstants {
 
     // topic type
@@ -9,7 +12,7 @@ public interface TopicmapsConstants {
 
     // content assoc
     static final String TOPICMAP_CONTEXT   = "dmx.topicmaps.topicmap_context";
-    static final String ROLE_TYPE_TOPICMAP = "dmx.core.default";
+    static final String ROLE_TYPE_TOPICMAP = DEFAULT;
     static final String ROLE_TYPE_CONTENT  = "dmx.topicmaps.topicmap_content";
 
     // topicmap props

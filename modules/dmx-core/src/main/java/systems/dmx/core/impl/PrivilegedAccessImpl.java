@@ -43,7 +43,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private static final String ASSOC_TYPE_USER_MAILBOX = "org.deepamehta.signup.user_mailbox";
     private static final String ASSOC_TYPE_CONFIGURATION = "dmx.config.configuration";
     private static final String ROLE_TYPE_CONFIGURABLE   = "dmx.config.configurable";
-    private static final String ROLE_TYPE_DEFAULT = "dmx.core.default";
 
     // Property URIs
     // ### TODO: move to dmx.core namespace?
@@ -227,7 +226,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             }
             // Note: direct storage access is required here
             AssocModel membership = al.sd.fetchAssoc(TYPE_MEMBERSHIP, _getUsernameTopicOrThrow(username).getId(),
-                workspaceId, "dmx.core.default", "dmx.core.default");
+                workspaceId, DEFAULT, DEFAULT);
             return membership != null;
         } catch (Exception e) {
             throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
@@ -338,8 +337,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             if (_workspaceId == -1) {
                 // create assignment association
                 al.createAssoc("dmx.workspaces.workspace_assignment",
-                    object.getModel().createPlayerModel("dmx.core.parent"),
-                    mf.newTopicPlayerModel(workspaceId, "dmx.core.child")
+                    object.getModel().createPlayerModel(PARENT),
+                    mf.newTopicPlayerModel(workspaceId, CHILD)
                 );
                 // store assignment property
                 object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
@@ -386,7 +385,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
         try {
             RelatedTopicModelImpl configTopic = al.sd.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
-                ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
+                ROLE_TYPE_CONFIGURABLE, DEFAULT, configTypeUri);
             if (configTopic == null) {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
                     " is missing");
@@ -466,7 +465,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
         RelatedTopicModelImpl userAccount = al.sd.fetchTopicRelatedTopic(usernameTopic.getId(), COMPOSITION,
-            "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
+            CHILD, PARENT, "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
                 usernameTopic.getSimpleValue() + "\", usernameTopic=" + usernameTopic);
@@ -481,7 +480,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
         RelatedTopicModel password = al.sd.fetchTopicRelatedTopic(userAccount.getId(), COMPOSITION,
-            "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
+            PARENT, CHILD, "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
                 userAccount.getSimpleValue() + "\", userAccount=" + userAccount);
@@ -542,7 +541,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
         TopicModel sharingMode = al.sd.fetchTopicRelatedTopic(workspaceId, COMPOSITION,
-            "dmx.core.parent", "dmx.core.child", "dmx.workspaces.sharing_mode");
+            PARENT, CHILD, "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
@@ -593,7 +592,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         String username = null;
         for (TopicModelImpl emailAddressTopic : al.db.fetchTopics(TYPE_EMAIL_ADDRESS, emailAddress)) {
             TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-                "dmx.core.child", "dmx.core.parent", TYPE_USERNAME);
+                CHILD, PARENT, TYPE_USERNAME);
             if (usernameTopic != null) {
                 if (username != null) {
                     throw new RuntimeException("Ambiguity: the Username assignment for email address \"" +
@@ -607,7 +606,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String _getEmailAddress(String username) {
         TopicModel emailAddress = _getUsernameTopicOrThrow(username).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-            "dmx.core.parent", "dmx.core.child", TYPE_EMAIL_ADDRESS);
+            PARENT, CHILD, TYPE_EMAIL_ADDRESS);
         return emailAddress != null ? emailAddress.getSimpleValue().toString() : null;
     }
 

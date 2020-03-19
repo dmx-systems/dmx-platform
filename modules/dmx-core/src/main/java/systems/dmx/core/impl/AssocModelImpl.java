@@ -294,9 +294,9 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         // Note: auto-typing only works for generic assocs (of type "Association") and for by-ID players.
         // That's why auto-typing does not interfere with comp defs created programmatically (through migration).
         if (DMXUtils.associationAutoTyping(this, TOPIC_TYPE, TOPIC_TYPE,
-                "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null ||
+                "dmx.core.composition_def", CHILD_TYPE, PARENT_TYPE) != null ||
             DMXUtils.associationAutoTyping(this, TOPIC_TYPE, ASSOC_TYPE,
-                "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null) {
+                "dmx.core.composition_def", CHILD_TYPE, PARENT_TYPE) != null) {
             childTopics.putRef(CARDINALITY, "dmx.core.one");
         }
         //
@@ -476,8 +476,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     }
 
     private AssocModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl assocType = getRelatedTopic(INSTANTIATION, "dmx.core.instance", "dmx.core.type",
-            ASSOC_TYPE);
+        RelatedTopicModelImpl assocType = getRelatedTopic(INSTANTIATION, INSTANCE, TYPE, ASSOC_TYPE);
         //
         if (assocType == null) {
             throw new RuntimeException("Assoc " + id + " is not associated to an association type");
@@ -531,8 +530,8 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
         if (assoc.hasSameRoleTypeUris()) {
             return false;
         }
-        if (assoc.getPlayerByRole("dmx.core.parent_type") == null ||
-            assoc.getPlayerByRole("dmx.core.child_type") == null)  {
+        if (assoc.getPlayerByRole(PARENT_TYPE) == null ||
+            assoc.getPlayerByRole(CHILD_TYPE) == null)  {
             return false;
         }
         //

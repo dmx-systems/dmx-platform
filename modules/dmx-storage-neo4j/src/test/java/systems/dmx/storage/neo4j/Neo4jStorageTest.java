@@ -61,10 +61,10 @@ public class Neo4jStorageTest {
         AssocModelImpl assoc = db.fetchAssoc(assocId);
         assertNotNull(assoc);
         //
-        PlayerModel player1 = assoc.getPlayerByRole("dmx.core.type");
+        PlayerModel player1 = assoc.getPlayerByRole(TYPE);
         assertNotNull(player1);
         //
-        PlayerModel player2 = assoc.getPlayerByRole("dmx.core.instance");
+        PlayerModel player2 = assoc.getPlayerByRole(INSTANCE);
         assertNotNull(player2);
     }
 
@@ -74,7 +74,7 @@ public class Neo4jStorageTest {
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-            INSTANTIATION, "dmx.core.instance", "dmx.core.type", META_TYPE);
+            INSTANTIATION, INSTANCE, TYPE, META_TYPE);
         assertEquals(1, topics.size());
         //
         TopicModelImpl type = topics.get(0);
@@ -88,7 +88,7 @@ public class Neo4jStorageTest {
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-            INSTANTIATION, "dmx.core.type", "dmx.core.instance", TOPIC_TYPE);
+            INSTANTIATION, TYPE, INSTANCE, TOPIC_TYPE);
         assertEquals(1, topics.size());
         //
         TopicModelImpl type = topics.get(0);
@@ -113,7 +113,7 @@ public class Neo4jStorageTest {
             assertNotNull(topic);
             //
             List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
-                INSTANTIATION, "dmx.core.instance", "dmx.core.type", META_TYPE);
+                INSTANTIATION, INSTANCE, TYPE, META_TYPE);
             assertEquals(1, topics.size());
             //
             AssocModelImpl assoc = topics.get(0).getRelatingAssoc();
@@ -122,7 +122,7 @@ public class Neo4jStorageTest {
             db.deleteAssoc(assoc.getId());
             //
             topics = db.fetchTopicRelatedTopics(topic.getId(), INSTANTIATION,
-                "dmx.core.instance", "dmx.core.type", META_TYPE);
+                INSTANCE, TYPE, META_TYPE);
             assertEquals(0, topics.size());
             //
             tx.success();
@@ -270,8 +270,8 @@ public class Neo4jStorageTest {
             createTopic(DATA_TYPE,  TOPIC_TYPE, "Data Type");
             //
             assocId = createAssoc(INSTANTIATION,
-                TOPIC_TYPE, "dmx.core.type",
-                DATA_TYPE, "dmx.core.instance"
+                TOPIC_TYPE, TYPE,
+                DATA_TYPE, INSTANCE
             );
             //
             // Fulltext indexing

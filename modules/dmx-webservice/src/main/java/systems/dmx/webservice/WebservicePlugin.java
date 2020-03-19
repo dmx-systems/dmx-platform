@@ -536,8 +536,8 @@ public class WebservicePlugin extends PluginActivator {
     private boolean isDirectModelledChildTopic(DMXObject parentObject, RelatedTopic childTopic) {
         // check comp def and role types
         return hasCompDef(parentObject, childTopic) && childTopic.getRelatingAssoc().matches(
-            "dmx.core.parent", parentObject.getId(),
-            "dmx.core.child", childTopic.getId()
+            PARENT, parentObject.getId(),
+            CHILD, childTopic.getId()
         );
     }
 

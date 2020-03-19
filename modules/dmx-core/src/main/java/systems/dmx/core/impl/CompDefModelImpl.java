@@ -58,12 +58,12 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     @Override
     public String getParentTypeUri() {
-        return ((TopicPlayerModel) getPlayerByRole("dmx.core.parent_type")).getTopicUri();
+        return ((TopicPlayerModel) getPlayerByRole(PARENT_TYPE)).getTopicUri();
     }
 
     @Override
     public String getChildTypeUri() {
-        return ((TopicPlayerModel) getPlayerByRole("dmx.core.child_type")).getTopicUri();
+        return ((TopicPlayerModel) getPlayerByRole(CHILD_TYPE)).getTopicUri();
     }
 
     @Override

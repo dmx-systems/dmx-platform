@@ -116,7 +116,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dmx.createAssoc(mf.newAssocModel(INSTANTIATION,
-            mf.newTopicPlayerModel(topicId,      "dmx.core.instance"),
+            mf.newTopicPlayerModel(topicId,      INSTANCE),
             mf.newTopicPlayerModel(facetTypeUri, "dmx.facets.facet")
         ));
     }
@@ -150,7 +150,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getCompDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Assoc assoc = dmx.getAssoc(assocTypeUri, topicId, facetTopicId, "dmx.core.parent", "dmx.core.child");
+        Assoc assoc = dmx.getAssoc(assocTypeUri, topicId, facetTopicId, PARENT, CHILD);
         return assoc != null;
     }
 
@@ -168,7 +168,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private RelatedTopic fetchChildTopic(DMXObject object, CompDef compDef) {
         String assocTypeUri  = compDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = compDef.getChildTypeUri();
-        return object.getRelatedTopic(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
+        return object.getRelatedTopic(assocTypeUri, PARENT, CHILD, othersTypeUri);
     }
 
     /**
@@ -181,7 +181,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private List<RelatedTopic> fetchChildTopics(DMXObject object, CompDef compDef) {
         String assocTypeUri  = compDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = compDef.getChildTypeUri();
-        return object.getRelatedTopics(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
+        return object.getRelatedTopics(assocTypeUri, PARENT, CHILD, othersTypeUri);
     }
 
     // ---

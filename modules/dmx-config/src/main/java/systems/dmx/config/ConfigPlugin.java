@@ -1,5 +1,6 @@
 package systems.dmx.config;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.SimpleValue;
@@ -36,7 +37,6 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     private static String ASSOC_TYPE_CONFIGURATION = "dmx.config.configuration";
     private static String ROLE_TYPE_CONFIGURABLE = "dmx.config.configurable";
-    private static String ROLE_TYPE_DEFAULT = "dmx.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -158,7 +158,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                     Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
                     dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
                         mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
-                        mf.newTopicPlayerModel(configTopic.getId(), ROLE_TYPE_DEFAULT)
+                        mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
                     ));
                     pa.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
                     // ### TODO: extend Core API to avoid re-retrieval

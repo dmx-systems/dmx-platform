@@ -43,7 +43,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
         return dmx.getTopic(personId).getRelatedTopics("dmx.events.event_involvement",
-            "dmx.core.default", "dmx.core.default", "dmx.events.event");
+            DEFAULT, DEFAULT, "dmx.events.event");
     }
 
     @GET
@@ -51,7 +51,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long eventId) {
         return dmx.getTopic(eventId).getRelatedTopics("dmx.events.event_involvement",
-            "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
+            DEFAULT, DEFAULT, "dmx.contacts.person");
     }
 
     // Listeners
@@ -60,14 +60,14 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     public void preCreateAssoc(AssocModel assoc) {
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
-            "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
+            "dmx.events.event_involvement", DEFAULT, DEFAULT);
         // Event <-> Organization
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.organization",
-            "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
+            "dmx.events.event_involvement", DEFAULT, DEFAULT);
         //
         // Event -> Address
         PlayerModel[] players = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
-            COMPOSITION, "dmx.core.parent", "dmx.core.child");
+            COMPOSITION, PARENT, CHILD);
         if (players != null) {
             long eventId = players[0].getId();
             Topic event = dmx.getTopic(eventId);

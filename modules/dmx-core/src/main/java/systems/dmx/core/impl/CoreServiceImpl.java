@@ -585,8 +585,8 @@ public class CoreServiceImpl implements CoreService {
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
         AssocModelImpl assoc = mf.newAssocModel(COMPOSITION,
-            mf.newTopicPlayerModel(typeUri,     "dmx.core.parent"),
-            mf.newTopicPlayerModel(dataTypeUri, "dmx.core.child")
+            mf.newTopicPlayerModel(typeUri,     PARENT),
+            mf.newTopicPlayerModel(dataTypeUri, CHILD)
         );
         al.db.storeAssoc(assoc);
         al.db.storeAssocValue(assoc.id, assoc.value, assoc.typeUri, false);         // isHtml=false

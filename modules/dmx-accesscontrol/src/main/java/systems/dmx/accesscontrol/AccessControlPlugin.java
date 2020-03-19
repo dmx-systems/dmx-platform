@@ -7,6 +7,7 @@ import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
@@ -348,8 +349,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
             Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP_TYPE,
-                mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
-                mf.newTopicPlayerModel(workspaceId, "dmx.core.default")
+                mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
+                mf.newTopicPlayerModel(workspaceId, DEFAULT)
             ));
             assignMembershipToWorkspace(assoc);
         } catch (Exception e) {

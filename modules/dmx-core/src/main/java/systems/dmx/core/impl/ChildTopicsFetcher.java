@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
@@ -86,7 +87,7 @@ class ChildTopicsFetcher {
         return al.sd.fetchRelatedTopic(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
-            "dmx.core.parent", "dmx.core.child",
+            PARENT, CHILD,
             compDef.getChildTypeUri()
         );
     }
@@ -95,7 +96,7 @@ class ChildTopicsFetcher {
         return al.db.fetchRelatedTopics(
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
-            "dmx.core.parent", "dmx.core.child",
+            PARENT, CHILD,
             compDef.getChildTypeUri()
         );
     }

@@ -236,8 +236,7 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     // Note: this method works only for instances, not for types.
     // This is because a type is not of type "dmx.core.topic_type" but of type "dmx.core.meta_type".
     private AssocModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl topicType = getRelatedTopic(INSTANTIATION, "dmx.core.instance",
-            "dmx.core.type", TOPIC_TYPE);
+        RelatedTopicModelImpl topicType = getRelatedTopic(INSTANTIATION, INSTANCE, TYPE, TOPIC_TYPE);
         //
         if (topicType == null) {
             throw new RuntimeException("Topic " + id + " is not associated to a topic type");

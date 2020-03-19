@@ -73,8 +73,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.plugin",              compDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", compDef.getChildTypeUri());
         assertEquals("dmx.core.one",                 compDef.getChildCardinalityUri());
-        DMXObject t1 = compDef.getDMXObjectByRole("dmx.core.parent_type");
-        DMXObject t2 = compDef.getDMXObjectByRole("dmx.core.child_type");
+        DMXObject t1 = compDef.getDMXObjectByRole(PARENT_TYPE);
+        DMXObject t2 = compDef.getDMXObjectByRole(CHILD_TYPE);
         assertEquals("dmx.core.plugin",              t1.getUri());
         assertEquals(TOPIC_TYPE,          t1.getTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", t2.getUri());
@@ -618,29 +618,26 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXType type = dmx.getTopicType("dmx.core.plugin");
         //
         // find comp def 1/3
-        RelatedAssoc compDef = type.getRelatedAssoc("dmx.core.aggregation", "dmx.core.type", "dmx.core.sequence_start",
-            null);   // othersAssocTypeUri=null
+        RelatedAssoc compDef = type.getRelatedAssoc("dmx.core.aggregation", TYPE, SEQUENCE_START, null);
+                                                                                        // othersAssocTypeUri=null
         logger.info("### comp def ID 1/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 2/3
-        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
-                                                                                              // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
         logger.info("### comp def ID 2/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 3/3
-        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
-                                                                                              // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
         logger.info("### comp def ID 3/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // there is no other
-        compDef = compDef.getRelatedAssoc(SEQUENCE, "dmx.core.predecessor", "dmx.core.successor", null);
-                                                                                              // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
         assertNull(compDef);
     }
 
@@ -779,8 +776,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // retype assoc players
             Assoc assoc = childTypes.get(0).getRelatingAssoc();
-            assoc.getPlayer1().setRoleTypeUri("dmx.core.default");
-            assoc.getPlayer2().setRoleTypeUri("dmx.core.default");
+            assoc.getPlayer1().setRoleTypeUri(DEFAULT);
+            assoc.getPlayer2().setRoleTypeUri(DEFAULT);
             //
             // re-execute query
             childTypes = getChildTypes(type);
@@ -1293,19 +1290,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
-        return type.getRelatedTopics(INSTANTIATION,
-            "dmx.core.type", "dmx.core.instance", type.getUri());
+        return type.getRelatedTopics(INSTANTIATION, TYPE, INSTANCE, type.getUri());
     }
 
     private List<RelatedAssoc> getAssocInstancesByTraversal(String assocTypeUri) {
-        return dmx.getTopicByUri(assocTypeUri).getRelatedAssocs(INSTANTIATION,
-            "dmx.core.type", "dmx.core.instance", assocTypeUri);
+        return dmx.getTopicByUri(assocTypeUri).getRelatedAssocs(INSTANTIATION, TYPE, INSTANCE, assocTypeUri);
     }
 
     private List<RelatedTopic> getChildTypes(Topic type) {
-        return type.getRelatedTopics("dmx.core.composition_def", "dmx.core.parent_type", "dmx.core.child_type",
-            TOPIC_TYPE
-        );
+        return type.getRelatedTopics("dmx.core.composition_def", PARENT_TYPE, CHILD_TYPE, TOPIC_TYPE);
     }
 
     // ---
@@ -1338,27 +1331,25 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private Assoc createAssoc(Topic topic1, Topic topic2) {
         return dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
-            mf.newTopicPlayerModel(topic1.getId(), "dmx.core.default"),
-            mf.newTopicPlayerModel(topic2.getId(), "dmx.core.default")
+            mf.newTopicPlayerModel(topic1.getId(), DEFAULT),
+            mf.newTopicPlayerModel(topic2.getId(), DEFAULT)
         ));
     }
 
     private Assoc createAssoc(Topic topic, Assoc assoc) {
         return dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
-            mf.newTopicPlayerModel(topic.getId(), "dmx.core.default"),
-            mf.newAssocPlayerModel(assoc.getId(), "dmx.core.default")
+            mf.newTopicPlayerModel(topic.getId(), DEFAULT),
+            mf.newAssocPlayerModel(assoc.getId(), DEFAULT)
         ));
     }
 
     // ---
 
     private List<RelatedTopic> getTestTopics(Topic topic) {
-        return topic.getRelatedTopics(ASSOCIATION,
-            "dmx.core.default", "dmx.core.default", "dmx.core.plugin");
+        return topic.getRelatedTopics(ASSOCIATION, DEFAULT, DEFAULT, "dmx.core.plugin");
     }
 
     private List<RelatedAssoc> getTestAssocs(Topic topic) {
-        return topic.getRelatedAssocs(ASSOCIATION,
-            "dmx.core.default", "dmx.core.default", ASSOCIATION);
+        return topic.getRelatedAssocs(ASSOCIATION, DEFAULT, DEFAULT, ASSOCIATION);
     }
 }
