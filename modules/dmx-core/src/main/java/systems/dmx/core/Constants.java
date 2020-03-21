@@ -42,4 +42,8 @@ public class Constants {
     public static final String PREDECESSOR    = "dmx.core.predecessor";
     public static final String SUCCESSOR      = "dmx.core.successor";
     public static final String SEQUENCE_START = "dmx.core.sequence_start";
+
+    // cardinalities
+    public static final String ONE            = "dmx.core.one";
+    public static final String MANY           = "dmx.core.many";
 }

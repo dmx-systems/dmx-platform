@@ -252,7 +252,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", NUMBER));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", IDENTITY)
             .addCompDef(mf.newCompDefModel(
-                "lotto.draw", "lotto.number", "dmx.core.many"
+                "lotto.draw", "lotto.number", MANY
             ))
         );
     }
@@ -261,7 +261,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", NUMBER));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", VALUE)
             .addCompDef(mf.newCompDefModel(
-                "lotto.draw", "lotto.number", "dmx.core.many"
+                "lotto.draw", "lotto.number", MANY
             ))
         );
     }
@@ -270,7 +270,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
             .addCompDef(mf.newCompDefModel(
-                "simple.entity", "simple.name", "dmx.core.one"
+                "simple.entity", "simple.name", ONE
             ))
         );
     }
@@ -279,7 +279,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
             .addCompDef(mf.newCompDefModel(
-                "simple.entity", "simple.name", "dmx.core.many"
+                "simple.entity", "simple.name", MANY
             ))
         );
     }

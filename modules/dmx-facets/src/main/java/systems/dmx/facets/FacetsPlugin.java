@@ -187,7 +187,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     // ---
 
     private boolean isMultiFacet(String facetTypeUri) {
-        return getCompDef(facetTypeUri).getChildCardinalityUri().equals("dmx.core.many");
+        return getCompDef(facetTypeUri).getChildCardinalityUri().equals(MANY);
     }
 
     private String getChildTypeUri(String facetTypeUri) {

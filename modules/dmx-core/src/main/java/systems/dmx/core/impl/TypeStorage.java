@@ -496,7 +496,7 @@ class TypeStorage {
         if (cardinality != null) {
             return cardinality;
         } else {
-            return mf.newRelatedTopicModel(al.db.fetchTopic("uri", "dmx.core.one"));    // ### FIXME
+            return mf.newRelatedTopicModel(al.db.fetchTopic("uri", ONE));    // ### FIXME
         }
     }
 

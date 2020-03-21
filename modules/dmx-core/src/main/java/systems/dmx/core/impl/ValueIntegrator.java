@@ -840,7 +840,7 @@ class ValueIntegrator {
     }
 
     private boolean isOne(String compDefUri) {
-        return compDef(compDefUri).getChildCardinalityUri().equals("dmx.core.one");
+        return compDef(compDefUri).getChildCardinalityUri().equals(ONE);
     }
 
     private boolean isValueType() {
