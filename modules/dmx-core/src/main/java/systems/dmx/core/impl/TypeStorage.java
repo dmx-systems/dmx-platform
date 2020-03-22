@@ -257,7 +257,7 @@ class TypeStorage {
         // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dmx.core.topic_type"
         // and "dmx.core.meta_type" (the latter is required e.g. by dmx-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics("dmx.core.composition_def",
+        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(COMPOSITION_DEF,
             PARENT_TYPE, CHILD_TYPE, null);   // othersTopicTypeUri=null
         //
         // 2) create comp defs
@@ -329,12 +329,12 @@ class TypeStorage {
             // identity-attr flag
             RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assoc);
             if (isIdentityAttr != null) {   // ### TODO: should a isIdentityAttr topic always exist?
-                childTopics.put("dmx.core.identity_attr", isIdentityAttr);
+                childTopics.put(IDENTITY_ATTR, isIdentityAttr);
             }
             // include-in-label flag
             RelatedTopicModel includeInLabel = fetchIncludeInLabel(assoc);
             if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
-                childTopics.put("dmx.core.include_in_label", includeInLabel);
+                childTopics.put(INCLUDE_IN_LABEL, includeInLabel);
             }
             return mf.newCompDefModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
@@ -345,17 +345,17 @@ class TypeStorage {
 
     private RelatedTopicModel fetchCustomAssocType(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic("dmx.core.custom_assoc_type", PARENT, CHILD, ASSOC_TYPE);
+        return assoc.getRelatedTopic(CUSTOM_ASSOC_TYPE, PARENT, CHILD, ASSOC_TYPE);
     }
 
     private RelatedTopicModel fetchIsIdentityAttr(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic(COMPOSITION, PARENT, CHILD, "dmx.core.identity_attr");
+        return assoc.getRelatedTopic(COMPOSITION, PARENT, CHILD, IDENTITY_ATTR);
     }
 
     private RelatedTopicModel fetchIncludeInLabel(AssocModelImpl assoc) {
         // Note: we can't use model-driven retrieval. See comment above.
-        return assoc.getRelatedTopic(COMPOSITION, PARENT, CHILD, "dmx.core.include_in_label");
+        return assoc.getRelatedTopic(COMPOSITION, PARENT, CHILD, INCLUDE_IN_LABEL);
     }
 
     // ---
@@ -531,15 +531,15 @@ class TypeStorage {
     // ---
 
     private RelatedAssocModelImpl fetchSequenceStart(long typeId) {
-        return al.sd.fetchTopicRelatedAssoc(typeId, COMPOSITION, TYPE, SEQUENCE_START, "dmx.core.composition_def");
+        return al.sd.fetchTopicRelatedAssoc(typeId, COMPOSITION, TYPE, SEQUENCE_START, COMPOSITION_DEF);
     }
 
     private RelatedAssocModelImpl fetchSuccessor(long compDefId) {
-        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, PREDECESSOR, SUCCESSOR, "dmx.core.composition_def");
+        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, PREDECESSOR, SUCCESSOR, COMPOSITION_DEF);
     }
 
     private RelatedAssocModelImpl fetchPredecessor(long compDefId) {
-        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, SUCCESSOR, PREDECESSOR, "dmx.core.composition_def");
+        return al.sd.fetchAssocRelatedAssoc(compDefId, SEQUENCE, SUCCESSOR, PREDECESSOR, COMPOSITION_DEF);
     }
 
     // --- Store ---

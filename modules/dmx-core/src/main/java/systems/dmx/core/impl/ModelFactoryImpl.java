@@ -36,8 +36,6 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String TYPE_COMP_DEF = "dmx.core.composition_def";
-
     private static final String REF_ID_PREFIX  = "ref_id:";
     private static final String REF_URI_PREFIX = "ref_uri:";
     private static final String DEL_ID_PREFIX  = "del_id:";
@@ -706,7 +704,7 @@ public class ModelFactoryImpl implements ModelFactory {
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(
                 newAssocModel(compDef.optLong("id", -1), null,
-                    TYPE_COMP_DEF,
+                    COMPOSITION_DEF,
                     player1 != null ? player1 : parentPlayer(compDef.getString("parentTypeUri")),
                     player2 != null ? player2 : childPlayer(compDef.getString("childTypeUri")),
                     null, childTopics(compDef)
@@ -727,7 +725,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                      String childCardinalityUri,
                                      ViewConfigurationModel viewConfig) {
         return new CompDefModelImpl(
-            newAssocModel(id, uri, TYPE_COMP_DEF, parentPlayer(parentTypeUri), childPlayer(childTypeUri),
+            newAssocModel(id, uri, COMPOSITION_DEF, parentPlayer(parentTypeUri), childPlayer(childTypeUri),
                 null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
             ),
             (ViewConfigurationModelImpl) viewConfig
@@ -738,7 +736,7 @@ public class ModelFactoryImpl implements ModelFactory {
      * Internal.
      */
     CompDefModelImpl newCompDefModel(ChildTopicsModel childTopics) {
-        return new CompDefModelImpl(newAssocModel(TYPE_COMP_DEF, childTopics));
+        return new CompDefModelImpl(newAssocModel(COMPOSITION_DEF, childTopics));
     }
 
     // ---
@@ -767,8 +765,8 @@ public class ModelFactoryImpl implements ModelFactory {
                                          boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
             .putRef(CARDINALITY, cardinalityUri)
-            .put("dmx.core.identity_attr", isIdentityAttr)
-            .put("dmx.core.include_in_label", includeInLabel);
+            .put(IDENTITY_ATTR, isIdentityAttr)
+            .put(INCLUDE_IN_LABEL, includeInLabel);
         //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {

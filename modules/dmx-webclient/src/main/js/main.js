@@ -9,7 +9,7 @@ import extraElementUI from './element-ui'
 import 'font-awesome/css/font-awesome.css'
 import './websocket'
 
-console.log('[DMX] 2020/03/21')
+console.log('[DMX] 2020/03/22')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.

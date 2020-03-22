@@ -69,7 +69,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals(IDENTITY,   topicType.getDataTypeUri());
         assertEquals(3,                     topicType.getCompDefs().size());
         CompDef compDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
-        assertEquals("dmx.core.composition_def",     compDef.getTypeUri());
+        assertEquals(COMPOSITION_DEF,     compDef.getTypeUri());
         assertEquals("dmx.core.plugin",              compDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", compDef.getChildTypeUri());
         assertEquals(ONE,                 compDef.getChildCardinalityUri());
@@ -386,7 +386,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void hasIncludeInLabel() {
         // Note: the comp def is created while migration
         RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
-            .getCompDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
+            .getCompDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
         assertNotNull(includeInLabel);
         assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
     }
@@ -405,7 +405,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the added comp def
             RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
-                .getCompDef("dmx.test.date").getChildTopics().getTopicOrNull("dmx.core.include_in_label");
+                .getCompDef("dmx.test.date").getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
             assertNotNull(includeInLabel);
             assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
             //
@@ -424,10 +424,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             TopicTypeImpl tt = dmx.getTopicType("dmx.core.plugin");
             //
             // set "Include in Label" flag
-            ChildTopics ct = tt.getCompDef("dmx.core.plugin_name").getChildTopics()
-                .set("dmx.core.include_in_label", true);
+            ChildTopics ct = tt.getCompDef("dmx.core.plugin_name").getChildTopics().set(INCLUDE_IN_LABEL, true);
             //
-            assertEquals(true, ct.getBoolean("dmx.core.include_in_label"));
+            assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
             //
             List<String> lc = tt.getLabelConfig();
             assertEquals(1, lc.size());
@@ -452,14 +451,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                         "dmx.test.person", "dmx.test.date", ONE)));
             // test comp def children *before* set
             ChildTopics ct = tt.getCompDef("dmx.test.date#dmx.test.birthday").getChildTopics();
-            assertEquals(false, ct.getBoolean("dmx.core.include_in_label"));
+            assertEquals(false, ct.getBoolean(INCLUDE_IN_LABEL));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
             // 2) set "Include in Label" flag
-            ct.set("dmx.core.include_in_label", true);
+            ct.set(INCLUDE_IN_LABEL, true);
             //
             // test comp def children *after* set (custom assoc type must not change)
-            assertEquals(true, ct.getBoolean("dmx.core.include_in_label"));
+            assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
             List<String> lc = tt.getLabelConfig();
@@ -480,7 +479,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set "Include in Label" flag
             long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
-            dmx.getAssoc(compDefId).getChildTopics().set("dmx.core.include_in_label", false);
+            dmx.getAssoc(compDefId).getChildTopics().set(INCLUDE_IN_LABEL, false);
             //
             // comp def order must not have changed
             Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
@@ -721,7 +720,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assocs = getAssocInstancesByTraversal(INSTANTIATION);
         assertEquals(66, assocs.size());
         //
-        assocs = getAssocInstancesByTraversal("dmx.core.composition_def");
+        assocs = getAssocInstancesByTraversal(COMPOSITION_DEF);
         assertEquals(5, assocs.size());
     }
 
@@ -739,7 +738,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // retype assoc
             Assoc assoc = childTypes.get(0).getRelatingAssoc();
-            assertEquals("dmx.core.composition_def", assoc.getTypeUri());
+            assertEquals(COMPOSITION_DEF, assoc.getTypeUri());
             assoc.setTypeUri(ASSOCIATION);
             assertEquals(ASSOCIATION, assoc.getTypeUri());
             assoc = dmx.getAssoc(assoc.getId());
@@ -1298,7 +1297,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedTopic> getChildTypes(Topic type) {
-        return type.getRelatedTopics("dmx.core.composition_def", PARENT_TYPE, CHILD_TYPE, TOPIC_TYPE);
+        return type.getRelatedTopics(COMPOSITION_DEF, PARENT_TYPE, CHILD_TYPE, TOPIC_TYPE);
     }
 
     // ---

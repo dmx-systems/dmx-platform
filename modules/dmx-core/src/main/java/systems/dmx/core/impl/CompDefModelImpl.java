@@ -148,7 +148,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     final boolean isIdentityAttr() {
-        TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dmx.core.identity_attr");
+        TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull(IDENTITY_ATTR);
         if (isIdentityAttr == null) {
             // ### TODO: should a isIdentityAttr topic always exist?
             // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Identity Attribute\" topic");
@@ -158,7 +158,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     final boolean includeInLabel() {
-        TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dmx.core.include_in_label");
+        TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull(INCLUDE_IN_LABEL);
         if (includeInLabel == null) {
             // ### TODO: should a includeInLabel topic always exist?
             // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Include in Label\" topic");
@@ -215,7 +215,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     private String defaultInstanceLevelAssocTypeUri() {
-        if (typeUri.equals("dmx.core.composition_def")) {
+        if (typeUri.equals(COMPOSITION_DEF)) {
             return COMPOSITION;
         } else {
             throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");

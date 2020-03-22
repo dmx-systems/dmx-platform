@@ -142,7 +142,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // ID of the comp def to be updated. -1 if the update does not target an comp def (but a type).
         long compDefId = -1;
         if (type == null) {
-            Assoc compDef = viewConfigTopic.getRelatedAssoc(COMPOSITION, CHILD, PARENT, "dmx.core.composition_def");
+            Assoc compDef = viewConfigTopic.getRelatedAssoc(COMPOSITION, CHILD, PARENT, COMPOSITION_DEF);
             if (compDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }
