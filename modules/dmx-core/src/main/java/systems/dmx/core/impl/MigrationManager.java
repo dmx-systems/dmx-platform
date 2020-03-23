@@ -49,7 +49,7 @@ class MigrationManager {
      * Determines the migrations to be run for the specified plugin, and runs them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
-        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dmx.core.plugin_migration_nr")
+        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic(PLUGIN_MIGRATION_NR)
             .getSimpleValue().intValue();
         int requiredModelVersion = Integer.parseInt(plugin.getConfigProperty("dmx.plugin.model_version", "0"));
         int migrationsToRun = requiredModelVersion - installedModelVersion;

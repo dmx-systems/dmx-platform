@@ -17,6 +17,11 @@ public class Constants {
     public static final String CARDINALITY       = "dmx.core.cardinality";
     public static final String IDENTITY_ATTR     = "dmx.core.identity_attr";
     public static final String INCLUDE_IN_LABEL  = "dmx.core.include_in_label";
+    //
+    public static final String PLUGIN               = "dmx.core.plugin";
+    public static final String PLUGIN_NAME          = "dmx.core.plugin_name";
+    public static final String PLUGIN_SYMBOLIC_NAME = "dmx.core.plugin_symbolic_name";
+    public static final String PLUGIN_MIGRATION_NR  = "dmx.core.plugin_migration_nr";
 
     // assoc types
     public static final String ASSOCIATION       = "dmx.core.association";

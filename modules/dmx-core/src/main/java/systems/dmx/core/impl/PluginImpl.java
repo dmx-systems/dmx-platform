@@ -239,7 +239,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getChildTopics().set("dmx.core.plugin_migration_nr", migrationNr);
+        pluginTopic.getChildTopics().set(PLUGIN_MIGRATION_NR, migrationNr);
     }
 
     // ---
@@ -579,10 +579,10 @@ public class PluginImpl implements Plugin, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private Topic createPluginTopic() {
-        return dmx.createTopic(mf.newTopicModel(pluginUri, "dmx.core.plugin", mf.newChildTopicsModel()
-            .put("dmx.core.plugin_name", pluginName())
-            .put("dmx.core.plugin_symbolic_name", pluginUri)
-            .put("dmx.core.plugin_migration_nr", 0)
+        return dmx.createTopic(mf.newTopicModel(pluginUri, PLUGIN, mf.newChildTopicsModel()
+            .put(PLUGIN_NAME, pluginName())
+            .put(PLUGIN_SYMBOLIC_NAME, pluginUri)
+            .put(PLUGIN_MIGRATION_NR, 0)
         ));
     }
 

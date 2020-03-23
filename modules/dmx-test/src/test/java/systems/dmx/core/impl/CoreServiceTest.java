@@ -63,21 +63,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void typeDefinition() {
-        TopicType topicType = dmx.getTopicType("dmx.core.plugin");
-        assertEquals("dmx.core.plugin",     topicType.getUri());
+        TopicType topicType = dmx.getTopicType(PLUGIN);
+        assertEquals(PLUGIN,     topicType.getUri());
         assertEquals(TOPIC_TYPE, topicType.getTypeUri());
         assertEquals(IDENTITY,   topicType.getDataTypeUri());
-        assertEquals(3,                     topicType.getCompDefs().size());
-        CompDef compDef = topicType.getCompDef("dmx.core.plugin_migration_nr");
+        assertEquals(3,          topicType.getCompDefs().size());
+        CompDef compDef = topicType.getCompDef(PLUGIN_MIGRATION_NR);
         assertEquals(COMPOSITION_DEF,     compDef.getTypeUri());
-        assertEquals("dmx.core.plugin",              compDef.getParentTypeUri());
-        assertEquals("dmx.core.plugin_migration_nr", compDef.getChildTypeUri());
+        assertEquals(PLUGIN,              compDef.getParentTypeUri());
+        assertEquals(PLUGIN_MIGRATION_NR, compDef.getChildTypeUri());
         assertEquals(ONE,                 compDef.getChildCardinalityUri());
         DMXObject t1 = compDef.getDMXObjectByRole(PARENT_TYPE);
         DMXObject t2 = compDef.getDMXObjectByRole(CHILD_TYPE);
-        assertEquals("dmx.core.plugin",              t1.getUri());
+        assertEquals(PLUGIN,              t1.getUri());
         assertEquals(TOPIC_TYPE,          t1.getTypeUri());
-        assertEquals("dmx.core.plugin_migration_nr", t2.getUri());
+        assertEquals(PLUGIN_MIGRATION_NR, t2.getUri());
         assertEquals(TOPIC_TYPE,          t2.getTypeUri());
     }
 
@@ -85,17 +85,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void createWithoutComposite() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", "dmx.core.plugin",
+            Topic topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
                 new SimpleValue("DMX Notes")));
             //
-            topic.getChildTopics().set("dmx.core.plugin_migration_nr", 23);
+            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 23);
             //
-            int nr = topic.getChildTopics().getTopic("dmx.core.plugin_migration_nr").getSimpleValue().intValue();
+            int nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getChildTopics().set("dmx.core.plugin_migration_nr", 42);
+            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 42);
             //
-            nr = topic.getChildTopics().getTopic("dmx.core.plugin_migration_nr").getSimpleValue().intValue();
+            nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -109,18 +109,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // Note: has() is internal API, so we need a TopicImpl here
-            TopicImpl topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", "dmx.core.plugin",
-                mf.newChildTopicsModel().put("dmx.core.plugin_migration_nr", 23)
+            TopicImpl topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
+                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
             ));
             //
-            assertTrue(topic.getChildTopics().has("dmx.core.plugin_migration_nr"));
+            assertTrue(topic.getChildTopics().has(PLUGIN_MIGRATION_NR));
             //
-            int nr = topic.getChildTopics().getTopic("dmx.core.plugin_migration_nr").getSimpleValue().intValue();
+            int nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getChildTopics().set("dmx.core.plugin_migration_nr", 42);
+            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 42);
             //
-            nr = topic.getChildTopics().getTopic("dmx.core.plugin_migration_nr").getSimpleValue().intValue();
+            nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -135,17 +135,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void onDemandChildTopicLoading() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            dmx.createTopic(mf.newTopicModel("systems.dmx.notes", "dmx.core.plugin",
-                mf.newChildTopicsModel().put("dmx.core.plugin_migration_nr", 23)
+            dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
+                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
             ChildTopicsImpl comp = topic.getChildTopics();
-            assertFalse(comp.has("dmx.core.plugin_migration_nr"));              // child topic is not yet loaded
+            assertFalse(comp.has(PLUGIN_MIGRATION_NR));                 // child topic is not yet loaded
             //
-            Topic childTopic = comp.getTopic("dmx.core.plugin_migration_nr");
-            assertEquals(23, childTopic.getSimpleValue().intValue());           // child topic is loaded on-demand
-            assertTrue(comp.has("dmx.core.plugin_migration_nr"));               // child topic is now loaded
+            Topic childTopic = comp.getTopic(PLUGIN_MIGRATION_NR);
+            assertEquals(23, childTopic.getSimpleValue().intValue());   // child topic is loaded on-demand
+            assertTrue(comp.has(PLUGIN_MIGRATION_NR));                  // child topic is now loaded
             //
             tx.success();
         } finally {
@@ -157,16 +157,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void onDemandChildTopicLoadingWithConvenienceAccessor() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            dmx.createTopic(mf.newTopicModel("systems.dmx.notes", "dmx.core.plugin",
-                mf.newChildTopicsModel().put("dmx.core.plugin_migration_nr", 23)
+            dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
+                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
             ChildTopicsImpl comp = topic.getChildTopics();
-            assertFalse(comp.has("dmx.core.plugin_migration_nr"));              // child topic is not yet loaded
+            assertFalse(comp.has(PLUGIN_MIGRATION_NR));              // child topic is not yet loaded
             //
-            assertEquals(23, comp.getInt("dmx.core.plugin_migration_nr"));      // child topic is loaded on-demand
-            assertTrue(comp.has("dmx.core.plugin_migration_nr"));               // child topic is now loaded
+            assertEquals(23, comp.getInt(PLUGIN_MIGRATION_NR));      // child topic is loaded on-demand
+            assertTrue(comp.has(PLUGIN_MIGRATION_NR));               // child topic is now loaded
             //
             tx.success();
         } finally {
@@ -180,11 +180,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithSetChildTopics() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.setChildTopics(mf.newChildTopicsModel().put("dmx.core.plugin_name", "My Plugin"));
-            assertEquals("My Plugin", topic.getChildTopics().getString("dmx.core.plugin_name"));
+            topic.setChildTopics(mf.newChildTopicsModel().put(PLUGIN_NAME, "My Plugin"));
+            assertEquals("My Plugin", topic.getChildTopics().getString(PLUGIN_NAME));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             Topic fetchedTopic = dmx.getTopic(topic.getId());
@@ -200,11 +200,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithChildTopicsSet() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.getChildTopics().set("dmx.core.plugin_name", "My Plugin");
-            assertEquals("My Plugin", topic.getChildTopics().getString("dmx.core.plugin_name"));
+            topic.getChildTopics().set(PLUGIN_NAME, "My Plugin");
+            assertEquals("My Plugin", topic.getChildTopics().getString(PLUGIN_NAME));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             Topic fetchedTopic = dmx.getTopic(topic.getId());
@@ -222,16 +222,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setLabelChildWhileChildrenAreNotLoaded() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin", mf.newChildTopicsModel()
-                .put("dmx.core.plugin_name", "My Plugin")
-                .put("dmx.core.plugin_symbolic_name", "dmx.test.my_plugin")
-                .put("dmx.core.plugin_migration_nr", 1)
+            Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN, mf.newChildTopicsModel()
+                .put(PLUGIN_NAME, "My Plugin")
+                .put(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
+                .put(PLUGIN_MIGRATION_NR, 1)
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
-            topic.getChildTopics().set("dmx.core.plugin_name", "HuHu");     // setting child used for labeling
+            topic.getChildTopics().set(PLUGIN_NAME, "HuHu");     // setting child used for labeling
             assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
             //
             tx.success();
@@ -244,16 +244,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setNonlabelChildWhileChildrenAreNotLoaded() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.core.plugin", mf.newChildTopicsModel()
-                .put("dmx.core.plugin_name", "My Plugin")
-                .put("dmx.core.plugin_symbolic_name", "dmx.test.my_plugin")
-                .put("dmx.core.plugin_migration_nr", 1)
+            Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN, mf.newChildTopicsModel()
+                .put(PLUGIN_NAME, "My Plugin")
+                .put(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
+                .put(PLUGIN_MIGRATION_NR, 1)
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
-            topic.getChildTopics().set("dmx.core.plugin_migration_nr", 3);  // setting child NOT used for labeling
+            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 3);             // setting child NOT used for labeling
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
             //
             tx.success();
@@ -385,8 +385,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void hasIncludeInLabel() {
         // Note: the comp def is created while migration
-        RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
-            .getCompDef("dmx.core.plugin_name").getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
+        RelatedTopic includeInLabel = dmx.getTopicType(PLUGIN)
+            .getCompDef(PLUGIN_NAME).getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
         assertNotNull(includeInLabel);
         assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
     }
@@ -397,14 +397,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // add comp def programmatically
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", TEXT));
-            dmx.getTopicType("dmx.core.plugin").addCompDef(
+            dmx.getTopicType(PLUGIN).addCompDef(
                 mf.newCompDefModel(
-                    "dmx.core.plugin", "dmx.test.date", ONE
+                    PLUGIN, "dmx.test.date", ONE
                 ));
             //
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the added comp def
-            RelatedTopic includeInLabel = dmx.getTopicType("dmx.core.plugin")
+            RelatedTopic includeInLabel = dmx.getTopicType(PLUGIN)
                 .getCompDef("dmx.test.date").getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
             assertNotNull(includeInLabel);
             assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
@@ -421,16 +421,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setIncludeInLabel() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            TopicTypeImpl tt = dmx.getTopicType("dmx.core.plugin");
+            TopicTypeImpl tt = dmx.getTopicType(PLUGIN);
             //
             // set "Include in Label" flag
-            ChildTopics ct = tt.getCompDef("dmx.core.plugin_name").getChildTopics().set(INCLUDE_IN_LABEL, true);
+            ChildTopics ct = tt.getCompDef(PLUGIN_NAME).getChildTopics().set(INCLUDE_IN_LABEL, true);
             //
             assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
             //
             List<String> lc = tt.getLabelConfig();
             assertEquals(1, lc.size());
-            assertEquals("dmx.core.plugin_name", lc.get(0));
+            assertEquals(PLUGIN_NAME, lc.get(0));
             //
             tx.success();
         } finally {
@@ -478,18 +478,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set "Include in Label" flag
-            long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
+            long compDefId = dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getId();
             dmx.getAssoc(compDefId).getChildTopics().set(INCLUDE_IN_LABEL, false);
             //
             // comp def order must not have changed
-            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            Collection<CompDef> compDefs = dmx.getTopicType(PLUGIN).getCompDefs();
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated comp defs
             assertEquals(3, compDefs.size());
             Iterator<CompDef> i = compDefs.iterator();
-            assertEquals("dmx.core.plugin_name",          i.next().getCompDefUri());
-            assertEquals("dmx.core.plugin_symbolic_name", i.next().getCompDefUri());
-            assertEquals("dmx.core.plugin_migration_nr",  i.next().getCompDefUri());
+            assertEquals(PLUGIN_NAME,          i.next().getCompDefUri());
+            assertEquals(PLUGIN_SYMBOLIC_NAME, i.next().getCompDefUri());
+            assertEquals(PLUGIN_MIGRATION_NR,  i.next().getCompDefUri());
             //
             tx.success();
         } finally {
@@ -502,11 +502,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Assoc Type (via comp def)
-            dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getChildTopics()
+            dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION);
             //
             // get Custom Assoc Type
-            Topic assocType = dmx.getTopicType("dmx.core.plugin")
+            Topic assocType = dmx.getTopicType(PLUGIN)
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
@@ -524,12 +524,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Assoc Type (via association)
-            long compDefId = dmx.getTopicType("dmx.core.plugin").getCompDef("dmx.core.plugin_name").getId();
+            long compDefId = dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getId();
             dmx.getAssoc(compDefId).getChildTopics()
                 .setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION);
             //
             // get Custom Assoc Type
-            Topic assocType = dmx.getTopicType("dmx.core.plugin")
+            Topic assocType = dmx.getTopicType(PLUGIN)
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
                 .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
             // Note: the topic type must be re-get as getTopicType() creates
@@ -548,10 +548,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void uriUniquenessCreateTopic() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.my.uri", "dmx.core.plugin"));
+            Topic topic = dmx.createTopic(mf.newTopicModel("dmx.my.uri", PLUGIN));
             assertEquals("dmx.my.uri", topic.getUri());
             //
-            dmx.createTopic(mf.newTopicModel("dmx.my.uri", "dmx.core.plugin"));
+            dmx.createTopic(mf.newTopicModel("dmx.my.uri", PLUGIN));
             fail("\"URI not unique\" exception not thrown");
             //
             tx.success();
@@ -568,10 +568,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void uriUniquenessSetUri() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic topic1 = dmx.createTopic(mf.newTopicModel("dmx.my.uri", "dmx.core.plugin"));
+            Topic topic1 = dmx.createTopic(mf.newTopicModel("dmx.my.uri", PLUGIN));
             assertEquals("dmx.my.uri", topic1.getUri());
             //
-            Topic topic2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic topic2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic2.getUri());
             //
             topic2.setUri("dmx.my.uri");
@@ -590,14 +590,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         long topic2Id = -1;
         try {
-            Topic topic1 = dmx.createTopic(mf.newTopicModel("dmx.my.uri", "dmx.core.plugin"));
+            Topic topic1 = dmx.createTopic(mf.newTopicModel("dmx.my.uri", PLUGIN));
             assertEquals("dmx.my.uri", topic1.getUri());
             //
-            Topic topic2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic topic2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
             topic2Id = topic2.getId();
             assertEquals("", topic2.getUri());
             //
-            topic2.update(mf.newTopicModel("dmx.my.uri", "dmx.core.plugin"));
+            topic2.update(mf.newTopicModel("dmx.my.uri", PLUGIN));
             fail("\"URI not unique\" exception not thrown");
             //
             tx.success();
@@ -614,7 +614,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void compDefSequence() {
-        DMXType type = dmx.getTopicType("dmx.core.plugin");
+        DMXType type = dmx.getTopicType(PLUGIN);
         //
         // find comp def 1/3
         RelatedAssoc compDef = type.getRelatedAssoc("dmx.core.aggregation", TYPE, SEQUENCE_START, null);
@@ -649,21 +649,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", TEXT));
             // insert comp def at pos 0
-            dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
-                mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", ONE),
-                "dmx.core.plugin_name"
+            dmx.getTopicType(PLUGIN).addCompDefBefore(
+                mf.newCompDefModel(PLUGIN, "dmx.test.name", ONE),
+                PLUGIN_NAME
             );
             //
             // Note: the type manipulators (here: addCompDefBefore()) operate on the *kernel* type model, while the
             // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            Collection<CompDef> compDefs = dmx.getTopicType(PLUGIN).getCompDefs();
             assertSame(4, compDefs.size());
             //
             Iterator<CompDef> i = compDefs.iterator();
-            assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new comp def is at pos 0
-            assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
+            assertEquals("dmx.test.name", i.next().getChildTypeUri());      // new comp def is at pos 0
+            assertEquals(PLUGIN_NAME, i.next().getChildTypeUri());          // former pos 0 is now at pos 1
             //
             tx.success();
         } finally {
@@ -678,22 +678,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // create child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", TEXT));
             // insert comp def at pos 1
-            dmx.getTopicType("dmx.core.plugin").addCompDefBefore(
-                mf.newCompDefModel("dmx.core.plugin", "dmx.test.name", ONE),
-                "dmx.core.plugin_symbolic_name"
+            dmx.getTopicType(PLUGIN).addCompDefBefore(
+                mf.newCompDefModel(PLUGIN, "dmx.test.name", ONE),
+                PLUGIN_SYMBOLIC_NAME
             );
             //
             // Note: the type manipulators (here: addCompDefBefore()) operate on the *kernel* type model, while the
             // accessors (here: getCompDefs()) operate on the *userland* type model, which is a cloned (and filtered)
             // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
             // change we must re-get the userland type model (by getTopicType()).
-            Collection<CompDef> compDefs = dmx.getTopicType("dmx.core.plugin").getCompDefs();
+            Collection<CompDef> compDefs = dmx.getTopicType(PLUGIN).getCompDefs();
             assertSame(4, compDefs.size());
             //
             Iterator<CompDef> i = compDefs.iterator();
-            assertEquals("dmx.core.plugin_name", i.next().getChildTypeUri());           // pos 0 is unchanged
-            assertEquals("dmx.test.name", i.next().getChildTypeUri());                  // new comp def is at pos 1
-            assertEquals("dmx.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2
+            assertEquals(PLUGIN_NAME, i.next().getChildTypeUri());              // pos 0 is unchanged
+            assertEquals("dmx.test.name", i.next().getChildTypeUri());          // new comp def is at pos 1
+            assertEquals(PLUGIN_SYMBOLIC_NAME, i.next().getChildTypeUri());     // former pos 1 is now at pos 2
             //
             tx.success();
         } finally {
@@ -732,7 +732,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> childTypes;
         try {
-            type = dmx.getTopicByUri("dmx.core.plugin");
+            type = dmx.getTopicByUri(PLUGIN);
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
             //
@@ -769,7 +769,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> childTypes;
         try {
-            type = dmx.getTopicByUri("dmx.core.plugin");
+            type = dmx.getTopicByUri(PLUGIN);
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
             //
@@ -813,7 +813,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // retype the first topic
             Topic topic = topics.get(0);
-            assertEquals("dmx.core.plugin", topic.getTypeUri());
+            assertEquals(PLUGIN, topic.getTypeUri());
             topic.setTypeUri(DATA_TYPE);
             assertEquals(DATA_TYPE, topic.getTypeUri());
             topic = dmx.getTopic(topic.getId());
@@ -1227,7 +1227,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void deleteTopic() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            dmx.createTopic(mf.newTopicModel("dmx.test.t0", "dmx.core.plugin"));
+            dmx.createTopic(mf.newTopicModel("dmx.test.t0", PLUGIN));
             //
             Topic t0 = dmx.getTopicByUri("dmx.test.t0");
             assertNotNull(t0);
@@ -1248,8 +1248,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void coreACAssignTopicToWorkspace() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-            Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+            Topic ws = dmx.createTopic(mf.newTopicModel(PLUGIN));
             //
             dmx.getPrivilegedAccess().assignToWorkspace(t1, ws.getId());
             //
@@ -1266,9 +1266,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void coreACAssignAssocToWorkspace() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-            Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-            Topic ws = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+            Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+            Topic t2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+            Topic ws = dmx.createTopic(mf.newTopicModel(PLUGIN));
             Assoc assoc = createAssoc(t1, t2);
             //
             dmx.getPrivilegedAccess().assignToWorkspace(assoc, ws.getId());
@@ -1303,21 +1303,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private void setupTestTopics() {
-        Topic t0 = dmx.createTopic(mf.newTopicModel("dmx.test.t0", "dmx.core.plugin"));
-        Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Topic t3 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+        Topic t0 = dmx.createTopic(mf.newTopicModel("dmx.test.t0", PLUGIN));
+        Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+        Topic t2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+        Topic t3 = dmx.createTopic(mf.newTopicModel(PLUGIN));
         createAssoc(t0, t1);
         createAssoc(t0, t2);
         createAssoc(t0, t3);
     }
 
     private void setupTestAssocs() {
-        Topic t0 = dmx.createTopic(mf.newTopicModel("dmx.test.t0", "dmx.core.plugin"));
-        Topic t1 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Topic t2 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Topic t3 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
-        Topic t4 = dmx.createTopic(mf.newTopicModel("dmx.core.plugin"));
+        Topic t0 = dmx.createTopic(mf.newTopicModel("dmx.test.t0", PLUGIN));
+        Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+        Topic t2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+        Topic t3 = dmx.createTopic(mf.newTopicModel(PLUGIN));
+        Topic t4 = dmx.createTopic(mf.newTopicModel(PLUGIN));
         Assoc a1 = createAssoc(t1, t2);
         Assoc a2 = createAssoc(t2, t3);
         Assoc a3 = createAssoc(t3, t4);
@@ -1345,7 +1345,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private List<RelatedTopic> getTestTopics(Topic topic) {
-        return topic.getRelatedTopics(ASSOCIATION, DEFAULT, DEFAULT, "dmx.core.plugin");
+        return topic.getRelatedTopics(ASSOCIATION, DEFAULT, DEFAULT, PLUGIN);
     }
 
     private List<RelatedAssoc> getTestAssocs(Topic topic) {
