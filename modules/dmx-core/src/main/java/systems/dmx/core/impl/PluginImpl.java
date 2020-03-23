@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;

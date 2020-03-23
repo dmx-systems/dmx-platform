@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.service.Migration;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.Plugin;

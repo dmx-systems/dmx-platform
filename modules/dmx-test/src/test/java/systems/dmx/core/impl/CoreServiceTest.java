@@ -231,7 +231,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
-            topic.getChildTopics().set(PLUGIN_NAME, "HuHu");     // setting child used for labeling
+            topic.getChildTopics().set(PLUGIN_NAME, "HuHu");                // setting child used for labeling
             assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
             //
             tx.success();
