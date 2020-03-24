@@ -3,11 +3,12 @@ import dm5 from 'dm5'
 import axios from 'axios'
 import Vue from 'vue'
 
-let extraElementUI
+let plugins = []          // installed plugins; array of plugin config objects
+let _extraElementUI       // a function that loads the extra Element UI components
 
-export default (_extraElementUI) => {
+export default (extraElementUI) => {
   //
-  extraElementUI = _extraElementUI
+  _extraElementUI = extraElementUI
   //
   // Init order notes:
   //  1. dmx-search provides the registerExtraMenuItems() action.
@@ -27,13 +28,20 @@ export default (_extraElementUI) => {
   // while development add your plugins here
   // initPlugin(require('modules-external/my-plugin/src/main/js/plugin.js').default)
   //
+  let p     // a promise resolved once the assets of all installed plugins are registered
   if (DEV) {
     console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
       'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement add your plugin to ' +
       'modules/dmx-webclient/src/main/js/plugin_manager.js')
+    p = Promise.resolve()
   } else {
-    fetchPluginsFromServer()
+    p = fetchPluginsFromServer().then(plugins => Promise.all(plugins))
   }
+  // invoke init hook
+  p.then(() => {
+    console.log('Initializing plugins', plugins.length)
+    plugins.forEach(plugin => plugin.init && plugin.init())
+  })
 }
 
 /**
@@ -43,6 +51,8 @@ export default (_extraElementUI) => {
  */
 function initPlugin (pluginConfig) {
   const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dm5, axios, Vue}) : pluginConfig
+  // register plugin
+  plugins.push(_pluginConfig)
   // store module
   const storeModule = _pluginConfig.storeModule
   if (storeModule) {
@@ -62,10 +72,10 @@ function initPlugin (pluginConfig) {
   }
   // extra Element UI components
   if (_pluginConfig.extraElementUI) {
-    extraElementUI()
+    _extraElementUI()
   }
   // webclient components
-  const components = _pluginConfig.components    // TODO: rename prop to "webclient"
+  const components = _pluginConfig.components    // TODO: rename prop to "webclient"?
   if (components) {
     components.forEach(compDef => {
       store.dispatch('registerComponent', compDef)
@@ -108,16 +118,20 @@ function registerDetailRenderers (renderers, renderer) {
  * Note: only frontend script/style of *external* plugins (not included in the DMX standard distro) is fetched.
  * In contrast the frontend script of the *standard* plugins is "linked" into the Webclient at build time.
  * A standard plugin's .jar file does not contain a `plugin.js` file.
+ *
+ * @return  a promise for an array containing promises for all installed plugins. These promises
+ *          are resolved once the respective plugin is fetched and its assets are registered.
  */
 function fetchPluginsFromServer () {
-  dm5.restClient.getPlugins().then(pluginInfos => {
+  return dm5.restClient.getPlugins().then(pluginInfos => {
+    const plugins = []      // array of promises for plugin exports
     console.group("[DMX] Fetching plugins")
     pluginInfos.forEach(pluginInfo => {
       if (pluginInfo.pluginFile || pluginInfo.styleFile) {
         console.group(pluginInfo.pluginUri)
         if (pluginInfo.pluginFile) {
           console.log('script', pluginInfo.pluginFile)
-          fetchPlugin(pluginInfo).then(initPlugin)
+          plugins.push(fetchPlugin(pluginInfo).then(initPlugin))
         }
         if (pluginInfo.styleFile) {
           console.log('stylesheet', pluginInfo.styleFile)
@@ -127,6 +141,7 @@ function fetchPluginsFromServer () {
       }
     })
     console.groupEnd()
+    return plugins
   })
 }
 
