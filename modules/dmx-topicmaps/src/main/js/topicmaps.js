@@ -32,6 +32,7 @@ const state = {
                               //       uri:
                               //       name:
                               //       renderer:
+                              //       hidden:
                               //     }
                               //   }
 

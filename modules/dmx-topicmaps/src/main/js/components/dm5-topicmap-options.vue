@@ -18,7 +18,7 @@ export default {
 
   computed: {
     topicmapTypes () {
-      return this.$store.state.topicmaps.topicmapTypes
+      return Object.values(this.$store.state.topicmaps.topicmapTypes).filter(type => !type.hidden)
     }
   }
 }
