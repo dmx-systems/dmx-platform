@@ -217,7 +217,7 @@ function confirmDeletion (idLists) {
     message = "You're about to delete multiple items"
     buttonText = `Delete ${_size} items`
   } else {
-    message = `You're about to delete ${idLists.topicIds.length ? 'a topic' : 'an association'}`
+    message = `You're about to delete a ${viewObject(idLists).typeName}`
     buttonText = 'Delete'
   }
   return MessageBox.confirm(message, 'Warning', {
@@ -232,6 +232,11 @@ function confirmDeletion (idLists) {
 // TODO: unify selection models (see selection.js in dmx-topicmaps module)
 function size (idLists) {
   return idLists.topicIds.length + idLists.assocIds.length
+}
+
+function viewObject (idLists) {
+  const id = idLists.topicIds.length ? idLists.topicIds[0] : idLists.assocIds[0]
+  return state.topicmaps.topicmap.getObject(id)
 }
 
 //
