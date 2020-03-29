@@ -75,22 +75,19 @@ Promise.all([
 // Windows workaround to suppress the browser's native context menu on
 // - right-clicking the canvas (to invoke search/create dialog)
 // - right-clicking a topic/assoc (to invoke Cytoscape context menu command)
+// - a dialog appears as the recation of a Cytoscape context menu command
 // Note: in contrast to other platforms on Windows the target of the "contextmenu" event is not the canvas but
-// - the search/create dialog (or its wrapper)
+// - a dialog (or its wrapper)
 // - the delete warning message box (or its wrapper)
 // Note: in contrast to the dialog the message box is not a child of <dm5-webclient> component, so we attach
 // the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
   // console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)
-  // search dialog
-  const inSearchDialog = document.querySelector('.dm5-search-widget').parentNode.contains(e.target)
-  // message box
-  // Note: the message box wrapper is added to DOM only on 1st message box invocation
-  const messageBoxWrapper = document.querySelector('.el-message-box__wrapper')
-  const inMessageBox = messageBoxWrapper && messageBoxWrapper.contains(e.target)
+  const inDialog     = e.target.closest('.el-dialog__wrapper')
+  const inMessageBox = e.target.closest('.el-message-box__wrapper')
   //
-  // console.log(inSearchDialog, inMessageBox)
-  if (inSearchDialog || inMessageBox) {
+  // console.log(inDialog, inMessageBox)
+  if (inDialog || inMessageBox) {
     e.preventDefault()
   }
 })
