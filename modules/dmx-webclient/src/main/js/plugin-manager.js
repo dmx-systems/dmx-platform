@@ -23,6 +23,7 @@ export default (extraElementUI) => {
   initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-contacts/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-help-menu/src/main/js/plugin.js').default)
   //
   // while development add your plugins here
