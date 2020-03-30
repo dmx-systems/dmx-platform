@@ -46,7 +46,7 @@ Continuous integration:
 ### Copyright + Licensing
 
 Copyright (C) 2000-2018 Jörg Richter <jri@dmx.berlin> et al.  
-Copyright (C) 2019 DMX Systems <https://dmx.systems>
+Copyright (C) 2019-2020 DMX Systems <https://dmx.systems>
 
 DeepaMehta 5 is available freely under the GNU Affero General Public License, version 3.
 
@@ -59,4 +59,4 @@ DeepaMehta is under heavy development. While you can do productive work with it,
 
 
 ------------
-Nov 23, 2019
+Mar 30, 2020

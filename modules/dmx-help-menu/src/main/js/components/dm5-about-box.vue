@@ -4,7 +4,7 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.0-beta-7-SNAPSHOT
+        5.0-beta-7
       </div>
       <div class="field">
         <div class="field-label">Released</div>
