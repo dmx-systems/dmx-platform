@@ -4,11 +4,11 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.0-beta-7
+        5.0-SNAPSHOT
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Mar 30, 2020
+        Apr 2, 2020
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -18,7 +18,7 @@
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2019&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
+        2020&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
           DMX Systems
         </el-link>
       </div>
