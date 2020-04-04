@@ -6,6 +6,9 @@ import Vue from 'vue'
 let plugins = []          // installed plugins; array of plugin config objects
 let _extraElementUI       // a function that loads the extra Element UI components
 
+/**
+ * @returns   a promise resolved once all plugins are loaded and initialized.
+ */
 export default (extraElementUI) => {
   //
   _extraElementUI = extraElementUI
@@ -39,7 +42,7 @@ export default (extraElementUI) => {
     p = fetchPluginsFromServer().then(plugins => Promise.all(plugins))
   }
   // invoke init hook
-  p.then(() => {
+  return p.then(() => {
     console.log('Initializing plugins', plugins.length)
     plugins.forEach(plugin => plugin.init && plugin.init())
   })

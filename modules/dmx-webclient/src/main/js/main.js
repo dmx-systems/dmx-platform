@@ -9,7 +9,7 @@ import extraElementUI from './element-ui'
 import 'font-awesome/css/font-awesome.css'
 import './websocket'
 
-console.log('[DMX] 2020/04/02')
+console.log('[DMX] 2020/04/04')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
@@ -28,16 +28,18 @@ const root = new Vue({
   render: h => h(App)
 })
 
-// 3) Load plugins
-// Note: loading plugins and mounting the Weblient toplevel components (step 5) does not require synchronization at the
-// moment. This is because all toplevel components (basically dm5-topicmap-panel and dm5-detail-panel) are provided by
-// *standard* plugins. Standard plugins are "linked" into the Webclient at build time. At runtime no asynchronicity is
-// involved.
-// As soon as we want allow an *external* plugin to provide Webclient toplevel components synchronization is required.
-// Note: in production mode external plugins are loaded asynchronously. Mounting can only start once loading completes.
-// In contrast external plugins in *development mode* as well as standard plugins (both modes) are "linked" into the
-// Webclient at build time. At runtime no asynchronicity is involved.
-loadPlugins(extraElementUI)
+// 3) Load plugins + mount toplevel components
+// Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
+// boxes -- component mounting must perform not before all plugins are loaded.
+// Another approach would be not to collect the toplevel components and then mounting all at once but to mount
+// a plugin's components immediately while plugin initialization. However this results in unresolved circular
+// dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
+// the Search plugin on the other hand depends on Workspaces `isWritable` state.
+loadPlugins(extraElementUI).then(() => {
+  // Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
+  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
+  store.dispatch('mountComponents', webclient)
+})
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
@@ -51,14 +53,7 @@ store.dispatch('registerDetailRenderer', {
   component: require('./components/dm5-color-picker').default
 })
 
-// 5) Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
-// Note: the mount point DOM exists only on next tick.
-Vue.nextTick(() => {
-  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
-  store.dispatch('mountComponents', webclient)
-})
-
-// 6) Initial navigation
+// 5) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
