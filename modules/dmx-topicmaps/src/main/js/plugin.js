@@ -55,26 +55,26 @@ export default ({store, dm5}) => {
           label: 'Edit', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
           disabled: isTopicEditDisabled
         },
+        {
+          label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+          disabled: isTopicDeleteDisabled
+        },
         {label: 'Related', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})},
         {label: 'Details', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'info'})}
       ],
-      topic_danger: [{
-        label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
-        disabled: isTopicDeleteDisabled
-      }],
       assoc: [
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
         {
           label: 'Edit', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
           disabled: isAssocEditDisabled
         },
+        {
+          label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+          disabled: isAssocDeleteDisabled
+        },
         {label: 'Related', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})},
         {label: 'Details', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'info'})}
-      ],
-      assoc_danger: [{
-        label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
-        disabled: isAssocDeleteDisabled
-      }]
+      ]
     },
 
     extraMenuItems: [{

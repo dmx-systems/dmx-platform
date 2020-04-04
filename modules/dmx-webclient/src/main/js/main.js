@@ -31,8 +31,8 @@ const root = new Vue({
 // 3) Load plugins + mount toplevel components
 // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
 // boxes -- component mounting must perform not before all plugins are loaded.
-// Another approach would be not to collect the toplevel components and then mounting all at once but to mount
-// a plugin's components immediately while plugin initialization. However this results in unresolved circular
+// Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
+// plugin's components immediately while plugin initialization. However this would result in unresolved circular
 // dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
 // the Search plugin on the other hand depends on Workspaces `isWritable` state.
 loadPlugins(extraElementUI).then(() => {

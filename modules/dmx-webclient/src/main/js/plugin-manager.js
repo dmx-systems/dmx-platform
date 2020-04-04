@@ -9,7 +9,7 @@ let _extraElementUI       // a function that loads the extra Element UI componen
 /**
  * @returns   a promise resolved once all plugins are loaded and initialized.
  */
-export default (extraElementUI) => {
+export default extraElementUI => {
   //
   _extraElementUI = extraElementUI
   //
