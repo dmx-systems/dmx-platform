@@ -26,9 +26,9 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a single-valued child.
-     * Returns <code>null</code> if there is no such child.
+     * Returns a default value if there is no such child.
      */
-    RelatedTopicModel getTopicOrNull(String compDefUri);
+    RelatedTopicModel getTopic(String compDefUri, RelatedTopicModel defaultValue);
 
     // ---
 
@@ -58,8 +58,6 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
 
     // === Convenience Accessors ===
-
-    // ### TODO: transform defaultValue methods into getXXOrNull() form, analogous to ChildTopics interface
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.

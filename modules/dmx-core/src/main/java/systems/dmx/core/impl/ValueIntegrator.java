@@ -239,7 +239,7 @@ class ValueIntegrator {
         for (String compDefUri : compDefUris()) {
             Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
             if (isOne(compDefUri)) {
-                newChildValue = _childTopics.getTopicOrNull(compDefUri);
+                newChildValue = _childTopics.getTopic(compDefUri, null);
             } else {
                 // TODO: if empty?
                 newChildValue = _childTopics.getTopicsOrNull(compDefUri);
@@ -445,7 +445,7 @@ class ValueIntegrator {
     private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel childTopic, String compDefUri) {
         try {
             ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
-            RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(compDefUri);   // may be null
+            RelatedTopicModelImpl oldValue = oldChildTopics.getTopic(compDefUri, null);
             if (oldValue != null && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
@@ -482,7 +482,7 @@ class ValueIntegrator {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(compDefUri);
+                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopic(compDefUri, null);
                 updateRelatingAssoc(assoc, compDefUri, newChildValue);
             }
         } catch (Exception e) {

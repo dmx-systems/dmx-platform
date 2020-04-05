@@ -55,7 +55,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final RelatedTopicModelImpl getTopic(String compDefUri) {
-        RelatedTopicModelImpl topic = getTopicOrNull(compDefUri);
+        RelatedTopicModelImpl topic = getTopic(compDefUri, null);
         // error check
         if (topic == null) {
             throw new RuntimeException("Comp Def URI \"" + compDefUri + "\" not found in " + childTopics.keySet());
@@ -65,9 +65,10 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public final RelatedTopicModelImpl getTopicOrNull(String compDefUri) {
+    public final RelatedTopicModelImpl getTopic(String compDefUri, RelatedTopicModel defaultValue) {
         try {
-            return (RelatedTopicModelImpl) childTopics.get(compDefUri);
+            Object topic = childTopics.get(compDefUri);
+            return (RelatedTopicModelImpl) (topic != null ? topic : defaultValue);
         } catch (ClassCastException e) {
             throwInvalidSingleAccess(compDefUri, e);
             return null;    // never reached
@@ -115,7 +116,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final String getString(String compDefUri, String defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
 
@@ -128,7 +129,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final int getInt(String compDefUri, int defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
 
@@ -141,7 +142,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final long getLong(String compDefUri, long defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
 
@@ -154,7 +155,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final double getDouble(String compDefUri, double defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
 
@@ -167,7 +168,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final boolean getBoolean(String compDefUri, boolean defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
@@ -180,7 +181,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final Object getObject(String compDefUri, Object defaultValue) {
-        TopicModel topic = getTopicOrNull(compDefUri);
+        TopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
@@ -193,7 +194,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final ChildTopicsModel getChildTopicsModel(String compDefUri, ChildTopicsModel defaultValue) {
-        RelatedTopicModel topic = getTopicOrNull(compDefUri);
+        RelatedTopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }
 
