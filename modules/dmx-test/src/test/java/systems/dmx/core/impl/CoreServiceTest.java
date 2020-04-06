@@ -51,7 +51,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         //
         assertEquals("Karl Blum", person.getString("dmx.core.name"));
         //
-        ChildTopicsModel address = person.getChildTopicsModel("dmx.contacts.home_address");
+        ChildTopicsModel address = person.getChildTopics("dmx.contacts.home_address");
         assertEquals("Berlin", address.getString("dmx.contacts.city"));
         //
         Object code = address.getObject("dmx.contacts.postal_code");

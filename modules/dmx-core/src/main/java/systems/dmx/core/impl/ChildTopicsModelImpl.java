@@ -188,12 +188,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final ChildTopicsModel getChildTopicsModel(String compDefUri) {
+    public final ChildTopicsModel getChildTopics(String compDefUri) {
         return getTopic(compDefUri).getChildTopicsModel();
     }
 
     @Override
-    public final ChildTopicsModel getChildTopicsModel(String compDefUri, ChildTopicsModel defaultValue) {
+    public final ChildTopicsModel getChildTopics(String compDefUri, ChildTopicsModel defaultValue) {
         RelatedTopicModel topic = getTopic(compDefUri, null);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }

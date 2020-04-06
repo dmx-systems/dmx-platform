@@ -34,14 +34,14 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a multiple-valued child.
-     * Throws if there is no such child. ### TODO: return empty list instead
+     * Throws if there is no such child. ### TODO: return empty list instead? -> Rather not
      */
     List<? extends RelatedTopicModel> getTopics(String compDefUri);
 
     /**
      * Accesses a multiple-valued child.
      * Returns <code>null</code> if there is no such child.
-     * ### TODO: drop this method
+     * ### TODO: drop this method? -> Rather not
      */
     List<? extends RelatedTopicModel> getTopicsOrNull(String compDefUri);
 
@@ -147,13 +147,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    ChildTopicsModel getChildTopicsModel(String compDefUri);
+    ChildTopicsModel getChildTopics(String compDefUri);
 
     /**
      * Convenience accessor for the *composite* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    ChildTopicsModel getChildTopicsModel(String compDefUri, ChildTopicsModel defaultValue);
+    ChildTopicsModel getChildTopics(String compDefUri, ChildTopicsModel defaultValue);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
