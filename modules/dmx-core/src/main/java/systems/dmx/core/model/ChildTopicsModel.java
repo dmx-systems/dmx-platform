@@ -212,13 +212,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a by-ID topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel putDeletionRef(String compDefUri, long refTopicId);
+    ChildTopicsModel setDeletionRef(String compDefUri, long refTopicId);
 
     /**
      * Puts a by-URI topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel putDeletionRef(String compDefUri, String refTopicUri);
+    ChildTopicsModel setDeletionRef(String compDefUri, String refTopicUri);
 
     // ---
 

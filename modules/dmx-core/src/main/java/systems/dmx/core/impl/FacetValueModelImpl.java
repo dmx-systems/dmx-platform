@@ -73,14 +73,14 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         return (FacetValueModel) setRef(childTypeUri, refTopicUri);
     }
 
-    // ---
+    // --- ### TODO: rename to "setDeletionRef" (2x)
 
     public FacetValueModel putDeletionRef(long refTopicId) {
-        return (FacetValueModel) putDeletionRef(childTypeUri, refTopicId);
+        return (FacetValueModel) setDeletionRef(childTypeUri, refTopicId);
     }
 
     public FacetValueModel putDeletionRef(String refTopicUri) {
-        return (FacetValueModel) putDeletionRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) setDeletionRef(childTypeUri, refTopicUri);
     }
 
 

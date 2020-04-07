@@ -770,7 +770,7 @@ public class ModelFactoryImpl implements ModelFactory {
         //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                childTopics.putDeletionRef("dmx.core.assoc_type#dmx.core.custom_assoc_type",
+                childTopics.setDeletionRef("dmx.core.assoc_type#dmx.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
                 childTopics.setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocTypeUri);
