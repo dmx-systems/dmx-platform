@@ -473,7 +473,7 @@ class ValueIntegrator {
                 // update DB
                 assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
-                oldChildTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+                oldChildTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
             // 3) update relating assoc
             //
@@ -684,7 +684,7 @@ class ValueIntegrator {
                 AssocModelImpl assoc = al.getAssoc(assocTypeUri, parent.id, childTopic.id, PARENT, CHILD);
                 if (assoc != null) {
                     // update memory
-                    parent.getChildTopics().put(
+                    parent.getChildTopics().set(
                         compDefUri,
                         mf.newRelatedTopicModel(childTopic, assoc)
                     );
@@ -728,7 +728,7 @@ class ValueIntegrator {
                 if (isOne(compDefUri)) {
                     TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
                     AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);         // update DB
-                    childTopics.put(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
+                    childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
                 } else {
                     for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
                         TopicModel childTopic = value.value;

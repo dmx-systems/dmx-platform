@@ -318,23 +318,23 @@ class TypeStorage {
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
             // cardinality (must exist in DB)
             ChildTopicsModel childTopics = assoc.getChildTopics();
-            childTopics.put(CARDINALITY, fetchCardinality(assoc));
+            childTopics.set(CARDINALITY, fetchCardinality(assoc));
                         // Note: putRef() would not be sufficient. The assoc model must be fully initialized.
                         // Otherwise update would fail. ### TODO: revise comment
             // custom assoc type
             RelatedTopicModel customAssocType = fetchCustomAssocType(assoc);
             if (customAssocType != null) {
-                childTopics.put("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);
+                childTopics.set("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);
             }
             // identity-attr flag
             RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assoc);
             if (isIdentityAttr != null) {   // ### TODO: should a isIdentityAttr topic always exist?
-                childTopics.put(IDENTITY_ATTR, isIdentityAttr);
+                childTopics.set(IDENTITY_ATTR, isIdentityAttr);
             }
             // include-in-label flag
             RelatedTopicModel includeInLabel = fetchIncludeInLabel(assoc);
             if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
-                childTopics.put(INCLUDE_IN_LABEL, includeInLabel);
+                childTopics.set(INCLUDE_IN_LABEL, includeInLabel);
             }
             return mf.newCompDefModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {

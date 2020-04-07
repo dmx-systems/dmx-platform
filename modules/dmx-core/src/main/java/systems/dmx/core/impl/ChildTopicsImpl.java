@@ -316,7 +316,7 @@ class ChildTopicsImpl implements ChildTopics {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // Note 1: we need to explicitly declare the arg as RelatedTopicModel. When declared as TopicModel instead the
-    // JVM would invoke the ChildTopicsModel's put()/add() which takes a TopicModel object even if at runtime a
+    // JVM would invoke the ChildTopicsModel's set()/add() which takes a TopicModel object even if at runtime a
     // RelatedTopicModel or even a TopicReferenceModel is passed. This is because Java method overloading involves
     // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dmx-test). ### still true?
 
@@ -326,7 +326,7 @@ class ChildTopicsImpl implements ChildTopics {
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dmx-test). ### still true?
 
     private ChildTopics _updateOne(String compDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(mf.newChildTopicsModel().put(compDefUri, newChildTopic));
+        parent.updateChildTopics(mf.newChildTopicsModel().set(compDefUri, newChildTopic));
         return this;
     }
 

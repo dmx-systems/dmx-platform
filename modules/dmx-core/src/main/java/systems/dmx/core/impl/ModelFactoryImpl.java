@@ -765,8 +765,8 @@ public class ModelFactoryImpl implements ModelFactory {
                                          boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
             .putRef(CARDINALITY, cardinalityUri)
-            .put(IDENTITY_ATTR, isIdentityAttr)
-            .put(INCLUDE_IN_LABEL, includeInLabel);
+            .set(IDENTITY_ATTR, isIdentityAttr)
+            .set(INCLUDE_IN_LABEL, includeInLabel);
         //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {

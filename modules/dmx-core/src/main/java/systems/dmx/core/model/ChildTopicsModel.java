@@ -169,9 +169,9 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
      */
-    ChildTopicsModel put(String compDefUri, RelatedTopicModel value);
+    ChildTopicsModel set(String compDefUri, RelatedTopicModel value);
 
-    ChildTopicsModel put(String compDefUri, TopicModel value);
+    ChildTopicsModel set(String compDefUri, TopicModel value);
 
     /**
      * Convenience method to put a *simple* value in a single-valued child.
@@ -182,7 +182,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    ChildTopicsModel put(String compDefUri, Object value);
+    ChildTopicsModel set(String compDefUri, Object value);
 
     /**
      * Convenience method to put a *composite* value in a single-valued child.
@@ -190,7 +190,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    ChildTopicsModel put(String compDefUri, ChildTopicsModel value);
+    ChildTopicsModel set(String compDefUri, ChildTopicsModel value);
 
     // ---
 

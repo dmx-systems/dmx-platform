@@ -95,7 +95,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                 if (!isMultiFacet(facetTypeUri)) {
                     Topic value = getFacet(topic, facetTypeUri);
                     if (value != null) {
-                        childTopics.put(childTypeUri, value.getModel());
+                        childTopics.set(childTypeUri, value.getModel());
                     }
                 } else {
                     List<RelatedTopic> values = getFacets(topic, facetTypeUri);

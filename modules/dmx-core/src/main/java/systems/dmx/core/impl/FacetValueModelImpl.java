@@ -43,24 +43,24 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         return getTopics(childTypeUri);
     }
 
-    // ---
+    // --- ### TODO rename to "set" (4x)
 
     public FacetValueModel put(RelatedTopicModel value) {
-        return (FacetValueModel) put(childTypeUri, value);
+        return (FacetValueModel) set(childTypeUri, value);
     }
 
     public FacetValueModel put(TopicModel value) {
-        return (FacetValueModel) put(childTypeUri, value);
+        return (FacetValueModel) set(childTypeUri, value);
     }
 
     // ---
 
     public FacetValueModel put(Object value) {
-        return (FacetValueModel) put(childTypeUri, value);
+        return (FacetValueModel) set(childTypeUri, value);
     }
 
     public FacetValueModel put(ChildTopicsModel value) {
-        return (FacetValueModel) put(childTypeUri, value);
+        return (FacetValueModel) set(childTypeUri, value);
     }
 
     // ---

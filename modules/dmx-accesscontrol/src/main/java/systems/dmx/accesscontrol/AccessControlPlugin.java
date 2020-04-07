@@ -249,7 +249,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 public Topic call() {
                     return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.user_account", mf.newChildTopicsModel()
                         .putRef("dmx.accesscontrol.username", usernameTopic.getId())
-                        .put("dmx.accesscontrol.password", cred.password)));
+                        .set("dmx.accesscontrol.password", cred.password)));
                 }
             });
             // 3) assign user account and password to private workspace

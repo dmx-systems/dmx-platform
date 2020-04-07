@@ -41,13 +41,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void compositeModel() {
         ChildTopicsModel person = mf.newChildTopicsModel()
-            .put("dmx.core.name", "Karl Blum")
-            .put("dmx.contacts.home_address", mf.newChildTopicsModel()
-                .put("dmx.contacts.postal_code", 13206)
-                .put("dmx.contacts.city", "Berlin"))
-            .put("dmx.contacts.office_address", mf.newChildTopicsModel()
-                .put("dmx.contacts.postal_code", 14345)
-                .put("dmx.contacts.city", "Berlin"));
+            .set("dmx.core.name", "Karl Blum")
+            .set("dmx.contacts.home_address", mf.newChildTopicsModel()
+                .set("dmx.contacts.postal_code", 13206)
+                .set("dmx.contacts.city", "Berlin"))
+            .set("dmx.contacts.office_address", mf.newChildTopicsModel()
+                .set("dmx.contacts.postal_code", 14345)
+                .set("dmx.contacts.city", "Berlin"));
         //
         assertEquals("Karl Blum", person.getString("dmx.core.name"));
         //
@@ -110,7 +110,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
-                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
+                mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 23)
             ));
             //
             assertTrue(topic.getChildTopics().has(PLUGIN_MIGRATION_NR));
@@ -136,7 +136,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
-                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
+                mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
@@ -158,7 +158,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
-                mf.newChildTopicsModel().put(PLUGIN_MIGRATION_NR, 23)
+                mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 23)
             ));
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = (TopicImpl) dmx.getTopicByUri("systems.dmx.notes");
@@ -183,7 +183,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.setChildTopics(mf.newChildTopicsModel().put(PLUGIN_NAME, "My Plugin"));
+            topic.setChildTopics(mf.newChildTopicsModel().set(PLUGIN_NAME, "My Plugin"));
             assertEquals("My Plugin", topic.getChildTopics().getString(PLUGIN_NAME));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -223,9 +223,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN, mf.newChildTopicsModel()
-                .put(PLUGIN_NAME, "My Plugin")
-                .put(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
-                .put(PLUGIN_MIGRATION_NR, 1)
+                .set(PLUGIN_NAME, "My Plugin")
+                .set(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
+                .set(PLUGIN_MIGRATION_NR, 1)
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -245,9 +245,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN, mf.newChildTopicsModel()
-                .put(PLUGIN_NAME, "My Plugin")
-                .put(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
-                .put(PLUGIN_MIGRATION_NR, 1)
+                .set(PLUGIN_NAME, "My Plugin")
+                .set(PLUGIN_SYMBOLIC_NAME, "dmx.test.my_plugin")
+                .set(PLUGIN_MIGRATION_NR, 1)
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -322,8 +322,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 2) create instances
             // "Person Name"
             Topic karl = dmx.createTopic(mf.newTopicModel("dmx.test.person_name", mf.newChildTopicsModel()
-                .put("dmx.test.first_name", "Karl")
-                .put("dmx.test.last_name", "Albrecht")
+                .set("dmx.test.first_name", "Karl")
+                .set("dmx.test.last_name", "Albrecht")
             ));
             //
             assertEquals("Karl Albrecht", karl.getSimpleValue().toString());
@@ -368,8 +368,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // "Comment"
             Topic comment = dmx.createTopic(mf.newTopicModel("dmx.test.comment"));
             comment.getChildTopics().set("dmx.test.person_name", mf.newChildTopicsModel()
-                .put("dmx.test.first_name", "Karl")
-                .put("dmx.test.last_name", "Albrecht")
+                .set("dmx.test.first_name", "Karl")
+                .set("dmx.test.last_name", "Albrecht")
             );
             //
             assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
@@ -938,7 +938,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             item2 = dmx.createTopic(mf.newTopicModel("dmx.test.item", new SimpleValue("Item 2")));
             // 3) create composite instance
             comp1 = dmx.createTopic(mf.newTopicModel("dmx.test.composite", mf.newChildTopicsModel()
-                .put("dmx.test.name", "Composite 1")
+                .set("dmx.test.name", "Composite 1")
                 // ### .putRef("dmx.test.item", item1.getId())
             ));
             tx.success();
@@ -1152,7 +1152,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             );
             // 2) create parent instance
             Topic parent1 = dmx.createTopic(mf.newTopicModel("dmx.test.parent", mf.newChildTopicsModel()
-                .put("dmx.test.child", "Child 1")
+                .set("dmx.test.child", "Child 1")
             ));
             //
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dmx.test.child").getSimpleValue().toString());

@@ -88,8 +88,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             logger.info("Creating topicmap \"" + name + "\", topicmapTypeUri=\"" + topicmapTypeUri + "\", viewProps=" +
                 viewProps);
             Topic topicmapTopic = dmx.createTopic(mf.newTopicModel(TOPICMAP, mf.newChildTopicsModel()
-                .put("dmx.topicmaps.topicmap_name", name)
-                .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
+                .set("dmx.topicmaps.topicmap_name", name)
+                .set("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
             ));
             getTopicmapType(topicmapTypeUri).initTopicmapState(topicmapTopic, viewProps, dmx);
             //

@@ -581,9 +581,9 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private Topic createPluginTopic() {
         return dmx.createTopic(mf.newTopicModel(pluginUri, PLUGIN, mf.newChildTopicsModel()
-            .put(PLUGIN_NAME, pluginName())
-            .put(PLUGIN_SYMBOLIC_NAME, pluginUri)
-            .put(PLUGIN_MIGRATION_NR, 0)
+            .set(PLUGIN_NAME, pluginName())
+            .set(PLUGIN_SYMBOLIC_NAME, pluginUri)
+            .set(PLUGIN_MIGRATION_NR, 0)
         ));
     }
 

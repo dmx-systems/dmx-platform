@@ -119,7 +119,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // 1) create workspace
                     Topic workspace = dmx.createTopic(
                         mf.newTopicModel(uri, "dmx.workspaces.workspace", mf.newChildTopicsModel()
-                            .put("dmx.workspaces.workspace_name", name)
+                            .set("dmx.workspaces.workspace_name", name)
                             .putRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
@@ -271,11 +271,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
             mf.newTopicModel("dmx.workspaces.enabled_sharing_modes", mf.newChildTopicsModel()
-                .put("dmx.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
-                .put("dmx.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
-                .put("dmx.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
-                .put("dmx.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
-                .put("dmx.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
+                .set("dmx.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
+                .set("dmx.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
+                .set("dmx.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
+                .set("dmx.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
+                .set("dmx.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
             ),
             ConfigModificationRole.ADMIN
         ));

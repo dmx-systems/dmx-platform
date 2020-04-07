@@ -206,7 +206,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // --- Single-valued Children ---
 
     @Override
-    public final ChildTopicsModel put(String compDefUri, RelatedTopicModel value) {
+    public final ChildTopicsModel set(String compDefUri, RelatedTopicModel value) {
         try {
             // check argument
             if (value == null) {
@@ -222,14 +222,14 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public final ChildTopicsModel put(String compDefUri, TopicModel value) {
-        return put(compDefUri, mf.newRelatedTopicModel(value));
+    public final ChildTopicsModel set(String compDefUri, TopicModel value) {
+        return set(compDefUri, mf.newRelatedTopicModel(value));
     }
 
     @Override
-    public final ChildTopicsModel put(String compDefUri, Object value) {
+    public final ChildTopicsModel set(String compDefUri, Object value) {
         try {
-            return put(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
+            return set(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a ChildTopicsModel failed (compDefUri=\"" + compDefUri +
                 "\", value=" + value + ")", e);
@@ -237,21 +237,21 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public final ChildTopicsModel put(String compDefUri, ChildTopicsModel value) {
-        return put(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), value));
+    public final ChildTopicsModel set(String compDefUri, ChildTopicsModel value) {
+        return set(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), value));
     }
 
     // ---
 
     @Override
     public final ChildTopicsModel putRef(String compDefUri, long refTopicId) {
-        put(compDefUri, mf.newTopicReferenceModel(refTopicId));
+        set(compDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
     @Override
     public final ChildTopicsModel putRef(String compDefUri, String refTopicUri) {
-        put(compDefUri, mf.newTopicReferenceModel(refTopicUri));
+        set(compDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -259,13 +259,13 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final ChildTopicsModel putDeletionRef(String compDefUri, long refTopicId) {
-        put(compDefUri, mf.newTopicDeletionModel(refTopicId));
+        set(compDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
     @Override
     public final ChildTopicsModel putDeletionRef(String compDefUri, String refTopicUri) {
-        put(compDefUri, mf.newTopicDeletionModel(refTopicUri));
+        set(compDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
 
@@ -402,7 +402,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             Object value = get(compDefUri);
             if (value instanceof RelatedTopicModel) {
                 RelatedTopicModel model = (RelatedTopicModel) value;
-                clone.put(compDefUri, model.clone());
+                clone.set(compDefUri, model.clone());
             } else if (value instanceof List) {
                 for (RelatedTopicModel model : (List<RelatedTopicModel>) value) {
                     clone.add(compDefUri, model.clone());
@@ -474,7 +474,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * For single-valued child
      */
     void putInChildTopics(RelatedTopicModel childTopic, CompDefModel compDef) {
-        put(compDef.getCompDefUri(), childTopic);
+        set(compDef.getCompDefUri(), childTopic);
     }
 
     /**

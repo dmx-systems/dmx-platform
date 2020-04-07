@@ -576,13 +576,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
-            .put("dmx.files.file_name", path.getName())
-            .put("dmx.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
-            .put("dmx.files.size", path.length());
+            .set("dmx.files.file_name", path.getName())
+            .set("dmx.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
+            .set("dmx.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
         if (mediaType != null) {
-            childTopics.put("dmx.files.media_type", mediaType);
+            childTopics.set("dmx.files.media_type", mediaType);
         }
         //
         return createFileOrFolderTopic(mf.newTopicModel("dmx.files.file", childTopics));      // throws Exception
@@ -611,8 +611,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         }
         //
         return createFileOrFolderTopic(mf.newTopicModel("dmx.files.folder", mf.newChildTopicsModel()
-            .put("dmx.files.folder_name", folderName)
-            .put("dmx.files.path", repoPath)));     // throws Exception
+            .set("dmx.files.folder_name", folderName)
+            .set("dmx.files.path", repoPath)));     // throws Exception
     }
 
     // ---

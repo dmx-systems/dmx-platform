@@ -44,7 +44,7 @@ class ChildTopicsFetcher {
                 RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), compDef);
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
-                    childTopics.put(compDefUri, childTopic);
+                    childTopics.set(compDefUri, childTopic);
                     if (deep) {
                         fetchChildTopics(childTopic, deep);    // recursion
                     }

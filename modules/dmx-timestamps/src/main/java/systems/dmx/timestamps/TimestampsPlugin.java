@@ -243,8 +243,8 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     private void enrichWithTimestamp(DMXObject object) {
         long objectId = object.getId();
         ChildTopicsModel childTopics = object.getChildTopics().getModel()
-            .put(PROP_CREATED, getCreationTime(objectId))
-            .put(PROP_MODIFIED, getModificationTime(objectId));
+            .set(PROP_CREATED, getCreationTime(objectId))
+            .set(PROP_MODIFIED, getModificationTime(objectId));
     }
 
     // ---

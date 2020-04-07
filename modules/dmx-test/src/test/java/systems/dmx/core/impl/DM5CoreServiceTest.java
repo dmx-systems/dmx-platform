@@ -192,13 +192,13 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             defineSimpleNameIdentityModel();
             String fullCompDefUriToBeUpdated = "simple.name";
             // create composite topic
-            ChildTopicsModel cm1 = mf.newChildTopicsModel().put(fullCompDefUriToBeUpdated, "Test");
+            ChildTopicsModel cm1 = mf.newChildTopicsModel().set(fullCompDefUriToBeUpdated, "Test");
             Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", cm1));
             assertTrue("Test".equals(topic.getSimpleValue().toString()));
             // updating simple child text topic
             TopicType parentType = dmx.getTopicType(topic.getTypeUri());
             CompDef typeRelation = parentType.getCompDef(fullCompDefUriToBeUpdated);
-            ChildTopicsModel cm2 = mf.newChildTopicsModel().put(fullCompDefUriToBeUpdated, "Test Studio");
+            ChildTopicsModel cm2 = mf.newChildTopicsModel().set(fullCompDefUriToBeUpdated, "Test Studio");
             topic.updateChildTopics(cm2, typeRelation);
             // assert child topic value and parent value update
             assertTrue("Test Studio".equals(topic.getChildTopics().getString(fullCompDefUriToBeUpdated)));

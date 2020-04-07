@@ -189,7 +189,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             logger.info("##### Changing password for user \"" + cred.username + "\"");
             TopicModelImpl userAccount = _getUserAccount(_getUsernameTopicOrThrow(cred.username));
             userAccount.update(mf.newTopicModel(mf.newChildTopicsModel()
-                .put("dmx.accesscontrol.password", cred.password)
+                .set("dmx.accesscontrol.password", cred.password)
             ));
         } catch (Exception e) {
             throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);

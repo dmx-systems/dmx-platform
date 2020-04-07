@@ -74,9 +74,9 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     public ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value) {
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
-            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, value)));
+            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().set(childTypeUri, value)));
         } else {
-            configTopic.getChildTopics().put(childTypeUri, value);
+            configTopic.getChildTopics().set(childTypeUri, value);
         }
         return this;
     }
@@ -87,11 +87,11 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         RelatedTopicModel valueRef = mf.newTopicReferenceModel(topicIdOrUri);
         if (configTopic == null) {
             // Note: valueRef must be known to be of type RelatedTopicModel *at compile time*.
-            // Otherwise the wrong put() method would be invoked.
+            // Otherwise the wrong set() method would be invoked.
             // In Java method overloading involves NO dynamic dispatch. See JavaAPITest in dmx-test.
-            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, valueRef)));
+            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().set(childTypeUri, valueRef)));
         } else {
-            configTopic.getChildTopics().put(childTypeUri, valueRef);
+            configTopic.getChildTopics().set(childTypeUri, valueRef);
         }
         return this;
     }
