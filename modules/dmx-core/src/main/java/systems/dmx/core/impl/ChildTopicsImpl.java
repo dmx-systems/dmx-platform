@@ -353,7 +353,7 @@ class ChildTopicsImpl implements ChildTopics {
     }
 
     private RelatedTopic _getTopicOrNull(String compDefUri) {
-        RelatedTopicModel topic = model.getTopic(compDefUri, null);
+        RelatedTopicModel topic = model.getTopicOrNull(compDefUri);
         return topic != null ? instantiate(topic) : null;
     }
 

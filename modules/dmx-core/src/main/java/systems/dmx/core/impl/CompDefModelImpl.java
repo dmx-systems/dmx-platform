@@ -138,7 +138,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     // === Read from ChildTopicsModel ===
 
     final String _getCardinalityUri() {
-        TopicModelImpl cardinality = getChildTopics().getTopic(CARDINALITY, null);
+        TopicModelImpl cardinality = getChildTopics().getTopicOrNull(CARDINALITY);
         if (cardinality == null) {
             // ### TODO: should a cardinality topic always exist?
             throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Cardinality\" topic");
@@ -148,7 +148,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     final boolean isIdentityAttr() {
-        TopicModel isIdentityAttr = getChildTopics().getTopic(IDENTITY_ATTR, null);
+        TopicModel isIdentityAttr = getChildTopics().getTopicOrNull(IDENTITY_ATTR);
         if (isIdentityAttr == null) {
             // ### TODO: should a isIdentityAttr topic always exist?
             // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Identity Attribute\" topic");
@@ -158,7 +158,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     final boolean includeInLabel() {
-        TopicModel includeInLabel = getChildTopics().getTopic(INCLUDE_IN_LABEL, null);
+        TopicModel includeInLabel = getChildTopics().getTopicOrNull(INCLUDE_IN_LABEL);
         if (includeInLabel == null) {
             // ### TODO: should a includeInLabel topic always exist?
             // throw new RuntimeException("Comp def \"" + getCompDefUri() + "\" has no \"Include in Label\" topic");
@@ -211,7 +211,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private TopicModelImpl getCustomAssocType() {
-        return getChildTopics().getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type", null);
+        return getChildTopics().getTopicOrNull("dmx.core.assoc_type#dmx.core.custom_assoc_type");
     }
 
     private String defaultInstanceLevelAssocTypeUri() {

@@ -26,9 +26,9 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a single-valued child.
-     * Returns a default value if there is no such child.
+     * Returns <code>null</code> if there is no such child.
      */
-    RelatedTopicModel getTopic(String compDefUri, RelatedTopicModel defaultValue);
+    RelatedTopicModel getTopicOrNull(String compDefUri);
 
     // ---
 
