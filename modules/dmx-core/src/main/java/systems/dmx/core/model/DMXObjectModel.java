@@ -45,7 +45,7 @@ public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     ChildTopicsModel getChildTopics();
 
-    void setChildTopicsModel(ChildTopicsModel childTopics);
+    void setChildTopics(ChildTopicsModel childTopics);
 
     // --- misc ---
 

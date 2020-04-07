@@ -147,7 +147,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
     }
 
     @Override
-    public void setChildTopicsModel(ChildTopicsModel childTopics) {
+    public void setChildTopics(ChildTopicsModel childTopics) {
         this.childTopics = (ChildTopicsModelImpl) childTopics;
     }
 
@@ -159,7 +159,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         setUri(object.getUri());
         setTypeUri(object.getTypeUri());
         setSimpleValue(object.getSimpleValue());
-        setChildTopicsModel(object.getChildTopics());
+        setChildTopics(object.getChildTopics());
     }
 
     // ---
@@ -196,7 +196,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
     public DMXObjectModel clone() {
         try {
             DMXObjectModel object = (DMXObjectModel) super.clone();
-            object.setChildTopicsModel(childTopics.clone());
+            object.setChildTopics(childTopics.clone());
             return object;
         } catch (Exception e) {
             throw new RuntimeException("Cloning a DMXObjectModel failed", e);

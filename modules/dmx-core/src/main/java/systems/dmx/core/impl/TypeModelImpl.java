@@ -368,7 +368,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // transfer assoc model to comp def model
             compDef.setTypeUri(assoc.getTypeUri());
             compDef.setSimpleValue(assoc.getSimpleValue());
-            compDef.setChildTopicsModel(assoc.getChildTopics());
+            compDef.setChildTopics(assoc.getChildTopics());
         }
         // rehash if comp def URI has changed (due to changed custom assoc type)
         if (!compDef.getCompDefUri().equals(oldCompDefUri)) {
