@@ -43,7 +43,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         return getTopics(childTypeUri);
     }
 
-    // --- ### TODO rename to "set" (4x)
+    // --- ### TODO: rename to "set" (4x)
 
     public FacetValueModel put(RelatedTopicModel value) {
         return (FacetValueModel) set(childTypeUri, value);
@@ -63,14 +63,14 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         return (FacetValueModel) set(childTypeUri, value);
     }
 
-    // ---
+    // --- ### TODO: rename to "setRef" (2x)
 
     public FacetValueModel putRef(long refTopicId) {
-        return (FacetValueModel) putRef(childTypeUri, refTopicId);
+        return (FacetValueModel) setRef(childTypeUri, refTopicId);
     }
 
     public FacetValueModel putRef(String refTopicUri) {
-        return (FacetValueModel) putRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) setRef(childTypeUri, refTopicUri);
     }
 
     // ---

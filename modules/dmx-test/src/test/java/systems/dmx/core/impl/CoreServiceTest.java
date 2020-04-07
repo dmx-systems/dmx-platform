@@ -939,7 +939,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 3) create composite instance
             comp1 = dmx.createTopic(mf.newTopicModel("dmx.test.composite", mf.newChildTopicsModel()
                 .set("dmx.test.name", "Composite 1")
-                // ### .putRef("dmx.test.item", item1.getId())
+                // ### .setRef("dmx.test.item", item1.getId())
             ));
             tx.success();
         } finally {
@@ -956,7 +956,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         tx = dmx.beginTx();
         try {
             comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
-                .putRef("dmx.test.item", item2.getId())
+                .setRef("dmx.test.item", item2.getId())
             ));
             tx.success();
         } finally {
@@ -973,7 +973,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         tx = dmx.beginTx();
         try {
             comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
-                .putRef("dmx.test.item", item1.getId())
+                .setRef("dmx.test.item", item1.getId())
             ));
             tx.success();
         } finally {
@@ -1018,7 +1018,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         tx = dmx.beginTx();
         try {
             name.updateChildTopics(
-                mf.newChildTopicsModel().putRef("dmx.test.item", item1.getId()),
+                mf.newChildTopicsModel().setRef("dmx.test.item", item1.getId()),
                 compDef
             );
             tx.success();
@@ -1036,7 +1036,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         tx = dmx.beginTx();
         try {
             name.updateChildTopics(
-                mf.newChildTopicsModel().putRef("dmx.test.item", item2.getId()),
+                mf.newChildTopicsModel().setRef("dmx.test.item", item2.getId()),
                 compDef
             );
             tx.success();
@@ -1070,7 +1070,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 2) create example child instance
             child1 = dmx.createTopic(mf.newTopicModel("dmx.test.child", new SimpleValue("Child 1")));
             // 3) create composite instance
-            // Note: addRef() must be used (instead of putRef()) as child is defined as "many".
+            // Note: addRef() must be used (instead of setRef()) as child is defined as "many".
             parent1 = dmx.createTopic(mf.newTopicModel("dmx.test.parent", mf.newChildTopicsModel()
                 .addRef("dmx.test.child", child1.getId())
             ));
@@ -1184,7 +1184,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic child1 = dmx.createTopic(mf.newTopicModel("dmx.test.child", new SimpleValue("Child 1")));
             // 3) create parent instance
             Topic parent1 = dmx.createTopic(mf.newTopicModel("dmx.test.parent", mf.newChildTopicsModel()
-                .putRef("dmx.test.child", child1.getId())
+                .setRef("dmx.test.child", child1.getId())
             ));
             //
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dmx.test.child").getSimpleValue().toString());
@@ -1210,7 +1210,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic child1 = dmx.createTopic(mf.newTopicModel("dmx.test.child", new SimpleValue("Child 1")));
             // 3) create parent instance
             Topic parent1 = dmx.createTopic(mf.newTopicModel("dmx.test.parent", mf.newChildTopicsModel()
-                .putRef("dmx.test.child", child1.getId())
+                .setRef("dmx.test.child", child1.getId())
             ));
             //
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dmx.test.child").getSimpleValue().toString());

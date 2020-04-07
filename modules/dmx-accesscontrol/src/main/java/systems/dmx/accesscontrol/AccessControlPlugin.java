@@ -248,7 +248,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 @Override
                 public Topic call() {
                     return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.user_account", mf.newChildTopicsModel()
-                        .putRef("dmx.accesscontrol.username", usernameTopic.getId())
+                        .setRef("dmx.accesscontrol.username", usernameTopic.getId())
                         .set("dmx.accesscontrol.password", cred.password)));
                 }
             });

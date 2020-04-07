@@ -319,7 +319,7 @@ class TypeStorage {
             // cardinality (must exist in DB)
             ChildTopicsModel childTopics = assoc.getChildTopics();
             childTopics.set(CARDINALITY, fetchCardinality(assoc));
-                        // Note: putRef() would not be sufficient. The assoc model must be fully initialized.
+                        // Note: setRef() would not be sufficient. The assoc model must be fully initialized.
                         // Otherwise update would fail. ### TODO: revise comment
             // custom assoc type
             RelatedTopicModel customAssocType = fetchCustomAssocType(assoc);

@@ -297,7 +297,7 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                 != null ||
             DMXUtils.associationAutoTyping(this, TOPIC_TYPE, ASSOC_TYPE, COMPOSITION_DEF, CHILD_TYPE, PARENT_TYPE)
                 != null) {
-            childTopics.putRef(CARDINALITY, ONE);
+            childTopics.setRef(CARDINALITY, ONE);
         }
         //
         duplicateCheck();

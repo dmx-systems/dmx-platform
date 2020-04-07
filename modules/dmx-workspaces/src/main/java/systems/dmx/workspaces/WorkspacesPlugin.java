@@ -120,7 +120,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     Topic workspace = dmx.createTopic(
                         mf.newTopicModel(uri, "dmx.workspaces.workspace", mf.newChildTopicsModel()
                             .set("dmx.workspaces.workspace_name", name)
-                            .putRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
+                            .setRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
                     Topic topicmap = topicmapsService.createTopicmap(

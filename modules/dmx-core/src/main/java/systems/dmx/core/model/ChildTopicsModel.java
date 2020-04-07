@@ -198,13 +198,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Puts a by-ID topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    ChildTopicsModel putRef(String compDefUri, long refTopicId);
+    ChildTopicsModel setRef(String compDefUri, long refTopicId);
 
     /**
      * Puts a by-URI topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    ChildTopicsModel putRef(String compDefUri, String refTopicUri);
+    ChildTopicsModel setRef(String compDefUri, String refTopicUri);
 
     // ---
 

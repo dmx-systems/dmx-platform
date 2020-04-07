@@ -244,13 +244,13 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final ChildTopicsModel putRef(String compDefUri, long refTopicId) {
+    public final ChildTopicsModel setRef(String compDefUri, long refTopicId) {
         set(compDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
     @Override
-    public final ChildTopicsModel putRef(String compDefUri, String refTopicUri) {
+    public final ChildTopicsModel setRef(String compDefUri, String refTopicUri) {
         set(compDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }

@@ -764,7 +764,7 @@ public class ModelFactoryImpl implements ModelFactory {
     private ChildTopicsModel childTopics(String cardinalityUri, String customAssocTypeUri, boolean isIdentityAttr,
                                          boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
-            .putRef(CARDINALITY, cardinalityUri)
+            .setRef(CARDINALITY, cardinalityUri)
             .set(IDENTITY_ATTR, isIdentityAttr)
             .set(INCLUDE_IN_LABEL, includeInLabel);
         //
@@ -773,7 +773,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 childTopics.putDeletionRef("dmx.core.assoc_type#dmx.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
-                childTopics.putRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocTypeUri);
+                childTopics.setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocTypeUri);
             }
         }
         //
