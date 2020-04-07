@@ -76,7 +76,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         if (configTopic == null) {
             addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, value)));
         } else {
-            configTopic.getChildTopicsModel().put(childTypeUri, value);
+            configTopic.getChildTopics().put(childTypeUri, value);
         }
         return this;
     }
@@ -91,7 +91,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
             // In Java method overloading involves NO dynamic dispatch. See JavaAPITest in dmx-test.
             addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, valueRef)));
         } else {
-            configTopic.getChildTopicsModel().put(childTypeUri, valueRef);
+            configTopic.getChildTopics().put(childTypeUri, valueRef);
         }
         return this;
     }
@@ -104,7 +104,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        return configTopic.getChildTopicsModel().getObject(childTypeUri, null);
+        return configTopic.getChildTopics().getObject(childTypeUri, null);
     }
 
     // ---

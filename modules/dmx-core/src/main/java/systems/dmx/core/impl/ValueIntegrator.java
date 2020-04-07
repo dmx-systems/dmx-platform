@@ -233,7 +233,7 @@ class ValueIntegrator {
      */
     private DMXObjectModelImpl integrateComposite() {
         Map<String, Object> childValues = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
-        ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
+        ChildTopicsModel _childTopics = newValues.getChildTopics();
         // Iterate through type, not through newValues.
         // newValues might contain children not contained in the type def, e.g. "dmx.timestamps.modified".
         for (String compDefUri : compDefUris()) {
@@ -444,7 +444,7 @@ class ValueIntegrator {
      */
     private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel childTopic, String compDefUri) {
         try {
-            ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
+            ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
             RelatedTopicModelImpl oldValue = oldChildTopics.getTopic(compDefUri, null);
             if (oldValue != null && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
@@ -482,7 +482,7 @@ class ValueIntegrator {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopic(compDefUri, null);
+                RelatedTopicModelImpl newChildValue = newValues.getChildTopics().getTopic(compDefUri, null);
                 updateRelatingAssoc(assoc, compDefUri, newChildValue);
             }
         } catch (Exception e) {
@@ -495,7 +495,7 @@ class ValueIntegrator {
      * @param   childValues   never null; a UnifiedValue's "value" field may be null
      */
     private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String compDefUri) {
-        ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
+        ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);   // may be null
         for (UnifiedValue childValue : childValues) {
             TopicModel childTopic = (TopicModel) childValue.value;
@@ -684,7 +684,7 @@ class ValueIntegrator {
                 AssocModelImpl assoc = al.getAssoc(assocTypeUri, parent.id, childTopic.id, PARENT, CHILD);
                 if (assoc != null) {
                     // update memory
-                    parent.getChildTopicsModel().put(
+                    parent.getChildTopics().put(
                         compDefUri,
                         mf.newRelatedTopicModel(childTopic, assoc)
                     );
@@ -709,7 +709,7 @@ class ValueIntegrator {
         while (i.hasNext()) {
             TopicModelImpl parent = i.next();
             parent.loadChildTopics(compDefUri, false);     // deep=false
-            List<? extends TopicModel> childTopics = parent.getChildTopicsModel().getTopics(compDefUri);
+            List<? extends TopicModel> childTopics = parent.getChildTopics().getTopics(compDefUri);
             if (!matches(childTopics, childValues)) {
                 i.remove();
             }
@@ -723,7 +723,7 @@ class ValueIntegrator {
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
         al.createSingleTopic(model, () -> {
             logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
-            ChildTopicsModelImpl childTopics = model.getChildTopicsModel();
+            ChildTopicsModelImpl childTopics = model.getChildTopics();
             for (String compDefUri : childValues.keySet()) {
                 if (isOne(compDefUri)) {
                     TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;

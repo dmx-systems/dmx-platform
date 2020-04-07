@@ -189,13 +189,13 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final ChildTopicsModel getChildTopics(String compDefUri) {
-        return getTopic(compDefUri).getChildTopicsModel();
+        return getTopic(compDefUri).getChildTopics();
     }
 
     @Override
     public final ChildTopicsModel getChildTopics(String compDefUri, ChildTopicsModel defaultValue) {
         RelatedTopicModel topic = getTopic(compDefUri, null);
-        return topic != null ? topic.getChildTopicsModel() : defaultValue;
+        return topic != null ? topic.getChildTopics() : defaultValue;
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.

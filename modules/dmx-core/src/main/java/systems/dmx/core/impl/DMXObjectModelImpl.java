@@ -64,7 +64,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
 
     DMXObjectModelImpl(DMXObjectModelImpl object) {
         this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel(), object.al);
+            object.getChildTopics(), object.al);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -142,7 +142,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
     // --- Child Topics ---
 
     @Override
-    public ChildTopicsModelImpl getChildTopicsModel() {
+    public ChildTopicsModelImpl getChildTopics() {
         return childTopics;
     }
 
@@ -159,7 +159,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         setUri(object.getUri());
         setTypeUri(object.getTypeUri());
         setSimpleValue(object.getSimpleValue());
-        setChildTopicsModel(object.getChildTopicsModel());
+        setChildTopicsModel(object.getChildTopics());
     }
 
     // ---

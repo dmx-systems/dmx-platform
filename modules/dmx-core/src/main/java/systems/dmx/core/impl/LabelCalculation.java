@@ -59,7 +59,7 @@ class LabelCalculation {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private String calculateChildLabel(String compDefUri) {
-        Object value = comp.getChildTopicsModel().get(compDefUri);
+        Object value = comp.getChildTopics().get(compDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return "";

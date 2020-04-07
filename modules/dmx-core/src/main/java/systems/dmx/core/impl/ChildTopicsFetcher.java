@@ -37,7 +37,7 @@ class ChildTopicsFetcher {
      */
     void fetch(DMXObjectModel object, CompDefModel compDef, boolean deep) {
         try {
-            ChildTopicsModel childTopics = object.getChildTopicsModel();
+            ChildTopicsModel childTopics = object.getChildTopics();
             String cardinalityUri = compDef.getChildCardinalityUri();
             String compDefUri     = compDef.getCompDefUri();
             if (cardinalityUri.equals(ONE)) {

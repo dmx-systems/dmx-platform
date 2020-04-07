@@ -317,7 +317,7 @@ class TypeStorage {
             // 2 players
             addPlayerUris(assoc, parentTypeUri, childTypeUri);
             // cardinality (must exist in DB)
-            ChildTopicsModel childTopics = assoc.getChildTopicsModel();
+            ChildTopicsModel childTopics = assoc.getChildTopics();
             childTopics.put(CARDINALITY, fetchCardinality(assoc));
                         // Note: putRef() would not be sufficient. The assoc model must be fully initialized.
                         // Otherwise update would fail. ### TODO: revise comment
