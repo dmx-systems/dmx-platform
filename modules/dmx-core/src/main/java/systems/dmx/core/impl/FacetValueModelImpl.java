@@ -43,43 +43,41 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         return getTopics(childTypeUri);
     }
 
-    // --- ### TODO: rename to "set" (4x)
+    // ---
 
-    public FacetValueModel put(RelatedTopicModel value) {
+    public FacetValueModel set(RelatedTopicModel value) {
         return (FacetValueModel) set(childTypeUri, value);
     }
 
-    public FacetValueModel put(TopicModel value) {
+    public FacetValueModel set(TopicModel value) {
+        return (FacetValueModel) set(childTypeUri, value);
+    }
+
+    public FacetValueModel set(Object value) {
+        return (FacetValueModel) set(childTypeUri, value);
+    }
+
+    public FacetValueModel set(ChildTopicsModel value) {
         return (FacetValueModel) set(childTypeUri, value);
     }
 
     // ---
 
-    public FacetValueModel put(Object value) {
-        return (FacetValueModel) set(childTypeUri, value);
-    }
-
-    public FacetValueModel put(ChildTopicsModel value) {
-        return (FacetValueModel) set(childTypeUri, value);
-    }
-
-    // --- ### TODO: rename to "setRef" (2x)
-
-    public FacetValueModel putRef(long refTopicId) {
+    public FacetValueModel setRef(long refTopicId) {
         return (FacetValueModel) setRef(childTypeUri, refTopicId);
     }
 
-    public FacetValueModel putRef(String refTopicUri) {
+    public FacetValueModel setRef(String refTopicUri) {
         return (FacetValueModel) setRef(childTypeUri, refTopicUri);
     }
 
-    // --- ### TODO: rename to "setDeletionRef" (2x)
+    // ---
 
-    public FacetValueModel putDeletionRef(long refTopicId) {
+    public FacetValueModel setDeletionRef(long refTopicId) {
         return (FacetValueModel) setDeletionRef(childTypeUri, refTopicId);
     }
 
-    public FacetValueModel putDeletionRef(String refTopicUri) {
+    public FacetValueModel setDeletionRef(String refTopicUri) {
         return (FacetValueModel) setDeletionRef(childTypeUri, refTopicUri);
     }
 
@@ -87,8 +85,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // === Multiple-valued Facets ===
 
-    // --- ### TODO: rename to "set"
-    public FacetValueModel put(List<RelatedTopicModel> values) {
+    public FacetValueModel set(List<RelatedTopicModel> values) {
         return (FacetValueModel) set(childTypeUri, values);
     }
 

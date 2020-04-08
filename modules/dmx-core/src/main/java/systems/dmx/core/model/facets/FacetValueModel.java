@@ -33,21 +33,19 @@ public interface FacetValueModel extends ChildTopicsModel {
     /**
      * Puts a value in a single-valued facet.
      */
-    FacetValueModel put(RelatedTopicModel value);
+    FacetValueModel set(RelatedTopicModel value);
 
-    FacetValueModel put(TopicModel value);
-
-    // ---
+    FacetValueModel set(TopicModel value);
 
     /**
      * Convenience method to put a *simple* value in a single-valued facet.
      */
-    FacetValueModel put(Object value);
+    FacetValueModel set(Object value);
 
     /**
      * Convenience method to put a *composite* value in a single-valued facet.
      */
-    FacetValueModel put(ChildTopicsModel value);
+    FacetValueModel set(ChildTopicsModel value);
 
     // ---
 
@@ -55,13 +53,13 @@ public interface FacetValueModel extends ChildTopicsModel {
      * Puts a by-ID topic reference in a single-valued facet.
      * An existing reference is overwritten.
      */
-    FacetValueModel putRef(long refTopicId);
+    FacetValueModel setRef(long refTopicId);
 
     /**
      * Puts a by-URI topic reference in a single-valued facet.
      * An existing reference is overwritten.
      */
-    FacetValueModel putRef(String refTopicUri);
+    FacetValueModel setRef(String refTopicUri);
 
     // ---
 
@@ -69,13 +67,13 @@ public interface FacetValueModel extends ChildTopicsModel {
      * Puts a by-ID topic deletion reference in a single-valued facet.
      * An existing value is overwritten.
      */
-    FacetValueModel putDeletionRef(long refTopicId);
+    FacetValueModel setDeletionRef(long refTopicId);
 
     /**
      * Puts a by-URI topic deletion reference in a single-valued facet.
      * An existing value is overwritten.
      */
-    FacetValueModel putDeletionRef(String refTopicUri);
+    FacetValueModel setDeletionRef(String refTopicUri);
 
 
 
@@ -84,7 +82,7 @@ public interface FacetValueModel extends ChildTopicsModel {
     /**
      * Sets the values of a multiple-valued facet.
      */
-    FacetValueModel put(List<RelatedTopicModel> values);
+    FacetValueModel set(List<RelatedTopicModel> values);
 
     // ---
 
