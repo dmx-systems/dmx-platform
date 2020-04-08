@@ -210,14 +210,14 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         try {
             // check argument
             if (value == null) {
-                throw new IllegalArgumentException("Tried to put null in a ChildTopicsModel");
+                throw new IllegalArgumentException("Tried to set null as a ChildTopicsModel value");
             }
             //
             childTopics.put(compDefUri, value);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (compDefUri=\"" +
-                compDefUri + "\", value=" + value + ")", e);
+            throw new RuntimeException("Setting a ChildTopicsModel value failed, compDefUri=\"" + compDefUri +
+                "\", value=" + value, e);
         }
     }
 
@@ -231,8 +231,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         try {
             return set(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (compDefUri=\"" + compDefUri +
-                "\", value=" + value + ")", e);
+            throw new RuntimeException("Setting a ChildTopicsModel value failed, compDefUri=\"" + compDefUri +
+                "\", value=" + value, e);
         }
     }
 
@@ -304,7 +304,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public final ChildTopicsModel put(String compDefUri, List<RelatedTopicModel> values) {
+    public final ChildTopicsModel set(String compDefUri, List<RelatedTopicModel> values) {
         childTopics.put(compDefUri, values);
         return this;
     }

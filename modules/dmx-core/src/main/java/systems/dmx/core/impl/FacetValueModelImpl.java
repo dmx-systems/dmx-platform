@@ -87,8 +87,9 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // === Multiple-valued Facets ===
 
+    // --- ### TODO: rename to "set"
     public FacetValueModel put(List<RelatedTopicModel> values) {
-        return (FacetValueModel) put(childTypeUri, values);
+        return (FacetValueModel) set(childTypeUri, values);
     }
 
     // ---

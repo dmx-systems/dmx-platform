@@ -43,13 +43,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-
-
-    // ************************************
-    // *** FacetsService Implementation ***
-    // ************************************
-
-
+    // === FacetsService ===
 
     @GET
     @Path("/{facet_type_uri}/topic/{id}")
@@ -99,14 +93,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                     }
                 } else {
                     List<RelatedTopic> values = getFacets(topic, facetTypeUri);
-                    // Note: without the type witness the generic put() method (which takes an Object) would be called
-                    childTopics.put(childTypeUri, DMXUtils.<RelatedTopicModel>toModelList(values));
+                    // Note: without the type witness the generic set() method (which takes an Object) would be called
+                    childTopics.set(childTypeUri, DMXUtils.<RelatedTopicModel>toModelList(values));
                 }
             }
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Getting facetted topic " + topicId + " failed (facetTypeUris=" + facetTypeUris +
-                ")", e);
+            throw new RuntimeException("Getting facetted topic " + topicId + " failed, facetTypeUris=" + facetTypeUris,
+                e);
         }
     }
 
@@ -133,7 +127,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
             updateFacet(dmx.getTopic(topicId), facetTypeUri, value);
         } catch (Exception e) {
             throw new RuntimeException("Updating facet \"" + facetTypeUri + "\" of topic " + topicId +
-                " failed (value=" + value + ")", e);
+                " failed, value=" + value, e);
         }
     }
 
@@ -153,8 +147,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
         Assoc assoc = dmx.getAssoc(assocTypeUri, topicId, facetTopicId, PARENT, CHILD);
         return assoc != null;
     }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

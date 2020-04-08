@@ -163,8 +163,6 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // --- Single-valued Children ---
 
-    // ### TODO: rename "put" methods to "set" to be consistent with ChildTopics interface.
-
     /**
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
@@ -250,7 +248,7 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Sets the values of a multiple-valued child.
      * Existing values are overwritten.
      */
-    ChildTopicsModel put(String compDefUri, List<RelatedTopicModel> values);
+    ChildTopicsModel set(String compDefUri, List<RelatedTopicModel> values);
 
     /**
      * Removes a value from a multiple-valued child.
