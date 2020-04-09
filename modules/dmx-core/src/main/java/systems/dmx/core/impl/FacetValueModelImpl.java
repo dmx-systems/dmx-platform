@@ -15,18 +15,18 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String childTypeUri;
+    private String compDefUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    FacetValueModelImpl(String childTypeUri, ModelFactory mf) {
+    FacetValueModelImpl(String compDefUri, ModelFactory mf) {
         super(new HashMap(), mf);
-        this.childTypeUri = childTypeUri;
+        this.compDefUri = compDefUri;
     }
 
     FacetValueModelImpl(ChildTopicsModelImpl childTopics) {
         super(childTopics);
-        this.childTypeUri = iterator().next();
+        this.compDefUri = iterator().next();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -36,49 +36,49 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     // === Single-valued Facets ===
 
     public RelatedTopicModel getTopic() {
-        return getTopic(childTypeUri);
+        return getTopic(compDefUri);
     }
 
     public List<? extends RelatedTopicModel> getTopics() {
-        return getTopics(childTypeUri);
+        return getTopics(compDefUri);
     }
 
     // ---
 
     public FacetValueModel set(RelatedTopicModel value) {
-        return (FacetValueModel) set(childTypeUri, value);
+        return (FacetValueModel) set(compDefUri, value);
     }
 
     public FacetValueModel set(TopicModel value) {
-        return (FacetValueModel) set(childTypeUri, value);
+        return (FacetValueModel) set(compDefUri, value);
     }
 
     public FacetValueModel set(Object value) {
-        return (FacetValueModel) set(childTypeUri, value);
+        return (FacetValueModel) set(compDefUri, value);
     }
 
     public FacetValueModel set(ChildTopicsModel value) {
-        return (FacetValueModel) set(childTypeUri, value);
+        return (FacetValueModel) set(compDefUri, value);
     }
 
     // ---
 
     public FacetValueModel setRef(long refTopicId) {
-        return (FacetValueModel) setRef(childTypeUri, refTopicId);
+        return (FacetValueModel) setRef(compDefUri, refTopicId);
     }
 
     public FacetValueModel setRef(String refTopicUri) {
-        return (FacetValueModel) setRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) setRef(compDefUri, refTopicUri);
     }
 
     // ---
 
     public FacetValueModel setDeletionRef(long refTopicId) {
-        return (FacetValueModel) setDeletionRef(childTypeUri, refTopicId);
+        return (FacetValueModel) setDeletionRef(compDefUri, refTopicId);
     }
 
     public FacetValueModel setDeletionRef(String refTopicUri) {
-        return (FacetValueModel) setDeletionRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) setDeletionRef(compDefUri, refTopicUri);
     }
 
 
@@ -86,26 +86,26 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     // === Multiple-valued Facets ===
 
     public FacetValueModel set(List<RelatedTopicModel> values) {
-        return (FacetValueModel) set(childTypeUri, values);
+        return (FacetValueModel) set(compDefUri, values);
     }
 
     // ---
 
     public FacetValueModel addRef(long refTopicId) {
-        return (FacetValueModel) addRef(childTypeUri, refTopicId);
+        return (FacetValueModel) addRef(compDefUri, refTopicId);
     }
 
     public FacetValueModel addRef(String refTopicUri) {
-        return (FacetValueModel) addRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) addRef(compDefUri, refTopicUri);
     }
 
     // ---
 
     public FacetValueModel addDeletionRef(long refTopicId) {
-        return (FacetValueModel) addDeletionRef(childTypeUri, refTopicId);
+        return (FacetValueModel) addDeletionRef(compDefUri, refTopicId);
     }
 
     public FacetValueModel addDeletionRef(String refTopicUri) {
-        return (FacetValueModel) addDeletionRef(childTypeUri, refTopicUri);
+        return (FacetValueModel) addDeletionRef(compDefUri, refTopicUri);
     }
 }
