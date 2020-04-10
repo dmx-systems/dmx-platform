@@ -111,75 +111,83 @@ class ChildTopicsImpl implements ChildTopics {
 
     @Override
     public String getString(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().toString();
+        loadChildTopics(compDefUri);
+        return model.getString(compDefUri);
     }
 
     @Override
-    public String getStringOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().toString() : null;
+    public String getString(String compDefUri, String defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getString(compDefUri, defaultValue);
     }
 
     @Override
     public int getInt(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().intValue();
+        loadChildTopics(compDefUri);
+        return model.getInt(compDefUri);
     }
 
     @Override
-    public Integer getIntOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().intValue() : null;
+    public int getInt(String compDefUri, int defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getInt(compDefUri, defaultValue);
     }
 
     @Override
     public long getLong(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().longValue();
+        loadChildTopics(compDefUri);
+        return model.getLong(compDefUri);
     }
 
     @Override
-    public Long getLongOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().longValue() : null;
+    public long getLong(String compDefUri, long defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getLong(compDefUri, defaultValue);
     }
 
     @Override
     public double getDouble(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().doubleValue();
+        loadChildTopics(compDefUri);
+        return model.getDouble(compDefUri);
     }
 
     @Override
-    public Double getDoubleOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().doubleValue() : null;
+    public double getDouble(String compDefUri, double defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getDouble(compDefUri, defaultValue);
     }
 
     @Override
     public boolean getBoolean(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().booleanValue();
+        loadChildTopics(compDefUri);
+        return model.getBoolean(compDefUri);
     }
 
     @Override
-    public Boolean getBooleanOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().booleanValue() : null;
+    public boolean getBoolean(String compDefUri, boolean defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getBoolean(compDefUri, defaultValue);
     }
 
     @Override
     public Object getObject(String compDefUri) {
-        return getTopic(compDefUri).getSimpleValue().value();
+        loadChildTopics(compDefUri);
+        return model.getObject(compDefUri);
     }
 
     @Override
-    public Object getObjectOrNull(String compDefUri) {
-        Topic topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getSimpleValue().value() : null;
+    public Object getObject(String compDefUri, Object defaultValue) {
+        loadChildTopics(compDefUri);
+        return model.getObject(compDefUri, defaultValue);
     }
 
     // ---
 
     @Override
     public ChildTopics getChildTopics(String compDefUri) {
-        return getTopic(compDefUri).getChildTopics();
+        loadChildTopics(compDefUri);
+        TopicModelImpl topic = model.getTopic(compDefUri);
+        return new ChildTopicsImpl(topic.childTopics, topic, al);
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.

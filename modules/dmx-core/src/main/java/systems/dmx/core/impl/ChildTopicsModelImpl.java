@@ -67,14 +67,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     @Override
     public final RelatedTopicModelImpl getTopicOrNull(String compDefUri) {
         try {
-            return (RelatedTopicModelImpl) childTopics.get(compDefUri);
+            return (RelatedTopicModelImpl) get(compDefUri);
         } catch (ClassCastException e) {
             throwInvalidSingleAccess(compDefUri, e);
             return null;    // never reached
         }
     }
-
-    // ---
 
     @Override
     public final List<RelatedTopicModelImpl> getTopics(String compDefUri) {
@@ -90,7 +88,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     @Override
     public final List<RelatedTopicModelImpl> getTopicsOrNull(String compDefUri) {
         try {
-            return (List<RelatedTopicModelImpl>) childTopics.get(compDefUri);
+            return (List<RelatedTopicModelImpl>) get(compDefUri);
         } catch (ClassCastException e) {
             throwInvalidMultiAccess(compDefUri, e);
             return null;    // never reached
@@ -187,14 +185,14 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final ChildTopicsModel getChildTopics(String compDefUri) {
-        return getTopic(compDefUri).getChildTopics();
+    public final ChildTopicsModelImpl getChildTopics(String compDefUri) {
+        return getTopic(compDefUri).childTopics;
     }
 
     @Override
-    public final ChildTopicsModel getChildTopics(String compDefUri, ChildTopicsModel defaultValue) {
-        RelatedTopicModel topic = getTopicOrNull(compDefUri);
-        return topic != null ? topic.getChildTopics() : defaultValue;
+    public final ChildTopicsModelImpl getChildTopics(String compDefUri, ChildTopicsModel defaultValue) {
+        RelatedTopicModelImpl topic = getTopicOrNull(compDefUri);
+        return topic != null ? topic.childTopics : (ChildTopicsModelImpl) defaultValue;
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.

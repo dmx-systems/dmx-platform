@@ -23,11 +23,11 @@ public interface ChildTopics extends Iterable<String> {
 
     /**
      * Accesses a multiple-valued child.
-     * Throws if there is no such child. ### TODO: return empty list instead
+     * Throws if there is no such child. ### TODO: explain why not return an empty list instead
      */
     List<RelatedTopic> getTopics(String compDefUri);
 
-    List<RelatedTopic> getTopicsOrNull(String compDefUri); // ### TODO: drop this method
+    List<RelatedTopic> getTopicsOrNull(String compDefUri); // ### TODO: explain why not return an empty list instead
 
     // ---
 
@@ -47,7 +47,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     String getString(String compDefUri);
 
-    String getStringOrNull(String compDefUri);
+    String getString(String compDefUri, String defaultValue);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -55,7 +55,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     int getInt(String compDefUri);
 
-    Integer getIntOrNull(String compDefUri);
+    int getInt(String compDefUri, int defaultValue);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -63,7 +63,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     long getLong(String compDefUri);
 
-    Long getLongOrNull(String compDefUri);
+    long getLong(String compDefUri, long defaultValue);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -71,7 +71,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     double getDouble(String compDefUri);
 
-    Double getDoubleOrNull(String compDefUri);
+    double getDouble(String compDefUri, double defaultValue);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -79,7 +79,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     boolean getBoolean(String compDefUri);
 
-    Boolean getBooleanOrNull(String compDefUri);
+    boolean getBoolean(String compDefUri, boolean defaultValue);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -87,7 +87,7 @@ public interface ChildTopics extends Iterable<String> {
      */
     Object getObject(String compDefUri);
 
-    Object getObjectOrNull(String compDefUri);
+    Object getObject(String compDefUri, Object defaultValue);
 
     // ---
 
