@@ -84,9 +84,13 @@ public interface ChildTopics extends Iterable<String> {
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
+     * ### TODO: rename to "getValue()"
      */
     Object getObject(String compDefUri);
 
+    /**
+     * ### TODO: rename to "getValue()"
+     */
     Object getObject(String compDefUri, Object defaultValue);
 
     // ---

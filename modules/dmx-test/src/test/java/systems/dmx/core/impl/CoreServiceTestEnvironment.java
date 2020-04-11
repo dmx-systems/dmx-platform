@@ -30,8 +30,8 @@ public class CoreServiceTestEnvironment {
 
     @Before
     public void setup() {
-        mf = new ModelFactoryImpl();
         db = CoreActivator.openDB(DATABASE_FACTORY, JavaUtils.createTempDirectory("dmx-test-").getAbsolutePath());
+        mf = db.getModelFactory();
         dmx = new CoreServiceImpl(new AccessLayer(db), null);     // bundleContext=null
     }
 

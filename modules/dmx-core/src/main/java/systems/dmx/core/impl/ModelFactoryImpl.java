@@ -907,7 +907,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private AccessLayer al() {
         if (al == null) {
-            throw new RuntimeException("Before using the ModelFactory a AccessLayer must be set");
+            throw new RuntimeException("Before using the ModelFactory an AccessLayer must be set");
         }
         return al;
     }
