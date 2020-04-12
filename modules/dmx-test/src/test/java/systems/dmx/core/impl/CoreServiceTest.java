@@ -272,7 +272,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // "Person Name" (simple)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", TEXT));
             // "Comment" (composite)
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", ONE
                 ))
@@ -305,7 +305,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.first_name", "First Name", TEXT));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.last_name",  "Last Name",  TEXT));
             // "Person Name" (composite)
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", VALUE)
                 .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.first_name", ONE
                 ))
@@ -314,7 +314,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 ))
             );
             // "Comment" (composite)
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", ONE
                 ))
@@ -350,7 +350,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.first_name", "First Name", TEXT));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.last_name",  "Last Name",  TEXT));
             // "Person Name" (composite)
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", VALUE)
                 .addCompDef(mf.newCompDefModel(null, false, true,
                     "dmx.test.person_name", "dmx.test.first_name", ONE
                 ))
@@ -359,7 +359,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 ))
             );
             // "Comment" (composite)
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.comment", "dmx.test.person_name", ONE
                 ))
