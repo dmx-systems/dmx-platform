@@ -446,7 +446,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", TEXT));
             dmx.createAssocType(mf.newAssocTypeModel("dmx.test.birthday", "Birthday", TEXT));
             TopicTypeImpl tt = dmx.createTopicType(
-                mf.newTopicTypeModel("dmx.test.person", "Person", COMPOSITE).addCompDef(
+                mf.newTopicTypeModel("dmx.test.person", "Person", IDENTITY).addCompDef(
                     mf.newCompDefModel("dmx.test.birthday", false, false,
                         "dmx.test.person", "dmx.test.date", ONE)));
             // test comp def children *before* set
@@ -925,7 +925,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", TEXT));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item", "Item", TEXT));
             // parent type
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.composite", "Composite", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.composite", "Composite", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.composite", "dmx.test.name", ONE
                 ))
@@ -995,7 +995,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define facet
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item", "Item", TEXT));
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item_facet", "Item Facet", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item_facet", "Item Facet", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.item_facet", "dmx.test.item", ONE
                 ))
@@ -1062,7 +1062,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
             // parent type
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", MANY
                 ))
@@ -1091,7 +1091,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define parent type (with Aggregation-Many child definition)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", MANY
                 ))
@@ -1120,7 +1120,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // child type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
             // parent type
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", MANY
                 ))
@@ -1145,7 +1145,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define parent type (with Aggregation-One child definition)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", ONE
                 ))
@@ -1175,7 +1175,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define composite type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", ONE
                 ))
@@ -1201,7 +1201,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define composite type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", TEXT));
-            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", COMPOSITE)
+            dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", IDENTITY)
                 .addCompDef(mf.newCompDefModel(
                     "dmx.test.parent", "dmx.test.child", ONE
                 ))
