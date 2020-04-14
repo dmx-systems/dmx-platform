@@ -13,7 +13,7 @@ copy-and-deploy:
   script:
     # add plugins and copy to download area
     - DISTDIR='modules/dmx-distribution/target'
-    - PLUGINS=( dmx-geomaps dmx-ldap dmx-tableview dmx-cooking )
+    - PLUGINS=( dmx-geomaps dmx-mobile dmx-ldap dmx-tableview dmx-cooking )
     - WEBSRC='https://download.dmx.systems/ci/'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
