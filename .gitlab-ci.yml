@@ -31,7 +31,7 @@ copy-and-deploy:
     - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    - for plugin in "${PLUGINS[@]}"; do wget -P ${DMXDIR}${DSTDIR} ${WEBSRC}/${plugin}/${plugin}-latest.jar; done
+    - for plugin in "${PLUGINS[@]}"; do wget -q ${WEBSRC}/${plugin}/${plugin}-latest.jar -P ${DMXDIR}${DSTDIR}; done
     - zip -mr ${ZIPFILE} ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
