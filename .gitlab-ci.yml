@@ -19,16 +19,14 @@ copy-and-deploy:
     - NUNC="$( date +%F )"
     - MY_JOB_TOKEN="$(</home/gitlab-runner/.after-maven-build.token)"
     - DSTDIR='bundle-available'
-    - | 
-        ABOUTDIR="About the bundle-available directory\n
-        ------------------------------------\n\n
-        This directory contains a set of selected DMX plugins.\n\n
-        To activate a plugin copy or link to the bundles-deploy folder.\n
-        Find more information on DMX plugins at\n\n
-        https://git.dmx.systems/dmx-plugins"
     - DMXDIR="$( zipinfo -1 ${ZIPFILE} | head -n1 )"
     - mkdir -p ${DMXDIR}${DSTDIR}
-    - echo -e "${ABOUTDIR}" >${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "About the bundle-available directory" >${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "------------------------------------\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "This directory contains a set of selected DMX plugins.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
+    - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - for plugin in "${PLUGINS[@]}"; do wget -P ${DMXDIR}${DSTDIR} ${SRCDIR}/${plugin}/${plugin}-latest.jar; done
     - zip -mr ${ZIPFILE} ${ ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
