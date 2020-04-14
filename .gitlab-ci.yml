@@ -14,6 +14,7 @@ copy-and-deploy:
     # add plugins and copy to download area
     - DISTDIR='modules/dmx-distribution/target'
     - PLUGINS=( dmx-geomaps dmx-ldap dmx-tableview dmx-cooking )
+    - WEBSRC='https://download.dmx.systems/ci/'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
     - FILENAME="$( basename ${ZIPFILE} .zip )"
@@ -21,7 +22,6 @@ copy-and-deploy:
     - MY_JOB_TOKEN="$(</home/gitlab-runner/.after-maven-build.token)"
     - DSTDIR='bundle-available'
     - ZIPINFO="$( zipinfo -1 ${ZIPFILE} )"
-    - echo "ZIPINFO = ${ZIPINFO}"
     - DMXDIR="$( head -n1 <<<${ZIPINFO} )"
     - echo "DMXDIR = ${DMXDIR}"
     - mkdir -p ${DMXDIR}${DSTDIR}
@@ -31,7 +31,7 @@ copy-and-deploy:
     - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    - for plugin in "${PLUGINS[@]}"; do wget -P ${DMXDIR}${DSTDIR} ${SRCDIR}/${plugin}/${plugin}-latest.jar; done
+    - for plugin in "${PLUGINS[@]}"; do wget -P ${DMXDIR}${DSTDIR} ${WEBSRC}/${plugin}/${plugin}-latest.jar; done
     - zip -mr ${ZIPFILE} ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
