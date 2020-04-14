@@ -617,26 +617,25 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXType type = dmx.getTopicType(PLUGIN);
         //
         // find comp def 1/3
-        RelatedAssoc compDef = type.getRelatedAssoc("dmx.core.aggregation", TYPE, SEQUENCE_START, null);
-                                                                                        // othersAssocTypeUri=null
+        RelatedAssoc compDef = type.getRelatedAssoc(COMPOSITION, TYPE, SEQUENCE_START, COMPOSITION_DEF);
         logger.info("### comp def ID 1/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 2/3
-        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, COMPOSITION_DEF);
         logger.info("### comp def ID 2/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // find comp def 3/3
-        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, COMPOSITION_DEF);
         logger.info("### comp def ID 3/3 = " + compDef.getId() + ", relating assoc ID = " +
             compDef.getRelatingAssoc().getId());
         assertNotNull(compDef);
         //
         // there is no other
-        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, null);      // othersAssocTypeUri=null
+        compDef = compDef.getRelatedAssoc(SEQUENCE, PREDECESSOR, SUCCESSOR, COMPOSITION_DEF);
         assertNull(compDef);
     }
 
