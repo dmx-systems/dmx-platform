@@ -706,9 +706,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void getTopicsByType() {
         Topic type = dmx.getTopicByUri(DATA_TYPE);
         List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
-        assertEquals(5, topics1.size());
+        assertEquals(7, topics1.size());
         List<Topic> topics2 = getTopicInstances(DATA_TYPE);
-        assertEquals(5, topics2.size());
+        assertEquals(7, topics2.size());
     }
 
     // Note: when the meta model changes the values might need adjustment

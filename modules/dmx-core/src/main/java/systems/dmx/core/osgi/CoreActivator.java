@@ -112,9 +112,12 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     public static <S> S getService(Class<S> clazz) {
+        if (bundleContext == null) {
+            throw new RuntimeException("Core bundle context not available");
+        }
         S serviceObject = bundleContext.getService(bundleContext.getServiceReference(clazz));
         if (serviceObject == null) {
-            throw new RuntimeException("Service \"" + clazz.getName() + "\" is not available");
+            throw new RuntimeException("Service \"" + clazz.getName() + "\" not available");
         }
         return serviceObject;
     }
