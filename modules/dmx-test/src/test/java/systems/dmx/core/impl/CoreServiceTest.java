@@ -557,7 +557,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.success();
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            assertNotNull(cause);
+            assertTrue(cause.getMessage().startsWith("Value integration failed"));
+            cause = cause.getCause();
+            assertTrue(cause.getMessage().startsWith("Creating single topic failed"));
+            cause = cause.getCause();
             assertEquals("URI \"dmx.my.uri\" is not unique", cause.getMessage());
         } finally {
             tx.finish();
