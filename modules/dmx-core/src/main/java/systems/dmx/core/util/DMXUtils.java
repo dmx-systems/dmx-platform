@@ -224,12 +224,11 @@ public class DMXUtils {
         if (!(r1 instanceof TopicPlayerModel) || !(r2 instanceof TopicPlayerModel)) {
             return null;
         }
-        CoreService dmx = CoreActivator.getCoreService();
         // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
         // is not yet available in case the association is part of the player's composite structure.
         // Compare to AssocModelImpl.duplicateCheck()
-        String t1 = (String) dmx.getProperty(r1.getId(), "typeUri");
-        String t2 = (String) dmx.getProperty(r2.getId(), "typeUri");
+        String t1 = r1.getTypeUri();
+        String t2 = r2.getTypeUri();
         PlayerModel player1 = getPlayer(r1, r2, t1, t2, topicTypeUri1, 1);
         PlayerModel player2 = getPlayer(r1, r2, t1, t2, topicTypeUri2, 2);
         // Note: if topicTypeUri1 equals topicTypeUri2 and in the assoc only *one* player matches this type
