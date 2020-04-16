@@ -71,6 +71,13 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     // === Updating ===
 
+    // TODO: specify canonic update() here?
+    // See update() in Topic/Assoc sub-interface.
+
+    /**
+     * Note: this method is meant only for facet updates.
+     * For canonic update use update() provided by Topic/Assoc sub-interface.
+     */
     void updateChildTopics(ChildTopicsModel updateModel, CompDef compDef);
 
 

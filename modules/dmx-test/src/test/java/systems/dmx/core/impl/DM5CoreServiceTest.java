@@ -184,25 +184,24 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
-    // Author: Malte Reißig
+    // Author: Malte Reißig, revised by jri at 2020/04/16
     @Test
     public void childParentUpdate() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineSimpleNameIdentityModel();
-            String fullCompDefUriToBeUpdated = "simple.name";
+            String SIMPLE_NAME   = "simple.name";
+            String SIMPLE_ENTITY = "simple.entity";
             // create composite topic
-            ChildTopicsModel cm1 = mf.newChildTopicsModel().set(fullCompDefUriToBeUpdated, "Test");
-            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", cm1));
-            assertTrue("Test".equals(topic.getSimpleValue().toString()));
-            // updating simple child text topic
-            TopicType parentType = dmx.getTopicType(topic.getTypeUri());
-            CompDef typeRelation = parentType.getCompDef(fullCompDefUriToBeUpdated);
-            ChildTopicsModel cm2 = mf.newChildTopicsModel().set(fullCompDefUriToBeUpdated, "Test Studio");
-            topic.updateChildTopics(cm2, typeRelation);
-            // assert child topic value and parent value update
-            assertTrue("Test Studio".equals(topic.getChildTopics().getString(fullCompDefUriToBeUpdated)));
-            assertTrue("Test Studio".equals(topic.getSimpleValue().toString()));
+            Topic topic = dmx.createTopic(mf.newTopicModel(SIMPLE_ENTITY,
+                mf.newChildTopicsModel().set(SIMPLE_NAME, "Test")
+            ));
+            assertEquals("Test", topic.getSimpleValue().toString());
+            // update child
+            topic.getChildTopics().set(SIMPLE_NAME, "Test Studio");
+            // both have changed, child value and parent value
+            assertEquals("Test Studio", topic.getChildTopics().getString(SIMPLE_NAME));
+            assertEquals("Test Studio", topic.getSimpleValue().toString());
         } finally {
             tx.finish();
         }
