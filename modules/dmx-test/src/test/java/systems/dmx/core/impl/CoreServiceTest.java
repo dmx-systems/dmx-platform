@@ -717,10 +717,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         List<RelatedAssoc> assocs;
         //
         assocs = getAssocInstancesByTraversal(INSTANTIATION);
-        assertEquals(66, assocs.size());
+        assertEquals(39, assocs.size());
         //
         assocs = getAssocInstancesByTraversal(COMPOSITION_DEF);
-        assertEquals(5, assocs.size());
+        assertEquals(7, assocs.size());
     }
 
     // ---
