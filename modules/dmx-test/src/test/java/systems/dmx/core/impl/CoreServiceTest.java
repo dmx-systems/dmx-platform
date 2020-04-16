@@ -878,19 +878,19 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             type = dmx.getTopicByUri(DATA_TYPE);
             topics = getTopicInstancesByTraversal(type);
-            assertEquals(5, topics.size());
+            assertEquals(7, topics.size());
             //
             // retype topic
             Topic topic = topics.get(0);
             assertEquals(DATA_TYPE, topic.getTypeUri());
-            topic.setTypeUri("dmx.core.index_mode");
-            assertEquals("dmx.core.index_mode", topic.getTypeUri());
+            topic.setTypeUri(PLUGIN_NAME);
+            assertEquals(PLUGIN_NAME, topic.getTypeUri());
             topic = dmx.getTopic(topic.getId());
-            assertEquals("dmx.core.index_mode", topic.getTypeUri());
+            assertEquals(PLUGIN_NAME, topic.getTypeUri());
             //
             // re-execute query
             topics = getTopicInstancesByTraversal(type);
-            assertEquals(4, topics.size());
+            assertEquals(6, topics.size());
             // ### Note: in contrast to the above 4 tests this time the Lucene index update *is* visible
             // ### within the transaction! This suggests the following hypothesis:
             // ###     index.remove(entity) operation *is* visible within the transaction
@@ -907,7 +907,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         topics = getTopicInstancesByTraversal(type);
-        assertEquals(4, topics.size());
+        assertEquals(6, topics.size());
         // ### Note: the Lucene index update was already visible within the transaction!
     }
 
