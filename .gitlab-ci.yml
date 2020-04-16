@@ -14,7 +14,8 @@ copy-and-deploy:
     # add plugins and copy to download area
     - DISTDIR='modules/dmx-distribution/target'
     - PLUGINS=( dmx-geomaps dmx-mobile dmx-ldap dmx-tableview dmx-cooking )
-    - WEBSRC='https://download.dmx.systems/ci/'
+    #- WEBSRC='https://download.dmx.systems/ci/'
+    - WEBCGI='https://download.dmx.systems/cgi-bin/v1/latest-version.cgi?'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
     - FILENAME="$( basename ${ZIPFILE} .zip )"
@@ -31,7 +32,7 @@ copy-and-deploy:
     - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
     - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    - for plugin in "${PLUGINS[@]}"; do wget -q ${WEBSRC}/${plugin}/${plugin}-latest.jar -P ${DMXDIR}${DSTDIR}; done
+    - for plugin in "${PLUGINS[@]}"; do LATEST="$( wget -q -O - ${WEBCGI}/ci/${plugin}/${plugin}-latest.jar )"; wget -q ${LATEST} -P ${DMXDIR}${DSTDIR}; done
     - zip -mr ${ZIPFILE} ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
