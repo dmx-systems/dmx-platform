@@ -17,10 +17,6 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    // ### TODO: drop this?
-    PlayerModelImpl() {
-    }
-
     PlayerModelImpl(long playerId, String roleTypeUri, AccessLayer al) {
         this.id = playerId;
         setRoleTypeUri(roleTypeUri);
@@ -31,11 +27,16 @@ abstract class PlayerModelImpl implements PlayerModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public long getId() {
+    public final long getId() {
         if (id == -1) {
             throw new IllegalStateException("No player ID set in " + this);
         }
         return id;
+    }
+
+    @Override
+    public final String getTypeUri() {
+        return (String) al.db.fetchProperty(getId(), "typeUri");
     }
 
     @Override

@@ -8,6 +8,8 @@ public interface PlayerModel extends JSONEnabled, Cloneable {
 
     long getId();
 
+    String getTypeUri();
+
     String getRoleTypeUri();
 
     // ---
