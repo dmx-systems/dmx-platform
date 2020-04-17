@@ -1247,9 +1247,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void coreACAssignTopicToWorkspace() {
+    public void privilegedAccessAssignTopicToWorkspace() {
         DMXTransaction tx = dmx.beginTx();
         try {
+            setupWorkspacesModel();
+            //
             Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
             Topic ws = dmx.createTopic(mf.newTopicModel(PLUGIN));
             //
@@ -1265,9 +1267,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void coreACAssignAssocToWorkspace() {
+    public void privilegedAccessAssignAssocToWorkspace() {
         DMXTransaction tx = dmx.beginTx();
         try {
+            setupWorkspacesModel();
+            //
             Topic t1 = dmx.createTopic(mf.newTopicModel(PLUGIN));
             Topic t2 = dmx.createTopic(mf.newTopicModel(PLUGIN));
             Topic ws = dmx.createTopic(mf.newTopicModel(PLUGIN));
@@ -1326,6 +1330,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         createAssoc(t0, a1);
         createAssoc(t0, a2);
         createAssoc(t0, a3);
+    }
+
+    private void setupWorkspacesModel() {
+        dmx.createAssocType(mf.newAssocTypeModel("dmx.workspaces.workspace_assignment", "Workspace Assignment", TEXT));
     }
 
     // ---
