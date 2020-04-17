@@ -37,7 +37,6 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics);
 
-    // ### TODO: make internal?
     TopicModel newTopicModel(ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(String typeUri);

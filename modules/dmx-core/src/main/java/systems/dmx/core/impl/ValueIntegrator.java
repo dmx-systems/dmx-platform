@@ -89,8 +89,12 @@ class ValueIntegrator {
             if (newValues instanceof TopicDeletionModel) {
                 return new UnifiedValue(null);
             }
+            // convenience: take newValues's typeUri from target object (if available)
+            if (newValues.typeUri == null && targetObject != null) {
+                newValues.typeUri = targetObject.typeUri;
+            }
             // argument check
-            if (newValues.getTypeUri() == null) {
+            if (newValues.typeUri == null) {
                 throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
                     newValues + ", targetObject=" + targetObject);
             }
