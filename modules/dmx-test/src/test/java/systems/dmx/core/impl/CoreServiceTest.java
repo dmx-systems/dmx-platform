@@ -957,9 +957,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update and check again
         tx = dmx.beginTx();
         try {
-            comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
+            comp1.update(mf.newTopicModel(mf.newChildTopicsModel()
                 .setRef("dmx.test.item", item2.getId())
             ));
+            // Note: this would be more easy and have the same effect:
+            // comp1.getChildTopics().setRef("dmx.test.item", item2.getId());
             tx.success();
         } finally {
             tx.finish();
@@ -974,9 +976,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update and check again
         tx = dmx.beginTx();
         try {
-            comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
+            comp1.update(mf.newTopicModel(mf.newChildTopicsModel()
                 .setRef("dmx.test.item", item1.getId())
             ));
+            // Note: this would be more easy and have the same effect:
+            // comp1.getChildTopics().setRef("dmx.test.item", item1.getId());
             tx.success();
         } finally {
             tx.finish();
