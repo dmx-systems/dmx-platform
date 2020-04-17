@@ -186,7 +186,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
 
     // Author: Malte Reißig, revised by jri at 2020/04/16
     @Test
-    public void childParentUpdate() {
+    public void childParentValueUpdate() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineSimpleNameIdentityModel();
@@ -207,37 +207,58 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
-    // Author: Malte Reißig
+    // Author: Malte Reißig, revised by jri at 2020/04/17
     @Test
-    public void addChildTopics() {
+    public void addChildTopicByValue() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineManyNamesIdentityModel();
-            String fullCompDefUriToBeUpdated = "simple.name";
-            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullCompDefUriToBeUpdated,
-                    mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
-            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
-            Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
-            topic.getChildTopics().add(fullCompDefUriToBeUpdated, futureChild.getModel());
+            String SIMPLE_NAME   = "simple.name";
+            String SIMPLE_ENTITY = "simple.entity";
+            // create composite topic
+            Topic topic = dmx.createTopic(mf.newTopicModel(SIMPLE_ENTITY,
+                mf.newChildTopicsModel().add(SIMPLE_NAME, "Text 1")
+            ));
+            // create simple topic
+            Topic topic2 = dmx.createTopic(mf.newTopicModel(SIMPLE_NAME, new SimpleValue("Text 2")));
+            // there are now 2 simple.name topics
+            assertSame(2, dmx.getTopicsByType(SIMPLE_NAME).size());
+            //
+            // add child topic by-value
+            topic.getChildTopics().add(SIMPLE_NAME, "Text 2");
+            // now the composite has 2 children -- the existing "Text 2" topic was identified (by-value) and reused
+            List<RelatedTopic> children = topic.getChildTopics().getTopics(SIMPLE_NAME);
+            assertEquals(2,              children.size());
+            assertEquals(topic2.getId(), children.get(1).getId());
+            // no further simple.name topic is created
+            assertEquals(2, dmx.getTopicsByType(SIMPLE_NAME).size());
         } finally {
             tx.finish();
         }
     }
 
-    // Author: Malte Reißig
+    // Author: Malte Reißig, revised by jri at 2020/04/17
     @Test
-    public void addRefChildTopics() {
+    public void addChildTopicByRef() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineManyNamesIdentityModel();
-            String fullCompDefUriToBeUpdated = "simple.name";
-            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullCompDefUriToBeUpdated,
-                    mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
-            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
-            Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
-            topic.getChildTopics().addRef(fullCompDefUriToBeUpdated, futureChild.getId());
-            List<RelatedTopic> children = topic.getChildTopics().getTopics(fullCompDefUriToBeUpdated);
-            assertSame(2, children.size());
+            String SIMPLE_NAME   = "simple.name";
+            String SIMPLE_ENTITY = "simple.entity";
+            // create composite topic
+            Topic topic = dmx.createTopic(mf.newTopicModel(SIMPLE_ENTITY,
+                mf.newChildTopicsModel().add(SIMPLE_NAME, "Text 1")
+            ));
+            // create simple topic
+            Topic topic2 = dmx.createTopic(mf.newTopicModel(SIMPLE_NAME, new SimpleValue("Text 2")));
+            // there are now 2 simple.name topics
+            assertEquals(2, dmx.getTopicsByType(SIMPLE_NAME).size());
+            //
+            // add child topic by-ref
+            topic.getChildTopics().addRef(SIMPLE_NAME, topic2.getId());
+            // now the composite has 2 children
+            List<RelatedTopic> children = topic.getChildTopics().getTopics(SIMPLE_NAME);
+            assertEquals(2, children.size());
             assertEquals("Text 1", children.get(0).getSimpleValue().toString());
             assertEquals("Text 2", children.get(1).getSimpleValue().toString());
         } finally {
