@@ -3,7 +3,7 @@ maven-build:
   script:
     - node -v
     - npm -v
-    - mvn clean install -P all,dist -DskipTests
+    - mvn clean install -P all,dist
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
