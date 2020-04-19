@@ -286,6 +286,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         );
     }
 
+    // ---
+
     private void defineSimpleNameIdentityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)

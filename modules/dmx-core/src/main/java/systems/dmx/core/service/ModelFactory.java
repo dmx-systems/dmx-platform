@@ -51,11 +51,13 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics);
 
-    // ### TODO: make internal?
+    // TODO: make internal?
     TopicModel newTopicModel(long id);
 
-    // ### TODO: make internal?
+    // TODO: make internal? -> Rather not. Might be needed by app developer to replace a multi-value.
     TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
+
+    // TODO: add newTopicModel(long id, SimpleValue value)?
 
     TopicModel newTopicModel(TopicModel topic);
 
