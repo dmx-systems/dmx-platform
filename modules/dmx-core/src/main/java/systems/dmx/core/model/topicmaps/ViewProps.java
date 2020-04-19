@@ -12,12 +12,6 @@ public interface ViewProps extends Iterable<String>, JSONEnabled {
 
     Object get(String propUri);
 
-    ViewProps put(String propUri, Object value);
-
-    void store(DMXObject object);
-
-    // ---
-
     /**
      * Convenience getter.
      */
@@ -27,4 +21,8 @@ public interface ViewProps extends Iterable<String>, JSONEnabled {
      * Convenience getter.
      */
     boolean getBoolean(String propUri);
+
+    ViewProps set(String propUri, Object value);
+
+    void store(DMXObject object);
 }

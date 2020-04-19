@@ -73,7 +73,17 @@ class ViewPropsImpl implements ViewProps {
     }
 
     @Override
-    public ViewProps put(String propUri, Object value) {
+    public int getInt(String propUri) {
+        return (Integer) get(propUri);
+    }
+
+    @Override
+    public boolean getBoolean(String propUri) {
+        return (Boolean) get(propUri);
+    }
+
+    @Override
+    public ViewProps set(String propUri, Object value) {
         viewProps.put(propUri, value);
         return this;
     }
@@ -83,18 +93,6 @@ class ViewPropsImpl implements ViewProps {
         for (String propUri : this) {
             object.setProperty(propUri, get(propUri), false);       // addToIndex = false
         }
-    }
-
-    // ---
-
-    @Override
-    public int getInt(String propUri) {
-        return (Integer) get(propUri);
-    }
-
-    @Override
-    public boolean getBoolean(String propUri) {
-        return (Boolean) get(propUri);
     }
 
     // ---
@@ -117,15 +115,15 @@ class ViewPropsImpl implements ViewProps {
     // ------------------------------------------------------------------------------------------------ Private  Methods
 
     private void initPos(int x, int y) {
-        put("dmx.topicmaps.x", x);
-        put("dmx.topicmaps.y", y);
+        set("dmx.topicmaps.x", x);
+        set("dmx.topicmaps.y", y);
     }
 
     private void initVisibility(boolean visibility) {
-        put("dmx.topicmaps.visibility", visibility);
+        set("dmx.topicmaps.visibility", visibility);
     }
 
     private void initPinned(boolean pinned) {
-        put("dmx.topicmaps.pinned", pinned);
+        set("dmx.topicmaps.pinned", pinned);
     }
 }

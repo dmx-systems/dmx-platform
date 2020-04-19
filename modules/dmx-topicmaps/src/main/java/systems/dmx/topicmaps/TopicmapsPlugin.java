@@ -363,9 +363,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                       @PathParam("zoom") double zoom) {
         try {
             mf.newViewProps()
-                .put(PROP_PAN_X, panX)
-                .put(PROP_PAN_Y, panY)
-                .put(PROP_ZOOM, zoom)
+                .set(PROP_PAN_X, panX)
+                .set(PROP_PAN_Y, panY)
+                .set(PROP_ZOOM, zoom)
                 .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
             throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed, panX=" + panX +
@@ -490,9 +490,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private ViewProps fetchTopicmapViewProps(Topic topicmapTopic) {
         return mf.newViewProps()
-            .put(PROP_PAN_X, topicmapTopic.getProperty(PROP_PAN_X))
-            .put(PROP_PAN_Y, topicmapTopic.getProperty(PROP_PAN_Y))
-            .put(PROP_ZOOM,  topicmapTopic.getProperty(PROP_ZOOM));
+            .set(PROP_PAN_X, topicmapTopic.getProperty(PROP_PAN_X))
+            .set(PROP_PAN_Y, topicmapTopic.getProperty(PROP_PAN_Y))
+            .set(PROP_ZOOM,  topicmapTopic.getProperty(PROP_ZOOM));
     }
 
     private ViewProps fetchTopicViewProps(Assoc topicmapContext) {
@@ -528,7 +528,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             autoRevealAssocs(topic, topicmapId);
         } else {
             autoHideAssocs(topic, topicmapId);
-            viewProps.put(PROP_PINNED, false);      // hide implies unpin
+            viewProps.set(PROP_PINNED, false);      // hide implies unpin
         }
         // update DB
         viewProps.store(topicmapContext);
