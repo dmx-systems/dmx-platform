@@ -170,15 +170,15 @@ class ChildTopicsImpl implements ChildTopics {
     }
 
     @Override
-    public Object getObject(String compDefUri) {
+    public Object getValue(String compDefUri) {
         loadChildTopics(compDefUri);
-        return model.getObject(compDefUri);
+        return model.getValue(compDefUri);
     }
 
     @Override
-    public Object getObject(String compDefUri, Object defaultValue) {
+    public Object getValue(String compDefUri, Object defaultValue) {
         loadChildTopics(compDefUri);
-        return model.getObject(compDefUri, defaultValue);
+        return model.getValue(compDefUri, defaultValue);
     }
 
     // ---

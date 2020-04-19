@@ -54,7 +54,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         ChildTopicsModel address = person.getChildTopics("dmx.contacts.home_address");
         assertEquals("Berlin", address.getString("dmx.contacts.city"));
         //
-        Object code = address.getObject("dmx.contacts.postal_code");
+        Object code = address.getValue("dmx.contacts.postal_code");
         assertSame(Integer.class, code.getClass());
         assertEquals(13206, code);  // autoboxing
     }

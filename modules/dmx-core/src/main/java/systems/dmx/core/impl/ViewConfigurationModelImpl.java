@@ -104,7 +104,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        return configTopic.getChildTopics().getObject(childTypeUri, null);
+        return configTopic.getChildTopics().getValue(childTypeUri, null);
     }
 
     // ---

@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A wrapper for the topic value (atomic, non-null). Supported value types are string, int, long, double, boolean.
+ * A wrapper for the topic/assoc value (atomic, non-null). Supported value types are string, int, long, double, boolean.
  */
 public class SimpleValue {
 
