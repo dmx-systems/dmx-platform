@@ -33,6 +33,17 @@ public interface ChildTopics extends Iterable<String> {
 
     Object get(String compDefUri);
 
+    /**
+     * Checks if a child is contained in this ChildTopics.
+     */
+    boolean has(String compDefUri);
+
+    /**
+     * Returns the number of children contained in this ChildTopics.
+     * Multiple-valued children count as one.
+     */
+    int size();
+
     // ---
 
     ChildTopicsModel getModel();

@@ -98,6 +98,16 @@ class ChildTopicsImpl implements ChildTopics {
         }
     }
 
+    @Override
+    public boolean has(String compDefUri) {
+        return model.has(compDefUri);
+    }
+
+    @Override
+    public int size() {
+        return model.size();
+    }
+
     // ---
 
     @Override
@@ -309,16 +319,6 @@ class ChildTopicsImpl implements ChildTopics {
     @Override
     public Iterator<String> iterator() {
         return model.iterator();
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    boolean has(String compDefUri) {
-        return model.has(compDefUri);
-    }
-
-    int size() {
-        return model.size();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

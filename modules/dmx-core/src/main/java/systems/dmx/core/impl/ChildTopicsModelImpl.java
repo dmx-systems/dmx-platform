@@ -102,6 +102,16 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return childTopics.get(compDefUri);
     }
 
+    @Override
+    public boolean has(String compDefUri) {
+        return childTopics.containsKey(compDefUri);
+    }
+
+    @Override
+    public int size() {
+        return childTopics.size();
+    }
+
 
 
     // === Convenience Accessors ===
@@ -447,23 +457,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             return topicRef.findReferencedTopic(childTopics);
         }
         return null;
-    }
-
-    // ---
-
-    /**
-     * Checks if a child is contained in this ChildTopicsModel.
-     */
-    boolean has(String compDefUri) {
-        return childTopics.containsKey(compDefUri);
-    }
-
-    /**
-     * Returns the number of children contained in this ChildTopicsModel.
-     * Multiple-valued children count as one.
-     */
-    int size() {
-        return childTopics.size();
     }
 
     // --- Write Helper ---
