@@ -35,7 +35,11 @@ import java.util.logging.Logger;
 
 public class PersonTest extends CoreServiceTestEnvironment {
 
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    // ----------------------------------------------------------------------------------------------------------- Tests
 
     @Test
     public void addressLabel() {
@@ -43,6 +47,9 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             defineAddressModel();
             Topic address = createAddress();
+            // one address exists
+            assertEquals(1, dmx.getTopicsByType("dmx.contacts.address").size());
+            // address label concatenates all fields
             assertEquals("Parkstr. 3 13187 Berlin Germany", address.getSimpleValue().toString());
             tx.success();
         } finally {

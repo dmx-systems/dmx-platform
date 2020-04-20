@@ -35,7 +35,11 @@ import java.util.logging.Logger;
 
 public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
 
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    // ----------------------------------------------------------------------------------------------------------- Tests
 
     @Test
     public void addRefOnModel() {
