@@ -104,7 +104,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend(directives);
                 }
                 //
-                // 3) Broadcast directives
+                // 3) Client-Sync
                 if (directives != null) {
                     broadcast(directives);
                 }

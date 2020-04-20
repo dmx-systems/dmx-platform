@@ -15,6 +15,7 @@ import systems.dmx.core.storage.spi.DMXTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -51,6 +52,34 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, dmx.getTopicsByType("dmx.contacts.address").size());
             // address label concatenates all fields
             assertEquals("Parkstr. 3 13187 Berlin Germany", address.getSimpleValue().toString());
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void immutability() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineAddressModel();
+            Topic address = createAddress();
+            // this looks like we override "Berlin" with "Hamburg"
+            address.getChildTopics().set("dmx.contacts.city", "Hamburg");
+            // ... BUT the original address is unchanged
+            assertEquals("Berlin", address.getChildTopics().getString("dmx.contacts.city"));
+            // ... and another Address topic has been created
+            List<Topic> addrs = dmx.getTopicsByType("dmx.contacts.address");
+            assertEquals(2, addrs.size());
+            Topic address2 = addrs.get(0).getId() == address.getId() ? addrs.get(1) : addrs.get(0);
+            assertNotEquals(address.getId(), address2.getId());
+            // there are 2 City topics now
+            assertEquals(2, dmx.getTopicsByType("dmx.contacts.city").size());
+            //
+            assertEquals("Hamburg", address2.getChildTopics().getString("dmx.contacts.city"));
+            assertEquals(1, address2.getChildTopics().size());
+            assertEquals(4, address.getChildTopics().size());
+            //
             tx.success();
         } finally {
             tx.finish();
