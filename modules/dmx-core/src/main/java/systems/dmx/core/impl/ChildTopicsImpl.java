@@ -266,8 +266,6 @@ class ChildTopicsImpl implements ChildTopics {
         return _updateMany(compDefUri, mf.newRelatedTopicModel(value));
     }
 
-    // ---
-
     @Override
     public ChildTopics add(String compDefUri, Object value) {
         return _updateMany(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));

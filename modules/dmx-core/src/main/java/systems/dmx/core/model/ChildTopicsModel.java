@@ -257,6 +257,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
     ChildTopicsModel add(String compDefUri, Object value);
 
     /**
+     * Convenience method to add a *composite* value to a multiple-valued child.
+     *
+     * @return  this ChildTopicsModel.
+     */
+    ChildTopicsModel add(String compDefUri, ChildTopicsModel value);
+
+    /**
      * Sets the values of a multiple-valued child.
      * Existing values are overwritten.
      */

@@ -312,6 +312,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
+    public ChildTopicsModel add(String compDefUri, ChildTopicsModel value) {
+        return add(compDefUri, mf.newTopicModel(mf.childTypeUri(compDefUri), value));
+    }
+
+    @Override
     public final ChildTopicsModel set(String compDefUri, List<RelatedTopicModel> values) {
         childTopics.put(compDefUri, values);
         return this;
