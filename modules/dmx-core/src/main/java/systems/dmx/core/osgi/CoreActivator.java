@@ -196,6 +196,7 @@ public class CoreActivator implements BundleActivator {
     private void checkRequirementsForActivation() {
         if (httpService != null) {
             dmx = new CoreServiceImpl(new AccessLayer(db), bundleContext);
+            dmx.getWebSocketsService().start();
             //
             logger.info("Registering DMX core service at OSGi framework");
             bundleContext.registerService(CoreService.class.getName(), dmx, null);

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 
 
-class WebSocketsServiceImpl implements WebSocketsService {
+public class WebSocketsServiceImpl implements WebSocketsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -32,9 +32,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private WebSocketsServer server;
-    private WebSocketConnectionPool pool = new WebSocketConnectionPool();
-    private SendMessageWorker worker = new SendMessageWorker();
+    private WebSocketsServer server;            // instantiated in start()
+    private WebSocketConnectionPool pool;       // instantiated in start()
+    private SendMessageWorker worker;           // instantiated in start()
     private CoreService dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -44,7 +44,6 @@ class WebSocketsServiceImpl implements WebSocketsService {
     // ### TODO: inject event manager only 
     WebSocketsServiceImpl(CoreService dmx) {
         this.dmx = dmx;
-        init();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -82,14 +81,16 @@ class WebSocketsServiceImpl implements WebSocketsService {
         return WEBSOCKETS_URL;
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
-    private void init() {
+    public void start() {
         try {
             logger.info("##### Starting Jetty WebSocket server");
             server = new WebSocketsServer(WEBSOCKETS_PORT);
-            server.start();
+            pool = new WebSocketConnectionPool();
+            worker = new SendMessageWorker();
             worker.start();
+            server.start();
             // ### server.join();
             logger.info("Jetty WebSocket server started successfully");
         } catch (Exception e) {
@@ -97,7 +98,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
         }
     }
 
-    void shutdown() {
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void stop() {
         try {
             if (server != null) {
                 logger.info("### Stopping Jetty WebSocket server");
@@ -111,7 +114,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
         }
     }
 
-    // ---
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
      * @return  the WebSocket connection that is associated with the current request (based on its "dmx_client_id"
@@ -209,7 +212,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
                     message.connection.sendMessage(message.message);
                 }
             } catch (InterruptedException e) {
-                logger.info("### SendMessageWorker thread received an InterruptedException -- terminating");
+                logger.info("### Terminating SendMessageWorker thread");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker thread -- terminating:", e);
             }

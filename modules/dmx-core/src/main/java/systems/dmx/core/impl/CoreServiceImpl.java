@@ -42,7 +42,7 @@ public class CoreServiceImpl implements CoreService {
     PrivilegedAccess ac;
     MigrationManager migrationManager;
     PluginManager pluginManager;
-    WebSocketsServiceImpl wsService;
+    WebSocketsServiceImpl wss;
     WebPublishingService wpService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -60,8 +60,8 @@ public class CoreServiceImpl implements CoreService {
         this.ac = new PrivilegedAccessImpl(al);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.wsService = new WebSocketsServiceImpl(this);
-        this.wpService = new WebPublishingService(al, wsService);
+        this.wss = new WebSocketsServiceImpl(this);
+        this.wpService = new WebPublishingService(al, wss);
         //
         setupDB();
     }
@@ -437,7 +437,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public WebSocketsServiceImpl getWebSocketsService() {
-        return wsService;
+        return wss;
     }
 
     @Override
@@ -450,7 +450,7 @@ public class CoreServiceImpl implements CoreService {
     // Note: not part of public interface
     // Called from CoreActivator
     public void shutdown() {
-        wsService.shutdown();
+        wss.stop();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
