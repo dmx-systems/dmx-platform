@@ -43,22 +43,30 @@ public class PersonTest extends CoreServiceTestEnvironment {
     // ----------------------------------------------------------------------------------------------------------- Tests
 
     @Test
-    public void addressLabel() {
+    public void labelRules() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            defineAddressModel();
-            Topic address = createAddress();
-            // one address exists
-            assertEquals(1, dmx.getTopicsByType("dmx.contacts.address").size());
-            // address label concatenates all fields
-            assertEquals("Parkstr. 3 13187 Berlin Germany", address.getSimpleValue().toString());
+            definePersonModel();
+            Topic person = createPerson();
+            // one Person and one Address exists
+            List<Topic> persons   = dmx.getTopicsByType("dmx.contacts.person");
+            List<Topic> addresses = dmx.getTopicsByType("dmx.contacts.address");
+            assertEquals(1, persons.size());
+            assertEquals(1, addresses.size());
+            // labels are concatenated
+            ChildTopics children = persons.get(0).getChildTopics();
+            assertEquals("Jörg Richter", children.getString("dmx.contacts.person_name"));
+            assertEquals("Parkstr. 3 13187 Berlin Germany",
+                                         children.getTopics("dmx.contacts.address#dmx.contacts.address_entry")
+                                            .get(0).getSimpleValue().toString());
+            //
             tx.success();
         } finally {
             tx.finish();
         }
     }
 
-    @Test
+    /* @Test
     public void immutability() {
         DMXTransaction tx = dmx.beginTx();
         try {
@@ -84,9 +92,29 @@ public class PersonTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-    }
+    } */
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void definePersonModel() {
+        defineAddressModel();
+        // Person Name
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.first_name",  "First Name",  TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.last_name",   "Last Name",   TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_name", "Person Name", VALUE)
+          .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.person_name", "dmx.contacts.first_name", ONE))
+          .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.person_name", "dmx.contacts.last_name",  ONE))
+        );
+        // Person
+        dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.address_entry",      "Address Entry",      TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_description", "Person Description", HTML));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             IDENTITY)
+          .addCompDef(mf.newCompDefModel(null, true, false, "dmx.contacts.person", "dmx.contacts.person_name", ONE))
+          .addCompDef(mf.newCompDefModel("dmx.contacts.address_entry", false, false,
+                                         "dmx.contacts.person", "dmx.contacts.address",            MANY))
+          .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.person_description", ONE))
+        );
+    }
 
     private void defineAddressModel() {
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.street",      "Street",      TEXT));
@@ -101,12 +129,17 @@ public class PersonTest extends CoreServiceTestEnvironment {
         );
     }
 
-    private Topic createAddress() {
-        return dmx.createTopic(mf.newTopicModel("dmx.contacts.address", mf.newChildTopicsModel()
-            .set("dmx.contacts.street",      "Parkstr. 3")
-            .set("dmx.contacts.postal_code", "13187")
-            .set("dmx.contacts.city",        "Berlin")
-            .set("dmx.contacts.country",     "Germany")
+    private Topic createPerson() {
+        return dmx.createTopic(mf.newTopicModel("dmx.contacts.person", mf.newChildTopicsModel()
+            .set("dmx.contacts.person_name", mf.newChildTopicsModel()
+                .set("dmx.contacts.first_name", "Jörg")
+                .set("dmx.contacts.last_name",  "Richter"))
+            .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
+                .set("dmx.contacts.street",      "Parkstr. 3")
+                .set("dmx.contacts.postal_code", "13187")
+                .set("dmx.contacts.city",        "Berlin")
+                .set("dmx.contacts.country",     "Germany"))
+            .set("dmx.contacts.person_description", "<p>Software Developer</p>")
         ));
     }
 }
