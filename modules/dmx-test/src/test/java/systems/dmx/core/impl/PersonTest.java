@@ -107,7 +107,6 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // change description in-place
             children.set("dmx.contacts.person_description", "<p>Cook</p>");
             assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
-            //
             // there is still only 1 person in the DB (it was mutated in-place), refetch ...
             List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
             assertEquals(1, persons.size());
@@ -133,6 +132,39 @@ public class PersonTest extends CoreServiceTestEnvironment {
 
     @Test
     public void mutateEntityComposite() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create Person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            // change Last Name
+            children.set("dmx.contacts.person_name", mf.newChildTopicsModel()
+                .set("dmx.contacts.first_name", "Jörg")
+                .set("dmx.contacts.last_name", "Damm")
+            );
+            // name has changed in memory
+            ChildTopics name = children.getChildTopics("dmx.contacts.person_name");
+            assertEquals("Jörg", name.getString("dmx.contacts.first_name"));
+            assertEquals("Damm", name.getString("dmx.contacts.last_name"));
+            // check DB content; refetch ...
+            assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
+            assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
+            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(1, persons.size());
+            // name has changed in DB
+            name = persons.get(0).getChildTopics().getChildTopics("dmx.contacts.person_name");;
+            assertEquals("Jörg", name.getString("dmx.contacts.first_name"));
+            assertEquals("Damm", name.getString("dmx.contacts.last_name"));
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void mutateEntityCompositeWrong() {
         DMXTransaction tx = dmx.beginTx();
         try {
             definePersonModel();
