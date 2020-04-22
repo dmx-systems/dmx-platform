@@ -95,6 +95,42 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void mutateEntity() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            assertEquals("<p>Software Developer</p>", children.getString("dmx.contacts.person_description"));
+            // change description in-place
+            children.set("dmx.contacts.person_description", "<p>Cook</p>");
+            assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
+            //
+            // there is still only 1 person in the DB (it was mutated in-place), refetch ...
+            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(1, persons.size());
+            // no children are loaded yet
+            person = persons.get(0);
+            children = person.getChildTopics();
+            assertEquals(0, children.size());
+            // the description has changed in-place
+            assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
+            assertEquals(1, children.size());
+            // person name and address are still there
+            person.loadChildTopics();
+            assertEquals(3, children.size());
+            // now there are 2 description topics in the DB (the original one is not mutated/deleted)
+            List<Topic> descriptions = dmx.getTopicsByType("dmx.contacts.person_description");
+            assertEquals(2, descriptions.size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void definePersonModel() {
