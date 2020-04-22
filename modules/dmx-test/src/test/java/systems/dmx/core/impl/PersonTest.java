@@ -131,6 +131,40 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void mutateEntityComposite() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create Person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            // change Last Name -- DON'T DO IT THIS WAY (it produces unexpected result)
+            children.getChildTopics("dmx.contacts.person_name").set("dmx.contacts.last_name", "Damm");
+            // last name is still unchanged
+            assertEquals("Richter", children.getChildTopics("dmx.contacts.person_name").getString("dmx.contacts.last_name"));
+            //
+            // now there are 2 Person Name topics in the DB, the 2nd has only Last Name (no First Name)
+            assertEquals(2, dmx.getTopicsByType("dmx.contacts.person_name").size());
+            assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
+            assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
+            // Last Name "Damm" is assigned to a Person Name parent
+            Topic lastName = dmx.getTopicByValue("dmx.contacts.last_name", new SimpleValue("Damm"));
+            Topic personName = lastName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person_name");
+            assertNotNull(personName);
+            // ... which has no First Name (but only a Last Name)
+            assertNull(personName.getChildTopics().getString("dmx.contacts.first_name", null));
+            assertEquals("Damm", personName.getChildTopics().getString("dmx.contacts.last_name"));
+            // ... and is not assigned to any Person
+            Topic person2 = personName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person");
+            assertNull(person2);
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void definePersonModel() {

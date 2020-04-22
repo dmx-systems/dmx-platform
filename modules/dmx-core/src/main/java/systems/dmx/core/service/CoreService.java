@@ -63,6 +63,8 @@ public interface CoreService {
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
      * Compare to {@link #queryTopics(String,SimpleValue)}
      *
+     * TODO: Convenience: take Object as "value" and let Core wrap it?
+     *
      * @return  the topic, or <code>null</code> if no such topic exists.
      *
      * @throws  RuntimeException    If more than one topic is found.
@@ -74,6 +76,8 @@ public interface CoreService {
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
      * Compare to {@link #queryTopics(String,SimpleValue)}
+     *
+     * TODO: Convenience: take Object as "value" and let Core wrap it?
      */
     List<Topic> getTopicsByValue(String key, SimpleValue value);
 
@@ -81,6 +85,8 @@ public interface CoreService {
      * Looks up topics by key and value.
      * <p>
      * Wildcards like "*" in String values are interpreted.
+     *
+     * TODO: Convenience: take Object as "value" and let Core wrap it?
      */
     List<Topic> queryTopics(String key, SimpleValue value);
 
