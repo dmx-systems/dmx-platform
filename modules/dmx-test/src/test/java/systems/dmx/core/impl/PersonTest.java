@@ -66,12 +66,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
-    /* @Test
+    @Test
     public void immutability() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            defineAddressModel();
-            Topic address = createAddress();
+            definePersonModel();
+            Topic person = createPerson();
+            Topic address = person.getChildTopics().getTopics("dmx.contacts.address#dmx.contacts.address_entry").get(0);
             // this looks like we override "Berlin" with "Hamburg"
             address.getChildTopics().set("dmx.contacts.city", "Hamburg");
             // ... BUT the original address is unchanged
@@ -92,7 +93,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-    } */
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
