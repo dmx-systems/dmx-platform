@@ -135,15 +135,15 @@ abstract class DMXObjectImpl implements DMXObject {
     // ---
 
     @Override
-    public DMXObject loadChildTopics() {
+    public <O extends DMXObject> O loadChildTopics() {
         model.loadChildTopics(true);                // deep=true
-        return this;
+        return (O) this;
     }
 
     @Override
-    public DMXObject loadChildTopics(String compDefUri) {
+    public <O extends DMXObject> O loadChildTopics(String compDefUri) {
         model.loadChildTopics(compDefUri, true);   // deep=true
-        return this;
+        return (O) this;
     }
 
     // ---
@@ -161,6 +161,8 @@ abstract class DMXObjectImpl implements DMXObject {
 
 
     // === Updating ===
+
+    // Note: update() is implemented in sub-interfaces
 
     @Override
     public final void updateChildTopics(ChildTopicsModel updateModel, CompDef compDef) {

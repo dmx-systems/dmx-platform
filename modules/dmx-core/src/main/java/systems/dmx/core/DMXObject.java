@@ -49,8 +49,8 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    DMXObject loadChildTopics();
-    DMXObject loadChildTopics(String compDefUri);
+    <O extends DMXObject> O loadChildTopics();
+    <O extends DMXObject> O loadChildTopics(String compDefUri);
 
     // ---
 

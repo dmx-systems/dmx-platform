@@ -116,20 +116,6 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
 
     // ---
 
-    @Override
-    public final Assoc loadChildTopics() {
-        super.loadChildTopics();
-        return this;
-    }
-
-    @Override
-    public final Assoc loadChildTopics(String compDefUri) {
-        super.loadChildTopics(compDefUri);
-        return this;
-    }
-
-    // ---
-
     // Note: overridden by RelatedAssocImpl
     @Override
     public AssocModelImpl getModel() {

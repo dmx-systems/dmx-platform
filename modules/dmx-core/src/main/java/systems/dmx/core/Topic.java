@@ -31,13 +31,5 @@ public interface Topic extends DMXObject {
     // ---
 
     @Override
-    Topic loadChildTopics();
-
-    @Override
-    Topic loadChildTopics(String compDefUri);
-
-    // ---
-
-    @Override
     TopicModel getModel();
 }

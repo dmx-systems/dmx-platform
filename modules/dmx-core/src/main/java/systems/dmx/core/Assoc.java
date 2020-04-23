@@ -72,13 +72,5 @@ public interface Assoc extends DMXObject {
     // ---
 
     @Override
-    Assoc loadChildTopics();
-
-    @Override
-    Assoc loadChildTopics(String compDefUri);
-
-    // ---
-
-    @Override
     AssocModel getModel();
 }

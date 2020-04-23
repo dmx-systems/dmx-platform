@@ -57,20 +57,6 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
     // ---
 
-    @Override
-    public final Topic loadChildTopics() {
-        super.loadChildTopics();
-        return this;
-    }
-
-    @Override
-    public final Topic loadChildTopics(String compDefUri) {
-        super.loadChildTopics(compDefUri);
-        return this;
-    }
-
-    // ---
-
     // Note: overridden by DMXTypeImpl
     @Override
     public TopicModelImpl getModel() {
