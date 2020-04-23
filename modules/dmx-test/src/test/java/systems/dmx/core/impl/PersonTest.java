@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 
@@ -198,7 +199,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void addToMultiValue() {
+    public void addEmailAddress() {
         DMXTransaction tx = dmx.beginTx();
         try {
             definePersonModel();
@@ -218,7 +219,12 @@ public class PersonTest extends CoreServiceTestEnvironment {
             List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
             assertEquals(1, persons.size());
             emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
-            assertEquals(2, emailAddresses.size());
+            List<String> eas = emailAddresses.stream().map(
+                ea -> ea.getSimpleValue().toString()
+            ).collect(Collectors.toList());
+            assertEquals(2, eas.size());
+            assertTrue(eas.contains("jri@dmx.berlin"));
+            assertTrue(eas.contains("jri@deepamehta.de"));
             //
             tx.success();
         } finally {
