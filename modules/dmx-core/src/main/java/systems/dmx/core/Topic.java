@@ -11,10 +11,6 @@ import systems.dmx.core.model.TopicModel;
  */
 public interface Topic extends DMXObject {
 
-    void update(TopicModel model);
-
-    // ---
-
     /**
      * Searches this topic's child topics for a topic of the given type.
      * Only the child topics which are already loaded into memory are searched; the DB is not accessed.

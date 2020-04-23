@@ -71,10 +71,6 @@ public interface Assoc extends DMXObject {
 
     // ---
 
-    void update(AssocModel model);
-
-    // ---
-
     @Override
     Assoc loadChildTopics();
 

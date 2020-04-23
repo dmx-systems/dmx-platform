@@ -9,6 +9,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicPlayer;
 import systems.dmx.core.model.AssocModel;
+import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TopicPlayerModel;
 
@@ -104,7 +105,7 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     // ---
 
     @Override
-    public final void update(AssocModel updateModel) {
+    public final <M extends DMXObjectModel> void update(M updateModel) {
         al.updateAssoc(getModel(), (AssocModelImpl) updateModel);
     }
 

@@ -224,7 +224,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.postal_code", "Postal Code", TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.city",        "City",        TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.country",     "Country",     TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.address", "Address", VALUE)
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.address",     "Address",     VALUE)
             .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.street",      ONE))
             .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.postal_code", ONE))
             .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.city",        ONE))

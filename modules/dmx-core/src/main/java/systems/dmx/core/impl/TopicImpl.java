@@ -4,6 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
+import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TopicModel;
 
 import java.util.List;
@@ -37,7 +38,7 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
 
     @Override
-    public final void update(TopicModel updateModel) {
+    public final <M extends DMXObjectModel> void update(M updateModel) {
         al.updateTopic(getModel(), (TopicModelImpl) updateModel);
     }
 
