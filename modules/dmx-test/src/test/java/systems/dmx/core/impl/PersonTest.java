@@ -104,7 +104,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             assertEquals("<p>Software Developer</p>", children.getString("dmx.contacts.person_description"));
-            // change description in-place
+            // change Person Description in-place
             children.set("dmx.contacts.person_description", "<p>Cook</p>");
             assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
             // there is still only 1 person in the DB (it was mutated in-place), refetch ...
@@ -114,13 +114,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             person = persons.get(0);
             children = person.getChildTopics();
             assertEquals(0, children.size());
-            // the description has changed in-place
+            // the Person Description has changed in-place
             assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
             assertEquals(1, children.size());
-            // person name and address are still there
+            // the other children (Person Name, Email Address, Address) are still there
             person.loadChildTopics();
-            assertEquals(3, children.size());
-            // now there are 2 description topics in the DB (the original one is not mutated/deleted)
+            assertEquals(4, children.size());
+            // now there are 2 Person Description topics in the DB (the original one is not mutated/deleted)
             List<Topic> descriptions = dmx.getTopicsByType("dmx.contacts.person_description");
             assertEquals(2, descriptions.size());
             //
@@ -197,6 +197,35 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void addToMultiValue() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create Person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            assertEquals(1, emailAddresses.size());
+            assertEquals("jri@dmx.berlin", emailAddresses.get(0).getSimpleValue().toString());
+            // add 2nd Email Address
+            children.add("dmx.contacts.email_address", "jri@deepamehta.de");
+            //
+            // check memory
+            emailAddresses = children.getTopics("dmx.contacts.email_address");
+            assertEquals(2, emailAddresses.size());
+            // check DB content; refetch ...
+            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(1, persons.size());
+            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            assertEquals(2, emailAddresses.size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void definePersonModel() {
@@ -210,9 +239,11 @@ public class PersonTest extends CoreServiceTestEnvironment {
         );
         // Person
         dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.address_entry",      "Address Entry",      TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.email_address",      "Email Address",      TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_description", "Person Description", HTML));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             IDENTITY)
           .addCompDef(mf.newCompDefModel(null, true, false, "dmx.contacts.person", "dmx.contacts.person_name", ONE))
+          .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.email_address",      MANY))
           .addCompDef(mf.newCompDefModel("dmx.contacts.address_entry", false, false,
                                          "dmx.contacts.person", "dmx.contacts.address",            MANY))
           .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.person_description", ONE))
@@ -237,6 +268,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             .set("dmx.contacts.person_name", mf.newChildTopicsModel()
                 .set("dmx.contacts.first_name", "Jörg")
                 .set("dmx.contacts.last_name",  "Richter"))
+            .add("dmx.contacts.email_address", "jri@dmx.berlin")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
                 .set("dmx.contacts.street",      "Parkstr. 3")
                 .set("dmx.contacts.postal_code", "13187")
