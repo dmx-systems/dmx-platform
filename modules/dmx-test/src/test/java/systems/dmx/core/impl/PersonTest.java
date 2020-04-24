@@ -56,7 +56,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, addresses.size());
             // labels are concatenated
             ChildTopics children = persons.get(0).getChildTopics();
-            assertEquals("Jörg Richter", children.getString("dmx.contacts.person_name"));
+            assertEquals("Dave Stauges", children.getString("dmx.contacts.person_name"));
             assertEquals("Parkstr. 3 13187 Berlin Germany",
                                          children.getTopics("dmx.contacts.address#dmx.contacts.address_entry")
                                             .get(0).getSimpleValue().toString());
@@ -141,13 +141,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             ChildTopics children = person.getChildTopics();
             // change Last Name
             children.set("dmx.contacts.person_name", mf.newChildTopicsModel()
-                .set("dmx.contacts.first_name", "Jörg")
-                .set("dmx.contacts.last_name", "Damm")
+                .set("dmx.contacts.first_name", "Dave")
+                .set("dmx.contacts.last_name", "Habling")
             );
             // name has changed in memory
             ChildTopics name = children.getChildTopics("dmx.contacts.person_name");
-            assertEquals("Jörg", name.getString("dmx.contacts.first_name"));
-            assertEquals("Damm", name.getString("dmx.contacts.last_name"));
+            assertEquals("Dave", name.getString("dmx.contacts.first_name"));
+            assertEquals("Habling", name.getString("dmx.contacts.last_name"));
             // check DB content; refetch ...
             assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
             assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
@@ -155,8 +155,8 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, persons.size());
             // name has changed in DB
             name = persons.get(0).getChildTopics().getChildTopics("dmx.contacts.person_name");;
-            assertEquals("Jörg", name.getString("dmx.contacts.first_name"));
-            assertEquals("Damm", name.getString("dmx.contacts.last_name"));
+            assertEquals("Dave", name.getString("dmx.contacts.first_name"));
+            assertEquals("Habling", name.getString("dmx.contacts.last_name"));
             //
             tx.success();
         } finally {
@@ -173,22 +173,22 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // change Last Name -- DON'T DO IT THIS WAY (it produces unexpected result)
-            children.getChildTopics("dmx.contacts.person_name").set("dmx.contacts.last_name", "Damm");
+            children.getChildTopics("dmx.contacts.person_name").set("dmx.contacts.last_name", "Habling");
             // last name is still unchanged
-            assertEquals("Richter", children.getChildTopics("dmx.contacts.person_name")
+            assertEquals("Stauges", children.getChildTopics("dmx.contacts.person_name")
                 .getString("dmx.contacts.last_name"));
             //
             // now there are 2 Person Name topics in the DB, the 2nd has only Last Name (no First Name)
             assertEquals(2, dmx.getTopicsByType("dmx.contacts.person_name").size());
             assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
             assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
-            // Last Name "Damm" is assigned to a Person Name parent
-            Topic lastName = dmx.getTopicByValue("dmx.contacts.last_name", new SimpleValue("Damm"));
+            // Last Name "Habling" is assigned to a Person Name parent
+            Topic lastName = dmx.getTopicByValue("dmx.contacts.last_name", new SimpleValue("Habling"));
             Topic personName = lastName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person_name");
             assertNotNull(personName);
             // ... which has no First Name (but only a Last Name)
             assertNull(personName.getChildTopics().getString("dmx.contacts.first_name", null));
-            assertEquals("Damm", personName.getChildTopics().getString("dmx.contacts.last_name"));
+            assertEquals("Habling", personName.getChildTopics().getString("dmx.contacts.last_name"));
             // ... and is not assigned to any Person
             Topic person2 = personName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person");
             assertNull(person2);
@@ -241,12 +241,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // create Person
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
-            TopicModel eam = children.getTopics("dmx.contacts.email_address").get(0).getModel();
             // add 2nd Email Address
             children.add("dmx.contacts.email_address", "me@example2.com");
             // replace 1st Email Address
-            eam.setSimpleValue("me@example3.com");
-            children.add("dmx.contacts.email_address", eam);
+            Topic ea1 = dmx.getTopicByValue("dmx.contacts.email_address", new SimpleValue("me@example.com"));
+            children.add("dmx.contacts.email_address",
+                mf.newTopicModel(ea1.getId(), new SimpleValue("me@example3.com"))
+            );
             //
             // check memory
             List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
@@ -338,8 +339,8 @@ public class PersonTest extends CoreServiceTestEnvironment {
     private Topic createPerson() {
         return dmx.createTopic(mf.newTopicModel("dmx.contacts.person", mf.newChildTopicsModel()
             .set("dmx.contacts.person_name", mf.newChildTopicsModel()
-                .set("dmx.contacts.first_name", "Jörg")
-                .set("dmx.contacts.last_name",  "Richter"))
+                .set("dmx.contacts.first_name", "Dave")
+                .set("dmx.contacts.last_name",  "Stauges"))
             .add("dmx.contacts.email_address", "me@example.com")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
                 .set("dmx.contacts.street",      "Parkstr. 3")
