@@ -175,7 +175,8 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // change Last Name -- DON'T DO IT THIS WAY (it produces unexpected result)
             children.getChildTopics("dmx.contacts.person_name").set("dmx.contacts.last_name", "Damm");
             // last name is still unchanged
-            assertEquals("Richter", children.getChildTopics("dmx.contacts.person_name").getString("dmx.contacts.last_name"));
+            assertEquals("Richter", children.getChildTopics("dmx.contacts.person_name")
+                .getString("dmx.contacts.last_name"));
             //
             // now there are 2 Person Name topics in the DB, the 2nd has only Last Name (no First Name)
             assertEquals(2, dmx.getTopicsByType("dmx.contacts.person_name").size());
@@ -208,9 +209,9 @@ public class PersonTest extends CoreServiceTestEnvironment {
             ChildTopics children = person.getChildTopics();
             List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
             assertEquals(1, emailAddresses.size());
-            assertEquals("jri@dmx.berlin", emailAddresses.get(0).getSimpleValue().toString());
+            assertEquals("me@example.com", emailAddresses.get(0).getSimpleValue().toString());
             // add 2nd Email Address
-            children.add("dmx.contacts.email_address", "jri@deepamehta.de");
+            children.add("dmx.contacts.email_address", "me@example2.com");
             //
             // check memory
             emailAddresses = children.getTopics("dmx.contacts.email_address");
@@ -223,8 +224,43 @@ public class PersonTest extends CoreServiceTestEnvironment {
                 ea -> ea.getSimpleValue().toString()
             ).collect(Collectors.toList());
             assertEquals(2, eas.size());
-            assertTrue(eas.contains("jri@dmx.berlin"));
-            assertTrue(eas.contains("jri@deepamehta.de"));
+            assertTrue(eas.contains("me@example.com"));
+            assertTrue(eas.contains("me@example2.com"));
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void replaceEmailAddress() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create Person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            TopicModel eam = children.getTopics("dmx.contacts.email_address").get(0).getModel();
+            // add 2nd Email Address
+            children.add("dmx.contacts.email_address", "me@example2.com");
+            // replace 1st Email Address
+            eam.setSimpleValue("me@example3.com");
+            children.add("dmx.contacts.email_address", eam);
+            //
+            // check memory
+            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            assertEquals(2, emailAddresses.size());
+            // check DB content; refetch ...
+            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(1, persons.size());
+            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            List<String> eas = emailAddresses.stream().map(
+                ea -> ea.getSimpleValue().toString()
+            ).collect(Collectors.toList());
+            assertEquals(2, eas.size());
+            assertTrue(eas.contains("me@example2.com"));
+            assertTrue(eas.contains("me@example3.com"));
             //
             tx.success();
         } finally {
@@ -274,7 +310,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             .set("dmx.contacts.person_name", mf.newChildTopicsModel()
                 .set("dmx.contacts.first_name", "Jörg")
                 .set("dmx.contacts.last_name",  "Richter"))
-            .add("dmx.contacts.email_address", "jri@dmx.berlin")
+            .add("dmx.contacts.email_address", "me@example.com")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
                 .set("dmx.contacts.street",      "Parkstr. 3")
                 .set("dmx.contacts.postal_code", "13187")
