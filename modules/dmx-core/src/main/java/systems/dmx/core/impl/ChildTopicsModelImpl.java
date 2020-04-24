@@ -221,6 +221,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
                 throw new IllegalArgumentException("Tried to set null as a ChildTopicsModel value");
             }
             //
+            checkValue(compDefUri, value);
             childTopics.put(compDefUri, value);
             return this;
         } catch (Exception e) {
@@ -296,6 +297,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             childTopics.put(compDefUri, topics);
         }
         //
+        checkValue(compDefUri, value);
         topics.add((RelatedTopicModelImpl) value);
         //
         return this;
@@ -318,6 +320,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public final ChildTopicsModel set(String compDefUri, List<RelatedTopicModel> values) {
+        // FIXME: call checkValue() on every value
         childTopics.put(compDefUri, values);
         return this;
     }
@@ -511,6 +514,18 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             throw new RuntimeException("\"" + compDefUri + "\" is accessed as multi but is defined as single", e);
         } else {
             throw new RuntimeException("Accessing \"" + compDefUri + " failed", e);
+        }
+    }
+
+    // ---
+
+    private void checkValue(String compDefUri, RelatedTopicModel value) {
+        String childTypeUri = mf.childTypeUri(compDefUri);
+        if (value.getTypeUri() == null) {
+            value.setTypeUri(childTypeUri);     // convenience: auto-set typeUri
+        } else if (!value.getTypeUri().equals(childTypeUri)) {
+            throw new IllegalArgumentException("\"" + childTypeUri + "\" value expected, got \"" + value.getTypeUri() +
+                "\"");
         }
     }
 }
