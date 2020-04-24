@@ -268,6 +268,36 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void removeEmailAddress() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            // create Person
+            Topic person = createPerson();
+            ChildTopics children = person.getChildTopics();
+            Topic ea1 = children.getTopics("dmx.contacts.email_address").get(0);
+            // add 2nd Email Address
+            children.add("dmx.contacts.email_address", "me@example2.com");
+            // remove 1st Email Address
+            children.addDeletionRef("dmx.contacts.email_address", ea1.getId());
+            //
+            // check memory
+            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            assertEquals(1, emailAddresses.size());
+            // check DB content; refetch ...
+            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(1, persons.size());
+            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            assertEquals(1, emailAddresses.size());
+            assertEquals("me@example2.com", emailAddresses.get(0).getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void definePersonModel() {
