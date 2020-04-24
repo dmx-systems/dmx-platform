@@ -101,6 +101,11 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
+    public TopicModelImpl newTopicModel(long id, SimpleValue value) {
+        return newTopicModel(id, null, null, value, null);
+    }
+
+    @Override
     public TopicModelImpl newTopicModel(long id, ChildTopicsModel childTopics) {
         return newTopicModel(id, null, null, null, childTopics);
     }

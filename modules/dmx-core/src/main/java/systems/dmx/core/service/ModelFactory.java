@@ -54,10 +54,9 @@ public interface ModelFactory {
     // TODO: make internal?
     TopicModel newTopicModel(long id);
 
-    // TODO: make internal? -> Rather not. Might be needed by app developer to replace a multi-value.
-    TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
+    TopicModel newTopicModel(long id, SimpleValue value);
 
-    // TODO: add newTopicModel(long id, SimpleValue value)?
+    TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(TopicModel topic);
 
