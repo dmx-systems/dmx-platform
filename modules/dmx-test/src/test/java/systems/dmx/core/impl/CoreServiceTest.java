@@ -177,13 +177,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void changeLabelWithSetChildTopics() {
+    public void changeLabelWithUpdateChildTopics() {
         DMXTransaction tx = dmx.beginTx();
         try {
             Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.setChildTopics(mf.newChildTopicsModel().set(PLUGIN_NAME, "My Plugin"));
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_NAME, "My Plugin"));
             assertEquals("My Plugin", topic.getChildTopics().getString(PLUGIN_NAME));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //

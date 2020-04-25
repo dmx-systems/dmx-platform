@@ -384,18 +384,10 @@ public class DMXObjectModelImpl implements DMXObjectModel {
 
     // === Update (memory + DB) ===
 
-    final void updateChildTopics(ChildTopicsModel childTopics) {
+    // TODO: drop it
+    final void update(ChildTopicsModel childTopics) {
         update(createModelWithChildTopics(childTopics));
     }
-
-    final void updateChildTopics(ChildTopicsModel updateModel, CompDefModel compDef) {
-        // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
-        // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
-        // Compare to update() method.
-        new ValueIntegrator(al).integrate(createModelWithChildTopics(updateModel), this, compDef);
-    }
-
-    // ---
 
     /**
      * @param   updateModel    The data to update.
@@ -427,6 +419,13 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         } catch (Exception e) {
             throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
+    }
+
+    final void updateChildTopics(ChildTopicsModel updateModel, CompDefModel compDef) {
+        // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
+        // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
+        // Compare to update() method.
+        new ValueIntegrator(al).integrate(createModelWithChildTopics(updateModel), this, compDef);
     }
 
     // ---

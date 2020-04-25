@@ -45,8 +45,6 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     ChildTopics getChildTopics();
 
-    void setChildTopics(ChildTopicsModel childTopics);
-
     // ---
 
     <O extends DMXObject> O loadChildTopics();
@@ -72,6 +70,11 @@ public interface DMXObject extends Identifiable, JSONEnabled {
     // === Updating ===
 
     <M extends DMXObjectModel> void update(M updateModel);
+
+    /**
+     * Convenience that constructs a DMXObjectModel from a ChildTopicsModel and calls canonic update() with it.
+     */
+    void update(ChildTopicsModel updateModel);
 
     /**
      * Note: this method is meant only for facet updates.

@@ -6,6 +6,7 @@ import systems.dmx.core.DMXType;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.SimpleValue;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -127,11 +128,6 @@ abstract class DMXObjectImpl implements DMXObject {
         return new ChildTopicsImpl(model.childTopics, model, al);
     }
 
-    @Override
-    public final void setChildTopics(ChildTopicsModel childTopics) {
-        model.updateChildTopics(childTopics);
-    }
-
     // ---
 
     @Override
@@ -162,7 +158,12 @@ abstract class DMXObjectImpl implements DMXObject {
 
     // === Updating ===
 
-    // Note: update() is implemented in sub-interfaces
+    // Note: update() is implemented in sub-classes
+
+    @Override
+    public final void update(ChildTopicsModel updateModel) {
+        update(model.createModelWithChildTopics(updateModel));
+    }
 
     @Override
     public final void updateChildTopics(ChildTopicsModel updateModel, CompDef compDef) {
