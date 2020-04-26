@@ -67,9 +67,10 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             Topic num2 = dmx.createTopic(mf.newTopicModel("lotto.number", new SimpleValue(42)));
             //
             Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw"));
-            draw.getChildTopics()
+            draw.update(mf.newChildTopicsModel()
                 .addRef("lotto.number", num1.getId())
-                .addRef("lotto.number", num2.getId());
+                .addRef("lotto.number", num2.getId())
+            );
         } finally {
             tx.finish();
         }
@@ -260,7 +261,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(2, dmx.getTopicsByType(SIMPLE_NAME).size());
             //
             // add child topic by-ref
-            topic.getChildTopics().addRef(SIMPLE_NAME, topic2.getId());
+            topic.update(mf.newChildTopicsModel().addRef(SIMPLE_NAME, topic2.getId()));
             // now the composite has 2 children
             List<RelatedTopic> children = topic.getChildTopics().getTopics(SIMPLE_NAME);
             assertEquals(2, children.size());
