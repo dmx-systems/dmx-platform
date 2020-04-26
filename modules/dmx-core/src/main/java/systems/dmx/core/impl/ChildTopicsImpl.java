@@ -204,22 +204,6 @@ class ChildTopicsImpl implements ChildTopics {
 
 
 
-    // === Manipulators ===
-
-    // --- Multiple-valued Children ---
-
-    @Override
-    public ChildTopics addDeletionRef(String compDefUri, long refTopicId) {
-        return _updateMany(compDefUri, mf.newTopicDeletionModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics addDeletionRef(String compDefUri, String refTopicUri) {
-        return _updateMany(compDefUri, mf.newTopicDeletionModel(refTopicUri));
-    }
-
-
-
     // === Iterable Implementation ===
 
     @Override
@@ -228,28 +212,6 @@ class ChildTopicsImpl implements ChildTopics {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // Note 1: we need to explicitly declare the arg as RelatedTopicModel. When declared as TopicModel instead the
-    // JVM would invoke the ChildTopicsModel's set()/add() which takes a TopicModel object even if at runtime a
-    // RelatedTopicModel or even a TopicReferenceModel is passed. This is because Java method overloading involves
-    // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dmx-test). ### still true?
-
-    // Note 2: calling parent.update(..) would not work. The JVM would call the update() method of the base class
-    // (DMXObjectImpl), not the subclass's update() method. This is related to Java's (missing) multiple
-    // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
-    // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dmx-test). ### still true?
-
-    private ChildTopics _updateOne(String compDefUri, RelatedTopicModel newChildTopic) {
-        parent.update(mf.newChildTopicsModel().set(compDefUri, newChildTopic));
-        return this;
-    }
-
-    private ChildTopics _updateMany(String compDefUri, RelatedTopicModel newChildTopic) {
-        parent.update(mf.newChildTopicsModel().add(compDefUri, newChildTopic));
-        return this;
-    }
-
-    // ---
 
     /**
      * Loads the child topics for the given comp def, provided they are not loaded already.

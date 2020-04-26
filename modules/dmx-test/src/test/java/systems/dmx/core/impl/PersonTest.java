@@ -283,7 +283,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // add 2nd Email Address
             person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
             // remove 1st Email Address
-            children.addDeletionRef("dmx.contacts.email_address", ea1.getId());
+            person.update(mf.newChildTopicsModel().addDeletionRef("dmx.contacts.email_address", ea1.getId()));
             //
             // check memory
             List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");

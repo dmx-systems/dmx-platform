@@ -285,9 +285,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // "Comment"
             Topic comment = dmx.createTopic(mf.newTopicModel("dmx.test.comment"));
-            comment.update(mf.newChildTopicsModel().set(
-                "dmx.test.person_name", mf.newTopicReferenceModel(karl.getId())
-            ));
+            comment.update(mf.newChildTopicsModel().setRef("dmx.test.person_name", karl.getId()));
             //
             assertEquals(karl.getId(), comment.getChildTopics().getTopic("dmx.test.person_name").getId());
             assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
@@ -332,9 +330,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // "Comment"
             Topic comment = dmx.createTopic(mf.newTopicModel("dmx.test.comment"));
-            comment.update(mf.newChildTopicsModel().set(
-                "dmx.test.person_name", mf.newTopicReferenceModel(karl.getId())
-            ));
+            comment.update(mf.newChildTopicsModel().setRef("dmx.test.person_name", karl.getId()));
             //
             assertEquals(karl.getId(), comment.getChildTopics().getTopic("dmx.test.person_name").getId());
             assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
@@ -509,8 +505,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dmx.beginTx();
         try {
             // set Custom Assoc Type (via comp def)
-            dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).update(mf.newChildTopicsModel().set(
-                "dmx.core.assoc_type#dmx.core.custom_assoc_type", mf.newTopicReferenceModel(ASSOCIATION)
+            dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).update(mf.newChildTopicsModel().setRef(
+                "dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION
             ));
             //
             // get Custom Assoc Type
@@ -533,8 +529,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set Custom Assoc Type (via association)
             long compDefId = dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getId();
-            dmx.getAssoc(compDefId).update(mf.newChildTopicsModel().set(
-                "dmx.core.assoc_type#dmx.core.custom_assoc_type", mf.newTopicReferenceModel(ASSOCIATION)
+            dmx.getAssoc(compDefId).update(mf.newChildTopicsModel().setRef(
+                "dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION
             ));
             //
             // get Custom Assoc Type

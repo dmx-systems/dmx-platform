@@ -114,14 +114,4 @@ public interface ChildTopics extends Iterable<String> {
     ChildTopics getChildTopics(String compDefUri);
 
     // Note: there are no convenience accessors for a multiple-valued child.
-
-
-
-    // === Manipulators ===
-
-    // --- Multiple-valued Children ---
-
-    ChildTopics addDeletionRef(String compDefUri, long refTopicId);
-
-    ChildTopics addDeletionRef(String compDefUri, String refTopicUri);
 }

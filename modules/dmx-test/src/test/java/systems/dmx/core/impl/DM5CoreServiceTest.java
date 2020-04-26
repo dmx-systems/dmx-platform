@@ -94,7 +94,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertSame(23, numbers.get(0).getSimpleValue().intValue());
             assertSame(42, numbers.get(1).getSimpleValue().intValue());
             //
-            draw.getChildTopics().addDeletionRef("lotto.number", numbers.get(0).getId());
+            draw.update(mf.newChildTopicsModel().addDeletionRef("lotto.number", numbers.get(0).getId()));
             //
             draw = dmx.getTopic(drawId);
             numbers = draw.getChildTopics().getTopics("lotto.number");
