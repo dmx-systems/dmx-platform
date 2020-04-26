@@ -206,18 +206,6 @@ class ChildTopicsImpl implements ChildTopics {
 
     // === Manipulators ===
 
-    // --- Single-valued Children ---
-
-    @Override
-    public ChildTopics setDeletionRef(String compDefUri, long refTopicId) {
-        return _updateOne(compDefUri, mf.newTopicDeletionModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics setDeletionRef(String compDefUri, String refTopicUri) {
-        return _updateOne(compDefUri, mf.newTopicDeletionModel(refTopicUri));
-    }
-
     // --- Multiple-valued Children ---
 
     @Override

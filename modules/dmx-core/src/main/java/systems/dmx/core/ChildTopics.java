@@ -119,12 +119,6 @@ public interface ChildTopics extends Iterable<String> {
 
     // === Manipulators ===
 
-    // --- Single-valued Children ---
-
-    ChildTopics setDeletionRef(String compDefUri, long refTopicId);
-
-    ChildTopics setDeletionRef(String compDefUri, String refTopicUri);
-
     // --- Multiple-valued Children ---
 
     // TODO: add add(String compDefUri, RelatedTopicModel value)? Compare to ChildTopicsModel
