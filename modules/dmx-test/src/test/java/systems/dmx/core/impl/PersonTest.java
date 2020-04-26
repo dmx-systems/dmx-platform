@@ -213,7 +213,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, emailAddresses.size());
             assertEquals("me@example.com", emailAddresses.get(0).getSimpleValue().toString());
             // add 2nd Email Address
-            children.add("dmx.contacts.email_address", "me@example2.com");
+            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
             //
             // check memory
             emailAddresses = children.getTopics("dmx.contacts.email_address");
@@ -244,12 +244,12 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // add 2nd Email Address
-            children.add("dmx.contacts.email_address", "me@example2.com");
+            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
             // replace 1st Email Address
             Topic ea1 = dmx.getTopicByValue("dmx.contacts.email_address", new SimpleValue("me@example.com"));
-            children.add("dmx.contacts.email_address",
+            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address",
                 mf.newTopicModel(ea1.getId(), new SimpleValue("me@example3.com"))
-            );
+            ));
             //
             // check memory
             List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
@@ -281,7 +281,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             ChildTopics children = person.getChildTopics();
             Topic ea1 = children.getTopics("dmx.contacts.email_address").get(0);
             // add 2nd Email Address
-            children.add("dmx.contacts.email_address", "me@example2.com");
+            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
             // remove 1st Email Address
             children.addDeletionRef("dmx.contacts.email_address", ea1.getId());
             //

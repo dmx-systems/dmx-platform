@@ -209,23 +209,6 @@ class ChildTopicsImpl implements ChildTopics {
     // --- Multiple-valued Children ---
 
     @Override
-    public ChildTopics add(String compDefUri, TopicModel value) {
-        return _updateMany(compDefUri, mf.newRelatedTopicModel(value));
-    }
-
-    @Override
-    public ChildTopics add(String compDefUri, Object value) {
-        return _updateMany(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
-    }
-
-    @Override
-    public ChildTopics add(String compDefUri, ChildTopicsModel value) {
-        return _updateMany(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), value));
-    }
-
-    // ---
-
-    @Override
     public ChildTopics addRef(String compDefUri, long refTopicId) {
         return _updateMany(compDefUri, mf.newTopicReferenceModel(refTopicId));
     }

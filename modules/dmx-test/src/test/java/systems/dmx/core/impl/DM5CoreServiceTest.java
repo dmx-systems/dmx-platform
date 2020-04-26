@@ -82,9 +82,10 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             defineLottoModel();
             Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw"));
             long drawId = draw.getId();
-            draw.getChildTopics()
+            draw.update(mf.newChildTopicsModel()
                 .add("lotto.number", 23)
-                .add("lotto.number", 42);
+                .add("lotto.number", 42)
+            );
             //
             draw = dmx.getTopic(drawId);
             List<RelatedTopic> numbers = draw.getChildTopics().getTopics("lotto.number");
@@ -229,7 +230,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertSame(2, dmx.getTopicsByType(SIMPLE_NAME).size());
             //
             // add child topic by-value
-            topic.getChildTopics().add(SIMPLE_NAME, "Text 2");
+            topic.update(mf.newChildTopicsModel().add(SIMPLE_NAME, "Text 2"));
             // now the composite has 2 children -- the existing "Text 2" topic was identified (by-value) and reused
             List<RelatedTopic> children = topic.getChildTopics().getTopics(SIMPLE_NAME);
             assertEquals(2,              children.size());

@@ -121,16 +121,6 @@ public interface ChildTopics extends Iterable<String> {
 
     // --- Multiple-valued Children ---
 
-    // TODO: add add(String compDefUri, RelatedTopicModel value)? Compare to ChildTopicsModel
-
-    ChildTopics add(String compDefUri, TopicModel value);
-
-    ChildTopics add(String compDefUri, Object value);
-
-    ChildTopics add(String compDefUri, ChildTopicsModel value);
-
-    // ---
-
     ChildTopics addRef(String compDefUri, long refTopicId);
 
     ChildTopics addRef(String compDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);

@@ -1142,7 +1142,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             );
             // 2) create composite instance
             parent1 = dmx.createTopic(mf.newTopicModel("dmx.test.parent"));
-            parent1.getChildTopics().add("dmx.test.child", "Child 1");
+            parent1.update(mf.newChildTopicsModel().add("dmx.test.child", "Child 1"));
             tx.success();
         } finally {
             tx.finish();
