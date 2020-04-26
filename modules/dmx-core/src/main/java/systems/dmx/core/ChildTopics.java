@@ -121,16 +121,6 @@ public interface ChildTopics extends Iterable<String> {
 
     // --- Single-valued Children ---
 
-    ChildTopics setRef(String compDefUri, long refTopicId);
-
-    ChildTopics setRef(String compDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
-
-    ChildTopics setRef(String compDefUri, String refTopicUri);
-
-    ChildTopics setRef(String compDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
-
-    // ---
-
     ChildTopics setDeletionRef(String compDefUri, long refTopicId);
 
     ChildTopics setDeletionRef(String compDefUri, String refTopicUri);
