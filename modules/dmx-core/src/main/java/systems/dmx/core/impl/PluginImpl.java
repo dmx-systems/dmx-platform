@@ -240,7 +240,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getChildTopics().set(PLUGIN_MIGRATION_NR, migrationNr);
+        pluginTopic.update(mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, migrationNr));
     }
 
     // ---

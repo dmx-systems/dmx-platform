@@ -121,28 +121,6 @@ public interface ChildTopics extends Iterable<String> {
 
     // --- Single-valued Children ---
 
-    /**
-     * Sets a child.
-     */
-    ChildTopics set(String compDefUri, TopicModel value);
-
-    // ---
-
-    /**
-     * Convenience method to set the simple value of a child.
-     *
-     * @param   value   The simple value.
-     *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
-     */
-    ChildTopics set(String compDefUri, Object value);
-
-    /**
-     * Convenience method to set the composite value of a child.
-     */
-    ChildTopics set(String compDefUri, ChildTopicsModel value);
-
-    // ---
-
     ChildTopics setRef(String compDefUri, long refTopicId);
 
     ChildTopics setRef(String compDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);

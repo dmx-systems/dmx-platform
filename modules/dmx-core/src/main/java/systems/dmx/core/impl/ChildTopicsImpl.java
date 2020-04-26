@@ -209,25 +209,6 @@ class ChildTopicsImpl implements ChildTopics {
     // --- Single-valued Children ---
 
     @Override
-    public ChildTopics set(String compDefUri, TopicModel value) {
-        return _updateOne(compDefUri, mf.newRelatedTopicModel(value));
-    }
-
-    // ---
-
-    @Override
-    public ChildTopics set(String compDefUri, Object value) {
-        return _updateOne(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), new SimpleValue(value)));
-    }
-
-    @Override
-    public ChildTopics set(String compDefUri, ChildTopicsModel value) {
-        return _updateOne(compDefUri, mf.newRelatedTopicModel(mf.childTypeUri(compDefUri), value));
-    }
-
-    // ---
-
-    @Override
     public ChildTopics setRef(String compDefUri, long refTopicId) {
         return _updateOne(compDefUri, mf.newTopicReferenceModel(refTopicId));
     }

@@ -188,7 +188,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
-    // Author: Malte Reißig, revised by jri at 2020/04/16
+    // Author: Malte Reißig, revised by jri at 2020/04/26
     @Test
     public void childParentValueUpdate() {
         DMXTransaction tx = dmx.beginTx();
@@ -202,7 +202,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             ));
             assertEquals("Test", topic.getSimpleValue().toString());
             // update child
-            topic.getChildTopics().set(SIMPLE_NAME, "Test Studio");
+            topic.update(mf.newChildTopicsModel().set(SIMPLE_NAME, "Test Studio"));
             // both have changed, child value and parent value
             assertEquals("Test Studio", topic.getChildTopics().getString(SIMPLE_NAME));
             assertEquals("Test Studio", topic.getSimpleValue().toString());

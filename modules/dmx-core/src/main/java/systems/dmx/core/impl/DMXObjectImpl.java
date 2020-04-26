@@ -6,7 +6,6 @@ import systems.dmx.core.DMXType;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.SimpleValue;
 
 import org.codehaus.jettison.json.JSONObject;

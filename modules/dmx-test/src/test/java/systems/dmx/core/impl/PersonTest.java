@@ -75,7 +75,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             Topic address = person.getChildTopics().getTopics("dmx.contacts.address#dmx.contacts.address_entry").get(0);
             // this looks like we override "Berlin" with "Hamburg"
-            address.getChildTopics().set("dmx.contacts.city", "Hamburg");
+            address.update(mf.newChildTopicsModel().set("dmx.contacts.city", "Hamburg"));
             // ... BUT the original address is unchanged
             assertEquals("Berlin", address.getChildTopics().getString("dmx.contacts.city"));
             // ... and another Address topic has been created
@@ -106,7 +106,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             ChildTopics children = person.getChildTopics();
             assertEquals("<p>Software Developer</p>", children.getString("dmx.contacts.person_description"));
             // change Person Description in-place
-            children.set("dmx.contacts.person_description", "<p>Cook</p>");
+            person.update(mf.newChildTopicsModel().set("dmx.contacts.person_description", "<p>Cook</p>"));
             assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
             // there is still only 1 person in the DB (it was mutated in-place), refetch ...
             List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
@@ -140,10 +140,10 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // change Last Name
-            children.set("dmx.contacts.person_name", mf.newChildTopicsModel()
+            person.update(mf.newChildTopicsModel().set("dmx.contacts.person_name", mf.newChildTopicsModel()
                 .set("dmx.contacts.first_name", "Dave")
                 .set("dmx.contacts.last_name", "Habling")
-            );
+            ));
             // name has changed in memory
             ChildTopics name = children.getChildTopics("dmx.contacts.person_name");
             assertEquals("Dave", name.getString("dmx.contacts.first_name"));
@@ -173,7 +173,9 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // change Last Name -- DON'T DO IT THIS WAY (it produces unexpected result)
-            children.getChildTopics("dmx.contacts.person_name").set("dmx.contacts.last_name", "Habling");
+            children.getTopic("dmx.contacts.person_name").update(
+                mf.newChildTopicsModel().set("dmx.contacts.last_name", "Habling")
+            );
             // last name is still unchanged
             assertEquals("Stauges", children.getChildTopics("dmx.contacts.person_name")
                 .getString("dmx.contacts.last_name"));

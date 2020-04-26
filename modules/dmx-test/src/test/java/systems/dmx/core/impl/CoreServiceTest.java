@@ -88,12 +88,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dmx.createTopic(mf.newTopicModel("systems.dmx.notes", PLUGIN,
                 new SimpleValue("DMX Notes")));
             //
-            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 23);
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 23));
             //
             int nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 42);
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 42));
             //
             nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(42, nr);
@@ -118,7 +118,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             int nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 42);
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 42));
             //
             nr = topic.getChildTopics().getTopic(PLUGIN_MIGRATION_NR).getSimpleValue().intValue();
             assertEquals(42, nr);
@@ -203,7 +203,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dmx.createTopic(mf.newTopicModel(PLUGIN));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.getChildTopics().set(PLUGIN_NAME, "My Plugin");
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_NAME, "My Plugin"));
             assertEquals("My Plugin", topic.getChildTopics().getString(PLUGIN_NAME));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -229,10 +229,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
-            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
-            topic.getChildTopics().set(PLUGIN_NAME, "HuHu");                // setting child used for labeling
-            assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
+            topic = dmx.getTopic(topic.getId());                                // Note: the children are not loaded
+            assertEquals("My Plugin", topic.getSimpleValue().toString());       // the label is intact
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_NAME, "HuHu"));    // setting child used for labeling
+            assertEquals("HuHu", topic.getSimpleValue().toString());            // the label is recalculated
             //
             tx.success();
         } finally {
@@ -251,10 +251,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             ));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            topic = dmx.getTopic(topic.getId());                            // Note: the children are not loaded
-            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
-            topic.getChildTopics().set(PLUGIN_MIGRATION_NR, 3);             // setting child NOT used for labeling
-            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
+            topic = dmx.getTopic(topic.getId());                                // Note: the children are not loaded
+            assertEquals("My Plugin", topic.getSimpleValue().toString());       // the label is intact
+            topic.update(mf.newChildTopicsModel().set(PLUGIN_MIGRATION_NR, 3)); // setting child NOT used for labeling
+            assertEquals("My Plugin", topic.getSimpleValue().toString());       // the label is still intact
             //
             tx.success();
         } finally {
@@ -367,10 +367,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // 2) create instances
             // "Comment"
             Topic comment = dmx.createTopic(mf.newTopicModel("dmx.test.comment"));
-            comment.getChildTopics().set("dmx.test.person_name", mf.newChildTopicsModel()
+            comment.update(mf.newChildTopicsModel().set("dmx.test.person_name", mf.newChildTopicsModel()
                 .set("dmx.test.first_name", "Karl")
                 .set("dmx.test.last_name", "Albrecht")
-            );
+            ));
             //
             assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
             //
@@ -424,7 +424,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             TopicTypeImpl tt = dmx.getTopicType(PLUGIN);
             //
             // set "Include in Label" flag
-            ChildTopics ct = tt.getCompDef(PLUGIN_NAME).getChildTopics().set(INCLUDE_IN_LABEL, true);
+            CompDef cd = tt.getCompDef(PLUGIN_NAME);
+            ChildTopics ct = cd.getChildTopics();
+            cd.update(mf.newChildTopicsModel().set(INCLUDE_IN_LABEL, true));
             //
             assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
             //
@@ -450,12 +452,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                     mf.newCompDefModel("dmx.test.birthday", false, false,
                         "dmx.test.person", "dmx.test.date", ONE)));
             // test comp def children *before* set
-            ChildTopics ct = tt.getCompDef("dmx.test.date#dmx.test.birthday").getChildTopics();
+            CompDef cd = tt.getCompDef("dmx.test.date#dmx.test.birthday");
+            ChildTopics ct = cd.getChildTopics();
             assertEquals(false, ct.getBoolean(INCLUDE_IN_LABEL));
             assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
             //
             // 2) set "Include in Label" flag
-            ct.set(INCLUDE_IN_LABEL, true);
+            cd.update(mf.newChildTopicsModel().set(INCLUDE_IN_LABEL, true));
             //
             // test comp def children *after* set (custom assoc type must not change)
             assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
@@ -479,7 +482,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set "Include in Label" flag
             long compDefId = dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getId();
-            dmx.getAssoc(compDefId).getChildTopics().set(INCLUDE_IN_LABEL, false);
+            dmx.getAssoc(compDefId).update(mf.newChildTopicsModel().set(INCLUDE_IN_LABEL, false));
             //
             // comp def order must not have changed
             Collection<CompDef> compDefs = dmx.getTopicType(PLUGIN).getCompDefs();
@@ -1163,7 +1166,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dmx.test.child").getSimpleValue().toString());
             // 3) update child topics
-            parent1.getChildTopics().set("dmx.test.child", "Child 2");
+            parent1.update(mf.newChildTopicsModel().set("dmx.test.child", "Child 2"));
             //
             assertEquals("Child 2", parent1.getChildTopics().getTopic("dmx.test.child").getSimpleValue().toString());
             //
