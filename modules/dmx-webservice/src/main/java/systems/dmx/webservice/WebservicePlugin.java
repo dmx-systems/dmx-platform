@@ -104,17 +104,16 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template, use query params (like queryTopicsFulltext())
     @GET
-    @Path("/topic/multi/by_value/{uri}/{value}")
+    @Path("/topic/type/{uri}/query/{value}")
     public List<Topic> queryTopics(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
         return dmx.queryTopics(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/topic")
-    public QueryResult queryTopicsFulltext(@QueryParam("query") String query,
+    @Path("/topic/query/{query}")
+    public QueryResult queryTopicsFulltext(@PathParam("query") String query,
                                            @QueryParam("topic_type_uri") String topicTypeUri,
                                            @QueryParam("search_child_topics") boolean searchChildTopics) {
         return dmx.queryTopicsFulltext(query, topicTypeUri, searchChildTopics);
