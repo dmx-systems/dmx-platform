@@ -95,19 +95,19 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Topic getTopicByValue(String key, SimpleValue value) {
-        TopicModelImpl topic = al.getTopicByValue(key, value);
+    public Topic getTopicByValue(String typeUri, SimpleValue value) {
+        TopicModelImpl topic = al.getTopicByValue(typeUri, value);
         return topic != null ? topic.instantiate() : null;
     }
 
     @Override
-    public List<Topic> getTopicsByValue(String key, SimpleValue value) {
-        return al.instantiate(al.getTopicsByValue(key, value));
+    public List<Topic> getTopicsByValue(String typeUri, SimpleValue value) {
+        return al.instantiate(al.getTopicsByValue(typeUri, value));
     }
 
     @Override
-    public List<Topic> queryTopics(String key, SimpleValue value) {
-        return al.instantiate(al.queryTopics(key, value));
+    public List<Topic> queryTopics(String typeUri, SimpleValue value) {
+        return al.instantiate(al.queryTopics(typeUri, value));
     }
 
     @Override
@@ -150,14 +150,14 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Assoc getAssocByValue(String key, SimpleValue value) {
-        AssocModelImpl assoc = al.getAssocByValue(key, value);
+    public Assoc getAssocByValue(String typeUri, SimpleValue value) {
+        AssocModelImpl assoc = al.getAssocByValue(typeUri, value);
         return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
-    public List<Assoc> queryAssocs(String key, SimpleValue value) {
-        return al.instantiate(al.queryAssocs(key, value));
+    public List<Assoc> queryAssocs(String typeUri, SimpleValue value) {
+        return al.instantiate(al.queryAssocs(typeUri, value));
     }
 
     @Override

@@ -69,7 +69,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If more than one topic is found.
      */
-    Topic getTopicByValue(String key, SimpleValue value);
+    Topic getTopicByValue(String typeUri, SimpleValue value);
 
     /**
      * Looks up topics by exact value.
@@ -79,16 +79,16 @@ public interface CoreService {
      *
      * TODO: Convenience: take Object as "value" and let Core wrap it?
      */
-    List<Topic> getTopicsByValue(String key, SimpleValue value);
+    List<Topic> getTopicsByValue(String typeUri, SimpleValue value);
 
     /**
-     * Looks up topics by key and value.
+     * Looks up topics by typeUri and value.
      * <p>
      * Wildcards like "*" in String values are interpreted.
      *
      * TODO: Convenience: take Object as "value" and let Core wrap it?
      */
-    List<Topic> queryTopics(String key, SimpleValue value);
+    List<Topic> queryTopics(String typeUri, SimpleValue value);
 
     /**
      * Performs a fulltext search.
@@ -126,14 +126,14 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If more than one association is found.
      */
-    Assoc getAssocByValue(String key, SimpleValue value);
+    Assoc getAssocByValue(String typeUri, SimpleValue value);
 
     /**
-     * Looks up associations by key and value.
+     * Looks up associations by typeUri and value.
      * <p>
      * Wildcards like "*" in String values <i>are</i> interpreted.
      */
-    List<Assoc> queryAssocs(String key, SimpleValue value);
+    List<Assoc> queryAssocs(String typeUri, SimpleValue value);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.

@@ -90,21 +90,25 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template
     @GET
-    @Path("/topic/by_value/{key}/{value}")
-    public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.getTopicByValue(key, value);
+    @Path("/topic/type/{uri}/{value}")
+    public Topic getTopicByValue(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
+        return dmx.getTopicByValue(typeUri, value);
     }
 
-    // TODO: getTopicsByValue()
+    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/topics/type/{uri}/{value}")
+    public List<Topic> getTopicsByValue(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
+        return dmx.getTopicsByValue(typeUri, value);
+    }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template, use query params (like queryTopicsFulltext())
     @GET
-    @Path("/topic/multi/by_value/{key}/{value}")
-    public List<Topic> queryTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.queryTopics(key, value);
+    @Path("/topic/multi/by_value/{uri}/{value}")
+    public List<Topic> queryTopics(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
+        return dmx.queryTopics(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
@@ -158,17 +162,17 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
     @GET
-    @Path("/assoc/by_value/{key}/{value}")
-    public Assoc getAssocByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.getAssocByValue(key, value);
+    @Path("/assoc/by_value/{uri}/{value}")
+    public Assoc getAssocByValue(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
+        return dmx.getAssocByValue(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     // ### TODO: change URI template
     @GET
-    @Path("/assoc/multi/by_value/{key}/{value}")
-    public List<Assoc> queryAssocs(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dmx.queryAssocs(key, value);
+    @Path("/assoc/multi/by_value/{uri}/{value}")
+    public List<Assoc> queryAssocs(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
+        return dmx.queryAssocs(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
