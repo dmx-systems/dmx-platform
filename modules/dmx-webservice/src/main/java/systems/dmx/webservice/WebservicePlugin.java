@@ -355,7 +355,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/topic/{id}/related_topics")
+    @Path("/topic/{id}/related-topics")
     public List<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                     long topicId,
                                                     @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
@@ -367,7 +367,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/topic/{id}/related_assocs")
+    @Path("/topic/{id}/related-assocs")
     public List<RelatedAssoc> getTopicRelatedAssocs(@PathParam("id")                     long topicId,
                                                     @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
@@ -387,7 +387,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/association/{id}/related_topics")
+    @Path("/assoc/{id}/related-topics")
     public List<RelatedTopic> getAssocRelatedTopics(@PathParam("id")                     long assocId,
                                                     @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
@@ -400,7 +400,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/association/{id}/related_assocs")
+    @Path("/assoc/{id}/related-assocs")
     public List<RelatedAssoc> getAssocRelatedAssocs(@PathParam("id")                     long assocId,
                                                     @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
