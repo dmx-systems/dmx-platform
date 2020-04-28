@@ -340,7 +340,7 @@ public class WebservicePlugin extends PluginActivator {
     // === Plugins ===
 
     @GET
-    @Path("/plugin")
+    @Path("/plugins")
     public List<PluginInfo> getPluginInfo() {
         return dmx.getPluginInfo();
     }
@@ -420,7 +420,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
     @GET
-    @Path("/object/{id}/related_topics")
+    @Path("/object/{id}/related-topics")
     public List<RelatedTopic> getRelatedTopicsWithoutChilds(@PathParam("id") long objectId) {
         DMXObject object = dmx.getObject(objectId);
         List<RelatedTopic> relTopics = object.getRelatedTopics();
