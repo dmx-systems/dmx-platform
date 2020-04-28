@@ -184,14 +184,14 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/association/multiple/{topic1_id}/{topic2_id}")
+    @Path("/assocs/{topic1_id}/{topic2_id}")
     public List<Assoc> getAssocs(@PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id) {
         return dmx.getAssocs(topic1Id, topic2Id);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
+    @Path("/assocs/{assoc_type_uri}/{topic1_id}/{topic2_id}")
     public List<Assoc> getAssocs(@PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                                  @PathParam("assoc_type_uri") String assocTypeUri) {
         return dmx.getAssocs(topic1Id, topic2Id, assocTypeUri);
