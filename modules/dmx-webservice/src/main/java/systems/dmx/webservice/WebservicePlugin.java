@@ -200,14 +200,14 @@ public class WebservicePlugin extends PluginActivator {
     // ---
 
     @POST
-    @Path("/association")
+    @Path("/assoc")
     @Transactional
     public DirectivesResponse createAssoc(AssocModel model) {
         return new DirectivesResponse(dmx.createAssoc(model));
     }
 
     @PUT
-    @Path("/association/{id}")
+    @Path("/assoc/{id}")
     @Transactional
     public DirectivesResponse updateAssoc(@PathParam("id") long assocId, AssocModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
@@ -219,7 +219,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @DELETE
-    @Path("/association/{id}")
+    @Path("/assoc/{id}")
     @Transactional
     public DirectivesResponse deleteAssoc(@PathParam("id") long assocId) {
         dmx.deleteAssoc(assocId);
