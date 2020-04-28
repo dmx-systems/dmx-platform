@@ -140,6 +140,8 @@ public interface CoreService {
      * If no such association exists <code>null</code> is returned.
      * If more than one association exist, a runtime exception is thrown.
      *
+     * TODO: rename to "getAssocBetweenTopicAndTopic"
+     *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
     Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);

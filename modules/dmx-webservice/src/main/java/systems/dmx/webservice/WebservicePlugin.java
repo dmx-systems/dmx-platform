@@ -151,32 +151,29 @@ public class WebservicePlugin extends PluginActivator {
     // === Associations ===
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template "/assoc"
     @GET
-    @Path("/association/{id}")
+    @Path("/assoc/{id}")
     public Assoc getAssoc(@PathParam("id") long assocId) {
         return dmx.getAssoc(assocId);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template
     @GET
-    @Path("/assoc/by_value/{uri}/{value}")
+    @Path("/assoc/type/{uri}/{value}")
     public Assoc getAssocByValue(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
         return dmx.getAssocByValue(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    // ### TODO: change URI template
     @GET
-    @Path("/assoc/multi/by_value/{uri}/{value}")
+    @Path("/assocs/type/{uri}/query/{value}")
     public List<Assoc> queryAssocs(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
         return dmx.queryAssocs(typeUri, value);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
+    @Path("/assoc/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     public Assoc getAssoc(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
