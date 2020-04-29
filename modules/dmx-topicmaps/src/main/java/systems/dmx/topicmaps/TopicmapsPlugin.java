@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/topicmap")      // TODO: rename "/topicmaps"
+@Path("/topicmaps")
 @Consumes("application/json")
 @Produces("application/json")
 public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, TopicmapsConstants, MessengerContext {
