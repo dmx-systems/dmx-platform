@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/event")
+@Path("/events")
 @Consumes("application/json")
 @Produces("application/json")
 public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssoc {
