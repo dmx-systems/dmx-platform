@@ -263,7 +263,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/topic/{topic_id}/{x}/{y}")         // TODO: extend URL .../x/{x}/y/{y}
+    @Path("/{id}/topic/{topic_id}/x/{x}/y/{y}")
     @Transactional
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
@@ -288,7 +288,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/topic/{topic_id}/{visibility}")    // TODO: extend URL .../visibility/{visibility}
+    @Path("/{id}/topic/{topic_id}/visibility/{visibility}")
     @Transactional
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
