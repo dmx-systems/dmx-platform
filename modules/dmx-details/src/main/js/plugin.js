@@ -76,7 +76,7 @@ export default ({store}) => {
     } else if (object.isTopic()) {
       return `/core/topic/${object.id}?children=true&assoc_children=true`
     } else if (object.isAssoc()) {
-      return `/core/association/${object.id}?children=true&assoc_children=true`
+      return `/core/assoc/${object.id}?children=true&assoc_children=true`
     }
     throw Error('unexpected object')
   }

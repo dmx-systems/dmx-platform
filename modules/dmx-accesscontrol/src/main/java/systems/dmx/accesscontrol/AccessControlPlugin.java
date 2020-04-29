@@ -376,7 +376,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @GET
-    @Path("/association/{id}")
+    @Path("/assoc/{id}")
     @Override
     public Permissions getAssocPermissions(@PathParam("id") long assocId) {
         return getPermissions(assocId);

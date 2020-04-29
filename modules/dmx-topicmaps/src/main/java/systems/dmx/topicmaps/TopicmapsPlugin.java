@@ -184,7 +184,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @POST
-    @Path("/{id}/association/{assoc_id}")
+    @Path("/{id}/assoc/{assoc_id}")
     @Transactional
     @Override
     public void addAssocToTopicmap(@PathParam("id") final long topicmapId,
@@ -208,7 +208,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @POST
-    @Path("/{id}/topic/{topic_id}/association/{assoc_id}")
+    @Path("/{id}/topic/{topic_id}/assoc/{assoc_id}")
     @Transactional
     @Override
     public void addRelatedTopicToTopicmap(@PathParam("id") final long topicmapId,
@@ -254,7 +254,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/association/{assoc_id}")
+    @Path("/{id}/assoc/{assoc_id}")
     @Transactional
     @Override
     public void setAssocViewProps(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
