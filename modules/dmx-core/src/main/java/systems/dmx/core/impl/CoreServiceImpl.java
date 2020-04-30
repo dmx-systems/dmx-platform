@@ -161,8 +161,10 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2) {
-        AssocModelImpl assoc = al.getAssoc(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+    public Assoc getAssocBetweenTopicAndTopic(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                              String roleTypeUri2) {
+        AssocModelImpl assoc = al.getAssocBetweenTopicAndTopic(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
+            roleTypeUri2);
         return assoc != null ? assoc.instantiate() : null;
     }
 

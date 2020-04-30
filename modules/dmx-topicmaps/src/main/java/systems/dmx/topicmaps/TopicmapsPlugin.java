@@ -125,7 +125,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Assoc getTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssoc(TOPICMAP_CONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
+        return dmx.getAssocBetweenTopicAndTopic(TOPICMAP_CONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP,
+            ROLE_TYPE_CONTENT);
     }
 
     @Override

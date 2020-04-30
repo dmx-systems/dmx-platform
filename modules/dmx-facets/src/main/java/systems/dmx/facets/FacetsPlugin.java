@@ -144,7 +144,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getCompDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Assoc assoc = dmx.getAssoc(assocTypeUri, topicId, facetTopicId, PARENT, CHILD);
+        Assoc assoc = dmx.getAssocBetweenTopicAndTopic(assocTypeUri, topicId, facetTopicId, PARENT, CHILD);
         return assoc != null;
     }
 

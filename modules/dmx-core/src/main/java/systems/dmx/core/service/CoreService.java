@@ -144,7 +144,8 @@ public interface CoreService {
      *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
      */
-    Assoc getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1, String roleTypeUri2);
+    Assoc getAssocBetweenTopicAndTopic(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                       String roleTypeUri2);
 
     Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
                                        String assocRoleTypeUri);

@@ -266,8 +266,8 @@ public final class AccessLayer {
         }
     }
 
-    AssocModelImpl getAssoc(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                                                               String roleTypeUri2) {
+    AssocModelImpl getAssocBetweenTopicAndTopic(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
