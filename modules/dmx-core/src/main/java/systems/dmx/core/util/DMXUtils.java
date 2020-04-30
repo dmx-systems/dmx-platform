@@ -200,8 +200,8 @@ public class DMXUtils {
      *          <code>null</code> otherwise. Convenience to access the assoc's players after retyping.
      *          Element 0 is the player of "topicTypeUri1", Element 1 is the player of "topicTypeUri2".
      */
-    public static PlayerModel[] associationAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                      String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
+    public static PlayerModel[] assocAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
+                                                String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
         if (!assoc.getTypeUri().equals(ASSOCIATION)) {
             return null;
         }

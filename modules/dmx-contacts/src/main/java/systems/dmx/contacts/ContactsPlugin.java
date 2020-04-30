@@ -45,7 +45,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Person <-> Organization
-        DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
+        DMXUtils.assocAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
             "dmx.contacts.organization_involvement", DEFAULT, DEFAULT);
     }
 }

@@ -59,15 +59,15 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Event <-> Person
-        DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
-            "dmx.events.event_involvement", DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person", "dmx.events.event_involvement",
+            DEFAULT, DEFAULT);
         // Event <-> Organization
-        DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.organization",
-            "dmx.events.event_involvement", DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.organization", "dmx.events.event_involvement",
+            DEFAULT, DEFAULT);
         //
         // Event -> Address
-        PlayerModel[] players = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
-            COMPOSITION, PARENT, CHILD);
+        PlayerModel[] players = DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address", COMPOSITION,
+            PARENT, CHILD);
         if (players != null) {
             long eventId = players[0].getId();
             Topic event = dmx.getTopic(eventId);

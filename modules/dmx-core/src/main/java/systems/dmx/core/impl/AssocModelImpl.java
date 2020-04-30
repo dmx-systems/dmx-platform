@@ -293,10 +293,8 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     void preCreate() {
         // Note: auto-typing only works for generic assocs (of type "Association") and for by-ID players.
         // That's why auto-typing does not interfere with comp defs created programmatically (through migration).
-        if (DMXUtils.associationAutoTyping(this, TOPIC_TYPE, TOPIC_TYPE, COMPOSITION_DEF, CHILD_TYPE, PARENT_TYPE)
-                != null ||
-            DMXUtils.associationAutoTyping(this, TOPIC_TYPE, ASSOC_TYPE, COMPOSITION_DEF, CHILD_TYPE, PARENT_TYPE)
-                != null) {
+        if (DMXUtils.assocAutoTyping(this, TOPIC_TYPE, TOPIC_TYPE, COMPOSITION_DEF, CHILD_TYPE, PARENT_TYPE) != null ||
+            DMXUtils.assocAutoTyping(this, TOPIC_TYPE, ASSOC_TYPE, COMPOSITION_DEF, CHILD_TYPE, PARENT_TYPE) != null) {
             childTopics.setRef(CARDINALITY, ONE);
         }
         //
