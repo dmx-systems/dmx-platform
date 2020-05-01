@@ -59,7 +59,7 @@
       {
         "value":       "View Configuration",
         "uri":         "dmx.webclient.view_config",
-        "dataTypeUri": "dmx.core.identity",
+        "dataTypeUri": "dmx.core.entity",
         "compDefs": [
           {
             "childTypeUri":        "dmx.webclient.icon",

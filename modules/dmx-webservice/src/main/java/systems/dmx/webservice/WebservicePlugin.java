@@ -174,7 +174,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
-    public Assoc getAssoc(@PathParam("assoc_type_uri") String assocTypeUri,
+    public Assoc getAssocBetweenTopicAndTopic(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
         return dmx.getAssocBetweenTopicAndTopic(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);

@@ -17,7 +17,7 @@
     {
       "value":       "User Account",
       "uri":         "dmx.accesscontrol.user_account",
-      "dataTypeUri": "dmx.core.identity",
+      "dataTypeUri": "dmx.core.entity",
       "compDefs": [
         {
           "childTypeUri":        "dmx.accesscontrol.username",

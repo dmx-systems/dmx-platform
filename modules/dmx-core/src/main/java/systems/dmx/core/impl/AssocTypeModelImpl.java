@@ -21,7 +21,7 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     AssocTypeModelImpl(TypeModelImpl type) {
         super(type);
-        if (type.dataTypeUri.equals(VALUE) || type.dataTypeUri.equals(IDENTITY)) {
+        if (type.dataTypeUri.equals(VALUE) || type.dataTypeUri.equals(ENTITY)) {
             throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for an assoc " +
                 "type. Use \"dmx.core.composite\" instead. " + type);
         }

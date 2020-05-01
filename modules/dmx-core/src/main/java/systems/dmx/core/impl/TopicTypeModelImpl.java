@@ -23,7 +23,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
         super(type);
         if (type.dataTypeUri.equals(COMPOSITE)) {
             throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for a topic " +
-                "type. Use \"dmx.core.value\" or \"dmx.core.identity\" instead. " + type);
+                "type. Use \"dmx.core.value\" or \"dmx.core.entity\" instead. " + type);
         }
     }
 

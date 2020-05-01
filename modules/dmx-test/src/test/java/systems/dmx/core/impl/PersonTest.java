@@ -316,7 +316,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.address_entry",      "Address Entry",      TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.email_address",      "Email Address",      TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_description", "Person Description", HTML));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             IDENTITY)
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             ENTITY)
           .addCompDef(mf.newCompDefModel(null, true, false, "dmx.contacts.person", "dmx.contacts.person_name", ONE))
           .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.email_address",      MANY))
           .addCompDef(mf.newCompDefModel("dmx.contacts.address_entry", false, false,

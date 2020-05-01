@@ -180,7 +180,7 @@
       {
         "value":       "Person",
         "uri":         "dmx.contacts.person",
-        "dataTypeUri": "dmx.core.identity",
+        "dataTypeUri": "dmx.core.entity",
         "compDefs": [
           {
             "childTypeUri":        "dmx.contacts.person_name",
@@ -234,7 +234,7 @@
       {
         "value":       "Organization",
         "uri":         "dmx.contacts.organization",
-        "dataTypeUri": "dmx.core.identity",
+        "dataTypeUri": "dmx.core.entity",
         "compDefs": [
           {
             "childTypeUri":        "dmx.contacts.organization_name",

@@ -38,7 +38,7 @@ public class Constants {
     public static final String BOOLEAN           = "dmx.core.boolean";
     public static final String COMPOSITE         = "dmx.core.composite";
     public static final String VALUE             = "dmx.core.value";
-    public static final String IDENTITY          = "dmx.core.identity";
+    public static final String ENTITY            = "dmx.core.entity";
 
     // role types
     public static final String DEFAULT           = "dmx.core.default";

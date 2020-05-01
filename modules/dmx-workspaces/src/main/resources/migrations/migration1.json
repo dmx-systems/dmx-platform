@@ -41,7 +41,7 @@
       {
         "value":       "Workspace",
         "uri":         "dmx.workspaces.workspace",
-        "dataTypeUri": "dmx.core.identity",
+        "dataTypeUri": "dmx.core.entity",
         "compDefs": [
           {
             "childTypeUri":        "dmx.workspaces.workspace_name",
@@ -77,7 +77,7 @@
       {
         "value":       "Workspace Facet",
         "uri":         "dmx.workspaces.workspace_facet",
-        "dataTypeUri": "dmx.core.identity",
+        "dataTypeUri": "dmx.core.entity",
         "compDefs": [
           {
             "childTypeUri":        "dmx.workspaces.workspace",

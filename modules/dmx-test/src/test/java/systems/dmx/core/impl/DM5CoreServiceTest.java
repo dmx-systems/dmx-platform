@@ -195,7 +195,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     public void childParentValueUpdate() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            defineSimpleNameIdentityModel();
+            defineSimpleNameEntityModel();
             String SIMPLE_NAME   = "simple.name";
             String SIMPLE_ENTITY = "simple.entity";
             // create composite topic
@@ -218,7 +218,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     public void addChildTopicByValue() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            defineManyNamesIdentityModel();
+            defineManyNamesEntityModel();
             String SIMPLE_NAME   = "simple.name";
             String SIMPLE_ENTITY = "simple.entity";
             // create composite topic
@@ -248,7 +248,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     public void addChildTopicByRef() {
         DMXTransaction tx = dmx.beginTx();
         try {
-            defineManyNamesIdentityModel();
+            defineManyNamesEntityModel();
             String SIMPLE_NAME   = "simple.name";
             String SIMPLE_ENTITY = "simple.entity";
             // create composite topic
@@ -276,7 +276,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
 
     private void defineLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", NUMBER));
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", IDENTITY)
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", ENTITY)
             .addCompDef(mf.newCompDefModel(
                 "lotto.draw", "lotto.number", MANY
             ))
@@ -294,18 +294,18 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
 
     // ---
 
-    private void defineSimpleNameIdentityModel() {
+    private void defineSimpleNameEntityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", ENTITY)
             .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", ONE
             ))
         );
     }
 
-    private void defineManyNamesIdentityModel() {
+    private void defineManyNamesEntityModel() {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", IDENTITY)
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", ENTITY)
             .addCompDef(mf.newCompDefModel(
                 "simple.entity", "simple.name", MANY
             ))

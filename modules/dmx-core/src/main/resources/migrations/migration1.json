@@ -81,8 +81,8 @@
             "typeUri": "dmx.core.data_type"
         },
         {
-            "value":   "Identity",
-            "uri":     "dmx.core.identity",
+            "value":   "Entity",
+            "uri":     "dmx.core.entity",
             "typeUri": "dmx.core.data_type"
         },
         // Role Types

@@ -326,7 +326,7 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
-     *   - this.type is an identity type OR this is a facet update
+     *   - this.type is an entity type OR this is a facet update
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
@@ -354,7 +354,7 @@ class ValueIntegrator {
                 return !childTopics.isEmpty() ? unifyChildTopics(childTopics, identityCompDefUris) : null;
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
-                // Note: for value-types this is fixed meanwhile, but not for identity-types.
+                // Note: for value-types this is fixed meanwhile, but not for entity-types.
                 DMXObjectModelImpl parent = createSimpleTopic();
                 logger.fine("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
                     "\")");
@@ -406,7 +406,7 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
-     *   - this.type is an identity type OR this is a facet update
+     *   - this.type is an entity type OR this is a facet update
      *   - parent's type is this.type
      *   - compDef's parent type is this.type
      *   - newChildTopic's type is compDef's child type

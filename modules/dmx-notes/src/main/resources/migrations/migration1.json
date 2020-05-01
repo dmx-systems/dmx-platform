@@ -13,7 +13,7 @@
         {
             "value":       "Note",
             "uri":         "dmx.notes.note",
-            "dataTypeUri": "dmx.core.identity",
+            "dataTypeUri": "dmx.core.entity",
             "compDefs": [
                 {
                     "childTypeUri":        "dmx.notes.title",

@@ -11,7 +11,7 @@
     {
       "value":       "Bookmark",
       "uri":         "dmx.bookmarks.bookmark",
-      "dataTypeUri": "dmx.core.identity",
+      "dataTypeUri": "dmx.core.entity",
       "compDefs": [
         {
           "childTypeUri":        "dmx.base.url",
