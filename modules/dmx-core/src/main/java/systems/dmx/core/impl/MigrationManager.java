@@ -24,7 +24,7 @@ class MigrationManager {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "systems.dmx.core.migrations";
-    private static final int CORE_MODEL_VERSION = 3;
+    private static final int CORE_MODEL_VERSION = 4;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
