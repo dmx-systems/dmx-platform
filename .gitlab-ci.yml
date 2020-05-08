@@ -12,6 +12,7 @@ javadoc:
   stage: build
   script:
     - mvn -P all javadoc:aggregate
+    - rsync -a target/site/apidocs/ /var/www/apidocs.test/
 
 copy-and-deploy-ci:
   stage: deploy
