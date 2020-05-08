@@ -8,6 +8,10 @@ maven-build:
     paths:
       - modules/dmx-distribution/target/*.zip
 
+javadoc:
+  stage: build
+  script:
+    - mvn -P all javadoc:aggregate
 
 copy-and-deploy-ci:
   stage: deploy
