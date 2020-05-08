@@ -344,23 +344,6 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>2.8.1</version>
                         <configuration>
-                            <show>private</show>
-                            <linksource>true</linksource>
-                            <links>
-                                <link>http://jersey.java.net/nonav/apidocs/1.8/jersey/</link>
-                                <link>http://jettison.codehaus.org/apidocs/</link> <!-- version 1.2 -->
-                                <link>http://www.osgi.org/javadoc/r4v401/</link>
-                            </links>
-                            <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
-                            <docletArtifact>
-                                <groupId>org.umlgraph</groupId>
-                                <artifactId>umlgraph</artifactId>
-                                <version>5.6</version>
-                            </docletArtifact>
-                            <additionalparam>
-                                -collapsible -hide java.* -hide org.* -inferdepvis public -inferrel
-                            </additionalparam>
-                            <useStandardDocletOptions>true</useStandardDocletOptions>
                             <failOnError>false</failOnError>
                         </configuration>
                     </plugin>
