@@ -6,7 +6,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TypeModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.util.SequencedHashMap;
@@ -28,14 +28,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     String dataTypeUri;     // may be null in models used for an update operation
     SequencedHashMap<String, CompDefModelImpl> compDefs;        // is never null, may be empty
-    ViewConfigurationModelImpl viewConfig;                      // is never null
+    ViewConfigModelImpl viewConfig;                             // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                                                ViewConfigurationModelImpl viewConfig) {
+                                                                ViewConfigModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.compDefs    = toMap(compDefs);
@@ -135,7 +135,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === View Configuration ===
 
     @Override
-    public ViewConfigurationModelImpl getViewConfig() {
+    public ViewConfigModelImpl getViewConfig() {
         return viewConfig;
     }
 
@@ -145,8 +145,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
-    public void setViewConfig(ViewConfigurationModel viewConfig) {
-        this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
+    public void setViewConfig(ViewConfigModel viewConfig) {
+        this.viewConfig = (ViewConfigModelImpl) viewConfig;
     }
 
 

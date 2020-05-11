@@ -42,7 +42,7 @@ public interface DMXType extends Topic, Iterable<String> {
 
     // === View Configuration ===
 
-    ViewConfiguration getViewConfig();
+    ViewConfig getViewConfig();
 
     Object getViewConfigValue(String configTypeUri, String childTypeUri);
 

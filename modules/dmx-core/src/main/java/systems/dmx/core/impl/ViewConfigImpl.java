@@ -1,25 +1,25 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Topic;
-import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 
 
 
 /**
  * A view configuration that is attached to the {@link AccessLayer}.
  */
-class ViewConfigurationImpl implements ViewConfiguration {
+class ViewConfigImpl implements ViewConfig {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
      * The underlying model.
      */
-    private ViewConfigurationModelImpl model;
+    private ViewConfigModelImpl model;
 
     /**
      * A player that points to the object this view configuration applies to.
@@ -32,7 +32,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationImpl(PlayerModel configurable, ViewConfigurationModelImpl model, AccessLayer al) {
+    ViewConfigImpl(PlayerModel configurable, ViewConfigModelImpl model, AccessLayer al) {
         this.configurable = configurable;
         this.model = model;
         this.al = al;
@@ -43,7 +43,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
 
 
-    // === ViewConfiguration Implementation ===
+    // === ViewConfig Implementation ===
 
     @Override
     public Iterable<Topic> getConfigTopics() {
@@ -64,14 +64,14 @@ class ViewConfigurationImpl implements ViewConfiguration {
     }
 
     @Override
-    public ViewConfiguration setConfigValue(String configTypeUri, String childTypeUri, Object value) {
+    public ViewConfig setConfigValue(String configTypeUri, String childTypeUri, Object value) {
         _setConfigValue(configTypeUri, mf.newChildTopicsModel()
             .set(childTypeUri, value));
         return this;
     }
 
     @Override
-    public ViewConfiguration setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
+    public ViewConfig setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
         _setConfigValue(configTypeUri, mf.newChildTopicsModel()
             .set(childTypeUri, mf.newTopicReferenceModel(topicIdOrUri)));
         return this;
@@ -80,7 +80,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
     // ---
 
     @Override
-    public ViewConfigurationModel getModel() {
+    public ViewConfigModel getModel() {
         return model;
     }
 

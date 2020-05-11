@@ -11,7 +11,7 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicDeletionModel;
 import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.TopicReferenceModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
@@ -582,9 +582,8 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                                ViewConfigurationModel viewConfig) {
-        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
-            (ViewConfigurationModelImpl) viewConfig));
+                                                ViewConfigModel viewConfig) {
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs, (ViewConfigModelImpl) viewConfig));
     }
 
     @Override
@@ -607,9 +606,8 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssocTypeModelImpl newAssocTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                                ViewConfigurationModel viewConfig) {
-        return new AssocTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs,
-            (ViewConfigurationModelImpl) viewConfig));
+                                                ViewConfigModel viewConfig) {
+        return new AssocTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, compDefs, (ViewConfigModelImpl) viewConfig));
     }
 
     @Override
@@ -631,13 +629,13 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TypeModel ===
 
     TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                                                         ViewConfigurationModelImpl viewConfig) {
+                                                                         ViewConfigModelImpl viewConfig) {
         return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, compDefs, viewConfig);
     }
 
     TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
         return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, new ArrayList(),
-            newViewConfigurationModel());
+            newViewConfigModel());
     }
 
     TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
@@ -645,7 +643,7 @@ public class ModelFactoryImpl implements ModelFactory {
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
             parseCompDefs(typeModel.optJSONArray("compDefs"), typeTopic.getUri()),      // optJSONArray may return null
-            newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null
+            newViewConfigModel(typeModel.optJSONArray("viewConfigTopics")));            // optJSONArray may return null
     }
 
     // ---
@@ -675,7 +673,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public CompDefModelImpl newCompDefModel(String parentTypeUri, String childTypeUri,
                                             String childCardinalityUri,
-                                            ViewConfigurationModel viewConfig) {
+                                            ViewConfigModel viewConfig) {
         return newCompDefModel(-1, null, null, false, false, parentTypeUri, childTypeUri, childCardinalityUri,
             viewConfig);
     }
@@ -694,8 +692,8 @@ public class ModelFactoryImpl implements ModelFactory {
      *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID). ### still true?
      */
     @Override
-    public CompDefModelImpl newCompDefModel(AssocModel assoc, ViewConfigurationModel viewConfig) {
-        return new CompDefModelImpl((AssocModelImpl) assoc, (ViewConfigurationModelImpl) viewConfig);
+    public CompDefModelImpl newCompDefModel(AssocModel assoc, ViewConfigModel viewConfig) {
+        return new CompDefModelImpl((AssocModelImpl) assoc, (ViewConfigModelImpl) viewConfig);
     }
 
     @Override
@@ -714,7 +712,7 @@ public class ModelFactoryImpl implements ModelFactory {
                     player2 != null ? player2 : childPlayer(compDef.getString("childTypeUri")),
                     null, childTopics(compDef)
                 ),
-                newViewConfigurationModel(compDef.optJSONArray("viewConfigTopics"))
+                newViewConfigModel(compDef.optJSONArray("viewConfigTopics"))
             );
         } catch (Exception e) {
             throw parsingFailed(compDef, e, "CompDefModelImpl");
@@ -728,12 +726,12 @@ public class ModelFactoryImpl implements ModelFactory {
                                      boolean isIdentityAttr, boolean includeInLabel,
                                      String parentTypeUri, String childTypeUri,
                                      String childCardinalityUri,
-                                     ViewConfigurationModel viewConfig) {
+                                     ViewConfigModel viewConfig) {
         return new CompDefModelImpl(
             newAssocModel(id, uri, COMPOSITION_DEF, parentPlayer(parentTypeUri), childPlayer(childTypeUri),
                 null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
             ),
-            (ViewConfigurationModelImpl) viewConfig
+            (ViewConfigModelImpl) viewConfig
         );
     }
 
@@ -787,27 +785,27 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === ViewConfigurationModel ===
+    // === ViewConfigModel ===
 
     @Override
-    public ViewConfigurationModelImpl newViewConfigurationModel() {
-        return new ViewConfigurationModelImpl(new HashMap(), al());
+    public ViewConfigModelImpl newViewConfigModel() {
+        return new ViewConfigModelImpl(new HashMap(), al());
     }    
 
     @Override
-    public ViewConfigurationModelImpl newViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
+    public ViewConfigModelImpl newViewConfigModel(Iterable<? extends TopicModel> configTopics) {
         Map<String, TopicModelImpl> _configTopics = new HashMap();
         for (TopicModel configTopic : configTopics) {
             _configTopics.put(configTopic.getTypeUri(), (TopicModelImpl) configTopic);
         }
-        return new ViewConfigurationModelImpl(_configTopics, al());
+        return new ViewConfigModelImpl(_configTopics, al());
     }    
 
     /**
      * @param   configTopics    may be null
      */
     @Override
-    public ViewConfigurationModelImpl newViewConfigurationModel(JSONArray configTopics) {
+    public ViewConfigModelImpl newViewConfigModel(JSONArray configTopics) {
         try {
             Map<String, TopicModelImpl> _configTopics = new HashMap();
             if (configTopics != null) {
@@ -816,9 +814,9 @@ public class ModelFactoryImpl implements ModelFactory {
                     _configTopics.put(configTopic.getTypeUri(), configTopic);
                 }
             }
-            return new ViewConfigurationModelImpl(_configTopics, al());
+            return new ViewConfigModelImpl(_configTopics, al());
         } catch (Exception e) {
-            throw parsingFailed(configTopics, e, "ViewConfigurationModelImpl");
+            throw parsingFailed(configTopics, e, "ViewConfigModelImpl");
         }
     }    
 

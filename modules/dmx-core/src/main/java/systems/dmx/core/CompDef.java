@@ -43,7 +43,7 @@ public interface CompDef extends Assoc {
 
     // ---
 
-    ViewConfiguration getViewConfig();
+    ViewConfig getViewConfig();
 
     // ---
 

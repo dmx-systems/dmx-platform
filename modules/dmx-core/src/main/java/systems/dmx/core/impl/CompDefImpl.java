@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.CompDef;
-import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.PlayerModel;
 
@@ -72,9 +72,9 @@ class CompDefImpl extends AssocImpl implements CompDef {
     // ---
 
     @Override
-    public ViewConfiguration getViewConfig() {
+    public ViewConfig getViewConfig() {
         PlayerModel configurable = al.typeStorage.newCompDefPlayer(getId());   // ### ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), al);
+        return new ViewConfigImpl(configurable, getModel().getViewConfig(), al);
     }
 
     // ---

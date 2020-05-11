@@ -2,7 +2,7 @@ package systems.dmx.webclient.migrations;
 
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
-import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.Migration;
 
@@ -59,7 +59,7 @@ public class Migration3 extends Migration {
 
     private void repair(DMXType type, int i) {
         try {
-            ViewConfiguration viewConfig = type.getViewConfig();
+            ViewConfig viewConfig = type.getViewConfig();
             Topic configTopic = viewConfig.getConfigTopic("dmx.webclient.view_config");
             if (configTopic == null) {
                 // 1) create config topic

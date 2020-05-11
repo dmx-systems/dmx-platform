@@ -6,13 +6,13 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
@@ -177,7 +177,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Overrides the cached view config topic for the given type/comp def with the given view config topic.
      */
     private void updateTypeCache(TypeModel type, long compDefId, TopicModel viewConfigTopic) {
-        ViewConfigurationModel vcm;
+        ViewConfigModel vcm;
         if (compDefId == -1) {
             vcm = type.getViewConfig();
         } else {
@@ -197,7 +197,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
-    private void setViewConfigLabel(ViewConfiguration viewConfig) {
+    private void setViewConfigLabel(ViewConfig viewConfig) {
         for (Topic configTopic : viewConfig.getConfigTopics()) {
             setDefaultConfigTopicLabel(configTopic);
         }
@@ -224,7 +224,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
-    private void addDefaultViewConfigTopic(ViewConfigurationModel viewConfig) {
+    private void addDefaultViewConfigTopic(ViewConfigModel viewConfig) {
         if (viewConfig.getConfigTopic("dmx.webclient.view_config") == null) {
             viewConfig.addConfigTopic(mf.newTopicModel("dmx.webclient.view_config"));
         }

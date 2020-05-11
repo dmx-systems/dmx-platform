@@ -31,12 +31,12 @@ public interface CompDefModel extends AssocModel {
 
     String getChildCardinalityUri();
 
-    ViewConfigurationModel getViewConfig();
+    ViewConfigModel getViewConfig();
 
     // ---
 
     // TODO: currently not supported. Drop from public API?
     void setChildCardinalityUri(String childCardinalityUri);
 
-    void setViewConfig(ViewConfigurationModel viewConfig);
+    void setViewConfig(ViewConfigModel viewConfig);
 }

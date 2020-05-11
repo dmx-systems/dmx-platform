@@ -8,7 +8,7 @@ import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.util.DMXUtils;
 
 import java.util.ArrayList;
@@ -284,7 +284,7 @@ class TypeStorage {
     CompDefModelImpl newCompDefModel(AssocModelImpl assoc) {
         return mf.newCompDefModel(
             addPlayerUris(assoc, fetchParentTypeTopic(assoc).uri, fetchChildTypeTopic(assoc).uri),
-            mf.newViewConfigurationModel().addConfigTopic(
+            mf.newViewConfigModel().addConfigTopic(
                 // FIXME: the Core must not know about the Webclient
                 // FIXME: the view config topic label is not set
                 mf.newTopicModel("dmx.webclient.view_config", new SimpleValue("View Configuration"))
@@ -649,7 +649,7 @@ class TypeStorage {
 
     // ---
 
-    private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
+    private ViewConfigModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
             return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), COMPOSITION,
                 PARENT, CHILD, "dmx.webclient.view_config"));
@@ -658,7 +658,7 @@ class TypeStorage {
         }
     }
 
-    private ViewConfigurationModel fetchViewConfigOfCompDef(AssocModel compDef) {
+    private ViewConfigModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
             return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), COMPOSITION,
                 PARENT, CHILD, "dmx.webclient.view_config"));
@@ -673,15 +673,15 @@ class TypeStorage {
      * Creates a view config model from a bunch of config topics.
      * Loads the child topics of the given topics and updates them in-place.
      */
-    private ViewConfigurationModel viewConfigModel(Iterable<? extends TopicModelImpl> configTopics) {
+    private ViewConfigModel viewConfigModel(Iterable<? extends TopicModelImpl> configTopics) {
         loadChildTopics(configTopics);
-        return mf.newViewConfigurationModel(configTopics);
+        return mf.newViewConfigModel(configTopics);
     }
 
     // --- Store ---
 
     private void storeViewConfig(TypeModelImpl type) {
-        ViewConfigurationModelImpl viewConfig = type.viewConfig;
+        ViewConfigModelImpl viewConfig = type.viewConfig;
         TopicModel configTopic = _storeViewConfig(newTypePlayer(type.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
         // would be missing on a cold start. Subsequent migrations operating on them would fail.
@@ -691,7 +691,7 @@ class TypeStorage {
     }
 
     void storeViewConfig(CompDefModelImpl compDef) {
-        ViewConfigurationModelImpl viewConfig = compDef.viewConfig;
+        ViewConfigModelImpl viewConfig = compDef.viewConfig;
         TopicModel configTopic = _storeViewConfig(newCompDefPlayer(compDef.id), viewConfig);
         // Note: cached view config must be overridden with the "real thing". Otherwise the child assocs
         // would be missing on a cold start. Subsequent migrations operating on them would fail.
@@ -703,7 +703,7 @@ class TypeStorage {
     /**
      * @return      may be null
      */
-    private TopicModel _storeViewConfig(PlayerModel configurable, ViewConfigurationModelImpl viewConfig) {
+    private TopicModel _storeViewConfig(PlayerModel configurable, ViewConfigModelImpl viewConfig) {
         try {
             TopicModel topic = null;
             for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {

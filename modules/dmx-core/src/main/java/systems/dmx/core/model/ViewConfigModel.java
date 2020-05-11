@@ -12,7 +12,7 @@ import org.codehaus.jettison.json.JSONArray;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface ViewConfigurationModel {
+public interface ViewConfigModel {
 
     Iterable<? extends TopicModel> getConfigTopics();
 
@@ -26,7 +26,7 @@ public interface ViewConfigurationModel {
      *
      * @throws  RuntimeException    if this view config already contains a config topic for that type URI.
      */
-    ViewConfigurationModel addConfigTopic(TopicModel configTopic);
+    ViewConfigModel addConfigTopic(TopicModel configTopic);
 
     /**
      * Overrides a config topic with the given one.
@@ -45,9 +45,9 @@ public interface ViewConfigurationModel {
      * @param   childTypeUri    The child type URI of the config value to set, e.g. "dmx.webclient.icon"
      * @param   value           The config value (String, Integer, Long, Double, or Boolean)
      */
-    ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value);
+    ViewConfigModel setConfigValue(String configTypeUri, String childTypeUri, Object value);
 
-    ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
+    ViewConfigModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
 
     // ---
 

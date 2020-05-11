@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXType;
-import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.TypeModel;
@@ -87,9 +87,9 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     // === View Configuration ===
 
     @Override
-    public final ViewConfiguration getViewConfig() {
+    public final ViewConfig getViewConfig() {
         PlayerModel configurable = al.typeStorage.newTypePlayer(getId());   // ### type ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), al);
+        return new ViewConfigImpl(configurable, getModel().getViewConfig(), al);
     }
 
     @Override

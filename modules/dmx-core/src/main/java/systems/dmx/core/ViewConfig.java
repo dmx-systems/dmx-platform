@@ -1,7 +1,7 @@
 package systems.dmx.core;
 
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 
 
 
@@ -13,7 +13,7 @@ import systems.dmx.core.model.ViewConfigurationModel;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface ViewConfiguration {
+public interface ViewConfig {
 
     Iterable<Topic> getConfigTopics();
 
@@ -39,11 +39,11 @@ public interface ViewConfiguration {
      * @param   childTypeUri    The child type URI of the config value to set, e.g. "dmx.webclient.icon"
      * @param   value           The config value (String, Integer, Long, Double, or Boolean)
      */
-    ViewConfiguration setConfigValue(String configTypeUri, String childTypeUri, Object value);
+    ViewConfig setConfigValue(String configTypeUri, String childTypeUri, Object value);
 
-    ViewConfiguration setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
+    ViewConfig setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
 
     // ---
 
-    ViewConfigurationModel getModel();
+    ViewConfigModel getModel();
 }

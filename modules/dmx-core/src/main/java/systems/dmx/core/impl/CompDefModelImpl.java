@@ -5,7 +5,7 @@ import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicPlayerModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -17,7 +17,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    ViewConfigurationModelImpl viewConfig;     // is never null
+    ViewConfigModelImpl viewConfig;     // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -30,9 +30,9 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     /**
      * @param   assoc   the underlying association.
      */
-    CompDefModelImpl(AssocModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
+    CompDefModelImpl(AssocModelImpl assoc, ViewConfigModelImpl viewConfig) {
         super(assoc);
-        this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
+        this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigModel();
         // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
     }
 
@@ -72,7 +72,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     @Override
-    public ViewConfigurationModelImpl getViewConfig() {
+    public ViewConfigModelImpl getViewConfig() {
         return viewConfig;
     }
 
@@ -84,8 +84,8 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     }
 
     @Override
-    public void setViewConfig(ViewConfigurationModel viewConfig) {
-        this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
+    public void setViewConfig(ViewConfigModel viewConfig) {
+        this.viewConfig = (ViewConfigModelImpl) viewConfig;
     }
 
     // ---

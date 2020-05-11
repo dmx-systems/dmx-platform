@@ -16,7 +16,7 @@ import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.model.TopicReferenceModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
@@ -181,7 +181,7 @@ public interface ModelFactory {
     // === TopicTypeModel ===
 
     TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                     ViewConfigurationModel viewConfig);
+                                     ViewConfigModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
 
@@ -192,7 +192,7 @@ public interface ModelFactory {
     // === AssocTypeModel ===
 
     AssocTypeModel newAssocTypeModel(TopicModel typeTopic, String dataTypeUri, List<CompDefModel> compDefs,
-                                     ViewConfigurationModel viewConfig);
+                                     ViewConfigModel viewConfig);
 
     AssocTypeModel newAssocTypeModel(String uri, String value, String dataTypeUri);
 
@@ -205,24 +205,24 @@ public interface ModelFactory {
     CompDefModel newCompDefModel(String parentTypeUri, String childTypeUri, String childCardinalityUri);
 
     CompDefModel newCompDefModel(String parentTypeUri, String childTypeUri, String childCardinalityUri,
-                                 ViewConfigurationModel viewConfig);
+                                 ViewConfigModel viewConfig);
 
     CompDefModel newCompDefModel(String customAssocTypeUri, boolean isIdentityAttr, boolean includeInLabel,
                                  String parentTypeUri, String childTypeUri, String childCardinalityUri);
 
-    CompDefModel newCompDefModel(AssocModel assoc, ViewConfigurationModel viewConfig);
+    CompDefModel newCompDefModel(AssocModel assoc, ViewConfigModel viewConfig);
 
     CompDefModel newCompDefModel(JSONObject compDef);
 
 
 
-    // === ViewConfigurationModel ===
+    // === ViewConfigModel ===
 
-    ViewConfigurationModel newViewConfigurationModel();
+    ViewConfigModel newViewConfigModel();
 
-    ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics);
+    ViewConfigModel newViewConfigModel(Iterable<? extends TopicModel> configTopics);
 
-    ViewConfigurationModel newViewConfigurationModel(JSONArray configTopics);
+    ViewConfigModel newViewConfigModel(JSONArray configTopics);
 
 
 

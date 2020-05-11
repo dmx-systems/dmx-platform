@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.ViewConfigurationModel;
+import systems.dmx.core.model.ViewConfigModel;
 
 import org.codehaus.jettison.json.JSONArray;
 
@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 
 
-class ViewConfigurationModelImpl implements ViewConfigurationModel {
+class ViewConfigModelImpl implements ViewConfigModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -28,7 +28,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     /**
      * @param   configTopics    must not be null
      */
-    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics, AccessLayer al) {
+    ViewConfigModelImpl(Map<String, TopicModelImpl> configTopics, AccessLayer al) {
         this.configTopics = configTopics;
         this.mf = al.mf;
     }
@@ -46,7 +46,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     }
 
     @Override
-    public ViewConfigurationModel addConfigTopic(TopicModel configTopic) {
+    public ViewConfigModel addConfigTopic(TopicModel configTopic) {
         // error check
         String configTypeUri = configTopic.getTypeUri();
         if (getConfigTopic(configTypeUri) != null) {
@@ -71,7 +71,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     // ---
 
     @Override
-    public ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value) {
+    public ViewConfigModel setConfigValue(String configTypeUri, String childTypeUri, Object value) {
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().set(childTypeUri, value)));
@@ -82,7 +82,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     }
 
     @Override
-    public ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
+    public ViewConfigModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
         TopicModel configTopic = getConfigTopic(configTypeUri);
         RelatedTopicModel valueRef = mf.newTopicReferenceModel(topicIdOrUri);
         if (configTopic == null) {
