@@ -51,7 +51,7 @@ public class EventTest extends CoreServiceTestEnvironment {
             createEvent();
             List<Topic> events = dmx.getTopicsByType("dmx.events.event");
             assertEquals(1, events.size());
-            // labels are concatenated
+            //
             ChildTopics event = events.get(0).getChildTopics();
             ChildTopics from = event.getChildTopics("dmx.datetime#dmx.datetime.from");
             ChildTopics date = from.getChildTopics("dmx.datetime.date");
@@ -73,8 +73,8 @@ public class EventTest extends CoreServiceTestEnvironment {
     private void defineEventModel() {
         defineDateTimeModel();
         // Event
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event_name", "Event Name",  TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event",      "Event", ENTITY)
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event_name", "Event Name", TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event",      "Event",      ENTITY)
           .addCompDef(mf.newCompDefModel(null, true, false, "dmx.events.event", "dmx.events.event_name", ONE))
           .addCompDef(mf.newCompDefModel("dmx.datetime.from", false, false, "dmx.events.event", "dmx.datetime", ONE))
           .addCompDef(mf.newCompDefModel("dmx.datetime.to",   false, false, "dmx.events.event", "dmx.datetime", ONE))
