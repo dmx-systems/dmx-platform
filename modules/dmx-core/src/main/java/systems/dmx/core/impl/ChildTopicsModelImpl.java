@@ -367,7 +367,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // === Iterable Implementation ===
 
     /**
-     * Returns an interator which iterates this ChildTopicsModel's comp def URIs.
+     * Returns an iterator which iterates this ChildTopicsModel's comp def URIs.
      */
     @Override
     public final Iterator<String> iterator() {

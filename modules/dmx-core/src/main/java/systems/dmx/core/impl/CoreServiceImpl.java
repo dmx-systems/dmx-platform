@@ -95,6 +95,13 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public Iterable<Topic> getAllTopics() {
+        return new InstantiationIterable(al.getAllTopics());
+    }
+
+    // ---
+
+    @Override
     public Topic getTopicByValue(String typeUri, SimpleValue value) {
         TopicModelImpl topic = al.getTopicByValue(typeUri, value);
         return topic != null ? topic.instantiate() : null;
@@ -116,11 +123,6 @@ public class CoreServiceImpl implements CoreService {
             query, topicTypeUri, searchChildTopics,
             al.instantiate(al.queryTopicsFulltext(query, topicTypeUri, searchChildTopics))
         );
-    }
-
-    @Override
-    public Iterable<Topic> getAllTopics() {
-        return new InstantiationIterable(al.getAllTopics());
     }
 
     // ---
@@ -150,14 +152,23 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Assoc getAssocByValue(String typeUri, SimpleValue value) {
-        AssocModelImpl assoc = al.getAssocByValue(typeUri, value);
-        return assoc != null ? assoc.instantiate() : null;
+    public List<PlayerModel> getPlayerModels(long assocId) {
+        return al.getPlayerModels(assocId);
     }
 
     @Override
-    public List<Assoc> queryAssocs(String typeUri, SimpleValue value) {
-        return al.instantiate(al.queryAssocs(typeUri, value));
+    public List<Assoc> getAssocsByType(String assocTypeUri) {
+        return al.instantiate(al.getAssocsByType(assocTypeUri));
+    }
+
+    @Override
+    public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
+        return al.instantiate(al.getAssocs(topic1Id, topic2Id));
+    }
+
+    @Override
+    public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
+        return al.instantiate(al.getAssocs(assocTypeUri, topic1Id, topic2Id));
     }
 
     @Override
@@ -176,33 +187,22 @@ public class CoreServiceImpl implements CoreService {
         return assoc != null ? assoc.instantiate() : null;
     }
 
-    // ---
-
-    @Override
-    public List<Assoc> getAssocsByType(String assocTypeUri) {
-        return al.instantiate(al.getAssocsByType(assocTypeUri));
-    }
-
-    @Override
-    public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
-        return al.instantiate(al.getAssocs(topic1Id, topic2Id));
-    }
-
-    @Override
-    public List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri) {
-        return al.instantiate(al.getAssocs(assocTypeUri, topic1Id, topic2Id));
-    }
-
-    // ---
-
     @Override
     public Iterable<Assoc> getAllAssocs() {
         return new InstantiationIterable(al.getAllAssocs());
     }
 
+    // ---
+
     @Override
-    public List<PlayerModel> getPlayerModels(long assocId) {
-        return al.getPlayerModels(assocId);
+    public Assoc getAssocByValue(String typeUri, SimpleValue value) {
+        AssocModelImpl assoc = al.getAssocByValue(typeUri, value);
+        return assoc != null ? assoc.instantiate() : null;
+    }
+
+    @Override
+    public List<Assoc> queryAssocs(String typeUri, SimpleValue value) {
+        return al.instantiate(al.queryAssocs(typeUri, value));
     }
 
     // ---
@@ -235,8 +235,6 @@ public class CoreServiceImpl implements CoreService {
     public TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         return al.getTopicTypeImplicitly(topicId).instantiate();
     }
-
-    // ---
 
     @Override
     public List<TopicType> getAllTopicTypes() {
@@ -273,8 +271,6 @@ public class CoreServiceImpl implements CoreService {
     public AssocTypeImpl getAssocTypeImplicitly(long assocId) {
         return al.getAssocTypeImplicitly(assocId).instantiate();
     }
-
-    // ---
 
     @Override
     public List<AssocType> getAllAssocTypes() {

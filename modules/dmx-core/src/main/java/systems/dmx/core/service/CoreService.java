@@ -57,6 +57,10 @@ public interface CoreService {
 
     List<Topic> getTopicsByType(String topicTypeUri);
 
+    Iterable<Topic> getAllTopics();
+
+    // ---
+
     /**
      * Looks up a single topic by exact value.
      * <p>
@@ -100,8 +104,6 @@ public interface CoreService {
      */
     QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics);
 
-    Iterable<Topic> getAllTopics();
-
     // ---
 
     Topic createTopic(TopicModel model);
@@ -115,6 +117,41 @@ public interface CoreService {
     // === Associations ===
 
     Assoc getAssoc(long assocId);
+
+    List<PlayerModel> getPlayerModels(long assocId);
+
+    List<Assoc> getAssocsByType(String assocTypeUri);
+
+    /**
+     * Returns all associations between two topics. If no such association exists an empty list is returned.
+     */
+    List<Assoc> getAssocs(long topic1Id, long topic2Id);
+
+    /**
+     * Returns the associations between two topics. If no such association exists an empty list is returned.
+     *
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
+     */
+    List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri);
+
+    /**
+     * Returns the association between two topics, qualified by association type and both role types.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association exist, a runtime exception is thrown.
+     *
+     * TODO: rename to "getAssocBetweenTopicAndTopic"
+     *
+     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
+     */
+    Assoc getAssocBetweenTopicAndTopic(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                       String roleTypeUri2);
+
+    Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
+                                       String assocRoleTypeUri);
+
+    Iterable<Assoc> getAllAssocs();
+
+    // ---
 
     /**
      * Looks up a single association by exact value.
@@ -135,43 +172,6 @@ public interface CoreService {
      */
     List<Assoc> queryAssocs(String typeUri, SimpleValue value);
 
-    /**
-     * Returns the association between two topics, qualified by association type and both role types.
-     * If no such association exists <code>null</code> is returned.
-     * If more than one association exist, a runtime exception is thrown.
-     *
-     * TODO: rename to "getAssocBetweenTopicAndTopic"
-     *
-     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
-     */
-    Assoc getAssocBetweenTopicAndTopic(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
-                                       String roleTypeUri2);
-
-    Assoc getAssocBetweenTopicAndAssoc(String assocTypeUri, long topicId, long assocId, String topicRoleTypeUri,
-                                       String assocRoleTypeUri);
-
-    // ---
-
-    List<Assoc> getAssocsByType(String assocTypeUri);
-
-    /**
-     * Returns all associations between two topics. If no such association exists an empty list is returned.
-     */
-    List<Assoc> getAssocs(long topic1Id, long topic2Id);
-
-    /**
-     * Returns the associations between two topics. If no such association exists an empty list is returned.
-     *
-     * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.
-     */
-    List<Assoc> getAssocs(long topic1Id, long topic2Id, String assocTypeUri);
-
-    // ---
-
-    Iterable<Assoc> getAllAssocs();
-
-    List<PlayerModel> getPlayerModels(long assocId);
-
     // ---
 
     Assoc createAssoc(AssocModel model);
@@ -191,8 +191,6 @@ public interface CoreService {
      * A user has implicit READ permission for the topic type if she has READ permission for the given topic.
      */
     TopicType getTopicTypeImplicitly(long topicId);
-
-    // ---
 
     List<TopicType> getAllTopicTypes();
 
@@ -216,8 +214,6 @@ public interface CoreService {
      * association.
      */
     AssocType getAssocTypeImplicitly(long assocId);
-
-    // ---
 
     List<AssocType> getAllAssocTypes();
 
