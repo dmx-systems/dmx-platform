@@ -53,7 +53,7 @@ export default ({store, dm5}) => {
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
         {
           label: 'Edit', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
-          disabled: isTopicEditDisabled
+          disabled: isEditDisabled
         },
         {
           label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
@@ -66,7 +66,7 @@ export default ({store, dm5}) => {
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
         {
           label: 'Edit', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
-          disabled: isAssocEditDisabled
+          disabled: isEditDisabled
         },
         {
           label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
@@ -108,17 +108,12 @@ export default ({store, dm5}) => {
   // ---
 
   /**
-   * @return    a promise for a boolean
+   * @param   id    a topic/assoc ID.
+   *
+   * @return  a promise for a boolean
    */
-  function isTopicEditDisabled (id) {
-    return isTopicWritable(id).then(writable => !writable)
-  }
-
-  /**
-   * @return    a promise for a boolean
-   */
-  function isAssocEditDisabled (id) {
-    return isAssocWritable(id).then(writable => !writable)
+  function isEditDisabled (id) {
+    return isWritable(id).then(writable => !writable)
   }
 
   /**
@@ -152,19 +147,12 @@ export default ({store, dm5}) => {
    * @return    a promise for a boolean
    */
   function containUnwritableObject (idLists) {
-    return Promise.all([
-      ...idLists.topicIds.map(isTopicWritable),
-      ...idLists.assocIds.map(isAssocWritable)
-    ]).then(writables =>
+    return Promise.all([...idLists.topicIds, ...idLists.assocIds].map(isWritable)).then(writables =>
       writables.some(writable => !writable)
     )
   }
 
-  function isTopicWritable (id) {
-    return dm5.permCache.isTopicWritable(id)
-  }
-
-  function isAssocWritable (id) {
-    return dm5.permCache.isAssocWritable(id)
+  function isWritable (id) {
+    return dm5.permCache.isWritable(id)
   }
 }

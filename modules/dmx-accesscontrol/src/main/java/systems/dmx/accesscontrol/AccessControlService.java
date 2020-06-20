@@ -159,17 +159,12 @@ public interface AccessControlService {
 
     // === Permissions ===
 
-    // TODO: unify both into "getPermissions()"
-
     /**
+     * @param   objectId    a topic ID, or an association ID.
+     *
      * @return  A Permissions object with one entry: <code>dmx.accesscontrol.operation.write</code>.
      */
-    Permissions getTopicPermissions(long topicId);
-
-    /**
-     * @return  A Permissions object with one entry: <code>dmx.accesscontrol.operation.write</code>.
-     */
-    Permissions getAssocPermissions(long assocId);
+    Permissions getPermissions(long objectId);
 
 
 

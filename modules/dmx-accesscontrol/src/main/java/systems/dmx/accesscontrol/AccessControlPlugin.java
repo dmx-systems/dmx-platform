@@ -369,17 +369,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Permissions ===
 
     @GET
-    @Path("/topic/{id}")
+    @Path("/object/{id}")
     @Override
-    public Permissions getTopicPermissions(@PathParam("id") long topicId) {
-        return getPermissions(topicId);
-    }
-
-    @GET
-    @Path("/assoc/{id}")
-    @Override
-    public Permissions getAssocPermissions(@PathParam("id") long assocId) {
-        return getPermissions(assocId);
+    public Permissions getPermissions(@PathParam("id") long objectId) {
+        return new Permissions().add(Operation.WRITE, hasPermission(getUsername(), Operation.WRITE, objectId));
     }
 
 
@@ -953,13 +946,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new AccessControlException(userInfo(username) + " has no " + operation + " permission for object " +
                 objectId);
         }
-    }
-
-    /**
-     * @param   objectId    a topic ID, or an association ID.
-     */
-    private Permissions getPermissions(long objectId) {
-        return new Permissions().add(Operation.WRITE, hasPermission(getUsername(), Operation.WRITE, objectId));
     }
 
     /**
