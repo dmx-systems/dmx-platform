@@ -151,31 +151,31 @@ public class Neo4jStorageTest {
     public void testFulltextIndex() {
         List<TopicModelImpl> topics;
         // By default a Lucene index is case-insensitive:
-        topics = db.queryTopicsFulltext("Dmx"); assertEquals(2, topics.size());
-        topics = db.queryTopicsFulltext("dmx"); assertEquals(2, topics.size());
-        topics = db.queryTopicsFulltext("DMX"); assertEquals(2, topics.size());
+        topics = queryTopicsFulltext("Dmx"); assertEquals(2, topics.size());
+        topics = queryTopicsFulltext("dmx"); assertEquals(2, topics.size());
+        topics = queryTopicsFulltext("DMX"); assertEquals(2, topics.size());
         // Lucene's default operator is OR:
-        topics = db.queryTopicsFulltext("collaboration platform");         assertEquals(1, topics.size());
-        topics = db.queryTopicsFulltext("collaboration plaXXXform");       assertEquals(1, topics.size());
-        topics = db.queryTopicsFulltext("collaboration AND plaXXXform");   assertEquals(0, topics.size());
-        topics = db.queryTopicsFulltext("collaboration AND platform");     assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("collaboration platform");         assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("collaboration plaXXXform");       assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("collaboration AND plaXXXform");   assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("collaboration AND platform");     assertEquals(1, topics.size());
         // Phrases are set in ".."
-        topics = db.queryTopicsFulltext("\"collaboration platform\"");     assertEquals(0, topics.size());
-        topics = db.queryTopicsFulltext("\"platform for collaboration\""); assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("\"collaboration platform\"");     assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("\"platform for collaboration\""); assertEquals(1, topics.size());
         // Within phrases wildcards do not work:
-        topics = db.queryTopicsFulltext("\"platform * collaboration\"");   assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("\"platform * collaboration\"");   assertEquals(0, topics.size());
     }
 
     @Test
     public void testFulltextIndexWithHTML() {
         List<TopicModelImpl> topics;
         // Lucene's Whitespace Analyzer (default for a Neo4j "fulltext" index) regards HTML as belonging to the word
-        topics = db.queryTopicsFulltext("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
-        topics = db.queryTopicsFulltext("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
-        topics = db.queryTopicsFulltext("*Haskell*");      assertEquals(2, topics.size());
-        topics = db.queryTopicsFulltext("<b>Haskell");     assertEquals(0, topics.size());
-        topics = db.queryTopicsFulltext("<b>Haskell*");    assertEquals(1, topics.size()); assertUri(topics, "note-3");
-        topics = db.queryTopicsFulltext("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
+        topics = queryTopicsFulltext("Haskell");        assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = queryTopicsFulltext("Haskell*");       assertEquals(1, topics.size()); assertUri(topics, "note-4");
+        topics = queryTopicsFulltext("*Haskell*");      assertEquals(2, topics.size());
+        topics = queryTopicsFulltext("<b>Haskell");     assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("<b>Haskell*");    assertEquals(1, topics.size()); assertUri(topics, "note-3");
+        topics = queryTopicsFulltext("<b>Haskell</b>"); assertEquals(1, topics.size()); assertUri(topics, "note-3");
     }
 
     private void assertUri(List<TopicModelImpl> singletonList, String topicUri) {
@@ -321,6 +321,10 @@ public class Neo4jStorageTest {
     private void createTopic(String propUri, Object propValue) {
         long topicId = createTopic(null, "dmx.notes.note", "");
         db.storeTopicProperty(topicId, propUri, propValue, true);     // addToIndex=true
+    }
+
+    private List<TopicModelImpl> queryTopicsFulltext(Object value) {
+        return db.queryTopicsFulltext(null, value);     // key=null
     }
 
     // ---

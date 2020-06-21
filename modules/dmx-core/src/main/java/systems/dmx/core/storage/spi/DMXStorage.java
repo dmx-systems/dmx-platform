@@ -38,11 +38,7 @@ public interface DMXStorage {
 
     List<TopicModelImpl> fetchTopics(String key, Object value);
 
-    // ### TODO: drop it as actually not used?
     List<TopicModelImpl> queryTopics(String key, Object value);
-
-    // ### TODO: drop it from SPI as is pure convenience
-    List<TopicModelImpl> queryTopicsFulltext(Object value);
 
     /**
      * @return  The fetched topics.

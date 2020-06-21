@@ -145,11 +145,6 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public List<TopicModelImpl> queryTopicsFulltext(Object value) {
-        return queryTopicsFulltext(null, value);
-    }
-
-    @Override
     public List<TopicModelImpl> queryTopicsFulltext(String key, Object value) {
         if (key == null) {
             key = KEY_FULLTEXT;
