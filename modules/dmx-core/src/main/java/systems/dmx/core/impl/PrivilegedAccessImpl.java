@@ -278,7 +278,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public Topic getWorkspace(String uri) {
-        TopicModelImpl workspace = al.db.fetchTopic("uri", uri);
+        TopicModelImpl workspace = al.fetchTopic("uri", uri);
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }
@@ -302,7 +302,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         if (systemWorkspaceId == -1) {
             // Note: fetching the System workspace topic though the Core service would involve a permission check
             // and run in a vicious circle. So direct storage access is required here.
-            TopicModel workspace = al.db.fetchTopic("uri", SYSTEM_WORKSPACE_URI);
+            TopicModel workspace = al.fetchTopic("uri", SYSTEM_WORKSPACE_URI);
             // Note: the Access Control plugin creates the System workspace before it performs its first permission
             // check.
             if (workspace == null) {
@@ -575,7 +575,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
-        return al.db.fetchTopic(TYPE_USERNAME, username);
+        return al.fetchTopic(TYPE_USERNAME, username);
     }
 
     private TopicModelImpl _getUsernameTopicOrThrow(String username) {

@@ -125,16 +125,6 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public TopicModelImpl fetchTopic(String key, Object value) {
-        try {
-            Node node = topicContentExact.get(key, value).getSingle();
-            return node != null ? buildTopic(node) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
-        }
-    }
-
-    @Override
     public List<TopicModelImpl> fetchTopics(String key, Object value) {
         return buildTopics(topicContentExact.get(key, value));
     }

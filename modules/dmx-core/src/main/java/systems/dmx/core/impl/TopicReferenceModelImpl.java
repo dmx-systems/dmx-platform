@@ -86,7 +86,7 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
             if (isReferenceById()) {
                 topic = al.db.fetchTopic(id);    // .loadChildTopics();  // TODO?
             } else if (isReferenceByUri()) {
-                topic = al.db.fetchTopic("uri", uri);
+                topic = al.fetchTopic("uri", uri);
                 if (topic == null) {
                     throw new RuntimeException("Topic with URI \"" + uri + "\" not found");
                 }

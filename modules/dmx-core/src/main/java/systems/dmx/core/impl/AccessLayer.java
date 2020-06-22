@@ -57,6 +57,37 @@ public final class AccessLayer {
         bootstrapTypeCache();
     }
 
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    /**
+     * Retrieves a single topic by exact value.
+     *
+     * DB direct access, no access control.
+     * Note: is public as accessed by storage tests.
+     * Note: not part of storage SPI as it is sole on-top convenience.
+     *
+     * @return  The fetched topic, or <code>null</code> if no such topic exists.
+     *
+     * @throws  RuntimeException    if more than one topic exists.
+     */
+    public TopicModelImpl fetchTopic(String key, Object value) {
+        try {
+            List<TopicModelImpl> topics = db.fetchTopics(key, value);
+            int size = topics.size();
+            switch (size) {
+            case 0:
+                return null;
+            case 1:
+                return topics.get(0);
+            default:
+                throw new RuntimeException("Ambiguity: " + size + " topics do match, key=\"" + key + "\", value=" +
+                    value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic by value failed", e);
+        }
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
@@ -73,7 +104,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByUri(String uri) {
         try {
-            TopicModelImpl topic = db.fetchTopic("uri", uri);
+            TopicModelImpl topic = fetchTopic("uri", uri);
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, uri=\"" + uri + "\"", e);
@@ -90,7 +121,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
-            TopicModelImpl topic = db.fetchTopic(key, value.value());
+            TopicModelImpl topic = fetchTopic(key, value.value());
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);

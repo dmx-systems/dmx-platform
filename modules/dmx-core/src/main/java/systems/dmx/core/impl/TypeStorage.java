@@ -98,7 +98,7 @@ class TypeStorage {
             endlessRecursionDetection.check(topicTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = al.db.fetchTopic("uri", topicTypeUri);
+            TopicModelImpl typeTopic = al.fetchTopic("uri", topicTypeUri);
             checkTopicType(topicTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -129,7 +129,7 @@ class TypeStorage {
             endlessRecursionDetection.check(assocTypeUri);
             //
             // fetch generic topic
-            TopicModelImpl typeTopic = al.db.fetchTopic("uri", assocTypeUri);
+            TopicModelImpl typeTopic = al.fetchTopic("uri", assocTypeUri);
             checkAssocType(assocTypeUri, typeTopic);
             long typeId = typeTopic.getId();
             //
@@ -496,7 +496,7 @@ class TypeStorage {
         if (cardinality != null) {
             return cardinality;
         } else {
-            return mf.newRelatedTopicModel(al.db.fetchTopic("uri", ONE));    // ### FIXME
+            return mf.newRelatedTopicModel(al.fetchTopic("uri", ONE));    // ### FIXME
         }
     }
 

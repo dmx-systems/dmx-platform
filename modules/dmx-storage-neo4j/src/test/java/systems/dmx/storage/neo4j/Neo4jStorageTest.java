@@ -30,8 +30,9 @@ import java.util.logging.Logger;
 
 public class Neo4jStorageTest {
 
-    private DMXStorage db;
     private ModelFactoryImpl mf;
+    private DMXStorage db;
+    private AccessLayer al;
 
     private long assocId;
 
@@ -43,7 +44,7 @@ public class Neo4jStorageTest {
     public void setup() {
         mf = new ModelFactoryImpl();
         db = new Neo4jStorageFactory().newDMXStorage(createTempDirectory("neo4j-test-"), mf);
-        new AccessLayer(db);  // Note: the ModelFactory doesn't work when no AccessLayer is created
+        al = new AccessLayer(db);   // Note: the ModelFactory doesn't work when no AccessLayer is created
         setupContent();
     }
 
@@ -70,7 +71,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverse() {
-        TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
+        TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -84,7 +85,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverseBidirectional() {
-        TopicModelImpl topic = db.fetchTopic("uri", TOPIC_TYPE);
+        TopicModelImpl topic = al.fetchTopic("uri", TOPIC_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -98,7 +99,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverseWithWideFilter() {
-        TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
+        TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
@@ -109,7 +110,7 @@ public class Neo4jStorageTest {
     public void deleteAssoc() {
         DMXTransaction tx = db.beginTx();
         try {
-            TopicModelImpl topic = db.fetchTopic("uri", DATA_TYPE);
+            TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
             assertNotNull(topic);
             //
             List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -199,8 +200,8 @@ public class Neo4jStorageTest {
     @Test
     public void testExactIndexWithGet() {
         TopicModelImpl topic;
-        topic = db.fetchTopic("uri", DATA_TYPE); assertNotNull(topic);
-        topic = db.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
+        topic = al.fetchTopic("uri", DATA_TYPE); assertNotNull(topic);
+        topic = al.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
         // => DMXStorage's get-singular method supports no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }

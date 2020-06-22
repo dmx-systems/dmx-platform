@@ -25,17 +25,6 @@ public interface DMXStorage {
      */
     TopicModelImpl fetchTopic(long topicId);
 
-    /**
-     * Looks up a single topic by exact value.
-    // ### TODO: drop it from SPI as is pure convenience
-     *
-     * @return  The fetched topic, or <code>null</code> if no such topic exists.
-     *          Note: its child topics are not fetched.
-     *
-     * @throws  RuntimeException    if more than one topic is found.
-     */
-    TopicModelImpl fetchTopic(String key, Object value);
-
     List<TopicModelImpl> fetchTopics(String key, Object value);
 
     List<TopicModelImpl> queryTopics(String key, Object value);
