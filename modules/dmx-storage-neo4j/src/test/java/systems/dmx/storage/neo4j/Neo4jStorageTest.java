@@ -188,8 +188,9 @@ public class Neo4jStorageTest {
         List<TopicModelImpl> topics;
         topics = db.queryTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
         topics = db.queryTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
-        // => in contrast to Lucene docs a wildcard can be used as the first character of a search
+        // => in contrast to Lucene docs a wildcard can be used as the first character of a search.
         // http://lucene.apache.org/core/old_versioned_docs/versions/3_5_0/queryparsersyntax.html
+        // However there will be a performace penalty.
         //
         topics = db.queryTopics("uri", "dmx.core.*");   assertEquals(2, topics.size());
         topics = db.queryTopics("uri", "dmx.*.*");      assertEquals(2, topics.size());
@@ -200,9 +201,9 @@ public class Neo4jStorageTest {
     @Test
     public void testExactIndexWithGet() {
         TopicModelImpl topic;
-        topic = al.fetchTopic("uri", DATA_TYPE); assertNotNull(topic);
-        topic = al.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
-        // => DMXStorage's get-singular method supports no wildcards.
+        topic = al.fetchTopic("uri", DATA_TYPE);    assertNotNull(topic);
+        topic = al.fetchTopic("uri", "dmx.core.*"); assertNull(topic);
+        // => AccessLayer's fetch-singular methods support no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }
 

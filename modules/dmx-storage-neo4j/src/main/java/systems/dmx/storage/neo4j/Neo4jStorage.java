@@ -75,11 +75,11 @@ public class Neo4jStorage implements DMXStorage {
             GraphDatabaseService neo4j = null;
     private RelationtypeCache relTypeCache;
 
-    private Index<Node> topicContentExact;      // topic URI, topic type URI, topic value (index mode KEY), properties
-    private Index<Node> topicContentFulltext;   // topic value (index modes FULLTEXT or FULLTEXT_KEY)
-    private Index<Node> assocContentExact;      // assoc URI, assoc type URI, assoc value (index mode KEY), properties
-    private Index<Node> assocContentFulltext;   // assoc value (index modes FULLTEXT or FULLTEXT_KEY)
-    private Index<Node> assocMetadata;
+    private Index<Node> topicIndex;             // topic URI, topic type URI, topic value (index mode KEY), properties
+    private Index<Node> topicFulltextIndex;     // topic value (index modes FULLTEXT or FULLTEXT_KEY)
+    private Index<Node> assocIndex;             // assoc URI, assoc type URI, assoc value (index mode KEY), properties
+    private Index<Node> assocFulltextIndex;     // assoc value (index modes FULLTEXT or FULLTEXT_KEY)
+    private Index<Node> assocPlayerIndex;
 
     private ModelFactoryImpl mf;
 
@@ -91,12 +91,13 @@ public class Neo4jStorage implements DMXStorage {
         try {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new RelationtypeCache(neo4j);
-            // indexes
-            this.topicContentExact    = createExactIndex("topic-content-exact");
-            this.topicContentFulltext = createFulltextIndex("topic-content-fulltext");
-            this.assocContentExact    = createExactIndex("assoc-content-exact");
-            this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
-            this.assocMetadata = createExactIndex("assoc-metadata");
+            //
+            // Note: index directories are created with the given names in dmx-db/index/lucene/node/
+            this.topicIndex         = openIndex("topic-content-exact");
+            this.topicFulltextIndex = openFulltextIndex("topic-content-fulltext");
+            this.assocIndex         = openIndex("assoc-content-exact");
+            this.assocFulltextIndex = openFulltextIndex("assoc-content-fulltext");
+            this.assocPlayerIndex   = openIndex("assoc-metadata");
             //
             this.mf = mf;
         } catch (Exception e) {
@@ -126,12 +127,12 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public List<TopicModelImpl> fetchTopics(String key, Object value) {
-        return buildTopics(topicContentExact.get(key, value));
+        return buildTopics(topicIndex.get(key, value));
     }
 
     @Override
     public List<TopicModelImpl> queryTopics(String key, Object value) {
-        return buildTopics(topicContentExact.query(key, value));
+        return buildTopics(topicIndex.query(key, value));
     }
 
     @Override
@@ -144,7 +145,7 @@ public class Neo4jStorage implements DMXStorage {
                 key + "\")");
         }
         //
-        return buildTopics(topicContentFulltext.query(key, value));
+        return buildTopics(topicFulltextIndex.query(key, value));
     }
 
     @Override
@@ -223,12 +224,12 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public List<AssocModelImpl> fetchAssocs(String key, Object value) {
-        return buildAssocs(assocContentExact.get(key, value));
+        return buildAssocs(assocIndex.get(key, value));
     }
 
     @Override
     public List<AssocModelImpl> queryAssocs(String key, Object value) {
-        return buildAssocs(assocContentExact.query(key, value));
+        return buildAssocs(assocIndex.query(key, value));
     }
 
     @Override
@@ -455,35 +456,35 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public List<TopicModelImpl> fetchTopicsByProperty(String propUri, Object propValue) {
-        return buildTopics(queryIndexByProperty(topicContentExact, propUri, propValue));
+        return buildTopics(queryIndexByProperty(topicIndex, propUri, propValue));
     }
 
     @Override
     public List<TopicModelImpl> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return buildTopics(queryIndexByPropertyRange(topicContentExact, propUri, from, to));
+        return buildTopics(queryIndexByPropertyRange(topicIndex, propUri, from, to));
     }
 
     @Override
     public List<AssocModelImpl> fetchAssocsByProperty(String propUri, Object propValue) {
-        return buildAssocs(queryIndexByProperty(assocContentExact, propUri, propValue));
+        return buildAssocs(queryIndexByProperty(assocIndex, propUri, propValue));
     }
 
     @Override
     public List<AssocModelImpl> fetchAssocsByPropertyRange(String propUri, Number from, Number to) {
-        return buildAssocs(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
+        return buildAssocs(queryIndexByPropertyRange(assocIndex, propUri, from, to));
     }
 
     // ---
 
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
-        Index<Node> exactIndex = addToIndex ? topicContentExact : null;
+        Index<Node> exactIndex = addToIndex ? topicIndex : null;
         storeAndIndexExactValue(fetchTopicNode(topicId), propUri, propValue, exactIndex);
     }
 
     @Override
     public void storeAssocProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
-        Index<Node> exactIndex = addToIndex ? assocContentExact : null;
+        Index<Node> exactIndex = addToIndex ? assocIndex : null;
         storeAndIndexExactValue(fetchAssocNode(assocId), propUri, propValue, exactIndex);
     }
 
@@ -491,12 +492,12 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public void indexTopicProperty(long topicId, String propUri, Object propValue) {
-        indexExactValue(fetchTopicNode(topicId), propUri, propValue, topicContentExact);
+        indexExactValue(fetchTopicNode(topicId), propUri, propValue, topicIndex);
     }
 
     @Override
     public void indexAssocProperty(long assocId, String propUri, Object propValue) {
-        indexExactValue(fetchAssocNode(assocId), propUri, propValue, assocContentExact);
+        indexExactValue(fetchAssocNode(assocId), propUri, propValue, assocIndex);
     }
 
     // ---
@@ -576,22 +577,22 @@ public class Neo4jStorage implements DMXStorage {
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
         checkUriUniqueness(uri);
-        storeAndIndexExactValue(topicNode, KEY_URI, uri, topicContentExact);
+        storeAndIndexExactValue(topicNode, KEY_URI, uri, topicIndex);
     }
 
     private void storeAndIndexAssocUri(Node assocNode, String uri) {
         checkUriUniqueness(uri);
-        storeAndIndexExactValue(assocNode, KEY_URI, uri, assocContentExact);
+        storeAndIndexExactValue(assocNode, KEY_URI, uri, assocIndex);
     }
 
     // ---
 
     private void storeAndIndexTopicTypeUri(Node topicNode, String topicTypeUri) {
-        storeAndIndexExactValue(topicNode, KEY_TPYE_URI, topicTypeUri, topicContentExact);
+        storeAndIndexExactValue(topicNode, KEY_TPYE_URI, topicTypeUri, topicIndex);
     }
 
     private void storeAndIndexAssocTypeUri(Node assocNode, String assocTypeUri) {
-        storeAndIndexExactValue(assocNode, KEY_TPYE_URI, assocTypeUri, assocContentExact);
+        storeAndIndexExactValue(assocNode, KEY_TPYE_URI, assocTypeUri, assocIndex);
     }
 
     // ---
@@ -634,19 +635,19 @@ public class Neo4jStorage implements DMXStorage {
     // ---
 
     private void indexTopicNodeValue(Node topicNode, String indexKey, Object value, boolean isHtmlValue) {
-        indexNodeValue(topicNode, value, IndexMode.KEY,          indexKey, topicContentExact, topicContentFulltext);
+        indexNodeValue(topicNode, value, IndexMode.KEY,          indexKey, topicIndex, topicFulltextIndex);
         // TODO: don't fulltext index numbers/booleans?
         value = getIndexValue(value, isHtmlValue);
-        indexNodeValue(topicNode, value, IndexMode.FULLTEXT,     indexKey, topicContentExact, topicContentFulltext);
-        indexNodeValue(topicNode, value, IndexMode.FULLTEXT_KEY, indexKey, topicContentExact, topicContentFulltext);
+        indexNodeValue(topicNode, value, IndexMode.FULLTEXT,     indexKey, topicIndex, topicFulltextIndex);
+        indexNodeValue(topicNode, value, IndexMode.FULLTEXT_KEY, indexKey, topicIndex, topicFulltextIndex);
     }
 
     private void indexAssocNodeValue(Node assocNode, String indexKey, Object value, boolean isHtmlValue) {
-        indexNodeValue(assocNode, value, IndexMode.KEY,          indexKey, assocContentExact, assocContentFulltext);
+        indexNodeValue(assocNode, value, IndexMode.KEY,          indexKey, assocIndex, assocFulltextIndex);
         // TODO: don't fulltext index numbers/booleans?
         value = getIndexValue(value, isHtmlValue);
-        indexNodeValue(assocNode, value, IndexMode.FULLTEXT,     indexKey, assocContentExact, assocContentFulltext);
-        indexNodeValue(assocNode, value, IndexMode.FULLTEXT_KEY, indexKey, assocContentExact, assocContentFulltext);
+        indexNodeValue(assocNode, value, IndexMode.FULLTEXT,     indexKey, assocIndex, assocFulltextIndex);
+        indexNodeValue(assocNode, value, IndexMode.FULLTEXT_KEY, indexKey, assocIndex, assocFulltextIndex);
     }
 
     // ---
@@ -690,7 +691,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     private void indexAssocId(Node assocNode) {
-        assocMetadata.add(assocNode, KEY_ASSOC_ID, assocNode.getId());
+        assocPlayerIndex.add(assocNode, KEY_ASSOC_ID, assocNode.getId());
     }
 
     private void indexAssocType(Node assocNode, String assocTypeUri) {
@@ -698,10 +699,10 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     private void indexAssocRole(Node assocNode, int pos, String roleTypeUri, Node playerNode) {
-        assocMetadata.add(assocNode, KEY_ROLE_TPYE_URI + pos, roleTypeUri);
-        assocMetadata.add(assocNode, KEY_PLAYER_TPYE + pos, NodeType.of(playerNode).stringify());
-        assocMetadata.add(assocNode, KEY_PLAYER_ID + pos, playerNode.getId());
-        assocMetadata.add(assocNode, KEY_PLAYER_TYPE_URI + pos, typeUri(playerNode));
+        assocPlayerIndex.add(assocNode, KEY_ROLE_TPYE_URI + pos, roleTypeUri);
+        assocPlayerIndex.add(assocNode, KEY_PLAYER_TPYE + pos, NodeType.of(playerNode).stringify());
+        assocPlayerIndex.add(assocNode, KEY_PLAYER_ID + pos, playerNode.getId());
+        assocPlayerIndex.add(assocNode, KEY_PLAYER_TYPE_URI + pos, typeUri(playerNode));
     }
 
     // ---
@@ -729,7 +730,7 @@ public class Neo4jStorage implements DMXStorage {
         BooleanQuery query = new BooleanQuery();
         addTermQuery(KEY_ASSOC_ID, assocId, query);
         addTermQuery(KEY_PLAYER_ID + pos, playerId, query);
-        return assocMetadata.query(query).getSingle() != null;
+        return assocPlayerIndex.query(query).getSingle() != null;
     }
 
     // ---
@@ -753,7 +754,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     private IndexHits<Node> lookupAssocs(int pos, Node playerNode) {
-        return assocMetadata.get(KEY_PLAYER_ID + pos, playerNode.getId());
+        return assocPlayerIndex.get(KEY_PLAYER_ID + pos, playerNode.getId());
     }
 
     // ---
@@ -763,8 +764,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     private void reindexValue(Node assocNode, String key, String value) {
-        assocMetadata.remove(assocNode, key);
-        assocMetadata.add(assocNode, key, value);
+        assocPlayerIndex.remove(assocNode, key);
+        assocPlayerIndex.add(assocNode, key, value);
     }
 
     // --- Query indexes ---
@@ -786,7 +787,7 @@ public class Neo4jStorage implements DMXStorage {
     private List<AssocModelImpl> queryAssocIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
-        return buildAssocs(assocMetadata.query(buildAssocQuery(assocTypeUri,
+        return buildAssocs(assocPlayerIndex.query(buildAssocQuery(assocTypeUri,
             roleTypeUri1, playerType1, playerId1, playerTypeUri1,
             roleTypeUri2, playerType2, playerId2, playerTypeUri2
         )));
@@ -849,36 +850,42 @@ public class Neo4jStorage implements DMXStorage {
     // --- Remove index entries ---
 
     private void removeTopicFromIndex(Node topicNode) {
-        topicContentExact.remove(topicNode);
-        topicContentFulltext.remove(topicNode);
+        topicIndex.remove(topicNode);
+        topicFulltextIndex.remove(topicNode);
     }
 
     private void removeAssocFromIndex(Node assocNode) {
-        assocContentExact.remove(assocNode);
-        assocContentFulltext.remove(assocNode);
+        assocIndex.remove(assocNode);
+        assocFulltextIndex.remove(assocNode);
         //
-        assocMetadata.remove(assocNode);
+        assocPlayerIndex.remove(assocNode);
     }
 
     // ---
 
     private void removeTopicPropertyFromIndex(Node topicNode, String propUri) {
-        topicContentExact.remove(topicNode, propUri);
+        topicIndex.remove(topicNode, propUri);
     }
 
     private void removeAssocPropertyFromIndex(Node assocNode, String propUri) {
-        assocContentExact.remove(assocNode, propUri);
+        assocIndex.remove(assocNode, propUri);
     }
 
-    // --- Create indexes ---
+    // --- Open indexes ---
 
-    private Index<Node> createExactIndex(String name) {
+    /**
+     * Opens an on-disc index; creates it if not yet exsists.
+     */
+    private Index<Node> openIndex(String name) {
         return neo4j.index().forNodes(name);
     }
 
-    private Index<Node> createFulltextIndex(String name) {
+    /**
+     * Opens an on-disc fulltext index; creates it if not yet exsists.
+     */
+    private Index<Node> openFulltextIndex(String name) {
         if (neo4j.index().existsForNodes(name)) {
-            return neo4j.index().forNodes(name);
+            return openIndex(name);
         } else {
             Map<String, String> configuration = stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext");
             return neo4j.index().forNodes(name, configuration);
@@ -1064,7 +1071,7 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     private Node fetchTopicNodeByUri(String uri) {
-        Node node = topicContentExact.get(KEY_URI, uri).getSingle();
+        Node node = topicIndex.get(KEY_URI, uri).getSingle();
         //
         if (node == null) {
             throw new RuntimeException("Topic with URI \"" + uri + "\" not found in DB");
@@ -1150,8 +1157,8 @@ public class Neo4jStorage implements DMXStorage {
         if (uri.equals("")) {
             return;
         }
-        Node n1 = topicContentExact.get(KEY_URI, uri).getSingle();
-        Node n2 = assocContentExact.get(KEY_URI, uri).getSingle();
+        Node n1 = topicIndex.get(KEY_URI, uri).getSingle();
+        Node n2 = assocIndex.get(KEY_URI, uri).getSingle();
         if (n1 != null || n2 != null) {
             throw new RuntimeException("URI \"" + uri + "\" is not unique");
         }
