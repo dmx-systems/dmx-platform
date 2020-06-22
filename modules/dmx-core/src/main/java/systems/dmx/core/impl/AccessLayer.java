@@ -59,12 +59,13 @@ public final class AccessLayer {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // DB direct access, no access control.
+
+    // Note: is public as accessed by storage tests.
+    // Note: not part of storage SPI as it is sole on-top convenience.
+
     /**
      * Retrieves a single topic by exact value.
-     *
-     * DB direct access, no access control.
-     * Note: is public as accessed by storage tests.
-     * Note: not part of storage SPI as it is sole on-top convenience.
      *
      * @return  The fetched topic, or <code>null</code> if no such topic exists.
      *
@@ -85,6 +86,31 @@ public final class AccessLayer {
             }
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic by value failed", e);
+        }
+    }
+
+    /**
+     * Retrieves a single assoc by exact value.
+     *
+     * @return  The fetched assoc, or <code>null</code> if no such assoc exists.
+     *
+     * @throws  RuntimeException    if more than one assoc exists.
+     */
+    public AssocModelImpl fetchAssoc(String key, Object value) {
+        try {
+            List<AssocModelImpl> assocs = db.fetchAssocs(key, value);
+            int size = assocs.size();
+            switch (size) {
+            case 0:
+                return null;
+            case 1:
+                return assocs.get(0);
+            default:
+                throw new RuntimeException("Ambiguity: " + size + " assocs do match, key=\"" + key + "\", value=" +
+                    value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching assoc by value failed", e);
         }
     }
 
@@ -280,9 +306,17 @@ public final class AccessLayer {
         }
     }
 
+    List<AssocModelImpl> getAssocsByType(String assocTypeUri) {
+        try {
+            return filterReadables(_getAssocType(assocTypeUri).getAllInstances());
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching assocs by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
+        }
+    }
+
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
-            AssocModelImpl assoc = db.fetchAssoc(key, value.value());
+            AssocModelImpl assoc = fetchAssoc(key, value.value());
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);
@@ -323,14 +357,6 @@ public final class AccessLayer {
     }
 
     // ---
-
-    List<AssocModelImpl> getAssocsByType(String assocTypeUri) {
-        try {
-            return filterReadables(_getAssocType(assocTypeUri).getAllInstances());
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching assocs by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
-        }
-    }
 
     List<AssocModelImpl> getAssocs(long topic1Id, long topic2Id) {
         return getAssocs(null, topic1Id, topic2Id);   // assocTypeUri=null

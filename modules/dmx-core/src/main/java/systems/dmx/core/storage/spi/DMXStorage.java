@@ -20,18 +20,21 @@ public interface DMXStorage {
     // === Topics ===
 
     /**
+     * Fetches a topic by ID.
+     *
      * @return  The fetched topic.
-     *          Note: its child topics are not fetched.
      */
     TopicModelImpl fetchTopic(long topicId);
 
+    /**
+     * Fetches topics by exact value.
+     */
     List<TopicModelImpl> fetchTopics(String key, Object value);
 
     List<TopicModelImpl> queryTopics(String key, Object value);
 
     /**
      * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
      */
     List<TopicModelImpl> queryTopicsFulltext(String key, Object value);
 
@@ -84,17 +87,17 @@ public interface DMXStorage {
 
     // === Associations ===
 
+    /**
+     * Fetches an assoc by ID.
+     *
+     * @return  The fetched assoc.
+     */
     AssocModelImpl fetchAssoc(long assocId);
 
     /**
-     * Looks up a single association by exact value.
-     * If no such association exists <code>null</code> is returned.
-     * If more than one association is found a runtime exception is thrown.
-     *
-     * @return  The fetched association.
-     *          Note: its child topics are not fetched.
+     * Fetches assocs by exact value.
      */
-    AssocModelImpl fetchAssoc(String key, Object value);
+    List<AssocModelImpl> fetchAssocs(String key, Object value);
 
     List<AssocModelImpl> queryAssocs(String key, Object value);
 
@@ -161,7 +164,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                         String othersRoleTypeUri, String othersTopicTypeUri);
@@ -173,7 +175,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched associations.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedAssocModelImpl> fetchTopicRelatedAssocs(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                         String othersRoleTypeUri, String othersAssocTypeUri);
@@ -187,7 +188,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedTopicModelImpl> fetchAssocRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                         String othersRoleTypeUri, String othersTopicTypeUri);
@@ -199,7 +199,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched associations.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedAssocModelImpl> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                         String othersRoleTypeUri, String othersAssocTypeUri);
@@ -214,7 +213,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedTopicModelImpl> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri);
@@ -227,7 +225,6 @@ public interface DMXStorage {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched associations.
-     *          Note: their child topics are not fetched.
      */
     List<RelatedAssocModelImpl> fetchRelatedAssocs(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersAssocTypeUri);

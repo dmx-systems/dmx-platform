@@ -222,9 +222,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public AssocModelImpl fetchAssoc(String key, Object value) {
-        Node node = assocContentExact.get(key, value).getSingle();
-        return node != null ? buildAssoc(node) : null;
+    public List<AssocModelImpl> fetchAssocs(String key, Object value) {
+        return buildAssocs(assocContentExact.get(key, value));
     }
 
     @Override
