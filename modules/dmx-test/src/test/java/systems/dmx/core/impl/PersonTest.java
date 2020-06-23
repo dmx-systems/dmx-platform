@@ -67,6 +67,52 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // --- Search ---
+
+    @Test
+    public void getTopicsByValue() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            createPerson();
+            // getTopicsByValue() retrieves by exact value.
+            // Single word (like in fulltext search) is not supported.
+            // Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
+            assertEquals(1, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr. 3")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.\\ 3")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("\"Parkstr. 3\"")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Park*")).size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void queryTopics() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            createPerson();
+            // queryTopics() is backed by a Lucene index.
+            // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
+            // Single word (like in fulltext search) is not supported.
+            assertEquals(0, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr. 3")).size());
+            assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr.\\ 3")).size());
+            assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("\"Parkstr. 3\"")).size());
+            assertEquals(0, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr.")).size());
+            assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Park*")).size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // --- Manipulation ---
+
     @Test
     public void immutability() {
         DMXTransaction tx = dmx.beginTx();
