@@ -111,6 +111,37 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void queryTopicsFulltext() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            createPerson();
+            // queryTopicsFulltext() is backed by a Lucene fulltext index.
+            // Single words do match.
+            // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
+            // Note: by default search terms are combined by "OR" (Lucene default), not "AND".
+            // Use "AND" (uppercase is required) or synonymous "&&" explicitly.
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  "dmx.contacts.street", false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. AND XYZ", "dmx.contacts.street", false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. && XYZ",  "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. and XYZ", "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("3 AND Parkstr.",   "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("XYZ Parkstr.",     "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park*",            "dmx.contacts.street", false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Park",             "dmx.contacts.street", false).topics.size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // --- Manipulation ---
 
     @Test
