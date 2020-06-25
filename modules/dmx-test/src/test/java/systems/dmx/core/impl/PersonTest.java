@@ -75,7 +75,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             definePersonModel();
             createPerson();
-            // getTopicsByValue() retrieves by exact value. No Lucene index is in place.
+            // getTopicsByValue() retrieves by exact value.
             // Single word (like in fulltext search) is not supported.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
             // Search is case-sensitive.
@@ -98,7 +98,6 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             definePersonModel();
             createPerson();
-            // queryTopics() is backed by a Lucene index.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
             // Single word (like in fulltext search) is not supported. Spaces must be escaped.
             // Search is case-sensitive.
@@ -122,11 +121,11 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             definePersonModel();
             createPerson();
-            // queryTopicsFulltext() is backed by a Lucene fulltext index.
             // Single words do match.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
             // Note: by default search terms are combined by "OR" (Lucene default), not "AND".
             // Use "AND" (uppercase is required) or synonymous "&&" explicitly.
+            // Search is case-insensitive.
             assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       "dmx.contacts.street", false).topics.size());
             assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     "dmx.contacts.street", false).topics.size());
             assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  "dmx.contacts.street", false).topics.size());
@@ -146,6 +145,45 @@ public class PersonTest extends CoreServiceTestEnvironment {
             tx.success();
         } finally {
             tx.finish();
+        }
+    }
+
+    @Test
+    public void getTopicByValueNullTypeUri() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            dmx.getTopicByValue(null, new SimpleValue("Parkstr. 3"));       // typeUri=null
+            fail();
+        } catch (RuntimeException e) {
+            // is expected
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void getTopicsByValueNullTypeUri() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            dmx.getTopicsByValue(null, new SimpleValue("Parkstr. 3"));      // typeUri=null
+            fail();
+        } catch (RuntimeException e) {
+            // is expected
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void queryTopicsNullTypeUri() {
+        //DMXTransaction tx = dmx.beginTx();
+        try {
+            dmx.queryTopics(null, new SimpleValue("Parkstr. 3"));           // typeUri=null
+            fail();
+        } catch (RuntimeException e) {
+            // is expected
+        } finally {
+            //tx.finish();
         }
     }
 

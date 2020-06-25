@@ -62,45 +62,77 @@ public interface CoreService {
     // ---
 
     /**
-     * Looks up a single topic by exact value.
-     * <p>
-     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #queryTopics(String,SimpleValue)}
+     * Retrieves a single topic by type and exact value. Throws if more than one topic is found.
+     * Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
+     * Text searches are case-sensitive.
      *
-     * TODO: Convenience: take Object as "value" and let Core wrap it?
+     * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
+     * @param   value       the value to search for
      *
-     * @return  the topic, or <code>null</code> if no such topic exists.
+     * @return  the found topic, or <code>null</code> if no topic is found.
      *
      * @throws  RuntimeException    If more than one topic is found.
+     * @throws  RuntimeException    If null is given for "typeUri".
      */
     Topic getTopicByValue(String typeUri, SimpleValue value);
 
     /**
-     * Looks up topics by exact value.
-     * <p>
-     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #queryTopics(String,SimpleValue)}
+     * Retrieves topics by type and exact value.
+     * Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
+     * Text searches are case-sensitive.
      *
-     * TODO: Convenience: take Object as "value" and let Core wrap it?
+     * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
+     * @param   value       the value to search for
+     *
+     * @return  a list of found topics, may be empty.
+     *
+     * @throws  RuntimeException    If null is given for "typeUri".
      */
     List<Topic> getTopicsByValue(String typeUri, SimpleValue value);
 
     /**
-     * Looks up topics by typeUri and value.
-     * <p>
-     * Wildcards like "*" in String values are interpreted.
+     * Retrieves topics by type and value.
+     * For text-values Lucene query syntax is supported:
+     *      "*" matches arbitrary characters
+     *      "?" matches a single character
+     *      phrases enclosed in double quotes (")
+     *      escaping by preceding with back slash (\)
+     * A topic is regarded a hit if the search term matches the topic's entire value (in contrast to a fulltext search).
+     * Spaces must be escaped though.
+     * Text searches are case-sensitive.
      *
-     * TODO: Convenience: take Object as "value" and let Core wrap it?
+     * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
+     * @param   value       the value to search for
+     *
+     * @return  a list of found topics, may be empty.
+     *
+     * @throws  RuntimeException    If null is given for "typeUri".
      */
     List<Topic> queryTopics(String typeUri, SimpleValue value);
 
     /**
-     * Performs a fulltext search.
+     * Performs a fulltext search in topic values and in entire topic trees.
+     * Single words are found in entire text-value.
+     * Lucene query syntax is supported:
+     *      "*" matches arbitrary characters
+     *      "?" matches a single character
+     *      phrases enclosed in double quotes (")
+     *      escaping by preceding with back slash (\)
+     *      combining search terms by "AND" and "OR" (the default). "AND" and "&&" as well as "OR" and "||" are
+     *      synonymous respectively (uppercase required).
+     * Search is case-insensitive.
      *
-     * @param   query               A Lucene search query.
-     * @param   topicTypeUri        Only topics of this type are searched. If null all topics are searched.
-     * @param   searchChildTopics   If true the topic's child topics are searched as well. Works only if "topicTypeUri"
-     *                              is given.
+     * @param   query               The search query.
+     * @param   topicTypeUri        Optional: only topics of this type are searched. If null all topics are searched.
+     *                              If given, all returned topics are of this type (regardless of the
+     *                              "searchChildTopics" flag).
+     * @param   searchChildTopics   Applicable only if "topicTypeUri" is given (ignored otherwise): if true the topic's
+     *                              child topics are searched as well.
+     *                              Example: to search for Persons where "Berlin" appears in *any* child topic pass
+     *                              "dmx.contacts.person" for "topicTypeUri", and set "searchChildTopics" to true.
+     *
+     * @return  a QueryResult object that wraps both the original query parameters and the resulting topic list (may be
+     *          empty).
      */
     QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics);
 
