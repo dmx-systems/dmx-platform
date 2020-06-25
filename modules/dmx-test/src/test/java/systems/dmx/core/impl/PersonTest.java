@@ -75,10 +75,12 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             definePersonModel();
             createPerson();
-            // getTopicsByValue() retrieves by exact value.
+            // getTopicsByValue() retrieves by exact value. No Lucene index is in place.
             // Single word (like in fulltext search) is not supported.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
+            // Search is case-sensitive.
             assertEquals(1, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr. 3")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("parkSTR. 3")).size());
             assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.\\ 3")).size());
             assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("\"Parkstr. 3\"")).size());
             assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.")).size());
@@ -98,12 +100,15 @@ public class PersonTest extends CoreServiceTestEnvironment {
             createPerson();
             // queryTopics() is backed by a Lucene index.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
-            // Single word (like in fulltext search) is not supported.
+            // Single word (like in fulltext search) is not supported. Spaces must be escaped.
+            // Search is case-sensitive.
             assertEquals(0, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr. 3")).size());
             assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr.\\ 3")).size());
+            assertEquals(0, dmx.queryTopics("dmx.contacts.street", new SimpleValue("parkSTR.\\ 3")).size());
             assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("\"Parkstr. 3\"")).size());
             assertEquals(0, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr.")).size());
             assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Park*")).size());
+            assertEquals(1, dmx.queryTopics("dmx.contacts.street", new SimpleValue("Parkstr??3")).size());
             //
             tx.success();
         } finally {
@@ -133,8 +138,10 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     "dmx.contacts.street", false).topics.size());
             assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   "dmx.contacts.street", false).topics.size());
             assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("parkSTR.",         "dmx.contacts.street", false).topics.size());
             assertEquals(1, dmx.queryTopicsFulltext("Park*",            "dmx.contacts.street", false).topics.size());
             assertEquals(0, dmx.queryTopicsFulltext("Park",             "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park????",         "dmx.contacts.street", false).topics.size());
             //
             tx.success();
         } finally {
