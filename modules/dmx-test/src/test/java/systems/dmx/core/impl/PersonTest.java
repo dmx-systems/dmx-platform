@@ -262,9 +262,9 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // the Person Description has changed in-place
             assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
             assertEquals(1, children.size());
-            // the other children (Person Name, Email Address, Address) are still there
+            // the other children (Person Name, Birtday, Email Address, Address, Description) are still there
             person.loadChildTopics();
-            assertEquals(4, children.size());
+            assertEquals(5, children.size());
             // now there are 2 Person Description topics in the DB (the original one is not mutated/deleted)
             List<Topic> descriptions = dmx.getTopicsByType("dmx.contacts.person_description");
             assertEquals(2, descriptions.size());
