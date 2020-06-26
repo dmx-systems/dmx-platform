@@ -118,10 +118,10 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics) {
+    public QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics) {
         return new QueryResult(
-            query, topicTypeUri, searchChildTopics,
-            al.instantiate(al.queryTopicsFulltext(query, topicTypeUri, searchChildTopics))
+            query, typeUri, searchChildTopics,
+            al.instantiate(al.queryTopicsFulltext(query, typeUri, searchChildTopics))
         );
     }
 

@@ -187,6 +187,28 @@ public class PersonTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void searchNumber() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            definePersonModel();
+            createPerson();
+            //
+            assertEquals(1, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue(1972)).size());
+            assertEquals(1, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue("1972")).size());
+            assertEquals(0, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue("19*")).size());
+            assertEquals(1, dmx.queryTopics("dmx.datetime.year", new SimpleValue(1972)).size());
+            assertEquals(1, dmx.queryTopics("dmx.datetime.year", new SimpleValue("1972")).size());
+            assertEquals(1, dmx.queryTopics("dmx.datetime.year", new SimpleValue("19*")).size());
+            assertEquals(1, dmx.queryTopicsFulltext("1972", "dmx.datetime.year", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("19*", "dmx.datetime.year", false).topics.size());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
     // --- Manipulation ---
 
     @Test
@@ -426,6 +448,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void definePersonModel() {
+        defineDateModel();
         defineAddressModel();
         // Person Name
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.first_name",  "First Name",  TEXT));
@@ -435,15 +458,29 @@ public class PersonTest extends CoreServiceTestEnvironment {
           .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.person_name", "dmx.contacts.last_name",  ONE))
         );
         // Person
+        dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.date_of_birth",      "Date of Birth",      TEXT));
         dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.address_entry",      "Address Entry",      TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.email_address",      "Email Address",      TEXT));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_description", "Person Description", HTML));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             ENTITY)
           .addCompDef(mf.newCompDefModel(null, true, false, "dmx.contacts.person", "dmx.contacts.person_name", ONE))
+          .addCompDef(mf.newCompDefModel("dmx.contacts.date_of_birth", false, false,
+                                         "dmx.contacts.person", "dmx.datetime.date",               ONE))
           .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.email_address",      MANY))
           .addCompDef(mf.newCompDefModel("dmx.contacts.address_entry", false, false,
                                          "dmx.contacts.person", "dmx.contacts.address",            MANY))
           .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.person_description", ONE))
+        );
+    }
+
+    private void defineDateModel() {
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.month", "Month",   NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.day",   "Day",     NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.year",  "Year",    NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.date",  "Address", VALUE)
+            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.month", ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.day",   ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.year",  ONE))
         );
     }
 
@@ -465,6 +502,10 @@ public class PersonTest extends CoreServiceTestEnvironment {
             .set("dmx.contacts.person_name", mf.newChildTopicsModel()
                 .set("dmx.contacts.first_name", "Dave")
                 .set("dmx.contacts.last_name",  "Stauges"))
+            .set("dmx.datetime.date#dmx.contacts.date_of_birth", mf.newChildTopicsModel()
+                .set("dmx.datetime.month",      5)  // May
+                .set("dmx.datetime.day",        1)  // 1st
+                .set("dmx.datetime.year",       1972))
             .add("dmx.contacts.email_address", "me@example.com")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
                 .set("dmx.contacts.street",      "Parkstr. 3")

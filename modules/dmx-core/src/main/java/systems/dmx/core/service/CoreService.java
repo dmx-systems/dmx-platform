@@ -63,8 +63,8 @@ public interface CoreService {
 
     /**
      * Retrieves a single topic by type and exact value. Throws if more than one topic is found.
-     * Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
-     * Text searches are case-sensitive.
+     * Lucene query syntax (wildcards, phrase search, ...) is not supported.
+     * A text search is case-sensitive.
      *
      * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
      * @param   value       the value to search for
@@ -78,8 +78,8 @@ public interface CoreService {
 
     /**
      * Retrieves topics by type and exact value.
-     * Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
-     * Text searches are case-sensitive.
+     * Lucene query syntax (wildcards, phrase search, ...) is not supported.
+     * A text search is case-sensitive.
      *
      * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
      * @param   value       the value to search for
@@ -92,49 +92,56 @@ public interface CoreService {
 
     /**
      * Retrieves topics by type and value.
-     * For text-values Lucene query syntax is supported:
-     *      "*" matches arbitrary characters
-     *      "?" matches a single character
-     *      phrases enclosed in double quotes (")
-     *      escaping by preceding with back slash (\)
+     * For text-values Lucene query syntax is supported.
      * A topic is regarded a hit if the search term matches the topic's entire value (in contrast to a fulltext search).
      * Spaces must be escaped though.
-     * Text searches are case-sensitive.
+     * A text search is case-sensitive.
      *
      * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
-     * @param   value       the value to search for
+     * @param   query       The search query. Lucene query syntax is supported:
+     *      <ul>
+     *          <li>"*" matches arbitrary characters</li>
+     *          <li>"?" matches a single character</li>
+     *          <li>phrases enclosed in double quotes (")</li>
+     *          <li>escape special character by preceding with back slash (\)</li>
+     *          <li>combining search terms by "AND"/"OR" (uppercase required). Default is "OR". "&&" and "||" are
+     *              respective synonyms.</li>
+     *      </ul>
      *
      * @return  a list of found topics, may be empty.
      *
      * @throws  RuntimeException    If null is given for "typeUri".
      */
-    List<Topic> queryTopics(String typeUri, SimpleValue value);
+    List<Topic> queryTopics(String typeUri, SimpleValue query);
 
     /**
      * Performs a fulltext search in topic values and in entire topic trees.
      * Single words are found in entire text-value.
-     * Lucene query syntax is supported:
-     *      "*" matches arbitrary characters
-     *      "?" matches a single character
-     *      phrases enclosed in double quotes (")
-     *      escaping by preceding with back slash (\)
-     *      combining search terms by "AND" and "OR" (the default). "AND" and "&&" as well as "OR" and "||" are
-     *      synonymous respectively (uppercase required).
+     * Lucene query syntax is supported.
      * Search is case-insensitive.
      *
-     * @param   query               The search query.
-     * @param   topicTypeUri        Optional: only topics of this type are searched. If null all topics are searched.
-     *                              If given, all returned topics are of this type (regardless of the
-     *                              "searchChildTopics" flag).
+     * @param   query               The search query. Lucene query syntax is supported:
+     *      <ul>
+     *          <li>"*" matches arbitrary characters</li>
+     *          <li>"?" matches a single character</li>
+     *          <li>phrases enclosed in double quotes (")</li>
+     *          <li>escape special character by preceding with back slash (\)</li>
+     *          <li>combining search terms by "AND"/"OR" (uppercase required). Default is "OR". "&&" and "||" are
+     *              respective synonyms.</li>
+     *      </ul>
+     * @param   typeUri             Optional: a topic type URI; only topics of this type are searched. If null all
+     *                              topics are searched.<br>
+     *                              If given, all returned topics are of this type (regardless of  the
+     *                              "searchChildTopics" setting).
      * @param   searchChildTopics   Applicable only if "topicTypeUri" is given (ignored otherwise): if true the topic's
-     *                              child topics are searched as well.
+     *                              child topics are searched as well.<br>
      *                              Example: to search for Persons where "Berlin" appears in *any* child topic pass
      *                              "dmx.contacts.person" for "topicTypeUri", and set "searchChildTopics" to true.
      *
      * @return  a QueryResult object that wraps both the original query parameters and the resulting topic list (may be
      *          empty).
      */
-    QueryResult queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics);
+    QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
 
     // ---
 
@@ -186,23 +193,43 @@ public interface CoreService {
     // ---
 
     /**
-     * Looks up a single association by exact value.
-     * <p>
-     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #queryAssocs(String,SimpleValue)}
+     * Retrieves a single association by type and exact value. Throws if more than one association is found.
+     * Lucene query syntax (wildcards, phrase search, ...) is not supported.
+     * A text search is case-sensitive.
      *
-     * @return  the association, or <code>null</code> if no such association exists.
+     * @param   typeUri     an association type URI; only associations of this type are searched; mandatory
+     * @param   value       the value to search for
+     *
+     * @return  the found association, or <code>null</code> if no association is found.
      *
      * @throws  RuntimeException    If more than one association is found.
+     * @throws  RuntimeException    If null is given for "typeUri".
      */
     Assoc getAssocByValue(String typeUri, SimpleValue value);
 
     /**
-     * Looks up associations by typeUri and value.
-     * <p>
-     * Wildcards like "*" in String values <i>are</i> interpreted.
+     * Retrieves associations by type and value.
+     * For text-values Lucene query syntax is supported.
+     * An association is regarded a hit if the search term matches the association's entire value (in contrast to a
+     * fulltext search). Spaces must be escaped though.
+     * A text search is case-sensitive.
+     *
+     * @param   typeUri     an association type URI; only associations of this type are searched; mandatory
+     * @param   query       The search query. Lucene query syntax is supported:
+     *      <ul>
+     *          <li>"*" matches arbitrary characters</li>
+     *          <li>"?" matches a single character</li>
+     *          <li>phrases enclosed in double quotes (")</li>
+     *          <li>escape special character by preceding with back slash (\)</li>
+     *          <li>combining search terms by "AND"/"OR" (uppercase required). Default is "OR". "&&" and "||" are
+     *              respective synonyms.</li>
+     *      </ul>
+     *
+     * @return  a list of found associations, may be empty.
+     *
+     * @throws  RuntimeException    If null is given for "typeUri".
      */
-    List<Assoc> queryAssocs(String typeUri, SimpleValue value);
+    List<Assoc> queryAssocs(String typeUri, SimpleValue query);
 
     // ---
 
