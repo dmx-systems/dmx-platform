@@ -40,18 +40,18 @@ public interface CoreService {
     // === Topics ===
 
     /**
-     * Accesses a topic by ID.
+     * Retrieves a topic by ID.
      *
      * @return  the topic.
      *
-     * @throws  RuntimeException    if no such topic exists.
+     * @throws  RuntimeException    if no topic is found.
      */
     Topic getTopic(long topicId);
 
     /**
-     * Accesses a topic by URI.
+     * Retrieves a topic by URI.
      *
-     * @return  the topic, or <code>null</code> if no such topic exists.
+     * @return  the topic, or <code>null</code> if no topic is found.
      */
     Topic getTopicByUri(String uri);
 
@@ -92,13 +92,13 @@ public interface CoreService {
 
     /**
      * Retrieves topics by type and value.
-     * For text-values Lucene query syntax is supported.
+     * Lucene query syntax is supported.
      * A topic is regarded a hit if the search term matches the topic's entire value (in contrast to a fulltext search).
      * Spaces must be escaped though.
-     * A text search is case-sensitive.
+     * Search is case-sensitive.
      *
      * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
-     * @param   query       The search query. Lucene query syntax is supported:
+     * @param   query       The query. Lucene query syntax is supported:
      *      <ul>
      *          <li>"*" matches arbitrary characters</li>
      *          <li>"?" matches a single character</li>
@@ -112,7 +112,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If null is given for "typeUri".
      */
-    List<Topic> queryTopics(String typeUri, SimpleValue query);
+    List<Topic> queryTopics(String typeUri, String query);
 
     /**
      * Performs a fulltext search in topic values and in entire topic trees.
@@ -209,13 +209,13 @@ public interface CoreService {
 
     /**
      * Retrieves associations by type and value.
-     * For text-values Lucene query syntax is supported.
+     * Lucene query syntax is supported.
      * An association is regarded a hit if the search term matches the association's entire value (in contrast to a
      * fulltext search). Spaces must be escaped though.
-     * A text search is case-sensitive.
+     * Search is case-sensitive.
      *
      * @param   typeUri     an association type URI; only associations of this type are searched; mandatory
-     * @param   query       The search query. Lucene query syntax is supported:
+     * @param   query       The query. Lucene query syntax is supported:
      *      <ul>
      *          <li>"*" matches arbitrary characters</li>
      *          <li>"?" matches a single character</li>
@@ -229,7 +229,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If null is given for "typeUri".
      */
-    List<Assoc> queryAssocs(String typeUri, SimpleValue query);
+    List<Assoc> queryAssocs(String typeUri, String query);
 
     // ---
 

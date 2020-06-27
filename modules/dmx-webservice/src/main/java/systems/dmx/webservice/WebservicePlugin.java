@@ -105,9 +105,9 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/topics/type/{uri}/query/{value}")
-    public List<Topic> queryTopics(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
-        return dmx.queryTopics(typeUri, value);
+    @Path("/topics/type/{uri}/query/{query}")
+    public List<Topic> queryTopics(@PathParam("uri") String typeUri, @PathParam("query") String query) {
+        return dmx.queryTopics(typeUri, query);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
@@ -166,9 +166,9 @@ public class WebservicePlugin extends PluginActivator {
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/assocs/type/{uri}/query/{value}")
-    public List<Assoc> queryAssocs(@PathParam("uri") String typeUri, @PathParam("value") SimpleValue value) {
-        return dmx.queryAssocs(typeUri, value);
+    @Path("/assocs/type/{uri}/query/{query}")
+    public List<Assoc> queryAssocs(@PathParam("uri") String typeUri, @PathParam("query") String query) {
+        return dmx.queryAssocs(typeUri, query);
     }
 
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter

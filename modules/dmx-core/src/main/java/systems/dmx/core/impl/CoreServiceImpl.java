@@ -113,8 +113,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Topic> queryTopics(String typeUri, SimpleValue value) {
-        return al.instantiate(al.queryTopics(typeUri, value));
+    public List<Topic> queryTopics(String typeUri, String query) {
+        return al.instantiate(al.queryTopics(typeUri, query));
     }
 
     @Override
@@ -201,8 +201,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public List<Assoc> queryAssocs(String typeUri, SimpleValue value) {
-        return al.instantiate(al.queryAssocs(typeUri, value));
+    public List<Assoc> queryAssocs(String typeUri, String query) {
+        return al.instantiate(al.queryAssocs(typeUri, query));
     }
 
     // ---

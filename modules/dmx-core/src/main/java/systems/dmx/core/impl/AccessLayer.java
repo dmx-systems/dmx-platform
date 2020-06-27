@@ -162,11 +162,11 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
+    List<TopicModelImpl> queryTopics(String key, String query) {
         try {
-            return filterReadables(db.queryTopics(key, value.value()));
+            return filterReadables(db.queryTopics(key, query));
         } catch (Exception e) {
-            throw new RuntimeException("Querying topics failed, key=\"" + key + "\", value=" + value, e);
+            throw new RuntimeException("Querying topics failed, key=\"" + key + "\", query=" + query, e);
         }
     }
 
@@ -323,11 +323,11 @@ public final class AccessLayer {
         }
     }
 
-    List<AssocModelImpl> queryAssocs(String key, SimpleValue value) {
+    List<AssocModelImpl> queryAssocs(String key, String query) {
         try {
-            return filterReadables(db.queryAssocs(key, value.value()));
+            return filterReadables(db.queryAssocs(key, query));
         } catch (Exception e) {
-            throw new RuntimeException("Querying assocs failed, key=\"" + key + "\", value=" + value, e);
+            throw new RuntimeException("Querying assocs failed, key=\"" + key + "\", query=" + query, e);
         }
     }
 
