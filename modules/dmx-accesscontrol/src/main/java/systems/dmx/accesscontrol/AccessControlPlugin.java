@@ -364,6 +364,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
+    // ---
+
+    @GET
+    @Path("/workspace/admin/id")
+    @Override
+    public long getAdminWorkspaceId() {
+        return dmx.getPrivilegedAccess().getAdministrationWorkspaceId();
+    }
 
 
     // === Permissions ===

@@ -155,6 +155,10 @@ public interface AccessControlService {
      */
     boolean isMember(String username, long workspaceId);
 
+    // ---
+
+    long getAdminWorkspaceId();
+
 
 
     // === Permissions ===
