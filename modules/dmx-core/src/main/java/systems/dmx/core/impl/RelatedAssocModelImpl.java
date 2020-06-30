@@ -26,6 +26,19 @@ public class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAsso
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Overrides DMXObjectModelImpl
+     * ### Copy in RelatedTopicModelImpl
+     */
+    @Override
+    boolean isReadable() {
+        try {
+            return super.isReadable() && getRelatingAssoc().isReadable();
+        } catch (Exception e) {
+            throw new RuntimeException("Checking related assoc READability failed (" + this + ")", e);
+        }
+    }
+
     @Override
     String className() {
         return "related association";

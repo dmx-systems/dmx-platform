@@ -224,6 +224,20 @@ public class DMXObjectModelImpl implements DMXObjectModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Convenience on-top of checkReadAccess() that catches the AccessControlException and returns a boolean.
+     *
+     * Can be overridden in subclasses (see CompDefModelImpl, RelatedTopicModelImpl, RelatedAssocModelImpl)
+     */
+    boolean isReadable() {
+        try {
+            checkReadAccess();
+            return true;
+        } catch (AccessControlException e) {
+            return false;
+        }
+    }
+
 
 
     // === Abstract Methods ===
@@ -315,15 +329,6 @@ public class DMXObjectModelImpl implements DMXObjectModel {
      */
     void checkWriteAccess() {
         throw new UnsupportedOperationException();
-    }
-
-    boolean isReadable() {
-        try {
-            checkReadAccess();
-            return true;
-        } catch (AccessControlException e) {
-            return false;
-        }
     }
 
     // ---

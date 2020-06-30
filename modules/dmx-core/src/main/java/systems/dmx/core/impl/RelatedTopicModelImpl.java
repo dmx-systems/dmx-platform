@@ -70,6 +70,19 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Overrides DMXObjectModelImpl
+     * ### Copy in RelatedAssocModelImpl
+     */
+    @Override
+    boolean isReadable() {
+        try {
+            return super.isReadable() && getRelatingAssoc().isReadable();
+        } catch (Exception e) {
+            throw new RuntimeException("Checking related topic READability failed (" + this + ")", e);
+        }
+    }
+
     @Override
     String className() {
         return "related topic";

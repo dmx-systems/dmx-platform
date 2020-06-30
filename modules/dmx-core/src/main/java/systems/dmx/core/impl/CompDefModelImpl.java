@@ -171,6 +171,9 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     // === Access Control ===
 
+    /**
+     * Overrides DMXObjectModelImpl
+     */
     boolean isReadable() {
         try {
             // 1) check comp def
