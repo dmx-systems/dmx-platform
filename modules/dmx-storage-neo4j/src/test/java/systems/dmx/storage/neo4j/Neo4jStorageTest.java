@@ -71,7 +71,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverse() {
-        TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
+        TopicModelImpl topic = al.sd.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -85,7 +85,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverseBidirectional() {
-        TopicModelImpl topic = al.fetchTopic("uri", TOPIC_TYPE);
+        TopicModelImpl topic = al.sd.fetchTopic("uri", TOPIC_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -99,7 +99,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void traverseWithWideFilter() {
-        TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
+        TopicModelImpl topic = al.sd.fetchTopic("uri", DATA_TYPE);
         assertNotNull(topic);
         //
         List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
@@ -110,7 +110,7 @@ public class Neo4jStorageTest {
     public void deleteAssoc() {
         DMXTransaction tx = db.beginTx();
         try {
-            TopicModelImpl topic = al.fetchTopic("uri", DATA_TYPE);
+            TopicModelImpl topic = al.sd.fetchTopic("uri", DATA_TYPE);
             assertNotNull(topic);
             //
             List<RelatedTopicModelImpl> topics = db.fetchTopicRelatedTopics(topic.getId(),
@@ -201,8 +201,8 @@ public class Neo4jStorageTest {
     @Test
     public void testExactIndexWithGet() {
         TopicModelImpl topic;
-        topic = al.fetchTopic("uri", DATA_TYPE);    assertNotNull(topic);
-        topic = al.fetchTopic("uri", "dmx.core.*"); assertNull(topic);
+        topic = al.sd.fetchTopic("uri", DATA_TYPE);    assertNotNull(topic);
+        topic = al.sd.fetchTopic("uri", "dmx.core.*"); assertNull(topic);
         // => AccessLayer's fetch-singular methods support no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }

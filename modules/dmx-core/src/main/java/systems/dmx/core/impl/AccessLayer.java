@@ -14,13 +14,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Storage vendor agnostic access control on top of vendor specific storage.
- *
- * 2 kinds of methods:
- *   - access controlled: get/create/update
- *   - direct DB access: fetch/store (as derived from storage impl)
- *
- * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
+ * Vendor agnostic access control on top of vendor specific storage.
  */
 public final class AccessLayer {
 
@@ -32,11 +26,11 @@ public final class AccessLayer {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    DMXStorage db;
-    StorageDecorator sd;
-    TypeStorage typeStorage;
-    EventManager em;
-    ModelFactoryImpl mf;
+    public StorageDecorator sd;     // accessed by storage tests
+           DMXStorage db;
+           TypeStorage typeStorage;
+           EventManager em;
+           ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -57,63 +51,6 @@ public final class AccessLayer {
         bootstrapTypeCache();
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    // DB direct access, no access control.
-
-    // Note: is public as accessed by storage tests.
-    // Note: not part of storage SPI as it is sole on-top convenience.
-
-    /**
-     * Retrieves a single topic by exact value.
-     *
-     * @return  The fetched topic, or <code>null</code> if no such topic exists.
-     *
-     * @throws  RuntimeException    if more than one topic exists.
-     */
-    public TopicModelImpl fetchTopic(String key, Object value) {
-        try {
-            List<TopicModelImpl> topics = db.fetchTopics(key, value);
-            int size = topics.size();
-            switch (size) {
-            case 0:
-                return null;
-            case 1:
-                return topics.get(0);
-            default:
-                throw new RuntimeException("Ambiguity: " + size + " topics do match, key=\"" + key + "\", value=" +
-                    value);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic by value failed", e);
-        }
-    }
-
-    /**
-     * Retrieves a single assoc by exact value.
-     *
-     * @return  The fetched assoc, or <code>null</code> if no such assoc exists.
-     *
-     * @throws  RuntimeException    if more than one assoc exists.
-     */
-    public AssocModelImpl fetchAssoc(String key, Object value) {
-        try {
-            List<AssocModelImpl> assocs = db.fetchAssocs(key, value);
-            int size = assocs.size();
-            switch (size) {
-            case 0:
-                return null;
-            case 1:
-                return assocs.get(0);
-            default:
-                throw new RuntimeException("Ambiguity: " + size + " assocs do match, key=\"" + key + "\", value=" +
-                    value);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching assoc by value failed", e);
-        }
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
@@ -130,7 +67,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByUri(String uri) {
         try {
-            TopicModelImpl topic = fetchTopic("uri", uri);
+            TopicModelImpl topic = sd.fetchTopic("uri", uri);
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, uri=\"" + uri + "\"", e);
@@ -147,7 +84,7 @@ public final class AccessLayer {
 
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
         try {
-            TopicModelImpl topic = fetchTopic(key, value.value());
+            TopicModelImpl topic = sd.fetchTopic(key, value.value());
             return topic != null ? topic.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed, key=\"" + key + "\", value=" + value, e);
@@ -316,7 +253,7 @@ public final class AccessLayer {
 
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
-            AssocModelImpl assoc = fetchAssoc(key, value.value());
+            AssocModelImpl assoc = sd.fetchAssoc(key, value.value());
             return assoc != null ? assoc.checkReadAccess() : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc failed, key=\"" + key + "\", value=" + value, e);

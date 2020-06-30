@@ -11,7 +11,7 @@ import java.util.logging.Logger;
  * A utility layer above storage implementation.
  *  - Adds fetch-single calls on top of fetch-multiple calls and performs sanity checks.
  */
-class StorageDecorator {
+public class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -23,6 +23,61 @@ class StorageDecorator {
 
     StorageDecorator(DMXStorage db) {
         this.db = db;
+    }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // Note: is public as accessed by storage tests.
+    // Note: not part of storage SPI as it is sole on-top convenience.
+
+    /**
+     * Retrieves a single topic by exact value.
+     *
+     * @return  The fetched topic, or <code>null</code> if no such topic exists.
+     *
+     * @throws  RuntimeException    if more than one topic exists.
+     */
+    public TopicModelImpl fetchTopic(String key, Object value) {
+        try {
+            List<TopicModelImpl> topics = db.fetchTopics(key, value);
+            int size = topics.size();
+            switch (size) {
+            case 0:
+                return null;
+            case 1:
+                return topics.get(0);
+            default:
+                throw new RuntimeException("Ambiguity: " + size + " topics do match, key=\"" + key + "\", value=" +
+                    value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic by value failed", e);
+        }
+    }
+
+    /**
+     * Retrieves a single assoc by exact value.
+     *
+     * @return  The fetched assoc, or <code>null</code> if no such assoc exists.
+     *
+     * @throws  RuntimeException    if more than one assoc exists.
+     */
+    public AssocModelImpl fetchAssoc(String key, Object value) {
+        try {
+            List<AssocModelImpl> assocs = db.fetchAssocs(key, value);
+            int size = assocs.size();
+            switch (size) {
+            case 0:
+                return null;
+            case 1:
+                return assocs.get(0);
+            default:
+                throw new RuntimeException("Ambiguity: " + size + " assocs do match, key=\"" + key + "\", value=" +
+                    value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching assoc by value failed", e);
+        }
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
