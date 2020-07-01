@@ -20,7 +20,7 @@ export default ({store}) => {
           menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes  // TODO: why is getters undefined on start?
         },
         listeners: {
-          'topic-reveal': revealTopic,
+          'topic-click': revealTopic,
           'topic-create': createTopic,
           'extra-create': createExtra,
           close: _ => store.dispatch('closeSearchWidget')
@@ -34,9 +34,9 @@ export default ({store}) => {
     store.dispatch('revealTopic', {
       topic,
       pos: state.pos.model,
-      noSelect: state.options && state.options.noSelect
+      noSelect: state.options.noSelect
     })
-    state.options && state.options.topicHandler && state.options.topicHandler(topic)
+    state.options.topicHandler && state.options.topicHandler(topic)
   }
 
   function createTopic ({topicType, value}) {

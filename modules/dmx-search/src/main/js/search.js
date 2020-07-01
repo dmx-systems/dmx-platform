@@ -22,7 +22,7 @@ const actions = {
     // console.log('openSearchWidget', pos, options)
     state.visible = true
     state.pos = pos
-    state.options = options
+    state.options = options || {}
   },
 
   closeSearchWidget () {
