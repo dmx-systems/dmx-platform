@@ -21,6 +21,7 @@ export default ({store}) => {
         },
         listeners: {
           'topic-click': revealTopic,
+          'icon-click':  revealTopicNoSelect,
           'topic-create': createTopic,
           'extra-create': createExtra,
           close: _ => store.dispatch('closeSearchWidget')
@@ -29,12 +30,16 @@ export default ({store}) => {
     ]
   }
 
-  function revealTopic (topic) {
+  function revealTopicNoSelect (topic) {
+    revealTopic(topic, true)    // noSelect=true
+  }
+
+  function revealTopic (topic, noSelect) {
     const state = store.state.search
     store.dispatch('revealTopic', {
       topic,
       pos: state.pos.model,
-      noSelect: state.options.noSelect
+      noSelect: noSelect || state.options.noSelect
     })
     state.options.topicHandler && state.options.topicHandler(topic)
   }
