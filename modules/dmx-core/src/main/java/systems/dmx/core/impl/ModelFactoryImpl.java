@@ -706,11 +706,11 @@ public class ModelFactoryImpl implements ModelFactory {
             // explicit assoc players already. In that case we use these ones as they contain both, the ID-ref and the
             // URI-ref. In specific situations one or the other is needed.
             return new CompDefModelImpl(
-                newAssocModel(compDef.optLong("id", -1), null,
+                newAssocModel(compDef.optLong("id", -1), null,      // uri=null
                     COMPOSITION_DEF,
                     player1 != null ? player1 : parentPlayer(compDef.getString("parentTypeUri")),
                     player2 != null ? player2 : childPlayer(compDef.getString("childTypeUri")),
-                    null, childTopics(compDef)
+                    null, childTopics(compDef)                      // value=null
                 ),
                 newViewConfigModel(compDef.optJSONArray("viewConfigTopics"))
             );

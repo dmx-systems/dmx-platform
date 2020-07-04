@@ -1,5 +1,6 @@
 package systems.dmx.contacts;
 
+import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.AssocModel;
@@ -28,16 +29,14 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/person/{id}/organizations")
     @Override
     public List<RelatedTopic> getOrganizations(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_involvement",
-            DEFAULT, DEFAULT, "dmx.contacts.organization");
+        return dmx.getTopic(personId).getRelatedTopics(ORGANIZATION_INVOLVEMENT, DEFAULT, DEFAULT, ORGANIZATION);
     }
 
     @GET
     @Path("/organization/{id}/persons")
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long organizationId) {
-        return dmx.getTopic(organizationId).getRelatedTopics("dmx.contacts.organization_involvement",
-            DEFAULT, DEFAULT, "dmx.contacts.person");
+        return dmx.getTopic(organizationId).getRelatedTopics(ORGANIZATION_INVOLVEMENT, DEFAULT, DEFAULT, PERSON);
     }
 
     // Listeners
@@ -45,7 +44,6 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Person <-> Organization
-        DMXUtils.assocAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
-            "dmx.contacts.organization_involvement", DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, PERSON, ORGANIZATION, ORGANIZATION_INVOLVEMENT, DEFAULT, DEFAULT);
     }
 }

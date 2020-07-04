@@ -1,5 +1,6 @@
 package systems.dmx.events;
 
+import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -51,7 +52,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long eventId) {
         return dmx.getTopic(eventId).getRelatedTopics("dmx.events.event_involvement",
-            DEFAULT, DEFAULT, "dmx.contacts.person");
+            DEFAULT, DEFAULT, PERSON);
     }
 
     // Listeners
@@ -59,19 +60,19 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Event <-> Person
-        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person", "dmx.events.event_involvement",
+        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", PERSON, "dmx.events.event_involvement",
             DEFAULT, DEFAULT);
         // Event <-> Organization
-        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.organization", "dmx.events.event_involvement",
+        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", ORGANIZATION, "dmx.events.event_involvement",
             DEFAULT, DEFAULT);
         //
         // Event -> Address
-        PlayerModel[] players = DMXUtils.assocAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address", COMPOSITION,
+        PlayerModel[] players = DMXUtils.assocAutoTyping(assoc, "dmx.events.event", ADDRESS, COMPOSITION,
             PARENT, CHILD);
         if (players != null) {
             long eventId = players[0].getId();
             Topic event = dmx.getTopic(eventId);
-            event.getChildTopics().getTopic("dmx.contacts.address").getRelatingAssoc().delete();
+            event.getChildTopics().getTopic(ADDRESS).getRelatingAssoc().delete();
             timestampsService.setModified(event);
         }
     }

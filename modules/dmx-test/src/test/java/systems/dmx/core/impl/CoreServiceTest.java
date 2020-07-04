@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.ChildTopics;
@@ -42,19 +43,19 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void compositeModel() {
         ChildTopicsModel person = mf.newChildTopicsModel()
             .set("dmx.core.name", "Karl Blum")
-            .set("dmx.contacts.home_address", mf.newChildTopicsModel()
-                .set("dmx.contacts.postal_code", 13206)
-                .set("dmx.contacts.city", "Berlin"))
+            .set(HOME_ADDRESS, mf.newChildTopicsModel()
+                .set(POSTAL_CODE, 13206)
+                .set(CITY, "Berlin"))
             .set("dmx.contacts.office_address", mf.newChildTopicsModel()
-                .set("dmx.contacts.postal_code", 14345)
-                .set("dmx.contacts.city", "Berlin"));
+                .set(POSTAL_CODE, 14345)
+                .set(CITY, "Berlin"));
         //
         assertEquals("Karl Blum", person.getString("dmx.core.name"));
         //
-        ChildTopicsModel address = person.getChildTopics("dmx.contacts.home_address");
-        assertEquals("Berlin", address.getString("dmx.contacts.city"));
+        ChildTopicsModel address = person.getChildTopics(HOME_ADDRESS);
+        assertEquals("Berlin", address.getString(CITY));
         //
-        Object code = address.getValue("dmx.contacts.postal_code");
+        Object code = address.getValue(POSTAL_CODE);
         assertSame(Integer.class, code.getClass());
         assertEquals(13206, code);  // autoboxing
     }

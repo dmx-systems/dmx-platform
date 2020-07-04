@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
@@ -50,13 +51,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             definePersonModel();
             Topic person = createPerson();
             // one Person and one Address exists
-            List<Topic> persons   = dmx.getTopicsByType("dmx.contacts.person");
-            List<Topic> addresses = dmx.getTopicsByType("dmx.contacts.address");
+            List<Topic> persons   = dmx.getTopicsByType(PERSON);
+            List<Topic> addresses = dmx.getTopicsByType(ADDRESS);
             assertEquals(1, persons.size());
             assertEquals(1, addresses.size());
             // labels are concatenated
             ChildTopics children = persons.get(0).getChildTopics();
-            assertEquals("Dave Stauges", children.getString("dmx.contacts.person_name"));
+            assertEquals("Dave Stauges", children.getString(PERSON_NAME));
             assertEquals("Parkstr. 3 13187 Berlin Germany",
                                          children.getTopics("dmx.contacts.address#dmx.contacts.address_entry")
                                             .get(0).getSimpleValue().toString());
@@ -79,12 +80,12 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // Single word (like in fulltext search) is not supported.
             // Lucene query syntax (phrase, wildcards, escaping, ...) is not supported.
             // Search is case-sensitive.
-            assertEquals(1, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr. 3")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("parkSTR. 3")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.\\ 3")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("\"Parkstr. 3\"")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Parkstr.")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.contacts.street", new SimpleValue("Park*")).size());
+            assertEquals(1, dmx.getTopicsByValue(STREET, new SimpleValue("Parkstr. 3")).size());
+            assertEquals(0, dmx.getTopicsByValue(STREET, new SimpleValue("parkSTR. 3")).size());
+            assertEquals(0, dmx.getTopicsByValue(STREET, new SimpleValue("Parkstr.\\ 3")).size());
+            assertEquals(0, dmx.getTopicsByValue(STREET, new SimpleValue("\"Parkstr. 3\"")).size());
+            assertEquals(0, dmx.getTopicsByValue(STREET, new SimpleValue("Parkstr.")).size());
+            assertEquals(0, dmx.getTopicsByValue(STREET, new SimpleValue("Park*")).size());
             //
             tx.success();
         } finally {
@@ -101,13 +102,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // Lucene query syntax (phrase, wildcards, escaping, ...) is supported.
             // Single word (like in fulltext search) is not supported. Spaces must be escaped.
             // Search is case-sensitive.
-            assertEquals(0, dmx.queryTopics("dmx.contacts.street", "Parkstr. 3").size());
-            assertEquals(1, dmx.queryTopics("dmx.contacts.street", "Parkstr.\\ 3").size());
-            assertEquals(0, dmx.queryTopics("dmx.contacts.street", "parkSTR.\\ 3").size());
-            assertEquals(1, dmx.queryTopics("dmx.contacts.street", "\"Parkstr. 3\"").size());
-            assertEquals(0, dmx.queryTopics("dmx.contacts.street", "Parkstr.").size());
-            assertEquals(1, dmx.queryTopics("dmx.contacts.street", "Park*").size());
-            assertEquals(1, dmx.queryTopics("dmx.contacts.street", "Parkstr??3").size());
+            assertEquals(0, dmx.queryTopics(STREET, "Parkstr. 3").size());
+            assertEquals(1, dmx.queryTopics(STREET, "Parkstr.\\ 3").size());
+            assertEquals(0, dmx.queryTopics(STREET, "parkSTR.\\ 3").size());
+            assertEquals(1, dmx.queryTopics(STREET, "\"Parkstr. 3\"").size());
+            assertEquals(0, dmx.queryTopics(STREET, "Parkstr.").size());
+            assertEquals(1, dmx.queryTopics(STREET, "Park*").size());
+            assertEquals(1, dmx.queryTopics(STREET, "Parkstr??3").size());
             //
             tx.success();
         } finally {
@@ -126,21 +127,21 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // Note: by default search terms are combined by "OR" (Lucene default), not "AND".
             // Use "AND" (uppercase is required) or synonymous "&&" explicitly.
             // Search is case-insensitive.
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  "dmx.contacts.street", false).topics.size());
-            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. AND XYZ", "dmx.contacts.street", false).topics.size());
-            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. && XYZ",  "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. and XYZ", "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("3 AND Parkstr.",   "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("XYZ Parkstr.",     "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("parkSTR.",         "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Park*",            "dmx.contacts.street", false).topics.size());
-            assertEquals(0, dmx.queryTopicsFulltext("Park",             "dmx.contacts.street", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("Park????",         "dmx.contacts.street", false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. AND XYZ", STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. && XYZ",  STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. and XYZ", STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("3 AND Parkstr.",   STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("XYZ Parkstr.",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("parkSTR.",         STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park*",            STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Park",             STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park????",         STREET, false).topics.size());
             //
             tx.success();
         } finally {
@@ -220,18 +221,18 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             Topic address = person.getChildTopics().getTopics("dmx.contacts.address#dmx.contacts.address_entry").get(0);
             // this looks like we override "Berlin" with "Hamburg"
-            address.update(mf.newChildTopicsModel().set("dmx.contacts.city", "Hamburg"));
+            address.update(mf.newChildTopicsModel().set(CITY, "Hamburg"));
             // ... BUT the original address is unchanged
-            assertEquals("Berlin", address.getChildTopics().getString("dmx.contacts.city"));
+            assertEquals("Berlin", address.getChildTopics().getString(CITY));
             // ... and another Address topic has been created
-            List<Topic> addrs = dmx.getTopicsByType("dmx.contacts.address");
+            List<Topic> addrs = dmx.getTopicsByType(ADDRESS);
             assertEquals(2, addrs.size());
             Topic address2 = addrs.get(0).getId() == address.getId() ? addrs.get(1) : addrs.get(0);
             assertNotEquals(address.getId(), address2.getId());
             // there are 2 City topics now
-            assertEquals(2, dmx.getTopicsByType("dmx.contacts.city").size());
+            assertEquals(2, dmx.getTopicsByType(CITY).size());
             //
-            assertEquals("Hamburg", address2.getChildTopics().getString("dmx.contacts.city"));
+            assertEquals("Hamburg", address2.getChildTopics().getString(CITY));
             assertEquals(1, address2.getChildTopics().size());
             assertEquals(4, address.getChildTopics().size());
             //
@@ -249,25 +250,25 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // create person
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
-            assertEquals("<p>Software Developer</p>", children.getString("dmx.contacts.person_description"));
+            assertEquals("<p>Software Developer</p>", children.getString(PERSON_DESCRIPTION));
             // change Person Description in-place
-            person.update(mf.newChildTopicsModel().set("dmx.contacts.person_description", "<p>Cook</p>"));
-            assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
+            person.update(mf.newChildTopicsModel().set(PERSON_DESCRIPTION, "<p>Cook</p>"));
+            assertEquals("<p>Cook</p>", children.getString(PERSON_DESCRIPTION));
             // there is still only 1 person in the DB (it was mutated in-place), refetch ...
-            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
             // no children are loaded yet
             person = persons.get(0);
             children = person.getChildTopics();
             assertEquals(0, children.size());
             // the Person Description has changed in-place
-            assertEquals("<p>Cook</p>", children.getString("dmx.contacts.person_description"));
+            assertEquals("<p>Cook</p>", children.getString(PERSON_DESCRIPTION));
             assertEquals(1, children.size());
             // the other children (Person Name, Birtday, Email Address, Address, Description) are still there
             person.loadChildTopics();
             assertEquals(5, children.size());
             // now there are 2 Person Description topics in the DB (the original one is not mutated/deleted)
-            List<Topic> descriptions = dmx.getTopicsByType("dmx.contacts.person_description");
+            List<Topic> descriptions = dmx.getTopicsByType(PERSON_DESCRIPTION);
             assertEquals(2, descriptions.size());
             //
             tx.success();
@@ -285,23 +286,23 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // change Last Name
-            person.update(mf.newChildTopicsModel().set("dmx.contacts.person_name", mf.newChildTopicsModel()
-                .set("dmx.contacts.first_name", "Dave")
-                .set("dmx.contacts.last_name", "Habling")
+            person.update(mf.newChildTopicsModel().set(PERSON_NAME, mf.newChildTopicsModel()
+                .set(FIRST_NAME, "Dave")
+                .set(LAST_NAME, "Habling")
             ));
             // name has changed in memory
-            ChildTopics name = children.getChildTopics("dmx.contacts.person_name");
-            assertEquals("Dave", name.getString("dmx.contacts.first_name"));
-            assertEquals("Habling", name.getString("dmx.contacts.last_name"));
+            ChildTopics name = children.getChildTopics(PERSON_NAME);
+            assertEquals("Dave", name.getString(FIRST_NAME));
+            assertEquals("Habling", name.getString(LAST_NAME));
             // check DB content; refetch ...
-            assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
-            assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
-            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            assertEquals(2, dmx.getTopicsByType(LAST_NAME).size());
+            assertEquals(1, dmx.getTopicsByType(FIRST_NAME).size());
+            List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
             // name has changed in DB
-            name = persons.get(0).getChildTopics().getChildTopics("dmx.contacts.person_name");;
-            assertEquals("Dave", name.getString("dmx.contacts.first_name"));
-            assertEquals("Habling", name.getString("dmx.contacts.last_name"));
+            name = persons.get(0).getChildTopics().getChildTopics(PERSON_NAME);;
+            assertEquals("Dave", name.getString(FIRST_NAME));
+            assertEquals("Habling", name.getString(LAST_NAME));
             //
             tx.success();
         } finally {
@@ -318,26 +319,26 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // change Last Name -- DON'T DO IT THIS WAY (it produces unexpected result)
-            children.getTopic("dmx.contacts.person_name").update(
-                mf.newChildTopicsModel().set("dmx.contacts.last_name", "Habling")
+            children.getTopic(PERSON_NAME).update(
+                mf.newChildTopicsModel().set(LAST_NAME, "Habling")
             );
             // last name is still unchanged
-            assertEquals("Stauges", children.getChildTopics("dmx.contacts.person_name")
-                .getString("dmx.contacts.last_name"));
+            assertEquals("Stauges", children.getChildTopics(PERSON_NAME)
+                .getString(LAST_NAME));
             //
             // now there are 2 Person Name topics in the DB, the 2nd has only Last Name (no First Name)
-            assertEquals(2, dmx.getTopicsByType("dmx.contacts.person_name").size());
-            assertEquals(2, dmx.getTopicsByType("dmx.contacts.last_name").size());
-            assertEquals(1, dmx.getTopicsByType("dmx.contacts.first_name").size());
+            assertEquals(2, dmx.getTopicsByType(PERSON_NAME).size());
+            assertEquals(2, dmx.getTopicsByType(LAST_NAME).size());
+            assertEquals(1, dmx.getTopicsByType(FIRST_NAME).size());
             // Last Name "Habling" is assigned to a Person Name parent
-            Topic lastName = dmx.getTopicByValue("dmx.contacts.last_name", new SimpleValue("Habling"));
-            Topic personName = lastName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person_name");
+            Topic lastName = dmx.getTopicByValue(LAST_NAME, new SimpleValue("Habling"));
+            Topic personName = lastName.getRelatedTopic(COMPOSITION, CHILD, PARENT, PERSON_NAME);
             assertNotNull(personName);
             // ... which has no First Name (but only a Last Name)
-            assertNull(personName.getChildTopics().getString("dmx.contacts.first_name", null));
-            assertEquals("Habling", personName.getChildTopics().getString("dmx.contacts.last_name"));
+            assertNull(personName.getChildTopics().getString(FIRST_NAME, null));
+            assertEquals("Habling", personName.getChildTopics().getString(LAST_NAME));
             // ... and is not assigned to any Person
-            Topic person2 = personName.getRelatedTopic(COMPOSITION, CHILD, PARENT, "dmx.contacts.person");
+            Topic person2 = personName.getRelatedTopic(COMPOSITION, CHILD, PARENT, PERSON);
             assertNull(person2);
             //
             tx.success();
@@ -354,19 +355,19 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // create Person
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
-            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            List<RelatedTopic> emailAddresses = children.getTopics(EMAIL_ADDRESS);
             assertEquals(1, emailAddresses.size());
             assertEquals("me@example.com", emailAddresses.get(0).getSimpleValue().toString());
             // add 2nd Email Address
-            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             //
             // check memory
-            emailAddresses = children.getTopics("dmx.contacts.email_address");
+            emailAddresses = children.getTopics(EMAIL_ADDRESS);
             assertEquals(2, emailAddresses.size());
             // check DB content; refetch ...
-            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
-            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            emailAddresses = persons.get(0).getChildTopics().getTopics(EMAIL_ADDRESS);
             List<String> eas = emailAddresses.stream().map(
                 ea -> ea.getSimpleValue().toString()
             ).collect(Collectors.toList());
@@ -389,20 +390,20 @@ public class PersonTest extends CoreServiceTestEnvironment {
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
             // add 2nd Email Address
-            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // replace 1st Email Address
-            Topic ea1 = dmx.getTopicByValue("dmx.contacts.email_address", new SimpleValue("me@example.com"));
-            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address",
+            Topic ea1 = dmx.getTopicByValue(EMAIL_ADDRESS, new SimpleValue("me@example.com"));
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS,
                 mf.newTopicModel(ea1.getId(), new SimpleValue("me@example3.com"))
             ));
             //
             // check memory
-            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            List<RelatedTopic> emailAddresses = children.getTopics(EMAIL_ADDRESS);
             assertEquals(2, emailAddresses.size());
             // check DB content; refetch ...
-            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
-            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            emailAddresses = persons.get(0).getChildTopics().getTopics(EMAIL_ADDRESS);
             List<String> eas = emailAddresses.stream().map(
                 ea -> ea.getSimpleValue().toString()
             ).collect(Collectors.toList());
@@ -424,19 +425,19 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // create Person
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
-            Topic ea1 = children.getTopics("dmx.contacts.email_address").get(0);
+            Topic ea1 = children.getTopics(EMAIL_ADDRESS).get(0);
             // add 2nd Email Address
-            person.update(mf.newChildTopicsModel().add("dmx.contacts.email_address", "me@example2.com"));
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // remove 1st Email Address
-            person.update(mf.newChildTopicsModel().addDeletionRef("dmx.contacts.email_address", ea1.getId()));
+            person.update(mf.newChildTopicsModel().addDeletionRef(EMAIL_ADDRESS, ea1.getId()));
             //
             // check memory
-            List<RelatedTopic> emailAddresses = children.getTopics("dmx.contacts.email_address");
+            List<RelatedTopic> emailAddresses = children.getTopics(EMAIL_ADDRESS);
             assertEquals(1, emailAddresses.size());
             // check DB content; refetch ...
-            List<Topic> persons = dmx.getTopicsByType("dmx.contacts.person");
+            List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
-            emailAddresses = persons.get(0).getChildTopics().getTopics("dmx.contacts.email_address");
+            emailAddresses = persons.get(0).getChildTopics().getTopics(EMAIL_ADDRESS);
             assertEquals(1, emailAddresses.size());
             assertEquals("me@example2.com", emailAddresses.get(0).getSimpleValue().toString());
             //
@@ -452,25 +453,25 @@ public class PersonTest extends CoreServiceTestEnvironment {
         defineDateModel();
         defineAddressModel();
         // Person Name
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.first_name",  "First Name",  TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.last_name",   "Last Name",   TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_name", "Person Name", VALUE)
-          .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.person_name", "dmx.contacts.first_name", ONE))
-          .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.person_name", "dmx.contacts.last_name",  ONE))
+        dmx.createTopicType(mf.newTopicTypeModel(FIRST_NAME,  "First Name",  TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(LAST_NAME,   "Last Name",   TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(PERSON_NAME, "Person Name", VALUE)
+          .addCompDef(mf.newCompDefModel(null, false, true, PERSON_NAME, FIRST_NAME, ONE))
+          .addCompDef(mf.newCompDefModel(null, false, true, PERSON_NAME, LAST_NAME,  ONE))
         );
         // Person
-        dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.date_of_birth",      "Date of Birth",      TEXT));
-        dmx.createAssocType(mf.newAssocTypeModel("dmx.contacts.address_entry",      "Address Entry",      TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.email_address",      "Email Address",      TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person_description", "Person Description", HTML));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.person",             "Person",             ENTITY)
-          .addCompDef(mf.newCompDefModel(null, true, false, "dmx.contacts.person", "dmx.contacts.person_name", ONE))
-          .addCompDef(mf.newCompDefModel("dmx.contacts.date_of_birth", false, false,
-                                         "dmx.contacts.person", "dmx.datetime.date",               ONE))
-          .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.email_address",      MANY))
-          .addCompDef(mf.newCompDefModel("dmx.contacts.address_entry", false, false,
-                                         "dmx.contacts.person", "dmx.contacts.address",            MANY))
-          .addCompDef(mf.newCompDefModel("dmx.contacts.person", "dmx.contacts.person_description", ONE))
+        dmx.createAssocType(mf.newAssocTypeModel(DATE_OF_BIRTH,      "Date of Birth",      TEXT));
+        dmx.createAssocType(mf.newAssocTypeModel(ADDRESS_ENTRY,      "Address Entry",      TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(EMAIL_ADDRESS,      "Email Address",      TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(PERSON_DESCRIPTION, "Person Description", HTML));
+        dmx.createTopicType(mf.newTopicTypeModel(PERSON,             "Person",             ENTITY)
+          .addCompDef(mf.newCompDefModel(null, true, false, PERSON, PERSON_NAME, ONE))
+          .addCompDef(mf.newCompDefModel(DATE_OF_BIRTH, false, false,
+                                         PERSON, "dmx.datetime.date",               ONE))
+          .addCompDef(mf.newCompDefModel(PERSON, EMAIL_ADDRESS,      MANY))
+          .addCompDef(mf.newCompDefModel(ADDRESS_ENTRY, false, false,
+                                         PERSON, ADDRESS,            MANY))
+          .addCompDef(mf.newCompDefModel(PERSON, PERSON_DESCRIPTION, ONE))
         );
     }
 
@@ -486,34 +487,34 @@ public class PersonTest extends CoreServiceTestEnvironment {
     }
 
     private void defineAddressModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.street",      "Street",      TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.postal_code", "Postal Code", TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.city",        "City",        TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.country",     "Country",     TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.contacts.address",     "Address",     VALUE)
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.street",      ONE))
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.postal_code", ONE))
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.city",        ONE))
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.contacts.address", "dmx.contacts.country",     ONE))
+        dmx.createTopicType(mf.newTopicTypeModel(STREET,      "Street",      TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(POSTAL_CODE, "Postal Code", TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(CITY,        "City",        TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(COUNTRY,     "Country",     TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(ADDRESS,     "Address",     VALUE)
+            .addCompDef(mf.newCompDefModel(null, false, true, ADDRESS, STREET,      ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, ADDRESS, POSTAL_CODE, ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, ADDRESS, CITY,        ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, ADDRESS, COUNTRY,     ONE))
         );
     }
 
     private Topic createPerson() {
-        return dmx.createTopic(mf.newTopicModel("dmx.contacts.person", mf.newChildTopicsModel()
-            .set("dmx.contacts.person_name", mf.newChildTopicsModel()
-                .set("dmx.contacts.first_name", "Dave")
-                .set("dmx.contacts.last_name",  "Stauges"))
+        return dmx.createTopic(mf.newTopicModel(PERSON, mf.newChildTopicsModel()
+            .set(PERSON_NAME, mf.newChildTopicsModel()
+                .set(FIRST_NAME, "Dave")
+                .set(LAST_NAME,  "Stauges"))
             .set("dmx.datetime.date#dmx.contacts.date_of_birth", mf.newChildTopicsModel()
                 .set("dmx.datetime.month",      5)  // May
                 .set("dmx.datetime.day",        1)  // 1st
                 .set("dmx.datetime.year",       1972))
-            .add("dmx.contacts.email_address", "me@example.com")
+            .add(EMAIL_ADDRESS, "me@example.com")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
-                .set("dmx.contacts.street",      "Parkstr. 3")
-                .set("dmx.contacts.postal_code", "13187")
-                .set("dmx.contacts.city",        "Berlin")
-                .set("dmx.contacts.country",     "Germany"))
-            .set("dmx.contacts.person_description", "<p>Software Developer</p>")
+                .set(STREET,      "Parkstr. 3")
+                .set(POSTAL_CODE, "13187")
+                .set(CITY,        "Berlin")
+                .set(COUNTRY,     "Germany"))
+            .set(PERSON_DESCRIPTION, "<p>Software Developer</p>")
         ));
     }
 }
