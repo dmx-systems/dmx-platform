@@ -2,6 +2,7 @@ package systems.dmx.events;
 
 import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.events.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
@@ -43,16 +44,14 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/person/{id}")
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.events.event_involvement",
-            DEFAULT, DEFAULT, "dmx.events.event");
+        return dmx.getTopic(personId).getRelatedTopics(EVENT_INVOLVEMENT, DEFAULT, DEFAULT, EVENT);
     }
 
     @GET
     @Path("/{id}/persons")
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long eventId) {
-        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.event_involvement",
-            DEFAULT, DEFAULT, PERSON);
+        return dmx.getTopic(eventId).getRelatedTopics(EVENT_INVOLVEMENT, DEFAULT, DEFAULT, PERSON);
     }
 
     // Listeners
@@ -60,15 +59,12 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Event <-> Person
-        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", PERSON, "dmx.events.event_involvement",
-            DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, EVENT, PERSON, EVENT_INVOLVEMENT, DEFAULT, DEFAULT);
         // Event <-> Organization
-        DMXUtils.assocAutoTyping(assoc, "dmx.events.event", ORGANIZATION, "dmx.events.event_involvement",
-            DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, EVENT, ORGANIZATION, EVENT_INVOLVEMENT, DEFAULT, DEFAULT);
         //
         // Event -> Address
-        PlayerModel[] players = DMXUtils.assocAutoTyping(assoc, "dmx.events.event", ADDRESS, COMPOSITION,
-            PARENT, CHILD);
+        PlayerModel[] players = DMXUtils.assocAutoTyping(assoc, EVENT, ADDRESS, COMPOSITION, PARENT, CHILD);
         if (players != null) {
             long eventId = players[0].getId();
             Topic event = dmx.getTopic(eventId);

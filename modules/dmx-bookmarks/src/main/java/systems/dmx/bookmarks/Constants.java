@@ -1,4 +1,4 @@
-package systems.dmx.bookemarks;
+package systems.dmx.bookmarks;
 
 
 

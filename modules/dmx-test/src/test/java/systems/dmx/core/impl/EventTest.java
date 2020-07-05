@@ -50,7 +50,7 @@ public class EventTest extends CoreServiceTestEnvironment {
         try {
             defineEventModel();
             createEvent();
-            List<Topic> events = dmx.getTopicsByType("dmx.events.event");
+            List<Topic> events = dmx.getTopicsByType(EVENT);
             assertEquals(1, events.size());
             //
             ChildTopics event = events.get(0).getChildTopics();
@@ -74,11 +74,11 @@ public class EventTest extends CoreServiceTestEnvironment {
     private void defineEventModel() {
         defineDateTimeModel();
         // Event
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event_name", "Event Name", TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.events.event",      "Event",      ENTITY)
-          .addCompDef(mf.newCompDefModel(null, true, false, "dmx.events.event", "dmx.events.event_name", ONE))
-          .addCompDef(mf.newCompDefModel(FROM, false, false, "dmx.events.event", DATETIME, ONE))
-          .addCompDef(mf.newCompDefModel(TO,   false, false, "dmx.events.event", DATETIME, ONE))
+        dmx.createTopicType(mf.newTopicTypeModel(EVENT_NAME, "Event Name", TEXT));
+        dmx.createTopicType(mf.newTopicTypeModel(EVENT,      "Event",      ENTITY)
+          .addCompDef(mf.newCompDefModel(null, true, false, EVENT, EVENT_NAME, ONE))
+          .addCompDef(mf.newCompDefModel(FROM, false, false, EVENT, DATETIME, ONE))
+          .addCompDef(mf.newCompDefModel(TO,   false, false, EVENT, DATETIME, ONE))
         );
     }
 
@@ -110,8 +110,8 @@ public class EventTest extends CoreServiceTestEnvironment {
     }
 
     private Topic createEvent() {
-        return dmx.createTopic(mf.newTopicModel("dmx.events.event", mf.newChildTopicsModel()
-            .set("dmx.events.event_name", "Release Party")
+        return dmx.createTopic(mf.newTopicModel(EVENT, mf.newChildTopicsModel()
+            .set(EVENT_NAME, "Release Party")
             .set("dmx.datetime#dmx.datetime.from", mf.newChildTopicsModel()
                 .set(DATE, mf.newChildTopicsModel()
                     .set(MONTH, 7)   // July
