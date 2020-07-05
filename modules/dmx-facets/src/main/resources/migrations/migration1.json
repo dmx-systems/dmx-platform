@@ -1,6 +1,6 @@
 {
     "topics": [
-        ### Role Types ###
+        // Role Types
         {
             "value":   "Facet",
             "uri":     "dmx.facets.facet",

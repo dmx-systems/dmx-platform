@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import static systems.dmx.core.Constants.*;
 import static systems.dmx.datetime.Constants.*;
+import static systems.dmx.events.Constants.*;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -76,9 +77,9 @@ public class EventTest extends CoreServiceTestEnvironment {
         // Event
         dmx.createTopicType(mf.newTopicTypeModel(EVENT_NAME, "Event Name", TEXT));
         dmx.createTopicType(mf.newTopicTypeModel(EVENT,      "Event",      ENTITY)
-          .addCompDef(mf.newCompDefModel(null, true, false, EVENT, EVENT_NAME, ONE))
-          .addCompDef(mf.newCompDefModel(FROM, false, false, EVENT, DATETIME, ONE))
-          .addCompDef(mf.newCompDefModel(TO,   false, false, EVENT, DATETIME, ONE))
+          .addCompDef(mf.newCompDefModel(null, true,  false, EVENT, EVENT_NAME, ONE))
+          .addCompDef(mf.newCompDefModel(FROM, false, false, EVENT, DATETIME,   ONE))
+          .addCompDef(mf.newCompDefModel(TO,   false, false, EVENT, DATETIME,   ONE))
         );
     }
 
