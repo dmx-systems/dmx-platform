@@ -269,6 +269,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
+            // TODO: can't use AC constants -> cyclic dependency
+            // TODO: move registration to AC module?
             ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
             mf.newTopicModel("dmx.workspaces.enabled_sharing_modes", mf.newChildTopicsModel()
                 .set("dmx.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)

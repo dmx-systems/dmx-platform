@@ -428,6 +428,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
+            // TODO: can't use AC constants -> cyclic dependency
+            // TODO: move registration to AC module?
             ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
             mf.newTopicModel("dmx.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN

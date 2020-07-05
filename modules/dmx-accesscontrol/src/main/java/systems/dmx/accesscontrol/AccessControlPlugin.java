@@ -1,5 +1,6 @@
 package systems.dmx.accesscontrol;
 
+import static systems.dmx.accesscontrol.Constants.*;
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
@@ -112,10 +113,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ### TODO: copy in Credentials.java
     private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
-
-    // Type URIs
-    private static final String LOGIN_ENABLED_TYPE = "dmx.accesscontrol.login_enabled";
-    private static final String MEMBERSHIP_TYPE    = "dmx.accesscontrol.membership";
 
     // Property URIs
     private static final String PROP_CREATOR  = "dmx.accesscontrol.creator";
@@ -247,15 +244,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.user_account", mf.newChildTopicsModel()
-                        .setRef("dmx.accesscontrol.username", usernameTopic.getId())
-                        .set("dmx.accesscontrol.password", cred.password)));
+                    return dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
+                        .setRef(USERNAME, usernameTopic.getId())
+                        .set(PASSWORD, cred.password)));
                 }
             });
             // 3) assign user account and password to private workspace
             // Note: the current user has no READ access to the private workspace just created.
             // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
-            Topic passwordTopic = userAccount.getChildTopics().getTopic("dmx.accesscontrol.password");
+            Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
             long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
             pa.assignToWorkspace(userAccount, privateWorkspaceId);
             pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
@@ -286,7 +283,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             usernameTopic = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.username", new SimpleValue(username)));
+                    return dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)));
                 }
             });
             // 3) create private workspace
@@ -348,7 +345,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP_TYPE,
+            Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
                 mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
                 mf.newTopicPlayerModel(workspaceId, DEFAULT)
             ));
@@ -472,8 +469,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
-            ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
-            mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
+            ConfigTarget.TYPE_INSTANCES, USERNAME,
+            mf.newTopicModel(LOGIN_ENABLED, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
             ConfigModificationRole.ADMIN, this
         ));
     }
@@ -485,7 +482,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Access Control plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
-            configService.unregisterConfigDefinition(LOGIN_ENABLED_TYPE);
+            configService.unregisterConfigDefinition(LOGIN_ENABLED);
         } else {
             logger.warning("Config service is already gone");
         }
@@ -501,12 +498,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public TopicModel getConfigValue(Topic topic) {
-        if (!topic.getTypeUri().equals("dmx.accesscontrol.username")) {
+        if (!topic.getTypeUri().equals(USERNAME)) {
             throw new RuntimeException("Unexpected configurable topic: " + topic);
         }
         // the "admin" account must be enabled regardless of the "dmx.security.new_accounts_are_enabled" setting
         if (topic.getSimpleValue().toString().equals(ADMIN_USERNAME)) {
-            return mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
+            return mf.newTopicModel(LOGIN_ENABLED, new SimpleValue(true));
         }
         // don't customize
         return null;
@@ -565,7 +562,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preUpdateTopic(Topic topic, TopicModel updateModel) {
-        if (topic.getTypeUri().equals("dmx.accesscontrol.username")) {
+        if (topic.getTypeUri().equals(USERNAME)) {
             SimpleValue newUsername = updateModel.getSimpleValue();
             String oldUsername = topic.getSimpleValue().toString();
             if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
@@ -577,9 +574,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
-        if (topic.getTypeUri().equals("dmx.accesscontrol.user_account")) {
+        if (topic.getTypeUri().equals(USER_ACCOUNT)) {
             // encode password
-            RelatedTopic passwordTopic = topic.getChildTopics().getTopic("dmx.accesscontrol.password");
+            RelatedTopic passwordTopic = topic.getChildTopics().getTopic(PASSWORD);
             String password = passwordTopic.getSimpleValue().toString();
             passwordTopic.setSimpleValue(encodePassword(password));
             // reassign workspace
@@ -653,7 +650,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private boolean isMembership(AssocModel assoc) {
-        return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
+        return assoc.getTypeUri().equals(MEMBERSHIP);
     }
 
     /**
@@ -784,7 +781,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
-        Topic loginEnabled = dmx.getPrivilegedAccess().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
+        Topic loginEnabled = dmx.getPrivilegedAccess().getConfigTopic(LOGIN_ENABLED, usernameTopic.getId());
         return loginEnabled.getSimpleValue().booleanValue();
     }
 
