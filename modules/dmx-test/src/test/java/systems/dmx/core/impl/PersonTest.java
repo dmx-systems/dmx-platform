@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.datetime.Constants.*;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
@@ -195,15 +196,15 @@ public class PersonTest extends CoreServiceTestEnvironment {
             definePersonModel();
             createPerson();
             //
-            assertEquals(1, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue(1972)).size());
-            assertEquals(1, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue("1972")).size());
-            assertEquals(0, dmx.getTopicsByValue("dmx.datetime.year", new SimpleValue("19*")).size());
-            assertEquals(1, dmx.queryTopics("dmx.datetime.year", "1972").size());
-            assertEquals(1, dmx.queryTopics("dmx.datetime.year", "19*").size());
-            assertEquals(0, dmx.queryTopics("dmx.datetime.year", "19?").size());
-            assertEquals(1, dmx.queryTopics("dmx.datetime.year", "19??").size());
-            assertEquals(1, dmx.queryTopicsFulltext("1972", "dmx.datetime.year", false).topics.size());
-            assertEquals(1, dmx.queryTopicsFulltext("19*", "dmx.datetime.year", false).topics.size());
+            assertEquals(1, dmx.getTopicsByValue(YEAR, new SimpleValue(1972)).size());
+            assertEquals(1, dmx.getTopicsByValue(YEAR, new SimpleValue("1972")).size());
+            assertEquals(0, dmx.getTopicsByValue(YEAR, new SimpleValue("19*")).size());
+            assertEquals(1, dmx.queryTopics(YEAR, "1972").size());
+            assertEquals(1, dmx.queryTopics(YEAR, "19*").size());
+            assertEquals(0, dmx.queryTopics(YEAR, "19?").size());
+            assertEquals(1, dmx.queryTopics(YEAR, "19??").size());
+            assertEquals(1, dmx.queryTopicsFulltext("1972", YEAR, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("19*", YEAR, false).topics.size());
             //
             tx.success();
         } finally {
@@ -467,7 +468,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel(PERSON,             "Person",             ENTITY)
           .addCompDef(mf.newCompDefModel(null, true, false, PERSON, PERSON_NAME, ONE))
           .addCompDef(mf.newCompDefModel(DATE_OF_BIRTH, false, false,
-                                         PERSON, "dmx.datetime.date",               ONE))
+                                         PERSON, DATE,               ONE))
           .addCompDef(mf.newCompDefModel(PERSON, EMAIL_ADDRESS,      MANY))
           .addCompDef(mf.newCompDefModel(ADDRESS_ENTRY, false, false,
                                          PERSON, ADDRESS,            MANY))
@@ -476,13 +477,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
     }
 
     private void defineDateModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.month", "Month",   NUMBER));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.day",   "Day",     NUMBER));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.year",  "Year",    NUMBER));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.datetime.date",  "Address", VALUE)
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.month", ONE))
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.day",   ONE))
-            .addCompDef(mf.newCompDefModel(null, false, true, "dmx.datetime.date", "dmx.datetime.year",  ONE))
+        dmx.createTopicType(mf.newTopicTypeModel(MONTH, "Month",   NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel(DAY,   "Day",     NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel(YEAR,  "Year",    NUMBER));
+        dmx.createTopicType(mf.newTopicTypeModel(DATE,  "Address", VALUE)
+            .addCompDef(mf.newCompDefModel(null, false, true, DATE, MONTH, ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, DATE, DAY,   ONE))
+            .addCompDef(mf.newCompDefModel(null, false, true, DATE, YEAR,  ONE))
         );
     }
 
@@ -505,9 +506,9 @@ public class PersonTest extends CoreServiceTestEnvironment {
                 .set(FIRST_NAME, "Dave")
                 .set(LAST_NAME,  "Stauges"))
             .set("dmx.datetime.date#dmx.contacts.date_of_birth", mf.newChildTopicsModel()
-                .set("dmx.datetime.month",      5)  // May
-                .set("dmx.datetime.day",        1)  // 1st
-                .set("dmx.datetime.year",       1972))
+                .set(MONTH,      5)  // May
+                .set(DAY,        1)  // 1st
+                .set(YEAR,       1972))
             .add(EMAIL_ADDRESS, "me@example.com")
             .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
                 .set(STREET,      "Parkstr. 3")
