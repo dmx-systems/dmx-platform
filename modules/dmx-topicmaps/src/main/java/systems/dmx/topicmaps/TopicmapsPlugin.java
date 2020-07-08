@@ -1,5 +1,7 @@
 package systems.dmx.topicmaps;
 
+import static systems.dmx.topicmaps.Constants.*;
+import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssoc;
@@ -42,7 +44,7 @@ import java.util.logging.Logger;
 @Path("/topicmaps")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, TopicmapsConstants, MessengerContext {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, MessengerContext {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -125,14 +127,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Assoc getTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssocBetweenTopicAndTopic(TOPICMAP_CONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP,
-            ROLE_TYPE_CONTENT);
+        return dmx.getAssocBetweenTopicAndTopic(TOPICMAP_CONTEXT, topicmapId, topicId, DEFAULT, TOPICMAP_CONTENT);
     }
 
     @Override
     public Assoc getAssocMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssocBetweenTopicAndAssoc(TOPICMAP_CONTEXT, topicmapId, assocId, ROLE_TYPE_TOPICMAP,
-            ROLE_TYPE_CONTENT);
+        return dmx.getAssocBetweenTopicAndAssoc(TOPICMAP_CONTEXT, topicmapId, assocId, DEFAULT, TOPICMAP_CONTENT);
     }
 
     @GET
@@ -141,8 +141,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public List<RelatedTopic> getTopicmapTopics(@PathParam("id") long objectId) {
         try {
             List<RelatedTopic> topicmapTopics = new ArrayList();
-            for (RelatedTopic topic : dmx.getObject(objectId).getRelatedTopics(TOPICMAP_CONTEXT, ROLE_TYPE_CONTENT,
-                                                                               ROLE_TYPE_TOPICMAP, TOPICMAP)) {
+            for (RelatedTopic topic : dmx.getObject(objectId).getRelatedTopics(TOPICMAP_CONTEXT, TOPICMAP_CONTENT,
+                                                                               DEFAULT, TOPICMAP)) {
                 if (visibility(topic.getRelatingAssoc())) {
                     topicmapTopics.add(topic);
                 }
@@ -364,9 +364,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                       @PathParam("zoom") double zoom) {
         try {
             mf.newViewProps()
-                .set(PROP_PAN_X, panX)
-                .set(PROP_PAN_Y, panY)
-                .set(PROP_ZOOM, zoom)
+                .set(TOPICMAP_PAN_X, panX)
+                .set(TOPICMAP_PAN_Y, panY)
+                .set(TOPICMAP_ZOOM, zoom)
                 .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
             throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed, panX=" + panX +
@@ -444,8 +444,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, ViewTopic> fetchTopics(Topic topicmapTopic, boolean includeChildren) {
         Map<Long, ViewTopic> topics = new HashMap();
-        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPICMAP_CONTEXT,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersTopicTypeUri=null
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT,
+                                                                      null);       // othersTopicTypeUri=null
         if (includeChildren) {
             DMXUtils.loadChildTopics(relTopics);
         }
@@ -457,8 +457,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, ViewAssoc> fetchAssocs(Topic topicmapTopic) {
         Map<Long, ViewAssoc> assocs = new HashMap();
-        List<RelatedAssoc> relAssocs = topicmapTopic.getRelatedAssocs(TOPICMAP_CONTEXT, ROLE_TYPE_TOPICMAP,
-            ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
+        List<RelatedAssoc> relAssocs = topicmapTopic.getRelatedAssocs(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT,
+                                                                      null);       // othersAsspcTypeUri=null
         for (RelatedAssoc assoc : relAssocs) {
             assocs.put(assoc.getId(), buildViewAssoc(assoc));
         }
@@ -491,15 +491,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private ViewProps fetchTopicmapViewProps(Topic topicmapTopic) {
         return mf.newViewProps()
-            .set(PROP_PAN_X, topicmapTopic.getProperty(PROP_PAN_X))
-            .set(PROP_PAN_Y, topicmapTopic.getProperty(PROP_PAN_Y))
-            .set(PROP_ZOOM,  topicmapTopic.getProperty(PROP_ZOOM));
+            .set(TOPICMAP_PAN_X, topicmapTopic.getProperty(TOPICMAP_PAN_X))
+            .set(TOPICMAP_PAN_Y, topicmapTopic.getProperty(TOPICMAP_PAN_Y))
+            .set(TOPICMAP_ZOOM,  topicmapTopic.getProperty(TOPICMAP_ZOOM));
     }
 
     private ViewProps fetchTopicViewProps(Assoc topicmapContext) {
         return mf.newViewProps(
-            (Integer) topicmapContext.getProperty(PROP_X),
-            (Integer) topicmapContext.getProperty(PROP_Y),
+            (Integer) topicmapContext.getProperty(TOPICMAP_X),
+            (Integer) topicmapContext.getProperty(TOPICMAP_Y),
             visibility(topicmapContext),
             pinned(topicmapContext)
         );
@@ -513,11 +513,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private boolean visibility(Assoc topicmapContext) {
-        return (Boolean) topicmapContext.getProperty(PROP_VISIBILITY);
+        return (Boolean) topicmapContext.getProperty(TOPICMAP_VISIBILITY);
     }
 
     private boolean pinned(Assoc topicmapContext) {
-        return (Boolean) topicmapContext.getProperty(PROP_PINNED);
+        return (Boolean) topicmapContext.getProperty(TOPICMAP_PINNED);
     }
 
     // --- Update Visibility ---
@@ -529,7 +529,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             autoRevealAssocs(topic, topicmapId);
         } else {
             autoHideAssocs(topic, topicmapId);
-            viewProps.set(PROP_PINNED, false);      // hide implies unpin
+            viewProps.set(TOPICMAP_PINNED, false);      // hide implies unpin
         }
         // update DB
         viewProps.store(topicmapContext);
@@ -648,8 +648,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void createTopicMapcontext(long topicmapId, long topicId, ViewProps viewProps) {
         Assoc topicMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
-            mf.newTopicPlayerModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            mf.newTopicPlayerModel(topicId,    ROLE_TYPE_CONTENT)
+            mf.newTopicPlayerModel(topicmapId, DEFAULT),
+            mf.newTopicPlayerModel(topicId,    TOPICMAP_CONTENT)
         ));
         viewProps.store(topicMapcontext);
         //
@@ -659,8 +659,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void createAssocMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
         Assoc assocMapcontext = dmx.createAssoc(mf.newAssocModel(TOPICMAP_CONTEXT,
-            mf.newTopicPlayerModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            mf.newAssocPlayerModel(assocId,    ROLE_TYPE_CONTENT)
+            mf.newTopicPlayerModel(topicmapId, DEFAULT),
+            mf.newAssocPlayerModel(assocId,    TOPICMAP_CONTENT)
         ));
         viewProps.store(assocMapcontext);
         //

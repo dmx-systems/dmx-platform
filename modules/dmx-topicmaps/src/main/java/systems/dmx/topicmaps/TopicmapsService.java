@@ -1,5 +1,6 @@
 package systems.dmx.topicmaps;
 
+import static systems.dmx.topicmaps.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -10,7 +11,7 @@ import java.util.List;
 
 
 
-public interface TopicmapsService extends TopicmapsConstants {
+public interface TopicmapsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
