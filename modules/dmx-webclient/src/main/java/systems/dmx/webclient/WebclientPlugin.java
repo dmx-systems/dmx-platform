@@ -1,5 +1,6 @@
 package systems.dmx.webclient;
 
+import static systems.dmx.webclient.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
@@ -106,7 +107,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
-        if (topic.getTypeUri().equals("dmx.webclient.view_config")) {
+        if (topic.getTypeUri().equals(WEBCLIENT_VIEW_CONFIG)) {
             setDefaultConfigTopicLabel(topic);
             updateTypeCacheAndAddDirective(topic);
         }
@@ -225,8 +226,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     private void addDefaultViewConfigTopic(ViewConfigModel viewConfig) {
-        if (viewConfig.getConfigTopic("dmx.webclient.view_config") == null) {
-            viewConfig.addConfigTopic(mf.newTopicModel("dmx.webclient.view_config"));
+        if (viewConfig.getConfigTopic(WEBCLIENT_VIEW_CONFIG) == null) {
+            viewConfig.addConfigTopic(mf.newTopicModel(WEBCLIENT_VIEW_CONFIG));
         }
     }
 

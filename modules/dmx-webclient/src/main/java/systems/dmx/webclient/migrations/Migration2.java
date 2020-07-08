@@ -1,5 +1,6 @@
 package systems.dmx.webclient.migrations;
 
+import static systems.dmx.webclient.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.service.Migration;
@@ -41,11 +42,11 @@ public class Migration2 extends Migration {
         AssocType compDef = dmx.getAssocType(COMPOSITION_DEF);
         compDef.getCompDef(CARDINALITY)
             .getViewConfig()
-                .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");
+                .setConfigValueRef(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_WIDGET, WEBCLIENT_SELECT);
         compDef.getCompDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
             .getViewConfig()
-                .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select")
-                .setConfigValue("dmx.webclient.view_config", "dmx.webclient.clearable", true);
+                .setConfigValueRef(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_WIDGET, WEBCLIENT_SELECT)
+                .setConfigValue(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_CLEARABLE, true);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
