@@ -45,6 +45,7 @@ import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.JavaUtils;
 import systems.dmx.files.FilesService;
 import systems.dmx.files.event.CheckDiskQuota;
+import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.workspaces.WorkspacesService;
 
 // ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
@@ -547,7 +548,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic) {
-        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
+        if (topic.getTypeUri().equals(WORKSPACE)) {
             setWorkspaceOwner(topic);
         }
         setCreatorAndModifier(topic);
@@ -660,7 +661,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private void assignMembershipToWorkspace(Assoc assoc) {
         try {
-            DMXObject workspace = assoc.getDMXObjectByType("dmx.workspaces.workspace");
+            DMXObject workspace = assoc.getDMXObjectByType(WORKSPACE);
             if (workspace == null) {
                 throw new RuntimeException("Assoc " + assoc.getId() + " has no workspace player");
             }

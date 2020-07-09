@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import static systems.dmx.contacts.Constants.*;
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.CompDef;
@@ -1343,7 +1344,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void setupWorkspacesModel() {
-        dmx.createAssocType(mf.newAssocTypeModel("dmx.workspaces.workspace_assignment", "Workspace Assignment", TEXT));
+        dmx.createAssocType(mf.newAssocTypeModel(WORKSPACE_ASSIGNMENT, "Workspace Assignment", TEXT));
     }
 
     // ---

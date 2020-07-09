@@ -1,5 +1,6 @@
 package systems.dmx.workspaces;
 
+import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
@@ -118,9 +119,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     //
                     // 1) create workspace
                     Topic workspace = dmx.createTopic(
-                        mf.newTopicModel(uri, "dmx.workspaces.workspace", mf.newChildTopicsModel()
-                            .set("dmx.workspaces.workspace_name", name)
-                            .setRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
+                        mf.newTopicModel(uri, WORKSPACE, mf.newChildTopicsModel()
+                            .set(WORKSPACE_NAME, name)
+                            .setRef(SHARING_MODE, sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
                     Topic topicmap = topicmapsService.createTopicmap(
@@ -412,7 +413,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void preDeleteTopic(Topic topic) {
-        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
+        if (topic.getTypeUri().equals(WORKSPACE)) {
             long workspaceId = topic.getId();
             deleteWorkspaceContent(workspaceId);
         }
@@ -460,7 +461,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     private void __assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
-        facetsService.updateFacet(object, "dmx.workspaces.workspace_facet",
+        facetsService.updateFacet(object, WORKSPACE_FACET,
             mf.newFacetValueModel("dmx.workspaces.workspace#dmx.workspaces.workspace_assignment").setRef(workspaceId)
         );
         // Note: we are refering to an existing workspace. So we must set a topic *reference* (using setRef()).
@@ -484,7 +485,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void checkAssignmentArgs(DMXObject object, long workspaceId) {
         Topic workspace = dmx.getTopic(workspaceId);
         String typeUri = workspace.getTypeUri();
-        if (!typeUri.equals("dmx.workspaces.workspace")) {
+        if (!typeUri.equals(WORKSPACE)) {
             throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
                 "\")");
         }
@@ -535,12 +536,12 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private boolean isWorkspacePart(Topic topic) {
         String typeUri = topic.getTypeUri();
-        return typeUri.equals("dmx.workspaces.workspace_name") ||
-               typeUri.equals("dmx.workspaces.workspace_description");
+        return typeUri.equals(WORKSPACE_NAME) ||
+               typeUri.equals(WORKSPACE_DESCRIPTION);
     }
 
     private boolean isWorkspaceAssignment(Assoc assoc) {
-        return assoc.getTypeUri().equals("dmx.workspaces.workspace_assignment");
+        return assoc.getTypeUri().equals(WORKSPACE_ASSIGNMENT);
     }
 
     // ---

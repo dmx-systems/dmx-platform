@@ -88,6 +88,7 @@
       }
     ],
     "topics": [
+      // Sharing Modes
       {
         "value":   "Private",
         "uri":     "dmx.workspaces.private",
