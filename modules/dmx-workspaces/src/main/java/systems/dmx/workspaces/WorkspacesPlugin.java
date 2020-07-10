@@ -462,7 +462,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void __assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
         facetsService.updateFacet(object, WORKSPACE_FACET,
-            mf.newFacetValueModel("dmx.workspaces.workspace#dmx.workspaces.workspace_assignment").setRef(workspaceId)
+            mf.newFacetValueModel(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT).setRef(workspaceId)
         );
         // Note: we are refering to an existing workspace. So we must set a topic *reference* (using setRef()).
         //

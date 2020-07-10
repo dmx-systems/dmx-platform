@@ -5,9 +5,9 @@ package systems.dmx.datetime;
 public class Constants {
 
     // Topic Types
+    public static final String DATETIME = "dmx.datetime";
     public static final String DATE     = "dmx.datetime.date";
     public static final String TIME     = "dmx.datetime.time";
-    public static final String DATETIME = "dmx.datetime";
     public static final String MONTH    = "dmx.datetime.month";
     public static final String DAY      = "dmx.datetime.day";
     public static final String YEAR     = "dmx.datetime.year";

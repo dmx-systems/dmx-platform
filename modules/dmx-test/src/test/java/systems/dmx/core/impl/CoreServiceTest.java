@@ -457,14 +457,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             CompDef cd = tt.getCompDef("dmx.test.date#dmx.test.birthday");
             ChildTopics ct = cd.getChildTopics();
             assertEquals(false, ct.getBoolean(INCLUDE_IN_LABEL));
-            assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
+            assertEquals("dmx.test.birthday", ct.getTopic(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE).getUri());
             //
             // 2) set "Include in Label" flag
             cd.update(mf.newChildTopicsModel().set(INCLUDE_IN_LABEL, true));
             //
             // test comp def children *after* set (custom assoc type must not change)
             assertEquals(true, ct.getBoolean(INCLUDE_IN_LABEL));
-            assertEquals("dmx.test.birthday", ct.getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type").getUri());
+            assertEquals("dmx.test.birthday", ct.getTopic(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE).getUri());
             //
             List<String> lc = tt.getLabelConfig();
             assertEquals(1, lc.size());
@@ -508,13 +508,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // set Custom Assoc Type (via comp def)
             dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).update(mf.newChildTopicsModel().setRef(
-                "dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION
+                ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE, ASSOCIATION
             ));
             //
             // get Custom Assoc Type
             Topic assocType = dmx.getTopicType(PLUGIN)
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
-                .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
+                .getTopic(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE);
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated comp defs
             assertEquals(ASSOCIATION, assocType.getUri());
@@ -532,13 +532,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // set Custom Assoc Type (via association)
             long compDefId = dmx.getTopicType(PLUGIN).getCompDef(PLUGIN_NAME).getId();
             dmx.getAssoc(compDefId).update(mf.newChildTopicsModel().setRef(
-                "dmx.core.assoc_type#dmx.core.custom_assoc_type", ASSOCIATION
+                ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE, ASSOCIATION
             ));
             //
             // get Custom Assoc Type
             Topic assocType = dmx.getTopicType(PLUGIN)
                 .getCompDef("dmx.core.plugin_name#dmx.core.association").getChildTopics()
-                .getTopic("dmx.core.assoc_type#dmx.core.custom_assoc_type");
+                .getTopic(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE);
             // Note: the topic type must be re-get as getTopicType() creates
             // a cloned model that doesn't contain the manipulated comp defs
             assertEquals(ASSOCIATION, assocType.getUri());

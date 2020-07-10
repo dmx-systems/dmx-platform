@@ -324,7 +324,7 @@ class TypeStorage {
             // custom assoc type
             RelatedTopicModel customAssocType = fetchCustomAssocType(assoc);
             if (customAssocType != null) {
-                childTopics.set("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);
+                childTopics.set(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE, customAssocType);
             }
             // identity-attr flag
             RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assoc);

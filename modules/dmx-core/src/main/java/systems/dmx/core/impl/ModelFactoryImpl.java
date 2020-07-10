@@ -773,10 +773,9 @@ public class ModelFactoryImpl implements ModelFactory {
         //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                childTopics.setDeletionRef("dmx.core.assoc_type#dmx.core.custom_assoc_type",
-                    delTopicUri(customAssocTypeUri));
+                childTopics.setDeletionRef(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE, delTopicUri(customAssocTypeUri));
             } else {
-                childTopics.setRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocTypeUri);
+                childTopics.setRef(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE, customAssocTypeUri);
             }
         }
         //

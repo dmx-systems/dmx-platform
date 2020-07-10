@@ -55,7 +55,7 @@ public class EventTest extends CoreServiceTestEnvironment {
             assertEquals(1, events.size());
             //
             ChildTopics event = events.get(0).getChildTopics();
-            ChildTopics from = event.getChildTopics("dmx.datetime#dmx.datetime.from");
+            ChildTopics from = event.getChildTopics(DATETIME + "#" + FROM);
             ChildTopics date = from.getChildTopics(DATE);
             ChildTopics time = from.getChildTopics(TIME);
             assertEquals(7,    date.getInt(MONTH));
@@ -113,7 +113,7 @@ public class EventTest extends CoreServiceTestEnvironment {
     private Topic createEvent() {
         return dmx.createTopic(mf.newTopicModel(EVENT, mf.newChildTopicsModel()
             .set(EVENT_NAME, "Release Party")
-            .set("dmx.datetime#dmx.datetime.from", mf.newChildTopicsModel()
+            .set(DATETIME + "#" + FROM, mf.newChildTopicsModel()
                 .set(DATE, mf.newChildTopicsModel()
                     .set(MONTH, 7)   // July
                     .set(DAY,   1)   // 1st

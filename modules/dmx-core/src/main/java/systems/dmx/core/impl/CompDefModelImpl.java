@@ -214,7 +214,7 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private TopicModelImpl getCustomAssocType() {
-        return getChildTopics().getTopicOrNull("dmx.core.assoc_type#dmx.core.custom_assoc_type");
+        return getChildTopics().getTopicOrNull(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE);
     }
 
     private String defaultInstanceLevelAssocTypeUri() {

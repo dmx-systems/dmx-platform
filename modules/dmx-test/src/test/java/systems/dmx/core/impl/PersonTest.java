@@ -60,7 +60,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             ChildTopics children = persons.get(0).getChildTopics();
             assertEquals("Dave Stauges", children.getString(PERSON_NAME));
             assertEquals("Parkstr. 3 13187 Berlin Germany",
-                                         children.getTopics("dmx.contacts.address#dmx.contacts.address_entry")
+                                         children.getTopics(ADDRESS + "#" + ADDRESS_ENTRY)
                                             .get(0).getSimpleValue().toString());
             //
             tx.success();
@@ -220,7 +220,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
         try {
             definePersonModel();
             Topic person = createPerson();
-            Topic address = person.getChildTopics().getTopics("dmx.contacts.address#dmx.contacts.address_entry").get(0);
+            Topic address = person.getChildTopics().getTopics(ADDRESS + "#" + ADDRESS_ENTRY).get(0);
             // this looks like we override "Berlin" with "Hamburg"
             address.update(mf.newChildTopicsModel().set(CITY, "Hamburg"));
             // ... BUT the original address is unchanged
@@ -505,12 +505,12 @@ public class PersonTest extends CoreServiceTestEnvironment {
             .set(PERSON_NAME, mf.newChildTopicsModel()
                 .set(FIRST_NAME, "Dave")
                 .set(LAST_NAME,  "Stauges"))
-            .set("dmx.datetime.date#dmx.contacts.date_of_birth", mf.newChildTopicsModel()
+            .set(DATE + "#" + DATE_OF_BIRTH, mf.newChildTopicsModel()
                 .set(MONTH,      5)  // May
                 .set(DAY,        1)  // 1st
                 .set(YEAR,       1972))
             .add(EMAIL_ADDRESS, "me@example.com")
-            .add("dmx.contacts.address#dmx.contacts.address_entry", mf.newChildTopicsModel()
+            .add(ADDRESS + "#" + ADDRESS_ENTRY, mf.newChildTopicsModel()
                 .set(STREET,      "Parkstr. 3")
                 .set(POSTAL_CODE, "13187")
                 .set(CITY,        "Berlin")
