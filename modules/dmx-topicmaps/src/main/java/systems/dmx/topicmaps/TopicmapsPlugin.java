@@ -364,9 +364,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                       @PathParam("zoom") double zoom) {
         try {
             mf.newViewProps()
-                .set(TOPICMAP_PAN_X, panX)
-                .set(TOPICMAP_PAN_Y, panY)
-                .set(TOPICMAP_ZOOM, zoom)
+                .set(PAN_X, panX)
+                .set(PAN_Y, panY)
+                .set(ZOOM, zoom)
                 .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
             throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed, panX=" + panX +
@@ -491,15 +491,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private ViewProps fetchTopicmapViewProps(Topic topicmapTopic) {
         return mf.newViewProps()
-            .set(TOPICMAP_PAN_X, topicmapTopic.getProperty(TOPICMAP_PAN_X))
-            .set(TOPICMAP_PAN_Y, topicmapTopic.getProperty(TOPICMAP_PAN_Y))
-            .set(TOPICMAP_ZOOM,  topicmapTopic.getProperty(TOPICMAP_ZOOM));
+            .set(PAN_X, topicmapTopic.getProperty(PAN_X))
+            .set(PAN_Y, topicmapTopic.getProperty(PAN_Y))
+            .set(ZOOM,  topicmapTopic.getProperty(ZOOM));
     }
 
     private ViewProps fetchTopicViewProps(Assoc topicmapContext) {
         return mf.newViewProps(
-            (Integer) topicmapContext.getProperty(TOPICMAP_X),
-            (Integer) topicmapContext.getProperty(TOPICMAP_Y),
+            (Integer) topicmapContext.getProperty(X),
+            (Integer) topicmapContext.getProperty(Y),
             visibility(topicmapContext),
             pinned(topicmapContext)
         );
@@ -513,11 +513,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private boolean visibility(Assoc topicmapContext) {
-        return (Boolean) topicmapContext.getProperty(TOPICMAP_VISIBILITY);
+        return (Boolean) topicmapContext.getProperty(VISIBILITY);
     }
 
     private boolean pinned(Assoc topicmapContext) {
-        return (Boolean) topicmapContext.getProperty(TOPICMAP_PINNED);
+        return (Boolean) topicmapContext.getProperty(PINNED);
     }
 
     // --- Update Visibility ---
@@ -529,7 +529,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             autoRevealAssocs(topic, topicmapId);
         } else {
             autoHideAssocs(topic, topicmapId);
-            viewProps.set(TOPICMAP_PINNED, false);      // hide implies unpin
+            viewProps.set(PINNED, false);      // hide implies unpin
         }
         // update DB
         viewProps.store(topicmapContext);

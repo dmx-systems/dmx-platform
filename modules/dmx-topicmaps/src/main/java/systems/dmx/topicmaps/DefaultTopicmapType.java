@@ -17,9 +17,9 @@ class DefaultTopicmapType implements TopicmapType {
     @Override
     public void initTopicmapState(Topic topicmapTopic, ViewProps viewProps, CoreService dmx) {
         dmx.getModelFactory().newViewProps()
-            .set(TOPICMAP_PAN_X, 0)
-            .set(TOPICMAP_PAN_Y, 0)
-            .set(TOPICMAP_ZOOM, 1.0)
+            .set(PAN_X, 0)
+            .set(PAN_Y, 0)
+            .set(ZOOM, 1.0)
             .store(topicmapTopic);
     }
 }
