@@ -50,7 +50,7 @@ public class Migration3 extends Migration {
             // endless recursion while fetching that type. Fetching a type involves fetching its view config, that is
             // all its view config topics, including their child topics. Fetching child topics is driven by the topic's
             // type (its comp defs), here: "View Configuration" -- the one we're fetching just now.
-            if (type.getUri().equals(WEBCLIENT_VIEW_CONFIG)) {
+            if (type.getUri().equals(VIEW_CONFIG)) {
                 continue;
             }
             //
@@ -61,10 +61,10 @@ public class Migration3 extends Migration {
     private void repair(DMXType type, int i) {
         try {
             ViewConfig viewConfig = type.getViewConfig();
-            Topic configTopic = viewConfig.getConfigTopic(WEBCLIENT_VIEW_CONFIG);
+            Topic configTopic = viewConfig.getConfigTopic(VIEW_CONFIG);
             if (configTopic == null) {
                 // 1) create config topic
-                configTopic = viewConfig.addConfigTopic(mf.newTopicModel(WEBCLIENT_VIEW_CONFIG));
+                configTopic = viewConfig.addConfigTopic(mf.newTopicModel(VIEW_CONFIG));
                 //
                 // 2) assign workspace
                 // In case of a CLEAN_INSTALL the DMX workspace does not yet exist. The config topic gets its

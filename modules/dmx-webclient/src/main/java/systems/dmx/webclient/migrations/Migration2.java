@@ -42,11 +42,11 @@ public class Migration2 extends Migration {
         AssocType compDef = dmx.getAssocType(COMPOSITION_DEF);
         compDef.getCompDef(CARDINALITY)
             .getViewConfig()
-                .setConfigValueRef(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_WIDGET, WEBCLIENT_SELECT);
+                .setConfigValueRef(VIEW_CONFIG, WIDGET, SELECT);
         compDef.getCompDef(ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE)
             .getViewConfig()
-                .setConfigValueRef(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_WIDGET, WEBCLIENT_SELECT)
-                .setConfigValue(WEBCLIENT_VIEW_CONFIG, WEBCLIENT_CLEARABLE, true);
+                .setConfigValueRef(VIEW_CONFIG, WIDGET, SELECT)
+                .setConfigValue(VIEW_CONFIG, CLEARABLE, true);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -60,6 +60,6 @@ public class Migration2 extends Migration {
     }
 
     private void addBackgroundColorToAssocType(String assocTypeUri, String color) {
-        setAssocTypeViewConfigValue(assocTypeUri, "color#" + WEBCLIENT_BACKGROUND_COLOR, color);
+        setAssocTypeViewConfigValue(assocTypeUri, "color#" + BACKGROUND_COLOR, color);
     }
 }

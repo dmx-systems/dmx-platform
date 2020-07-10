@@ -107,7 +107,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
-        if (topic.getTypeUri().equals(WEBCLIENT_VIEW_CONFIG)) {
+        if (topic.getTypeUri().equals(VIEW_CONFIG)) {
             setDefaultConfigTopicLabel(topic);
             updateTypeCacheAndAddDirective(topic);
         }
@@ -226,8 +226,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     private void addDefaultViewConfigTopic(ViewConfigModel viewConfig) {
-        if (viewConfig.getConfigTopic(WEBCLIENT_VIEW_CONFIG) == null) {
-            viewConfig.addConfigTopic(mf.newTopicModel(WEBCLIENT_VIEW_CONFIG));
+        if (viewConfig.getConfigTopic(VIEW_CONFIG) == null) {
+            viewConfig.addConfigTopic(mf.newTopicModel(VIEW_CONFIG));
         }
     }
 
