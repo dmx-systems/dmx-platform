@@ -93,6 +93,11 @@ public interface AccessControlService {
      */
     Topic getPrivateWorkspace();
 
+    /**
+     * @return      <code>true</code> if the requesting user is a DMX admin, <code>false</code> otherwise.
+     */
+    boolean isAdmin();
+
 
 
     // === User Accounts ===
@@ -109,7 +114,7 @@ public interface AccessControlService {
 
     /**
      * Creates an user account.
-     * This is a privileged method. No permission is checked.
+     * This is a privileged method. No permissions are checked.
      * <p>
      * Note: this method is <i>not</i> RESTful.
      *

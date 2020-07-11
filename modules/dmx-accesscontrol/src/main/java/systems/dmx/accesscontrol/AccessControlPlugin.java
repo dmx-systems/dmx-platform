@@ -222,6 +222,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getPrivilegedAccess().getPrivateWorkspace(username);
     }
 
+    // TODO: make it RESTful?
+    @Override
+    public boolean isAdmin() {
+        return hasPermission(getUsername(), Operation.WRITE, getAdminWorkspaceId());
+    }
+
 
 
     // === User Accounts ===
@@ -369,6 +375,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    // TODO: drop it from service and make isAdmin() RESTful instead?
     @GET
     @Path("/workspace/admin/id")
     @Override
