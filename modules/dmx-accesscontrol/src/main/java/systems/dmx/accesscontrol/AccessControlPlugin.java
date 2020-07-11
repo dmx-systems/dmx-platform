@@ -237,42 +237,45 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Transactional
     @Override
     public Topic createUserAccount(Credentials cred) {
-        return _createUserAccount(cred);
-    }
-
-    @Override
-    public Topic _createUserAccount(final Credentials cred) {
         try {
-            String username = cred.username;
-            PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            logger.info("Creating user account \"" + username + "\"");
-            //
-            // 1) create Username topic and private workspace
-            final Topic usernameTopic = createUsername(username);
-            //
-            // 2) create User Account
-            // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
-            // special assignments. See step 3) below.
-            Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
-                @Override
-                public Topic call() {
-                    return dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
-                        .setRef(USERNAME, usernameTopic.getId())
-                        .set(PASSWORD, cred.password)));
-                }
-            });
-            // 3) assign user account and password to private workspace
-            // Note: the current user has no READ access to the private workspace just created.
-            // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
-            Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
-            long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
-            pa.assignToWorkspace(userAccount, privateWorkspaceId);
-            pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
-            //
-            return usernameTopic;
+            if (!isAdmin()) {
+                throw new RuntimeException(userInfo(getUsername()) + " is not a DMX admin");
+            }
+            return _createUserAccount(cred);
         } catch (Exception e) {
             throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
         }
+    }
+
+    @Override
+    public Topic _createUserAccount(final Credentials cred) throws Exception {
+        String username = cred.username;
+        PrivilegedAccess pa = dmx.getPrivilegedAccess();
+        logger.info("Creating user account \"" + username + "\"");
+        //
+        // 1) create Username topic and private workspace
+        final Topic usernameTopic = createUsername(username);
+        //
+        // 2) create User Account
+        // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
+        // special assignments. See step 3) below.
+        Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            @Override
+            public Topic call() {
+                return dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
+                    .setRef(USERNAME, usernameTopic.getId())
+                    .set(PASSWORD, cred.password)));
+            }
+        });
+        // 3) assign user account and password to private workspace
+        // Note: the current user has no READ access to the private workspace just created.
+        // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
+        Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
+        long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
+        pa.assignToWorkspace(userAccount, privateWorkspaceId);
+        pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
+        //
+        return usernameTopic;
     }
 
     @Override

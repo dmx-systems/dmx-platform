@@ -120,7 +120,7 @@ public interface AccessControlService {
      *
      * @return  The "Username" topic of the created user account.
      */
-    Topic _createUserAccount(Credentials cred);
+    Topic _createUserAccount(Credentials cred) throws Exception;        // TODO: don't throw checked ex
 
     /**
      * Creates a Username topic and a private workspace.
