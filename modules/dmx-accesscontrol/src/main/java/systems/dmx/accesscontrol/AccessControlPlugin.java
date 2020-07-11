@@ -230,7 +230,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/user_account")
     @Transactional
     @Override
-    public Topic createUserAccount(final Credentials cred) {
+    public Topic createUserAccount(Credentials cred) {
+        return _createUserAccount(cred);
+    }
+
+    @Override
+    public Topic _createUserAccount(final Credentials cred) {
         try {
             String username = cred.username;
             PrivilegedAccess pa = dmx.getPrivilegedAccess();

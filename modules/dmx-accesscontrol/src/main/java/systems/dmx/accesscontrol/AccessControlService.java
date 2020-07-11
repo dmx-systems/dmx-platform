@@ -98,9 +98,24 @@ public interface AccessControlService {
     // === User Accounts ===
 
     /**
+     * Checks user's permission and, if granted, creates an user account.
+     * Only DMX admins are allowed to create user accounts.
+     *
+     * @throws  RuntimeException    if the requesting user is not a DMX admin.
+     *
      * @return  The "Username" topic of the created user account.
      */
     Topic createUserAccount(Credentials cred);
+
+    /**
+     * Creates an user account.
+     * This is a privileged method. No permission is checked.
+     * <p>
+     * Note: this method is <i>not</i> RESTful.
+     *
+     * @return  The "Username" topic of the created user account.
+     */
+    Topic _createUserAccount(Credentials cred);
 
     /**
      * Creates a Username topic and a private workspace.
