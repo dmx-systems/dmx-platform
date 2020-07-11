@@ -49,7 +49,7 @@ public class Credentials {
             this.username = cred.getString("username");
             this.password = cred.getString("password");
         } catch (Exception e) {
-            throw new IllegalArgumentException("Illegal JSON argument " + cred, e);
+            throw new IllegalArgumentException("Illegal credentials: " + cred, e);
         }
     }
 

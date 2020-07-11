@@ -123,11 +123,11 @@ public interface PrivilegedAccess {
     // === Workspaces / Memberships ===
 
     /**
-     * Returns a workspace by URI.
+     * Fetches a Workspace topic by URI.
      * <p>
-     * This is a privileged method: it works also if the current user has no READ permission for the workspace.
+     * This is a privileged method: it works even if the current user has no READ permission for the workspace.
      *
-     * @return  The workspace (a topic of type "Workspace").
+     * @return  The Workspace topic.
      *
      * @throws  RuntimeException    if no workspace exists for the given URI.
      */

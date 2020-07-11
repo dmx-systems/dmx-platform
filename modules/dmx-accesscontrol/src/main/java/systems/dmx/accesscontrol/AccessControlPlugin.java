@@ -236,10 +236,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             PrivilegedAccess pa = dmx.getPrivilegedAccess();
             logger.info("Creating user account \"" + username + "\"");
             //
-            // 1) create username topic and a private workspace
+            // 1) create Username topic and private workspace
             final Topic usernameTopic = createUsername(username);
             //
-            // 2) create user account
+            // 2) create User Account
             // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
             // special assignments. See step 3) below.
             Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {

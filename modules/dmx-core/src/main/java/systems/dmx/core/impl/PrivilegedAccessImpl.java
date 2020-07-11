@@ -63,8 +63,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ### TODO: copy in Credentials.java
     private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
 
-    private long systemWorkspaceId = -1;    // initialized lazily
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // used for workspace assignment suppression
@@ -72,6 +70,10 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private AccessLayer al;
     private ModelFactoryImpl mf;
+
+    private long dmxWorkspaceId    = -1;    // initialized lazily
+    private long adminWorkspaceId  = -1;    // initialized lazily
+    private long systemWorkspaceId = -1;    // initialized lazily
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -278,38 +280,31 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public Topic getWorkspace(String uri) {
-        TopicModelImpl workspace = al.sd.fetchTopic("uri", uri);
-        if (workspace == null) {
-            throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
-        }
-        return workspace.instantiate();
+        return _getWorkspace(uri).instantiate();
     }
 
     // ---
 
     @Override
     public long getDMXWorkspaceId() {
-        return getWorkspace(DMX_WORKSPACE_URI).getId();
+        if (dmxWorkspaceId == -1) {
+            dmxWorkspaceId = _getWorkspace(DMX_WORKSPACE_URI).getId();
+        }
+        return dmxWorkspaceId;
     }
 
     @Override
     public long getAdministrationWorkspaceId() {
-        return getWorkspace(ADMINISTRATION_WORKSPACE_URI).getId();
+        if (adminWorkspaceId == -1) {
+            adminWorkspaceId = _getWorkspace(ADMINISTRATION_WORKSPACE_URI).getId();
+        }
+        return adminWorkspaceId;
     }
 
     @Override
     public long getSystemWorkspaceId() {
         if (systemWorkspaceId == -1) {
-            // Note: fetching the System workspace topic though the Core service would involve a permission check
-            // and run in a vicious circle. So direct storage access is required here.
-            TopicModel workspace = al.sd.fetchTopic("uri", SYSTEM_WORKSPACE_URI);
-            // Note: the Access Control plugin creates the System workspace before it performs its first permission
-            // check.
-            if (workspace == null) {
-                throw new RuntimeException("The System workspace does not exist");
-            }
-            //
-            systemWorkspaceId = workspace.getId();
+            systemWorkspaceId = _getWorkspace(SYSTEM_WORKSPACE_URI).getId();
         }
         return systemWorkspaceId;
     }
@@ -628,6 +623,25 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             }
         }
         return topics;
+    }
+
+    /**
+     * Fetches a workspace topic by URI.
+     */
+    private TopicModelImpl _getWorkspace(String uri) {
+        // Note: fetching Admin/System workspace topic though the Core service would involve a permission check
+        // and run in a vicious circle. So direct storage access is required here.
+        TopicModelImpl workspace = al.sd.fetchTopic("uri", uri);
+        // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
+        if (workspace == null) {
+            throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
+        }
+        if (!workspace.getTypeUri().equals("dmx.workspaces.workspace")) {
+            throw new RuntimeException("Topic \"" + uri + "\" is not a workspace but a \"" + workspace.getTypeUri() +
+                "\"");
+        }
+        //
+        return workspace;
     }
 
 

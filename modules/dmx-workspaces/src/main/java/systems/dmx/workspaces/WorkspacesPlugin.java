@@ -108,7 +108,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public Topic createWorkspace(@QueryParam("name") final String name, @QueryParam("uri") final String uri,
                                  @QueryParam("sharing_mode_uri") final SharingMode sharingMode) {
         final String operation = "Creating workspace \"" + name + "\" ";
-        final String info = "(uri=\"" + uri + "\", sharingMode=" + sharingMode + ")";
+        final String info = "(uri=" + uri + ", sharingMode=" + sharingMode + ")";
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
@@ -435,7 +435,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns the ID of the DMX workspace or -1 to signal abortion of type introduction.
      */
     private long workspaceIdForType(DMXType type) {
-        return workspaceId() == -1 && isDMXStandardType(type) ? getDMXWorkspace().getId() : -1;
+        return workspaceId() == -1 && isDMXStandardType(type) ? getDMXWorkspaceId() : -1;
     }
 
     // ---
@@ -547,10 +547,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     /**
-     * Returns the DMX workspace or throws an exception if it doesn't exist.
+     * Returns the ID of the DMX workspace or throws an exception if it doesn't exist.
      */
-    private Topic getDMXWorkspace() {
-        return getWorkspace(DMX_WORKSPACE_URI);
+    private long getDMXWorkspaceId() {
+        return dmx.getPrivilegedAccess().getDMXWorkspaceId();
     }
 
     private void applyWorkspaceFilter(Iterator<? extends DMXObject> objects, long workspaceId) {

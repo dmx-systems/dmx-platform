@@ -33,6 +33,9 @@ public interface WorkspacesService {
     /**
      * Returns a workspace by URI.
      *
+     * This is a privileged method: READ permission for the workspace is not required.
+     * ### TODO: why is this a privileged method?
+     *
      * @return  The workspace (a topic of type "Workspace").
      *
      * @throws  RuntimeException    If no workspace exists for the given URI.
