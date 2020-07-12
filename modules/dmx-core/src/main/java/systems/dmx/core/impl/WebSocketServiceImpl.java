@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
-import systems.dmx.core.service.WebSocketsService;
+import systems.dmx.core.service.websocket.WebSocketService;
 import systems.dmx.core.util.JavaUtils;
 
 import org.eclipse.jetty.server.Connector;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 
 
-public class WebSocketsServiceImpl implements WebSocketsService {
+public class WebSocketServiceImpl implements WebSocketService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -42,13 +42,13 @@ public class WebSocketsServiceImpl implements WebSocketsService {
     // ----------------------------------------------------------------------------------------------------- Constructor
 
     // ### TODO: inject event manager only 
-    WebSocketsServiceImpl(CoreService dmx) {
+    WebSocketServiceImpl(CoreService dmx) {
         this.dmx = dmx;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** WebSocketsService ***
+    // *** WebSocketService ***
 
     @Override
     public void messageToAll(String pluginUri, String message) {
@@ -77,7 +77,7 @@ public class WebSocketsServiceImpl implements WebSocketsService {
     // ---
 
     @Override
-    public String getWebSocketsURL() {
+    public String getWebSocketURL() {
         return WEBSOCKETS_URL;
     }
 

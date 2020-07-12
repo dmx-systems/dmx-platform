@@ -9,7 +9,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
-import systems.dmx.core.service.WebSocketsService;
+import systems.dmx.core.service.websocket.WebSocketService;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -52,7 +52,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EventManager em;
-    private WebSocketsService ws;
+    private WebSocketService ws;
 
     @Context
     private HttpServletRequest request;
@@ -61,7 +61,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EventManager em, WebSocketsService ws) {
+    JerseyResponseFilter(EventManager em, WebSocketService ws) {
         this.em = em;
         this.ws = ws;
     }

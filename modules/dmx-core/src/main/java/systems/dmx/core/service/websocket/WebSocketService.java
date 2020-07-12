@@ -1,10 +1,10 @@
-package systems.dmx.core.service;
+package systems.dmx.core.service.websocket;
 
 import javax.servlet.http.HttpServletRequest;
 
 
 
-public interface WebSocketsService {
+public interface WebSocketService {
 
     void messageToAll(String pluginUri, String message);
 
@@ -16,5 +16,5 @@ public interface WebSocketsService {
 
     // ---
 
-    String getWebSocketsURL();
+    String getWebSocketURL();
 }

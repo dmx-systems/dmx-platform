@@ -489,7 +489,7 @@ public class WebservicePlugin extends PluginActivator {
             @Override
             public JSONObject toJSON() {
                 try {
-                    return new JSONObject().put("dmx.websockets.url", dmx.getWebSocketsService().getWebSocketsURL());
+                    return new JSONObject().put("dmx.websockets.url", dmx.getWebSocketService().getWebSocketURL());
                 } catch (JSONException e) {
                     throw new RuntimeException("Serializing the WebSockets configuration failed", e);
                 }
@@ -612,7 +612,7 @@ public class WebservicePlugin extends PluginActivator {
         }
 
         private void messageToAllButOne(JSONObject message) {
-            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+            dmx.getWebSocketService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

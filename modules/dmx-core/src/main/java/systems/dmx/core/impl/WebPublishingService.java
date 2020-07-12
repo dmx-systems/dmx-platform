@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
-import systems.dmx.core.service.WebSocketsService;
+import systems.dmx.core.service.websocket.WebSocketService;
 import systems.dmx.core.util.JavaUtils;
 import systems.dmx.core.util.UniversalExceptionMapper;
 
@@ -60,7 +60,7 @@ class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(AccessLayer al, WebSocketsService ws) {
+    WebPublishingService(AccessLayer al, WebSocketService ws) {
         try {
             logger.info("Setting up the WebPublishingService");
             this.al = al;

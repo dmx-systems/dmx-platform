@@ -125,7 +125,7 @@ class Messenger {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void messageToAllButOne(JSONObject message) {
-        context.getCoreService().getWebSocketsService().messageToAllButOne(
+        context.getCoreService().getWebSocketService().messageToAllButOne(
             context.getRequest(), pluginUri, message.toString()
         );
     }

@@ -13,6 +13,7 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
+import systems.dmx.core.service.websocket.WebSocketService;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
 import java.util.List;
@@ -362,7 +363,7 @@ public interface CoreService {
 
     PrivilegedAccess getPrivilegedAccess();
 
-    WebSocketsService getWebSocketsService();
+    WebSocketService getWebSocketService();
 
     Object getDatabaseVendorObject();
 }

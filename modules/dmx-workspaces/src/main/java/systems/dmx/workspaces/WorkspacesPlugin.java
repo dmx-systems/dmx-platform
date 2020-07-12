@@ -622,7 +622,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // ---
 
         private void messageToAllButOne(JSONObject message) {
-            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+            dmx.getWebSocketService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }
