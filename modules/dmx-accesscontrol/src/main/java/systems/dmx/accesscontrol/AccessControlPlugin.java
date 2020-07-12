@@ -222,10 +222,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getPrivilegedAccess().getPrivateWorkspace(username);
     }
 
-    // TODO: make it RESTful?
     @Override
-    public boolean isAdmin() {
-        return hasPermission(getUsername(), Operation.WRITE, getAdminWorkspaceId());
+    public void checkAdmin() {
+        checkWriteAccess(getAdminWorkspaceId());
     }
 
 
@@ -238,9 +237,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public Topic createUserAccount(Credentials cred) {
         try {
-            if (!isAdmin()) {
-                throw new RuntimeException(userInfo(getUsername()) + " is not a DMX admin");
-            }
+            checkAdmin();
             return _createUserAccount(cred);
         } catch (Exception e) {
             throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
@@ -378,7 +375,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    // TODO: drop it from service and make isAdmin() RESTful instead?
     @GET
     @Path("/workspace/admin/id")
     @Override
@@ -950,8 +946,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         checkAccess(Operation.WRITE, objectId);
     }
 
-    // ---
-
     /**
      * @param   objectId    a topic ID, or an association ID
      */
@@ -970,7 +964,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks if a user is permitted to perform an operation on an object (topic or association).
+     * Calculates the permission for a user to perform an operation on an object (topic or association).
+     *
+     * This is a low-level method. It does not grant permission to "System".
+     * Consider the high-level checkReadAccess()/checkWriteAccess() methods instead.
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
      * @param   objectId    a topic ID, or an association ID.

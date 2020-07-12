@@ -94,9 +94,12 @@ public interface AccessControlService {
     Topic getPrivateWorkspace();
 
     /**
-     * @return      <code>true</code> if the requesting user is a DMX admin, <code>false</code> otherwise.
+     * Checks if the current user is a DMX admin, and throws AccessControlException if not.
+     * Note: if invoked as "system" AccessControlException is not thrown.
+     *
+     * @throws  AccessControlException  if the current user is not a DMX admin.
      */
-    boolean isAdmin();
+    void checkAdmin();
 
 
 
