@@ -682,7 +682,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    // --- Disk quota ---
+    // --- Disk Quota ---
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
@@ -705,15 +705,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             "\n      ##### " + info(request.getSession(false)));    // create=false
         // 1) apply subnet filter
         checkRequestOrigin(request);        // throws WebApplicationException 403 Forbidden
-        // 2) create session (if not yet created)
-        HttpSession session = request.getSession();
+        // 2) create session (if needed)
+        HttpSession session = getSession(request);
         // 3) check authorization (if not yet logged in)
         if (username(session) == null) {
             checkAuthorization(request);    // throws WebApplicationException 401 Unauthorized
         }
     }
 
-    // ---
+    private HttpSession getSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            session = request.getSession();
+            logger.info("### Creating " + info(session));
+        }
+        return session;
+    }
 
     private void checkRequestOrigin(HttpServletRequest request) {
         String remoteAddr = request.getRemoteAddr();

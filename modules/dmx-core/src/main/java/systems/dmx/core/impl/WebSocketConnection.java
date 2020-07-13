@@ -5,6 +5,8 @@ import systems.dmx.core.service.CoreService;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocket.Connection;
 
+import javax.servlet.http.HttpSession;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,24 +22,27 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    String pluginUri;
-    String clientId;
+            String pluginUri;
+            String clientId;
+            HttpSession session;
+    private WebSocketConnectionPool pool;
+    private CoreService dmx;
 
     /**
      * The underlying Jetty WebSocket connection.
      */
     private Connection connection;
 
-    private WebSocketConnectionPool pool;
-    private CoreService dmx;
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    WebSocketConnection(String pluginUri, String clientId, WebSocketConnectionPool pool, CoreService dmx) {
+    WebSocketConnection(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
+                                                                                CoreService dmx) {
+        logger.info("### Associating WebSocket connection (client ID " + clientId + ") with " + info(session));
         this.pluginUri = pluginUri;
         this.clientId = clientId;
+        this.session = session;
         this.pool = pool;
         this.dmx = dmx;
     }
@@ -89,5 +94,18 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
             pool.remove(this);
             logger.log(Level.SEVERE, "Sending message via " + this + " failed -- connection removed", e);
         }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // === Logging ===
+
+    private String info(HttpSession session) {
+        return "session" + (session != null ? " " + session.getId() +
+            " (username=" + username(session) + ")" : ": null");
+    }
+
+    private String username(HttpSession session) {
+        return dmx.getPrivilegedAccess().username(session);
     }
 }
