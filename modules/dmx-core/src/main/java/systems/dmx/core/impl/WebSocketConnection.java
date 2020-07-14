@@ -39,12 +39,13 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     WebSocketConnection(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
                                                                                 CoreService dmx) {
-        logger.info("### Associating WebSocket connection (client ID " + clientId + ") with " + info(session));
         this.pluginUri = pluginUri;
         this.clientId = clientId;
         this.session = session;
         this.pool = pool;
         this.dmx = dmx;
+        // Note: info(session) relies on "dmx"
+        logger.info("### Associating WebSocket connection (client ID " + clientId + ") with " + info(session));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
