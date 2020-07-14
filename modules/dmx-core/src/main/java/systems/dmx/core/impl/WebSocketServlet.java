@@ -61,11 +61,10 @@ public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServl
     }
 
     private HttpSession session(HttpServletRequest request) {
-        logger.info("request=" + JavaUtils.requestDump(request));
+        // logger.info("request=" + JavaUtils.requestDump(request));
         HttpSession session = request.getSession(false);
         if (session == null) {
-            // FIXME
-            // throw new RuntimeException("No (valid) session associated with upgrade request");
+            throw new RuntimeException("No (valid) session associated with upgrade request");
         }
         return session;
     }
