@@ -4,6 +4,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.accesscontrol.Operation;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -34,6 +35,7 @@ class Messenger {
 
     void newTopicmap(Topic topicmapTopic) {
         try {
+            // FIXME: per connection check read access
             sendToAllButOrigin(new JSONObject()
                 .put("type", "newTopicmap")
                 .put("args", new JSONObject()
@@ -48,12 +50,12 @@ class Messenger {
     void addTopicToTopicmap(long topicmapId, ViewTopic topic) {
         try {
             // FIXME: per connection check read access
-            sendToAllButOrigin(new JSONObject()
+            sendToAuthorized(new JSONObject()
                 .put("type", "addTopicToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
                     .put("viewTopic", topic.toJSON())
-                )
+                ), topic.getId()
             );
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error while sending a \"addTopicToTopicmap\" message:", e);
@@ -63,12 +65,12 @@ class Messenger {
     void addAssocToTopicmap(long topicmapId, ViewAssoc assoc) {
         try {
             // FIXME: per connection check read access
-            sendToAllButOrigin(new JSONObject()
+            sendToAuthorized(new JSONObject()
                 .put("type", "addAssocToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
                     .put("viewAssoc", assoc.toJSON())
-                )
+                ), assoc.getId()
             );
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error while sending a \"addAssocToTopicmap\" message:", e);
@@ -127,5 +129,13 @@ class Messenger {
 
     private void sendToAllButOrigin(JSONObject message) {
         dmx.getWebSocketService().sendToAllButOrigin(message.toString());
+    }
+
+    private void sendToAuthorized(JSONObject message, long objectId) {
+        dmx.getWebSocketService().sendToSome(message.toString(), conn -> {
+            boolean isReadable = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " -> " + isReadable);
+            return isReadable;
+        });
     }
 }

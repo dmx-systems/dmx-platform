@@ -28,7 +28,7 @@ class WebSocketConnectionPool {
     WebSocketConnectionImpl getConnection(String clientId) {
         WebSocketConnectionImpl connection = pool.get(clientId);
         if (connection == null) {
-            logger.warning("No open WebSocket connection for client ID " + clientId);
+            logger.warning("No WebSocket connection open for client ID " + clientId);
         }
         return connection;
     }

@@ -39,6 +39,9 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
+    /**
+     * @param   session     not null
+     */
     WebSocketConnectionImpl(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
                                                                                     CoreService dmx) {
         this.pluginUri = pluginUri;
@@ -57,6 +60,11 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
     @Override
     public String getClientId() {
         return clientId;
+    }
+
+    @Override
+    public String getUsername() {
+        return username(session);
     }
 
     // *** WebSocket ***
