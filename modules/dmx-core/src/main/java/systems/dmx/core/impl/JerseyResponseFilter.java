@@ -203,7 +203,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         JSONObject message = new JSONObject()
             .put("type", "processDirectives")
             .put("args", directives.toJSONArray());
-        wss.messageToAllButOne(request, "systems.dmx.webclient", message.toString());
+        wss.sendToAllButOrigin(message.toString());
+        // FIXME: don't send update directives to unauthorized parties
     }
 
 

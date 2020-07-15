@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.websocket.WebSocketConnection;
 import systems.dmx.core.service.websocket.WebSocketService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,27 +45,26 @@ public class WebSocketServiceImpl implements WebSocketService {
     // *** WebSocketService ***
 
     @Override
-    public void messageToAll(String pluginUri, String message) {
-        broadcast(pluginUri, message, null);    // exclude=null
-    }
-
-    @Override
-    public void messageToAllButOne(HttpServletRequest request, String pluginUri, String message) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is null");
-        }
-        broadcast(pluginUri, message, getConnection(pluginUri));
-    }
-
-    @Override
-    public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is null");
-        }
-        WebSocketConnection connection = getConnection(pluginUri);
+    public void sendToOrigin(String message) {
+        WebSocketConnectionImpl connection = getConnection();
         if (connection != null) {
             queueMessage(connection, message);
         }
+    }
+
+    @Override
+    public void sendToAll(String message) {
+        broadcast(message, conn -> true);
+    }
+
+    @Override
+    public void sendToAllButOrigin(String message) {
+        broadcast(message, conn -> !conn.getClientId().equals(clientId()));
+    }
+
+    @Override
+    public void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter) {
+        broadcast(message, connectionFilter);
     }
 
     // ---
@@ -107,30 +108,19 @@ public class WebSocketServiceImpl implements WebSocketService {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * @return  the WebSocket connection that is associated with the current request (based on its "dmx_client_id"
-     *          cookie), or null if no such cookie exists or if called outside request scope (e.g. while system
-     *          startup).
+     * @return  the WebSocket connection that is associated with the current request (based on "dmx_client_id" cookie),
+     *          or null if no such cookie exists or if called outside request scope (e.g. while system startup).
      */
-    private WebSocketConnection getConnection(String pluginUri) {
+    private WebSocketConnectionImpl getConnection() {
         String clientId = clientId();
-        return clientId != null ? pool.getConnection(pluginUri, clientId) : null;
+        return clientId != null ? pool.getConnection(clientId) : null;
     }
 
-    /**
-     * @param   exclude     may be null
-     */
-    private void broadcast(String pluginUri, String message, WebSocketConnection exclude) {
-        Collection<WebSocketConnection> connections = pool.getConnections(pluginUri);
-        if (connections != null) {
-            for (WebSocketConnection connection : connections) {
-                if (connection != exclude) {
-                    queueMessage(connection, message);
-                }
-            }
-        }
+    private void broadcast(String message, Predicate<WebSocketConnection> connectionFilter) {
+        pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> queueMessage(conn, message));
     }
 
-    private void queueMessage(WebSocketConnection connection, String message) {
+    private void queueMessage(WebSocketConnectionImpl connection, String message) {
         worker.queueMessage(connection, message);
     }
 
@@ -165,7 +155,7 @@ public class WebSocketServiceImpl implements WebSocketService {
             }
         }
 
-        private void queueMessage(WebSocketConnection connection, String message) {
+        private void queueMessage(WebSocketConnectionImpl connection, String message) {
             try {
                 // logger.info("----- queueing message " + Thread.currentThread().getName());
                 messages.put(new QueuedMessage(connection, message));
@@ -177,10 +167,10 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private static class QueuedMessage {
 
-        private WebSocketConnection connection;
+        private WebSocketConnectionImpl connection;
         private String message;
 
-        private QueuedMessage(WebSocketConnection connection, String message) {
+        private QueuedMessage(WebSocketConnectionImpl connection, String message) {
             this.connection = connection;
             this.message = message;
         }

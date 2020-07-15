@@ -38,9 +38,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.Iterator;
 import java.util.List;
@@ -84,9 +81,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Inject
     private ConfigService configService;
-
-    @Context
-    private HttpServletRequest request;
 
     private Messenger me = new Messenger("systems.dmx.webclient");
 
@@ -608,7 +602,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
         private void newWorkspace(Topic workspace) {
             try {
-                messageToAllButOne(new JSONObject()
+                sendToAllButOrigin(new JSONObject()
                     .put("type", "newWorkspace")
                     .put("args", new JSONObject()
                         .put("workspace", workspace.toJSON())
@@ -621,8 +615,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
         // ---
 
-        private void messageToAllButOne(JSONObject message) {
-            dmx.getWebSocketService().messageToAllButOne(request, pluginUri, message.toString());
+        private void sendToAllButOrigin(JSONObject message) {
+            dmx.getWebSocketService().sendToAllButOrigin(message.toString());
         }
     }
 }

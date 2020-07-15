@@ -34,9 +34,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.Iterator;
 import java.util.List;
@@ -54,9 +51,6 @@ import java.util.logging.Logger;
 public class WebservicePlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Context
-    private HttpServletRequest request;
 
     private Messenger me = new Messenger("systems.dmx.webclient");
 
@@ -600,7 +594,7 @@ public class WebservicePlugin extends PluginActivator {
 
         private void newType(Topic type, String argName, String messageType) {
             try {
-                messageToAllButOne(new JSONObject()
+                sendToAllButOrigin(new JSONObject()
                     .put("type", messageType)
                     .put("args", new JSONObject()
                         .put(argName, type.toJSON())
@@ -611,8 +605,8 @@ public class WebservicePlugin extends PluginActivator {
             }
         }
 
-        private void messageToAllButOne(JSONObject message) {
-            dmx.getWebSocketService().messageToAllButOne(request, pluginUri, message.toString());
+        private void sendToAllButOrigin(JSONObject message) {
+            dmx.getWebSocketService().sendToAllButOrigin(message.toString());
         }
     }
 }

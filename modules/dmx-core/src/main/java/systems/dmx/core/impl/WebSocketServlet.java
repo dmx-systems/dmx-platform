@@ -35,7 +35,7 @@ public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServl
     public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
         try {
             checkProtocol(protocol);
-            return new WebSocketConnection(protocol, clientId(request), session(request), pool, dmx);
+            return new WebSocketConnectionImpl(protocol, clientId(request), session(request), pool, dmx);
         } catch (Exception e) {
             throw new RuntimeException("Opening a WebSocket connection " +
                 (protocol != null ? "for plugin \"" + protocol + "\" " : "") + "failed", e);

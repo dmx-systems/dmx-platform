@@ -3,6 +3,7 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
+import systems.dmx.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -19,21 +20,21 @@ class Messenger {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private MessengerContext context;
+    private CoreService dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    Messenger(MessengerContext context) {
-        this.context = context;
+    Messenger(CoreService dmx) {
+        this.dmx = dmx;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void newTopicmap(Topic topicmapTopic) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "newTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapTopic", topicmapTopic.toJSON())
@@ -47,7 +48,7 @@ class Messenger {
     void addTopicToTopicmap(long topicmapId, ViewTopic topic) {
         try {
             // FIXME: per connection check read access
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "addTopicToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -62,7 +63,7 @@ class Messenger {
     void addAssocToTopicmap(long topicmapId, ViewAssoc assoc) {
         try {
             // FIXME: per connection check read access
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "addAssocToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -76,7 +77,7 @@ class Messenger {
 
     void setTopicPosition(long topicmapId, long topicId, int x, int y) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setTopicPosition")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -94,7 +95,7 @@ class Messenger {
 
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setTopicVisibility")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -109,7 +110,7 @@ class Messenger {
 
     void setAssocVisibility(long topicmapId, long assocId, boolean visibility) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setAssocVisibility")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -124,9 +125,7 @@ class Messenger {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void messageToAllButOne(JSONObject message) {
-        context.getCoreService().getWebSocketService().messageToAllButOne(
-            context.getRequest(), pluginUri, message.toString()
-        );
+    private void sendToAllButOrigin(JSONObject message) {
+        dmx.getWebSocketService().sendToAllButOrigin(message.toString());
     }
 }

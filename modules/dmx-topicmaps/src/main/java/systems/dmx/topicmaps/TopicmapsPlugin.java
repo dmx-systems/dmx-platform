@@ -18,7 +18,6 @@ import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -28,7 +27,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,7 +42,7 @@ import java.util.logging.Logger;
 @Path("/topicmaps")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, MessengerContext {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -55,10 +53,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
 
-    private Messenger me = new Messenger(this);
-
-    @Context
-    private HttpServletRequest request;     // required by Messenger
+    private Messenger me;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -420,20 +415,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // ************************
-    // *** MessengerContext ***
-    // ************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
     @Override
-    public CoreService getCoreService() {
-        return dmx;
-    }
-
-    @Override
-    public HttpServletRequest getRequest() {
-        return request;
+    public void init() {
+        me = new Messenger(dmx);
     }
 
 
