@@ -49,7 +49,6 @@ class Messenger {
 
     void addTopicToTopicmap(long topicmapId, ViewTopic topic) {
         try {
-            // FIXME: per connection check read access
             sendToAuthorized(new JSONObject()
                 .put("type", "addTopicToTopicmap")
                 .put("args", new JSONObject()
@@ -64,7 +63,6 @@ class Messenger {
 
     void addAssocToTopicmap(long topicmapId, ViewAssoc assoc) {
         try {
-            // FIXME: per connection check read access
             sendToAuthorized(new JSONObject()
                 .put("type", "addAssocToTopicmap")
                 .put("args", new JSONObject()

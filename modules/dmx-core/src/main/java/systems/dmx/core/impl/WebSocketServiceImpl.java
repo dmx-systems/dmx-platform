@@ -48,23 +48,27 @@ public class WebSocketServiceImpl implements WebSocketService {
     public void sendToOrigin(String message) {
         WebSocketConnectionImpl connection = getConnection();
         if (connection != null) {
-            queueMessage(connection, message);
+            queueMessage(message, connection);
         }
     }
 
     @Override
     public void sendToAll(String message) {
-        broadcast(message, conn -> true);
+        queueMessage(message, conn -> true);
     }
 
     @Override
     public void sendToAllButOrigin(String message) {
-        broadcast(message, conn -> !conn.getClientId().equals(clientId()));
+        // Note: the predicate is evaluated in another thread (SendMessageWorker). So to read out the client-id
+        // cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead from predicate)
+        // and hold the result in the predicate's closure.
+        String clientId = clientId();
+        queueMessage(message, conn -> !conn.getClientId().equals(clientId));
     }
 
     @Override
     public void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter) {
-        broadcast(message, connectionFilter);
+        queueMessage(message, connectionFilter);
     }
 
     // ---
@@ -107,6 +111,15 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private void queueMessage(String message, WebSocketConnectionImpl connection) {
+        worker.queueMessage(message, connection);
+    }
+
+    private void queueMessage(String message, Predicate<WebSocketConnection> connectionFilter) {
+        worker.queueMessage(message, connectionFilter);
+    }
+
+
     /**
      * @return  the WebSocket connection that is associated with the current request (based on "dmx_client_id" cookie),
      *          or null if no such cookie exists or if called outside request scope (e.g. while system startup).
@@ -114,14 +127,6 @@ public class WebSocketServiceImpl implements WebSocketService {
     private WebSocketConnectionImpl getConnection() {
         String clientId = clientId();
         return clientId != null ? pool.getConnection(clientId) : null;
-    }
-
-    private void broadcast(String message, Predicate<WebSocketConnection> connectionFilter) {
-        pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> queueMessage(conn, message));
-    }
-
-    private void queueMessage(WebSocketConnectionImpl connection, String message) {
-        worker.queueMessage(connection, message);
     }
 
     private String clientId() {
@@ -133,7 +138,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private class SendMessageWorker extends Thread {
 
-        private BlockingQueue<QueuedMessage> messages = new LinkedBlockingQueue();
+        private BlockingQueue<MessageTask> messageQueue = new LinkedBlockingQueue();
 
         private SendMessageWorker() {
             setPriority(Thread.MIN_PRIORITY);
@@ -143,36 +148,68 @@ public class WebSocketServiceImpl implements WebSocketService {
         public void run() {
             try {
                 while (true) {
-                    QueuedMessage message = messages.take();
+                    messageQueue.take().send();
                     yield();
-                    // logger.info("----- sending message " + Thread.currentThread().getName());
-                    message.connection.sendMessage(message.message);
                 }
             } catch (InterruptedException e) {
-                logger.info("### Terminating SendMessageWorker thread");
+                logger.info("### Terminating SendMessageWorker");
             } catch (Exception e) {
-                logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker thread -- terminating:", e);
+                logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker -- terminating:", e);
             }
         }
 
-        private void queueMessage(WebSocketConnectionImpl connection, String message) {
+        private void queueMessage(String message, WebSocketConnectionImpl connection) {
             try {
-                // logger.info("----- queueing message " + Thread.currentThread().getName());
-                messages.put(new QueuedMessage(connection, message));
+                messageQueue.put(new MessageTask(message, connection));
+            } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "Queueing a message failed:", e);
+            }
+        }
+
+        private void queueMessage(String message, Predicate<WebSocketConnection> connectionFilter) {
+            try {
+                messageQueue.put(new MessageTask(message, connectionFilter));
             } catch (InterruptedException e) {
                 logger.log(Level.WARNING, "Queueing a message failed:", e);
             }
         }
     }
 
-    private static class QueuedMessage {
+    private class MessageTask {
 
-        private WebSocketConnectionImpl connection;
         private String message;
 
-        private QueuedMessage(WebSocketConnectionImpl connection, String message) {
-            this.connection = connection;
+        private WebSocketConnectionImpl connection;
+        private Predicate<WebSocketConnection> connectionFilter;
+
+        /**
+         * A send-to-one task.
+         */
+        private MessageTask(String message, WebSocketConnectionImpl connection) {
             this.message = message;
+            this.connection = connection;
+        }
+
+        /**
+         * A send-to-many task.
+         */
+        private MessageTask(String message, Predicate<WebSocketConnection> connectionFilter) {
+            this.message = message;
+            this.connectionFilter = connectionFilter;
+        }
+
+        // ---
+
+        private void send() {
+            if (connection != null) {
+                _send(connection);
+            } else {
+                pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> _send(conn));
+            }
+        }
+
+        private void _send(WebSocketConnectionImpl conn) {
+            conn.sendMessage(message);
         }
     }
 }
