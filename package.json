@@ -16,7 +16,7 @@
   "dependencies": {
     "axios": "^0.18.1",
     "dm5": "https://github.com/jri/dm5.git",
-    "dm5-cytoscape-renderer": "0.26.0",
+    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-login-dialog": "0.1.0",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
