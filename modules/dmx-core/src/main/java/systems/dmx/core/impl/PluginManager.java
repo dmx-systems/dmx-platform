@@ -140,14 +140,14 @@ class PluginManager {
         try {
             String activatorClassName = bundle.getHeaders().get("Bundle-Activator");
             if (activatorClassName != null) {
-                Class activatorClass = bundle.loadClass(activatorClassName);    // throws ClassNotFoundException
-                return PluginActivator.class.isAssignableFrom(activatorClass);
+                Class activatorClass = bundle.loadClass(activatorClassName);    // throws ClassNotFoundException...
+                return PluginActivator.class.isAssignableFrom(activatorClass);  // resp. NoClassDefFoundError
             } else {
                 // Note: 3rd party bundles may have no activator
                 return false;
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Plugin detection failed for bundle " + bundle, e);
+        } catch (Throwable e) {     // Note: catch errors as well
+            throw new RuntimeException("DMX plugin detection failed for bundle " + bundle, e);
         }
     }
 
