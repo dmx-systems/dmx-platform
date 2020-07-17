@@ -48,4 +48,9 @@ class WebSocketConnectionPool {
                 " (client ID) from pool");
         }
     }
+
+    void close() {
+        logger.info("Closing " + pool.size() + " WebSocket connections");
+        getAllConnections().forEach(WebSocketConnectionImpl::close);
+    }
 }

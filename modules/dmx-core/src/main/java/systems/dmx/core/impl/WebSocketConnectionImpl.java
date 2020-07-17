@@ -114,6 +114,10 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
         }
     }
 
+    void close() {
+        connection.close();
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // === Logging ===

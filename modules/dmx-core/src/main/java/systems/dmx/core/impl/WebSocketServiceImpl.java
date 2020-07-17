@@ -35,7 +35,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    // ### TODO: inject event manager only 
     WebSocketServiceImpl(CoreService dmx) {
         this.dmx = dmx;
     }
@@ -84,9 +83,9 @@ public class WebSocketServiceImpl implements WebSocketService {
         try {
             logger.info("##### Starting WebSocket service");
             pool = new WebSocketConnectionPool();
-            CoreActivator.getHttpService().registerServlet("/websocket", new WebSocketServlet(pool, dmx), null, null);
             worker = new SendMessageWorker();
             worker.start();
+            CoreActivator.getHttpService().registerServlet("/websocket", new WebSocketServlet(pool, dmx), null, null);
             logger.info("WebSocket service started successfully");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Starting WebSocket service failed", e);
@@ -97,9 +96,10 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     void stop() {
         try {
-            if (worker != null) {
+            if (pool != null) {
                 logger.info("### Stopping WebSocket service (httpService=" + CoreActivator.getHttpService() + ")");
                 // CoreActivator.getHttpService().unregister("/websocket");     // HTTP service already gone
+                pool.close();
                 worker.interrupt();
             } else {
                 logger.info("Stopping WebSocket service SKIPPED -- it was not successfully started");
@@ -152,7 +152,7 @@ public class WebSocketServiceImpl implements WebSocketService {
                     yield();
                 }
             } catch (InterruptedException e) {
-                logger.info("### Terminating SendMessageWorker");
+                logger.info("Terminating SendMessageWorker");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker -- terminating:", e);
             }
