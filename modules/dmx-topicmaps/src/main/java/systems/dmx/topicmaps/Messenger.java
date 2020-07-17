@@ -3,6 +3,7 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
+import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.accesscontrol.Operation;
 
@@ -130,10 +131,29 @@ class Messenger {
     }
 
     private void sendToAuthorized(JSONObject message, long objectId) {
+        // Note: the predicate is evaluated in another thread (WebSocketService's SendMessageWorker). So to read out
+        // the client-id cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead
+        // from predicate) and hold the result in the predicate's closure.
+        String clientId = clientId();
+        //
         dmx.getWebSocketService().sendToSome(message.toString(), conn -> {
+            // don't send back to origin
+            boolean isOrigin = conn.getClientId().equals(clientId);
+            if (isOrigin) {
+                logger.info(conn.getClientId() + " " + conn.getUsername() + " (origin) -> " + false);
+                return false;
+            }
+            // only send if receiver is authorized
             boolean isReadable = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
             logger.info(conn.getClientId() + " " + conn.getUsername() + " -> " + isReadable);
             return isReadable;
         });
+    }
+
+    // ---
+
+    private String clientId() {
+        Cookies cookies = Cookies.get();
+        return cookies.has("dmx_client_id") ? cookies.get("dmx_client_id") : null;
     }
 }

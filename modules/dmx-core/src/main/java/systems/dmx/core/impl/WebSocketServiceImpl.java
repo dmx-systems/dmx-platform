@@ -58,6 +58,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void sendToAllButOrigin(String message) {
+        // Note: basically copied to Messenger.java (module dmx-topicmaps), including clientId() helper
+        // TODO: DRY. Provide central factory for the predicate + cookie logic
+        //
         // Note: the predicate is evaluated in another thread (SendMessageWorker). So to read out the client-id
         // cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead from predicate)
         // and hold the result in the predicate's closure.
@@ -99,8 +102,8 @@ public class WebSocketServiceImpl implements WebSocketService {
             if (pool != null) {
                 logger.info("### Stopping WebSocket service (httpService=" + CoreActivator.getHttpService() + ")");
                 // CoreActivator.getHttpService().unregister("/websocket");     // HTTP service already gone
-                pool.close();
                 worker.interrupt();
+                pool.close();
             } else {
                 logger.info("Stopping WebSocket service SKIPPED -- it was not successfully started");
             }
