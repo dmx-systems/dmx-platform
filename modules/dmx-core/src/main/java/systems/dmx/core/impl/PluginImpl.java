@@ -377,6 +377,8 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
+    // compare to CoreActivator.createServiceTracker()
+    // compare to handleEvent()
     private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //
         return new ServiceTracker(bundleContext, serviceInterface.getName(), null) {
@@ -387,11 +389,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 try {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
+                    checkRequirementsForActivation();
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
-                        " to " + pluginContext + ":", e);
-                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown against OSGi container it would not print out the stacktrace.
+                    logger.log(Level.SEVERE, "", e);
+                    // Note: we catch anything, also errors (like NoClassDefFoundError).
+                    // Anything thrown from here would be swallowed by OSGi container.
                 }
                 return service;
             }
@@ -402,10 +404,9 @@ public class PluginImpl implements Plugin, EventHandler {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
-                        " from " + pluginContext + ":", e);
-                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown against OSGi container it would not print out the stacktrace.
+                    logger.log(Level.SEVERE, "", e);
+                    // Note: we catch anything, also errors (like NoClassDefFoundError).
+                    // Anything thrown from here would be swallowed by OSGi container.
                 }
             }
         };
@@ -433,16 +434,13 @@ public class PluginImpl implements Plugin, EventHandler {
             setCoreService((CoreServiceImpl) service);
             publishWebResources();
             publishRestResources();
-            checkRequirementsForActivation();
         } else if (service instanceof EventAdmin) {
             logger.info("Adding Event Admin service to " + this);
             eventService = (EventAdmin) service;
-            checkRequirementsForActivation();
         } else {
             logger.info("Adding " + serviceInterface.getName() + " to " + this);
             injectableServices.get(serviceInterface).injectService(service);
             pluginContext.serviceArrived(service);
-            checkRequirementsForActivation();
         }
     }
 
@@ -938,13 +936,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 return;
             }
             //
-            logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while handling PLUGIN_ACTIVATED event from \"" + pluginUri +
-                "\" for " + this + ":", e);
-            // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown against OSGi container it would not print out the stacktrace.
+            logger.log(Level.SEVERE, "", e);
+            // Note: we catch anything, also errors (like NoClassDefFoundError).
+            // Anything thrown from here would be swallowed by OSGi container.
         }
     }
 

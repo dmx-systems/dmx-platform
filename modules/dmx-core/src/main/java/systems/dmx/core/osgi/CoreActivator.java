@@ -67,8 +67,8 @@ public class CoreActivator implements BundleActivator {
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while starting \"DMX Core\":", e);
-            // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown against OSGi container it would not print out the stacktrace.
+            // Note: we catch anything, also errors (like NoClassDefFoundError).
+            // Anything thrown from here would be swallowed by OSGi container.
             // File Install would retry to start the bundle endlessly.
         }
     }
@@ -90,8 +90,8 @@ public class CoreActivator implements BundleActivator {
             }
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while stopping \"DMX Core\":", e);
-            // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown against OSGi container it would not print out the stacktrace.
+            // Note: we catch anything, also errors (like NoClassDefFoundError).
+            // Anything thrown from here would be swallowed by OSGi container.
         }
     }
 
@@ -140,6 +140,7 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // compare to PluginImpl.createServiceTracker()
     private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //
         return new ServiceTracker(bundleContext, serviceInterface.getName(), null) {
@@ -151,10 +152,9 @@ public class CoreActivator implements BundleActivator {
                     service = super.addingService(serviceRef);
                     addService(service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
-                        " to \"DMX Core\":", e);
-                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown against OSGi container it would not print out the stacktrace.
+                    logger.log(Level.SEVERE, "", e);
+                    // Note: we catch anything, also errors (like NoClassDefFoundError).
+                    // Anything thrown from here would be swallowed by OSGi container.
                 }
                 return service;
             }
@@ -165,10 +165,9 @@ public class CoreActivator implements BundleActivator {
                     removeService(service);
                     super.removedService(ref, service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
-                        " from \"DMX Core\":", e);
-                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
-                    // If thrown against OSGi container it would not print out the stacktrace.
+                    logger.log(Level.SEVERE, "", e);
+                    // Note: we catch anything, also errors (like NoClassDefFoundError).
+                    // Anything thrown from here would be swallowed by OSGi container.
                 }
             }
         };

@@ -56,8 +56,8 @@ public class PluginActivator implements BundleActivator, PluginContext {
             plugin.start();
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while starting " + this + ":", e);
-            // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown against OSGi container it would not print out the stacktrace.
+            // Note: we catch anything, also errors (like NoClassDefFoundError).
+            // Anything thrown from here would be swallowed by OSGi container.
             // File Install would retry to start the bundle endlessly.
         }
     }
@@ -74,8 +74,8 @@ public class PluginActivator implements BundleActivator, PluginContext {
             plugin.stop();
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while stopping " + this + ":", e);
-            // Note: here we catch anything, also errors (like NoClassDefFoundError).
-            // If thrown against OSGi container it would not print out the stacktrace.
+            // Note: we catch anything, also errors (like NoClassDefFoundError).
+            // Anything thrown from here would be swallowed by OSGi container.
         }
     }
 
