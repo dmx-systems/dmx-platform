@@ -292,8 +292,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Workspaces plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
             configService.unregisterConfigDefinition("dmx.workspaces.enabled_sharing_modes");
-        } else {
-            logger.warning("Config service is already gone");
         }
     }
 

@@ -177,7 +177,7 @@ public class CoreActivator implements BundleActivator {
 
     private void addService(Object service) {
         if (service instanceof HttpService) {
-            logger.info("Adding HTTP service to DMX Core");
+            logger.fine("Adding HTTP service to DMX Core");
             httpService = (HttpService) service;
             checkRequirementsForActivation();
         }
@@ -185,7 +185,7 @@ public class CoreActivator implements BundleActivator {
 
     private void removeService(Object service) {
         if (service == httpService) {
-            logger.info("Removing HTTP service from DMX Core");
+            logger.fine("Removing HTTP service from DMX Core");
             httpService = null;
         }
     }

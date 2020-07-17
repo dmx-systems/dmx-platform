@@ -109,10 +109,9 @@ class WebPublishingService {
 
     void unpublishStaticResources(String uriNamespace) {
         HttpService httpService = getHttpService();
+        // HTTP service might be gone already
         if (httpService != null) {
             httpService.unregister(uriNamespace);
-        } else {
-            logger.warning("HTTP service is already gone");
         }
     }
 
@@ -254,10 +253,9 @@ class WebPublishingService {
         logger.fine("########## Unregistering Jersey servlet at HTTP service (URI namespace=\"" +
             ROOT_APPLICATION_PATH + "\")");
         HttpService httpService = getHttpService();
+        // HTTP service might be gone already
         if (httpService != null) {
             httpService.unregister(ROOT_APPLICATION_PATH);
-        } else {
-            logger.warning("HTTP service is already gone");
         }
         isJerseyServletRegistered = false;
     }

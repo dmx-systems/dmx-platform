@@ -430,15 +430,15 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void addService(Object service, Class serviceInterface) {
         if (service instanceof CoreService) {
-            logger.info("Adding DMX core service to " + this);
+            logger.fine("Adding DMX core service to " + this);
             setCoreService((CoreServiceImpl) service);
             publishWebResources();
             publishRestResources();
         } else if (service instanceof EventAdmin) {
-            logger.info("Adding Event Admin service to " + this);
+            logger.fine("Adding Event Admin service to " + this);
             eventService = (EventAdmin) service;
         } else {
-            logger.info("Adding " + serviceInterface.getName() + " to " + this);
+            logger.fine("Adding " + serviceInterface.getName() + " to " + this);
             injectableServices.get(serviceInterface).injectService(service);
             pluginContext.serviceArrived(service);
         }
@@ -446,17 +446,17 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void removeService(Object service, Class serviceInterface) {
         if (service == dmx) {
-            logger.info("Removing DMX core service from " + this);
+            logger.fine("Removing DMX core service from " + this);
             unpublishRestResources();
             unpublishWebResources();
             unpublishFileSystem();
             dmx.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
             setCoreService(null);
         } else if (service == eventService) {
-            logger.info("Removing Event Admin service from " + this);
+            logger.fine("Removing Event Admin service from " + this);
             eventService = null;
         } else {
-            logger.info("Removing " + serviceInterface.getName() + " from " + this);
+            logger.fine("Removing " + serviceInterface.getName() + " from " + this);
             pluginContext.serviceGone(service);
             injectableServices.get(serviceInterface).injectService(null);
         }

@@ -449,8 +449,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         // Files plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
             configService.unregisterConfigDefinition("dmx.files.disk_quota");
-        } else {
-            logger.warning("Config service is already gone");
         }
     }
 

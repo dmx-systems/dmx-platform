@@ -495,8 +495,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Access Control plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
             configService.unregisterConfigDefinition(LOGIN_ENABLED);
-        } else {
-            logger.warning("Config service is already gone");
         }
     }
 
