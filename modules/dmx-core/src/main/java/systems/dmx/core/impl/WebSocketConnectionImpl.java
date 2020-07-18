@@ -1,6 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.websocket.WebSocketConnection;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocket.Connection;
@@ -18,13 +19,14 @@ import java.util.logging.Logger;
  * <p>
  * Once the actual WebSocket connection is opened or closed the WebSocketConnection is added/removed to a pool.
  */
-class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSocket.OnBinaryMessage {
+class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSocket.OnTextMessage,
+                                                                         WebSocket.OnBinaryMessage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-            String pluginUri;
+    private String pluginUri;   // TODO: drop
             String clientId;
-            HttpSession session;
+    private HttpSession session;
     private WebSocketConnectionPool pool;
     private CoreService dmx;
 
@@ -37,31 +39,47 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    WebSocketConnection(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
-                                                                                CoreService dmx) {
-        logger.info("### Associating WebSocket connection (client ID " + clientId + ") with " + info(session));
+    /**
+     * @param   session     not null
+     */
+    WebSocketConnectionImpl(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
+                                                                                    CoreService dmx) {
         this.pluginUri = pluginUri;
         this.clientId = clientId;
         this.session = session;
         this.pool = pool;
         this.dmx = dmx;
+        // Note: info(session) relies on "dmx"
+        logger.info("### Associating WebSocket connection " + clientId + " (client ID) with " + info(session));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    // *** WebSocketConnection ***
+
+    @Override
+    public String getClientId() {
+        return clientId;
+    }
+
+    @Override
+    public String getUsername() {
+        return username(session);
+    }
 
     // *** WebSocket ***
 
     @Override
     public void onOpen(Connection connection) {
-        logger.info("Opening a WebSocket connection for plugin \"" + pluginUri + "\" (client ID " + clientId + ")");
+        logger.info("Opening WebSocket connection " + clientId + " (client ID)");
         this.connection = connection;
-        pool.add(this);
+        pool.addConnection(this);
     }
 
     @Override
     public void onClose(int code, String message) {
-        logger.info("Closing a WebSocket connection of plugin \"" + pluginUri + "\" (client ID " + clientId + ")");
-        pool.remove(this);
+        logger.info("Closing WebSocket connection " + clientId + " (client ID)");
+        pool.removeConnection(this);
     }
 
     // *** WebSocket.OnTextMessage ***
@@ -91,9 +109,13 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
         try {
             connection.sendMessage(message);
         } catch (Exception e) {
-            pool.remove(this);
-            logger.log(Level.SEVERE, "Sending message via " + this + " failed -- connection removed", e);
+            pool.removeConnection(this);
+            logger.log(Level.SEVERE, "Sending message via " + this + " failed -- connection removed from pool", e);
         }
+    }
+
+    void close() {
+        connection.close();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

@@ -12,10 +12,9 @@ class WebSocketConnectionPool {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * 1st hash: plugin URI
-     * 2nd hash: client ID
+     * key: client ID
      */
-    private Map<String, Map<String, WebSocketConnection>> pool = new ConcurrentHashMap();
+    private Map<String, WebSocketConnectionImpl> pool = new ConcurrentHashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -26,43 +25,32 @@ class WebSocketConnectionPool {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    /**
-     * Returns the open WebSocket connections associated to the given plugin, or <code>null</code> if there are none.
-     */
-    Collection<WebSocketConnection> getConnections(String pluginUri) {
-        Map connections = pool.get(pluginUri);
-        return connections != null ? connections.values() : null;
-    }
-
-    WebSocketConnection getConnection(String pluginUri, String clientId) {
-        Map<String, WebSocketConnection> connections = pool.get(pluginUri);
-        if (connections == null) {
-            logger.warning("No WebSocket connection open for plugin \"" + pluginUri + "\"");
-            return null;
-        }
-        WebSocketConnection connection = connections.get(clientId);
+    WebSocketConnectionImpl getConnection(String clientId) {
+        WebSocketConnectionImpl connection = pool.get(clientId);
         if (connection == null) {
-            logger.warning("No WebSocket connection open for client ID " + clientId + " (plugin \"" + pluginUri +
-                "\")");
+            logger.warning("No WebSocket connection open for client ID " + clientId);
         }
         return connection;
     }
 
-    void add(WebSocketConnection connection) {
-        String pluginUri = connection.pluginUri;
-        Map connections = pool.get(pluginUri);
-        if (connections == null) {
-            connections = new ConcurrentHashMap();
-            pool.put(pluginUri, connections);
-        }
-        connections.put(connection.clientId, connection);
+    Collection<WebSocketConnectionImpl> getAllConnections() {
+        return pool.values();
     }
 
-    void remove(WebSocketConnection connection) {
-        String pluginUri = connection.pluginUri;
-        boolean removed = getConnections(pluginUri).remove(connection);
+    void addConnection(WebSocketConnectionImpl connection) {
+        pool.put(connection.clientId, connection);
+    }
+
+    void removeConnection(WebSocketConnectionImpl connection) {
+        boolean removed = pool.remove(connection.clientId) != null;
         if (!removed) {
-            throw new RuntimeException("Removing a connection of plugin \"" + pluginUri + "\" failed");
+            throw new RuntimeException("Can't remove WebSocket connection " + connection.clientId +
+                " (client ID) from pool");
         }
+    }
+
+    void close() {
+        logger.info("Closing " + pool.size() + " WebSocket connections");
+        getAllConnections().forEach(WebSocketConnectionImpl::close);
     }
 }

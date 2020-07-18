@@ -52,7 +52,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EventManager em;
-    private WebSocketService ws;
+    private WebSocketService wss;
 
     @Context
     private HttpServletRequest request;
@@ -61,9 +61,9 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EventManager em, WebSocketService ws) {
+    JerseyResponseFilter(EventManager em, WebSocketService wss) {
         this.em = em;
-        this.ws = ws;
+        this.wss = wss;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -203,7 +203,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         JSONObject message = new JSONObject()
             .put("type", "processDirectives")
             .put("args", directives.toJSONArray());
-        ws.messageToAllButOne(request, "systems.dmx.webclient", message.toString());
+        wss.sendToAllButOrigin(message.toString());
+        // FIXME: don't send update directives to unauthorized parties
     }
 
 

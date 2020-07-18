@@ -108,8 +108,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             //
             return _hasPermission(username, operation, workspaceId);
         } catch (Exception e) {
-            throw new RuntimeException("Checking permission for object " + objectId + " failed, typeUri=\"" + typeUri +
-                "\", " + userInfo(username) + ", operation=" + operation, e);
+            throw new RuntimeException("Checking permission for object " + objectId + " failed, typeUri=" + typeUri +
+                ", " + userInfo(username) + ", operation=" + operation, e);
         }
     }
 
@@ -489,12 +489,12 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private boolean permissionIfNoWorkspaceIsAssigned(Operation operation, long objectId, String typeUri) {
         switch (operation) {
         case READ:
-            logger.fine("Object " + objectId + " (typeUri=\"" + typeUri +
-                "\") is not assigned to any workspace -- READ permission is granted");
+            logger.fine("Object " + objectId + " (typeUri=" + typeUri +
+                ") is not assigned to any workspace -- READ permission is granted");
             return true;
         case WRITE:
-            logger.warning("Object " + objectId + " (typeUri=\"" + typeUri +
-                "\") is not assigned to any workspace -- WRITE permission is refused");
+            logger.warning("Object " + objectId + " (typeUri=" + typeUri +
+                ") is not assigned to any workspace -- WRITE permission is refused");
             return false;
         default:
             throw new RuntimeException(operation + " is an unsupported operation");

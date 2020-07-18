@@ -60,7 +60,7 @@ class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(AccessLayer al, WebSocketService ws) {
+    WebPublishingService(AccessLayer al, WebSocketService wss) {
         try {
             logger.info("Setting up the WebPublishingService");
             this.al = al;
@@ -71,7 +71,7 @@ class WebPublishingService {
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
             properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(al.em));
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(al.em, ws));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(al.em, wss));
             properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(al));
             //
             // deploy Jersey application in container

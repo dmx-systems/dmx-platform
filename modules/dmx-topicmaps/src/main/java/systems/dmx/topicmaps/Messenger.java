@@ -3,6 +3,7 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
+import systems.dmx.core.service.websocket.WebSocketService;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -19,21 +20,26 @@ class Messenger {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private MessengerContext context;
+    private WebSocketService wss;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    Messenger(MessengerContext context) {
-        this.context = context;
+    Messenger(WebSocketService wss) {
+        this.wss = wss;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void newTopicmap(Topic topicmapTopic) {
         try {
-            messageToAllButOne(new JSONObject()
+            // FIXME: send message only to users who have READ permission for the topicmap topic.
+            // Unfortunately we can't just use sendToReadAllowed() as the permission check is performed in another thread
+            // (WebSocketService's SendMessageWorker), and the create-topicmap transaction is not yet committed.
+            // The result would be "org.neo4j.graphdb.NotFoundException: 'typeUri' property not found for NodeImpl#1234"
+            // (where 1234 is the ID of the just created topicmap).
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "newTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapTopic", topicmapTopic.toJSON())
@@ -46,13 +52,12 @@ class Messenger {
 
     void addTopicToTopicmap(long topicmapId, ViewTopic topic) {
         try {
-            // FIXME: per connection check read access
-            messageToAllButOne(new JSONObject()
+            sendToReadAllowed(new JSONObject()
                 .put("type", "addTopicToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
                     .put("viewTopic", topic.toJSON())
-                )
+                ), topic.getId()
             );
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error while sending a \"addTopicToTopicmap\" message:", e);
@@ -61,13 +66,12 @@ class Messenger {
 
     void addAssocToTopicmap(long topicmapId, ViewAssoc assoc) {
         try {
-            // FIXME: per connection check read access
-            messageToAllButOne(new JSONObject()
+            sendToReadAllowed(new JSONObject()
                 .put("type", "addAssocToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
                     .put("viewAssoc", assoc.toJSON())
-                )
+                ), assoc.getId()
             );
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error while sending a \"addAssocToTopicmap\" message:", e);
@@ -76,7 +80,7 @@ class Messenger {
 
     void setTopicPosition(long topicmapId, long topicId, int x, int y) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setTopicPosition")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -94,7 +98,7 @@ class Messenger {
 
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setTopicVisibility")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -109,7 +113,7 @@ class Messenger {
 
     void setAssocVisibility(long topicmapId, long assocId, boolean visibility) {
         try {
-            messageToAllButOne(new JSONObject()
+            sendToAllButOrigin(new JSONObject()
                 .put("type", "setAssocVisibility")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
@@ -124,9 +128,11 @@ class Messenger {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void messageToAllButOne(JSONObject message) {
-        context.getCoreService().getWebSocketService().messageToAllButOne(
-            context.getRequest(), pluginUri, message.toString()
-        );
+    private void sendToAllButOrigin(JSONObject message) {
+        wss.sendToAllButOrigin(message.toString());
+    }
+
+    private void sendToReadAllowed(JSONObject message, long objectId) {
+        wss.sendToReadAllowed(message.toString(), objectId);
     }
 }

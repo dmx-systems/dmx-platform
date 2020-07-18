@@ -3,27 +3,27 @@ import dm5 from 'dm5'
 const actions = {
 
   createTopicType ({dispatch}, {name, pos}) {
-    console.log('Creating topic type', name)
+    // console.log('Creating topic type', name)
     dm5.restClient.createTopicType(defaultTopicType(name)).then(topicType => {
-      console.log('Created', topicType)
+      // console.log('Created', topicType)
       dispatch('putTopicType', topicType)
       dispatch('revealTopic', {topic: topicType, pos})
     })
   },
 
   createAssocType ({dispatch}, {name, pos}) {
-    console.log('Creating assoc type', name)
+    // console.log('Creating assoc type', name)
     dm5.restClient.createAssocType(defaultAssocType(name)).then(assocType => {
-      console.log('Created', assocType)
+      // console.log('Created', assocType)
       dispatch('putAssocType', assocType)
       dispatch('revealTopic', {topic: assocType, pos})
     })
   },
 
   createRoleType ({dispatch}, {name, pos}) {
-    console.log('Creating role type', name)
+    // console.log('Creating role type', name)
     dm5.restClient.createRoleType(defaultRoleType(name)).then(roleType => {
-      console.log('Created', roleType)
+      // console.log('Created', roleType)
       dispatch('putRoleType', roleType)
       dispatch('revealTopic', {topic: roleType, pos})
     })

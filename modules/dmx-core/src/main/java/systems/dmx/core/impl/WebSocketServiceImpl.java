@@ -1,22 +1,17 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.accesscontrol.Operation;
+import systems.dmx.core.service.websocket.WebSocketConnection;
 import systems.dmx.core.service.websocket.WebSocketService;
-import systems.dmx.core.util.JavaUtils;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.websocket.WebSocket;
-import org.eclipse.jetty.websocket.WebSocketHandler;
+import org.codehaus.jettison.json.JSONObject;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,14 +21,12 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final int    WEBSOCKETS_PORT = Integer.getInteger("dmx.websockets.port", 8081);
     private static final String WEBSOCKETS_URL = System.getProperty("dmx.websockets.url", "ws://localhost:8081");
-    // Note: the default values are required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default values must match the values defined in project POM.
+    // Note: the default value is required in case no config file is in effect. This applies when DM is started
+    // via feature:install from Karaf. The default value must match the value defined in project POM.
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private WebSocketsServer server;            // instantiated in start()
     private WebSocketConnectionPool pool;       // instantiated in start()
     private SendMessageWorker worker;           // instantiated in start()
     private CoreService dmx;
@@ -42,7 +35,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    // ### TODO: inject event manager only 
     WebSocketServiceImpl(CoreService dmx) {
         this.dmx = dmx;
     }
@@ -52,27 +44,33 @@ public class WebSocketServiceImpl implements WebSocketService {
     // *** WebSocketService ***
 
     @Override
-    public void messageToAll(String pluginUri, String message) {
-        broadcast(pluginUri, message, null);    // exclude=null
-    }
-
-    @Override
-    public void messageToAllButOne(HttpServletRequest request, String pluginUri, String message) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is null");
-        }
-        broadcast(pluginUri, message, getConnection(pluginUri));
-    }
-
-    @Override
-    public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is null");
-        }
-        WebSocketConnection connection = getConnection(pluginUri);
+    public void sendToOrigin(String message) {
+        WebSocketConnectionImpl connection = getConnection();
         if (connection != null) {
-            queueMessage(connection, message);
+            queueMessage(message, connection);
         }
+    }
+
+    @Override
+    public void sendToAll(String message) {
+        queueMessage(message, conn -> true);
+    }
+
+    @Override
+    public void sendToAllButOrigin(String message) {
+        queueMessage(message, isOrigin().negate());
+    }
+
+    @Override
+    public void sendToReadAllowed(String message, long objectId) {
+        // don't send back to origin
+        // only send if receiver has READ permission for object
+        queueMessage(message, isOrigin().negate().and(isReadAllowed(objectId)));
+    }
+
+    @Override
+    public void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter) {
+        queueMessage(message, connectionFilter);
     }
 
     // ---
@@ -86,16 +84,14 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     public void start() {
         try {
-            logger.info("##### Starting Jetty WebSocket server");
-            server = new WebSocketsServer(WEBSOCKETS_PORT);
+            logger.info("##### Starting WebSocket service");
             pool = new WebSocketConnectionPool();
             worker = new SendMessageWorker();
             worker.start();
-            server.start();
-            // ### server.join();
-            logger.info("Jetty WebSocket server started successfully");
+            CoreActivator.getHttpService().registerServlet("/websocket", new WebSocketServlet(pool, dmx), null, null);
+            logger.info("WebSocket service started successfully");
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Starting Jetty WebSocket server failed", e);
+            logger.log(Level.SEVERE, "Starting WebSocket service failed", e);
         }
     }
 
@@ -103,46 +99,60 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     void stop() {
         try {
-            if (server != null) {
-                logger.info("### Stopping Jetty WebSocket server");
+            if (pool != null) {
+                logger.info("### Stopping WebSocket service (httpService=" + CoreActivator.getHttpService() + ")");
+                // CoreActivator.getHttpService().unregister("/websocket");     // HTTP service already gone
                 worker.interrupt();
-                server.stop();
+                pool.close();
             } else {
-                logger.info("Stopping Jetty WebSocket server SKIPPED -- not yet started");
+                logger.info("Stopping WebSocket service SKIPPED -- it was not successfully started");
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Stopping Jetty WebSocket server failed", e);
+            logger.log(Level.SEVERE, "Stopping WebSocket service failed", e);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    /**
-     * @return  the WebSocket connection that is associated with the current request (based on its "dmx_client_id"
-     *          cookie), or null if no such cookie exists or if called outside request scope (e.g. while system
-     *          startup).
-     */
-    private WebSocketConnection getConnection(String pluginUri) {
+    private void queueMessage(String message, WebSocketConnectionImpl connection) {
+        worker.queueMessage(message, connection);
+    }
+
+    private void queueMessage(String message, Predicate<WebSocketConnection> connectionFilter) {
+        worker.queueMessage(message, connectionFilter);
+    }
+
+    // ---
+
+    private Predicate<WebSocketConnection> isOrigin() {
+        // Note: the returned predicate is evaluated in another thread (SendMessageWorker). So to read out the client-id
+        // cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead from predicate)
+        // and hold the result in the predicate's closure.
         String clientId = clientId();
-        return clientId != null ? pool.getConnection(pluginUri, clientId) : null;
+        return conn -> {
+            boolean isOrigin = conn.getClientId().equals(clientId);
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isOrigin) -> " + isOrigin);
+            return isOrigin;
+        };
     }
+
+    private Predicate<WebSocketConnection> isReadAllowed(long objectId) {
+        return conn -> {
+            boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isReadAllowed) -> " + isReadAllowed);
+            return isReadAllowed;
+        };
+    }
+
+    // ---
 
     /**
-     * @param   exclude     may be null
+     * @return  the WebSocket connection that is associated with the current request (based on "dmx_client_id" cookie),
+     *          or null if no such cookie exists or if called outside request scope (e.g. while system startup).
      */
-    private void broadcast(String pluginUri, String message, WebSocketConnection exclude) {
-        Collection<WebSocketConnection> connections = pool.getConnections(pluginUri);
-        if (connections != null) {
-            for (WebSocketConnection connection : connections) {
-                if (connection != exclude) {
-                    queueMessage(connection, message);
-                }
-            }
-        }
-    }
-
-    private void queueMessage(WebSocketConnection connection, String message) {
-        worker.queueMessage(connection, message);
+    private WebSocketConnectionImpl getConnection() {
+        String clientId = clientId();
+        return clientId != null ? pool.getConnection(clientId) : null;
     }
 
     private String clientId() {
@@ -150,62 +160,11 @@ public class WebSocketServiceImpl implements WebSocketService {
         return cookies.has("dmx_client_id") ? cookies.get("dmx_client_id") : null;
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private class WebSocketsServer extends Server {
-
-        private WebSocketsServer(int port) {
-            // add connector
-            Connector connector = new SelectChannelConnector();
-            connector.setPort(port);
-            addConnector(connector);
-            // set handler
-            setHandler(new WebSocketHandler() {
-                @Override
-                public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-                    try {
-                        checkProtocol(protocol);
-                        return new WebSocketConnection(protocol, clientId(request), session(request), pool, dmx);
-                    } catch (Exception e) {
-                        throw new RuntimeException("Opening a WebSocket connection " +
-                            (protocol != null ? "for plugin \"" + protocol + "\" " : "") + "failed", e);
-                    }
-                }
-            });
-        }
-
-        private void checkProtocol(String pluginUri) {
-            if (pluginUri == null) {
-                throw new RuntimeException("A plugin URI is missing in the WebSocket handshake -- Add your " +
-                    "plugin's URI as the 2nd argument to the JavaScript WebSocket constructor");
-            }
-            dmx.getPlugin(pluginUri);   // check plugin URI, throws if invalid
-        }
-
-        private String clientId(HttpServletRequest request) {
-            String clientId = JavaUtils.cookieValue(request, "dmx_client_id");
-            if (clientId == null) {
-                throw new RuntimeException("Missing \"dmx_client_id\" cookie in websocket request");
-            }
-            return clientId;
-        }
-
-        private HttpSession session(HttpServletRequest request) {
-            // logger.info("request=" + JavaUtils.requestDump(request));
-            HttpSession session = request.getSession(false);
-            if (session == null) {
-                // FIXME
-                // throw new RuntimeException("No (valid) session associated with websocket request");
-            }
-            return session;
-        }
-    }
 
     private class SendMessageWorker extends Thread {
 
-        private BlockingQueue<QueuedMessage> messages = new LinkedBlockingQueue();
+        private BlockingQueue<MessageTask> messageQueue = new LinkedBlockingQueue();
 
         private SendMessageWorker() {
             setPriority(Thread.MIN_PRIORITY);
@@ -213,38 +172,85 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         @Override
         public void run() {
-            try {
-                while (true) {
-                    QueuedMessage message = messages.take();
+            boolean stopped = false;
+            while (!stopped) {
+                MessageTask task = null;
+                try {
+                    task = messageQueue.take();
+                    task.sendMessage();
                     yield();
-                    // logger.info("----- sending message " + Thread.currentThread().getName());
-                    message.connection.sendMessage(message.message);
+                } catch (InterruptedException e) {
+                    stopped = true;
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "An error occurred in the SendMessageWorker while processing a \"" +
+                        task.getMessageType() + "\" task (aborting this task):", e);
                 }
+            }
+            logger.info("### Terminating SendMessageWorker");
+        }
+
+        private void queueMessage(String message, WebSocketConnectionImpl connection) {
+            try {
+                messageQueue.put(new MessageTask(message, connection));
             } catch (InterruptedException e) {
-                logger.info("### Terminating SendMessageWorker thread");
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker thread -- terminating:", e);
+                logger.log(Level.WARNING, "Queueing a message failed:", e);
             }
         }
 
-        private void queueMessage(WebSocketConnection connection, String message) {
+        private void queueMessage(String message, Predicate<WebSocketConnection> connectionFilter) {
             try {
-                // logger.info("----- queueing message " + Thread.currentThread().getName());
-                messages.put(new QueuedMessage(connection, message));
+                messageQueue.put(new MessageTask(message, connectionFilter));
             } catch (InterruptedException e) {
                 logger.log(Level.WARNING, "Queueing a message failed:", e);
             }
         }
     }
 
-    private static class QueuedMessage {
+    private class MessageTask {
 
-        private WebSocketConnection connection;
         private String message;
 
-        private QueuedMessage(WebSocketConnection connection, String message) {
-            this.connection = connection;
+        private WebSocketConnectionImpl connection;
+        private Predicate<WebSocketConnection> connectionFilter;
+
+        /**
+         * A send-to-one task.
+         */
+        private MessageTask(String message, WebSocketConnectionImpl connection) {
             this.message = message;
+            this.connection = connection;
+        }
+
+        /**
+         * A send-to-many task.
+         */
+        private MessageTask(String message, Predicate<WebSocketConnection> connectionFilter) {
+            this.message = message;
+            this.connectionFilter = connectionFilter;
+        }
+
+        // ---
+
+        private void sendMessage() {
+            if (connection != null) {
+                _sendMessage(connection);
+            } else {
+                pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> _sendMessage(conn));
+            }
+        }
+
+        private void _sendMessage(WebSocketConnectionImpl conn) {
+            conn.sendMessage(message);
+        }
+
+        // ---
+
+        private String getMessageType() {
+            try {
+                return new JSONObject(message).getString("type");
+            } catch (Exception e) {
+                throw new RuntimeException("JSON parsing error", e);
+            }
         }
     }
 }

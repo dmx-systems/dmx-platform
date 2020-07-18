@@ -277,9 +277,9 @@ const actions = {
       player1: {roleTypeUri: 'dmx.core.default', ...playerId1},
       player2: {roleTypeUri: 'dmx.core.default', ...playerId2}
     }
-    console.log('createAssoc', assocModel)
+    // console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
-      console.log('Created', assoc)
+      // console.log('Created', assoc)
       dispatch('revealAssoc', {assoc})
       dispatch('_processDirectives', assoc.directives)
     })

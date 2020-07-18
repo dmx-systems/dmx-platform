@@ -1,18 +1,20 @@
 package systems.dmx.core.service.websocket;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.function.Predicate;
 
 
 
 public interface WebSocketService {
 
-    void messageToAll(String pluginUri, String message);
+    void sendToOrigin(String message);
 
-    // ### TODO: drop "request" parameter?
-    void messageToAllButOne(HttpServletRequest request, String pluginUri, String message);
+    void sendToAll(String message);
 
-    // ### TODO: drop "request" parameter?
-    void messageToOne(HttpServletRequest request, String pluginUri, String message);
+    void sendToAllButOrigin(String message);
+
+    void sendToReadAllowed(String message, long objectId);
+
+    void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter);
 
     // ---
 

@@ -49,7 +49,7 @@ export default ({store}) => {
     const topicModel = new dm5.Topic(topicType.newTopicModel(value)).fillChildren()
     // console.log('createTopic', topicModel)
     dm5.restClient.createTopic(topicModel).then(topic => {
-      console.log('Created', topic)
+      // console.log('Created', topic)
       revealTopic(topic)
       store.dispatch('_processDirectives', topic.directives)
     })

@@ -70,7 +70,7 @@
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
         <!-- WebSockets -->
         <dmx.websockets.port>8081</dmx.websockets.port>
-        <dmx.websockets.url>ws://localhost:8081</dmx.websockets.url>
+        <dmx.websockets.url>ws://localhost:8080/websocket</dmx.websockets.url>
 
         <!-- Request Filter -->
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
