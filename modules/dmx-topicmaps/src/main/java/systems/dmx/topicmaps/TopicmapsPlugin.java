@@ -13,7 +13,6 @@ import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.osgi.PluginActivator;
-import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
@@ -423,7 +422,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void init() {
-        me = new Messenger(dmx);
+        me = new Messenger(dmx.getWebSocketService());
     }
 
 

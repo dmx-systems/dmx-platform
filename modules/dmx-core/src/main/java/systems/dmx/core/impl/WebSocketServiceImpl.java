@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.websocket.WebSocketConnection;
 import systems.dmx.core.service.websocket.WebSocketService;
 
@@ -58,14 +59,14 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void sendToAllButOrigin(String message) {
-        // Note: basically copied to Messenger.java (module dmx-topicmaps), including clientId() helper
-        // TODO: DRY. Provide central factory for the predicate + cookie logic
-        //
-        // Note: the predicate is evaluated in another thread (SendMessageWorker). So to read out the client-id
-        // cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead from predicate)
-        // and hold the result in the predicate's closure.
-        String clientId = clientId();
-        queueMessage(message, conn -> !conn.getClientId().equals(clientId));
+        queueMessage(message, isOrigin().negate());
+    }
+
+    @Override
+    public void sendToReadAllowed(String message, long objectId) {
+        // don't send back to origin
+        // only send if receiver has READ permission for object
+        queueMessage(message, isOrigin().negate().and(isReadAllowed(objectId)));
     }
 
     @Override
@@ -122,6 +123,31 @@ public class WebSocketServiceImpl implements WebSocketService {
         worker.queueMessage(message, connectionFilter);
     }
 
+    // ---
+
+    private Predicate<WebSocketConnection> isOrigin() {
+        // Note: the returned predicate is evaluated in another thread (SendMessageWorker). So to read out the client-id
+        // cookie -- which is stored thread-locally -- we call clientId() from *this* thread (instead from predicate)
+        // and hold the result in the predicate's closure.
+        String clientId = clientId();
+        return conn -> {
+            boolean isOrigin = conn.getClientId().equals(clientId);
+            if (isOrigin) {
+                logger.info(conn.getClientId() + " " + conn.getUsername() + " (origin) -> " + false);
+            }
+            return isOrigin;
+        };
+    }
+
+    private Predicate<WebSocketConnection> isReadAllowed(long objectId) {
+        return conn -> {
+            boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " -> " + isReadAllowed);
+            return isReadAllowed;
+        };
+    }
+
+    // ---
 
     /**
      * @return  the WebSocket connection that is associated with the current request (based on "dmx_client_id" cookie),

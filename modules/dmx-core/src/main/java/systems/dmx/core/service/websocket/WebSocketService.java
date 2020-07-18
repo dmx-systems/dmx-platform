@@ -12,6 +12,8 @@ public interface WebSocketService {
 
     void sendToAllButOrigin(String message);
 
+    void sendToReadAllowed(String message, long objectId);
+
     void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter);
 
     // ---
