@@ -89,7 +89,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             ));
             getTopicmapType(topicmapTypeUri).initTopicmapState(topicmapTopic, viewProps, dmx);
             //
-            me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
+            me.newTopicmap(topicmapTopic);
             return topicmapTopic;
         } catch (Exception e) {
             throw new RuntimeException("Creating topicmap \"" + name + "\" failed, topicmapTypeUri=\"" +

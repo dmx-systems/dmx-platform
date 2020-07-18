@@ -7,9 +7,8 @@ import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.websocket.WebSocketConnection;
 import systems.dmx.core.service.websocket.WebSocketService;
 
-import javax.servlet.http.HttpServletRequest;
+import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Predicate;
@@ -132,9 +131,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         String clientId = clientId();
         return conn -> {
             boolean isOrigin = conn.getClientId().equals(clientId);
-            if (isOrigin) {
-                logger.info(conn.getClientId() + " " + conn.getUsername() + " (origin) -> " + false);
-            }
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isOrigin) -> " + isOrigin);
             return isOrigin;
         };
     }
@@ -142,7 +139,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     private Predicate<WebSocketConnection> isReadAllowed(long objectId) {
         return conn -> {
             boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
-            logger.info(conn.getClientId() + " " + conn.getUsername() + " -> " + isReadAllowed);
+            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isReadAllowed) -> " + isReadAllowed);
             return isReadAllowed;
         };
     }
@@ -175,16 +172,21 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         @Override
         public void run() {
-            try {
-                while (true) {
-                    messageQueue.take().send();
+            boolean stopped = false;
+            while (!stopped) {
+                MessageTask task = null;
+                try {
+                    task = messageQueue.take();
+                    task.sendMessage();
                     yield();
+                } catch (InterruptedException e) {
+                    stopped = true;
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "An error occurred in the SendMessageWorker while processing a \"" +
+                        task.getMessageType() + "\" task (aborting this task):", e);
                 }
-            } catch (InterruptedException e) {
-                logger.info("Terminating SendMessageWorker");
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker -- terminating:", e);
             }
+            logger.info("### Terminating SendMessageWorker");
         }
 
         private void queueMessage(String message, WebSocketConnectionImpl connection) {
@@ -229,16 +231,26 @@ public class WebSocketServiceImpl implements WebSocketService {
 
         // ---
 
-        private void send() {
+        private void sendMessage() {
             if (connection != null) {
-                _send(connection);
+                _sendMessage(connection);
             } else {
-                pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> _send(conn));
+                pool.getAllConnections().stream().filter(connectionFilter).forEach(conn -> _sendMessage(conn));
             }
         }
 
-        private void _send(WebSocketConnectionImpl conn) {
+        private void _sendMessage(WebSocketConnectionImpl conn) {
             conn.sendMessage(message);
+        }
+
+        // ---
+
+        private String getMessageType() {
+            try {
+                return new JSONObject(message).getString("type");
+            } catch (Exception e) {
+                throw new RuntimeException("JSON parsing error", e);
+            }
         }
     }
 }

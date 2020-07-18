@@ -34,7 +34,11 @@ class Messenger {
 
     void newTopicmap(Topic topicmapTopic) {
         try {
-            // FIXME: per connection check read access
+            // FIXME: send message only to users who have READ permission for the topicmap topic.
+            // Unfortunately we can't just use sendToReadAllowed() as the permission check is performed in another thread
+            // (WebSocketService's SendMessageWorker), and the create-topicmap transaction is not yet committed.
+            // The result would be "org.neo4j.graphdb.NotFoundException: 'typeUri' property not found for NodeImpl#1234"
+            // (where 1234 is the ID of the just created topicmap).
             sendToAllButOrigin(new JSONObject()
                 .put("type", "newTopicmap")
                 .put("args", new JSONObject()
