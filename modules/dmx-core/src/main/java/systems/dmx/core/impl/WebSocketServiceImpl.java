@@ -21,7 +21,8 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String WEBSOCKETS_URL = System.getProperty("dmx.websockets.url", "ws://localhost:8081");
+    private static final String WEBSOCKETS_URL = System.getProperty("dmx.websockets.url",
+                                                                    "ws://localhost:8080/websocket");
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
