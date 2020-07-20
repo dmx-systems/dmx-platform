@@ -372,7 +372,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void registerTopicmapType(TopicmapType topicmapType) {
-        logger.info("### Registering topicmap type \"" + topicmapType.getClass().getName() + "\"");
+        logger.info("### Registering topicmap type \"" + topicmapType.getUri() + "\"");
         topicmapTypes.put(topicmapType.getUri(), topicmapType);
     }
 

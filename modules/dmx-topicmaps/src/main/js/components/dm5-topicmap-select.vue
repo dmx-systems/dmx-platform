@@ -2,7 +2,9 @@
   <div class="dm5-topicmap-select">
     <el-select v-model="topicmapId">
       <el-option-group label="Topicmap">
-        <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+        <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id">
+          <span class="fa icon">{{icon(topic)}}</span><span>{{topic.value}}</span>
+        </el-option>
       </el-option-group>
     </el-select>
     <el-button type="text" class="fa fa-info-circle" title="Reveal Topicmap Topic" @click="revealTopicmapTopic">
@@ -14,6 +16,8 @@
 </template>
 
 <script>
+import dm5 from 'dm5'
+
 export default {
 
   computed: {
@@ -51,6 +55,11 @@ export default {
 
     resetTopicmapViewport () {
       this.$store.dispatch('resetTopicmapViewport')
+    },
+
+    icon (topicmapTopic) {
+      const mapTypeUri = topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+      return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
     }
   }
 }

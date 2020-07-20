@@ -16,8 +16,6 @@
 </template>
 
 <script>
-import dm5 from 'dm5'
-
 export default {
 
   created () {

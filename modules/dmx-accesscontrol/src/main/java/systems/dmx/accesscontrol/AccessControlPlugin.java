@@ -649,7 +649,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private Topic getUsernameTopicOrThrow(String username) {
         Topic usernameTopic = getUsernameTopic(username);
         if (usernameTopic == null) {
-            throw new RuntimeException("User \"" + username + "\" does not exist");
+            throw new RuntimeException("Unknown user \"" + username + "\"");
         }
         return usernameTopic;
     }

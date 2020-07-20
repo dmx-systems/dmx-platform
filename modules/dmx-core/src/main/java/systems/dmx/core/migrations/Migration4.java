@@ -10,7 +10,7 @@ import systems.dmx.core.service.Migration;
  * Renames data type "Identity" -> "Entity".
  *
  * Part of DMX 5.0
- * Runs on UPDATE
+ * Runs only on UPDATE
  */
 public class Migration4 extends Migration {
 

@@ -576,7 +576,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUsernameTopicOrThrow(String username) {
         TopicModelImpl usernameTopic = _getUsernameTopic(username);
         if (usernameTopic == null) {
-            throw new RuntimeException("User \"" + username + "\" does not exist");
+            throw new RuntimeException("Unknown user \"" + username + "\"");
         }
         return usernameTopic;
     }
@@ -634,7 +634,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         TopicModelImpl workspace = al.sd.fetchTopic("uri", uri);
         // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
         if (workspace == null) {
-            throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
+            throw new RuntimeException("Unknown workspace \"" + uri + "\"");
         }
         if (!workspace.getTypeUri().equals("dmx.workspaces.workspace")) {
             throw new RuntimeException("Topic \"" + uri + "\" is not a workspace but a \"" + workspace.getTypeUri() +
