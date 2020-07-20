@@ -17,13 +17,15 @@ export default ({store}) => {
           extraMenuItems: state => state.search.extraMenuItems,
           createEnabled:  state => state.workspaces.isWritable,
           markerIds:      (_, getters) => getters && getters.visibleTopicIds,
-          menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes  // TODO: why is getters undefined on start?
+          menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes, // TODO: why is getters undefined on start?
+          topicmapTypes:  state => Object.values(state.topicmaps.topicmapTypes)
         },
         listeners: {
           'topic-click': revealTopic,
           'icon-click':  revealTopicNoSelect,
-          'topic-create': createTopic,
-          'extra-create': createExtra,
+          'topic-create':    createTopic,
+          'extra-create':    createExtra,
+          'topicmap-create': createTopicmap,
           close: _ => store.dispatch('closeSearchWidget')
         }
       }
@@ -57,5 +59,9 @@ export default ({store}) => {
 
   function createExtra ({extraItem, value, optionsData}) {
     extraItem.create(value, optionsData, store.state.search.pos.model)
+  }
+
+  function createTopicmap ({name, topicmapTypeUri, viewProps}) {
+    store.dispatch('createTopicmap', {name, topicmapTypeUri, viewProps})
   }
 }

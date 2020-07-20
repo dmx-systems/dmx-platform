@@ -139,7 +139,8 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private Predicate<WebSocketConnection> isReadAllowed(long objectId) {
         return conn -> {
-            boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ, objectId);
+            boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ,
+                objectId);
             logger.info(conn.getClientId() + " " + conn.getUsername() + " (isReadAllowed) -> " + isReadAllowed);
             return isReadAllowed;
         };

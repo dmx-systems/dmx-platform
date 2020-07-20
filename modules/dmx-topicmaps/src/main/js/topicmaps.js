@@ -49,9 +49,9 @@ const actions = {
   createTopicmap ({rootState, dispatch}, {name = 'untitled',
                                           topicmapTypeUri = 'dmx.topicmaps.topicmap',
                                           viewProps = {}}) {
-    console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
+    // console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
     dm5.restClient.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
-      console.log('Topicmap topic', topic)
+      // console.log('Topicmap topic', topic)
       // update state
       topicmapTopics(rootState).push(topic)
       initSelection(topic.id, dispatch)
