@@ -3,7 +3,8 @@
     <el-select v-model="workspaceId">
       <el-option-group label="Workspace">
         <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id">
-          <span class="fa icon">{{topic.icon}}</span><span>{{topic.value}}</span>
+          <!-- Note: harcoding icon here; the Workspace type might not yet be present in type cache -->
+          <span class="fa icon">&#xf005;</span><span>{{topic.value}}</span>
         </el-option>
       </el-option-group>
     </el-select>
