@@ -77,6 +77,13 @@ export default ({store, dm5}) => {
       ]
     },
 
+    iconRenderers: {
+      'dmx.topicmaps.topicmap': topic => {
+        const mapTypeUri = topic.children['dmx.topicmaps.topicmap_type_uri'].value
+        return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
+      }
+    },
+
     topicmapType: {
       uri: 'dmx.topicmaps.topicmap',
       name: 'Topicmap',

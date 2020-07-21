@@ -14,6 +14,7 @@ import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Transactional;
+import systems.dmx.core.service.event.PreSendTopic;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
 
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
 @Path("/topicmaps")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, ViewmodelCustomizer, PreSendTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -64,6 +65,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // Note: registering the default topicmap type in the init() hook would be too late.
         // The topicmap type is already needed at install-in-DB time ### Still true? Use preInstall() hook?
         registerTopicmapType(new DefaultTopicmapType());
+        //
+        registerViewmodelCustomizer(this);
+        // ### FIXME: unregister is missing
     }
 
 
@@ -410,6 +414,44 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public InputStream getTopicmapAndTopicInWebclient() {
         // Note: the path parameters are evaluated at client-side
         return invokeWebclient();
+    }
+
+
+
+    // ***************************
+    // *** ViewmodelCustomizer ***
+    // ***************************
+
+
+
+    /**
+     * Note: as Topicmap is not a DMXObject no PRE_SEND event is fired, so for customizing the topicmap we use a
+     * ViewmodelCustomizer.
+     */
+    @Override
+    public void enrichViewProps(RelatedTopic topic, ViewProps viewProps) {
+        if (topic.getTypeUri().equals(TOPICMAP)) {
+            topic.loadChildTopics();
+        }
+    }
+
+
+
+    // *****************
+    // *** Listeners ***
+    // *****************
+
+
+
+    /**
+     * Always send a Topicmap topic complete with child topics. Clients need them in order to render a maptype specific
+     * icon.
+     */
+    @Override
+    public void preSendTopic(Topic topic) {
+        if (topic.getTypeUri().equals(TOPICMAP)) {
+            topic.loadChildTopics();
+        }
     }
 
 
