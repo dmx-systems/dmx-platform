@@ -9,14 +9,15 @@ import extraElementUI from './element-ui'
 import 'font-awesome/css/font-awesome.css'
 import './websocket'
 
-console.log('[DMX] 2020/07/20')
+console.log('[DMX] 2020/07/21')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
 // The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init(). ### TODO: still true?
 const dm5ready = dm5.init({
   store,
-  onHttpError
+  onHttpError,
+  iconRenderers: store.state.iconRenderers
 })
 
 // 2) Create Vue root instance

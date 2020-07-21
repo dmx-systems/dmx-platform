@@ -89,6 +89,9 @@ function initPlugin (pluginConfig) {
   registerDetailRenderers(_pluginConfig.objectRenderers, 'object')
   registerDetailRenderers(_pluginConfig.valueRenderers,  'value')
   //
+  // icon renderers
+  registerIconRenderers(_pluginConfig.iconRenderers)
+  //
   // context commands
   const contextCommands = _pluginConfig.contextCommands
   if (contextCommands) {
@@ -112,6 +115,12 @@ function registerDetailRenderers (renderers, renderer) {
       store.dispatch('registerDetailRenderer', {renderer, typeUri, component: renderers[typeUri]})
     }
   }
+}
+
+function registerIconRenderers (renderers) {
+  renderers && Object.entries(renderers).forEach(([typeUri, iconFunc]) => {
+    store.dispatch('registerIconRenderer', {typeUri, iconFunc})
+  })
 }
 
 // --- Fetch from server ---

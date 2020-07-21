@@ -36,13 +36,13 @@ import java.util.logging.Logger;
  * <ol>
  * <li>Fire the <code>CoreEvent.SERVICE_RESPONSE_FILTER</code> event to let plugins operate on the response, e.g.
  *     - the Caching plugin sets the <code>Cache-Control</code> response header
- *     - the Time plugin sets the <code>Last-Modified</code> response header
+ *     - the Timestamps plugin sets the <code>Last-Modified</code> response header
  * <li>Load child topics of the response object(s) if requested with the <code>children</code> and
  *     <code>assoc_children</code> query parameters.
  * <li>Fire the <code>CoreEvent.PRE_SEND_XXX</code> events for all response object(s) and objects contained in response
  *     directives. This let plugins operate on the response on a per-object basis, e.g.
  *     - the Geomaps plugin enriches an Address topic with its geo coordinate
- *     - the Time plugin enriches topics/associations with creation/modification timestamps
+ *     - the Timestamps plugin enriches topics/associations with creation/modification timestamps
  * <li>Broadcast directives.
  * <li>Remove the (thread-local) directives assembled while request processing.
  * </ol>
@@ -95,7 +95,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend(((DirectivesResponse) entity).getObject());
                     //
                     // Note: some plugins rely on the PRE_SEND event to be fired for the individual DMX
-                    // objects contained in the set of directives. E.g. the Time plugin enriches updated objects
+                    // objects contained in the set of directives. E.g. the Timestamps plugin enriches updated objects
                     // with timestamps. The timestamps in turn are needed at client-side by the Caching plugin
                     // in order to issue conditional PUT requests.
                     // ### TODO: don't fire PRE_SEND events for the individual directives but only for the wrapped

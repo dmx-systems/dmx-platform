@@ -21,6 +21,11 @@ const state = {
     value: {}               //     typeUri: component
   },                        //   }
 
+  iconRenderers: {          // Registered icon renderers:
+  },                        //   {
+                            //     typeUri: function (topic) => icon
+                            //   }
+
   compDefs: {},             // Registered webclient components:
                             // {
                             //    mount: [compDef]
@@ -91,10 +96,14 @@ const actions = {
   // ---
 
   /**
-   * @param   render    "object" or "value"
+   * @param   renderer    "object" or "value"
    */
   registerDetailRenderer (_, {renderer, typeUri, component}) {
     state.detailRenderers[renderer][typeUri] = component
+  },
+
+  registerIconRenderer (_, {typeUri, iconFunc}) {
+    state.iconRenderers[typeUri] = iconFunc
   },
 
   registerComponent (_, compDef) {

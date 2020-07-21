@@ -3,7 +3,7 @@
     <el-select v-model="topicmapId">
       <el-option-group label="Topicmap">
         <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id">
-          <span class="fa icon">{{icon(topic)}}</span><span>{{topic.value}}</span>
+          <span class="fa icon">{{topic.icon}}</span><span>{{topic.value}}</span>
         </el-option>
       </el-option-group>
     </el-select>
@@ -55,11 +55,6 @@ export default {
 
     resetTopicmapViewport () {
       this.$store.dispatch('resetTopicmapViewport')
-    },
-
-    icon (topicmapTopic) {
-      const mapTypeUri = topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
-      return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
     }
   }
 }
