@@ -4,6 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.ChildTopics;
+import systems.dmx.core.QueryResult;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -91,6 +92,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend((DMXObject) entity);
                 } else if (isIterable(response, DMXObject.class)) {
                     firePreSend((Iterable<DMXObject>) entity);
+                } else if (entity instanceof QueryResult) {
+                    firePreSend(((QueryResult) entity).topics);
                 } else if (entity instanceof DirectivesResponse) {
                     firePreSend(((DirectivesResponse) entity).getObject());
                     //
@@ -176,7 +179,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    private void firePreSend(Iterable<DMXObject> objects) {
+    private void firePreSend(Iterable<? extends DMXObject> objects) {
         for (DMXObject object : objects) {
             firePreSend(object);
         }
