@@ -132,7 +132,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         String clientId = clientId();
         return conn -> {
             boolean isOrigin = conn.getClientId().equals(clientId);
-            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isOrigin) -> " + isOrigin);
+            logger.fine(conn.getClientId() + " " + conn.getUsername() + " (isOrigin) -> " + isOrigin);
             return isOrigin;
         };
     }
@@ -141,7 +141,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         return conn -> {
             boolean isReadAllowed = dmx.getPrivilegedAccess().hasPermission(conn.getUsername(), Operation.READ,
                 objectId);
-            logger.info(conn.getClientId() + " " + conn.getUsername() + " (isReadAllowed) -> " + isReadAllowed);
+            logger.fine(conn.getClientId() + " " + conn.getUsername() + " (isReadAllowed) -> " + isReadAllowed);
             return isReadAllowed;
         };
     }

@@ -17,13 +17,13 @@ public class Constants {
     public static final String TOPICMAP_CONTENT     = "dmx.topicmaps.topicmap_content";
 
     // Props (topicmap)
-    static final String PAN_X                       = "dmx.topicmaps.pan_x";
-    static final String PAN_Y                       = "dmx.topicmaps.pan_y";
-    static final String ZOOM                        = "dmx.topicmaps.zoom";
+    public static final String PAN_X                = "dmx.topicmaps.pan_x";
+    public static final String PAN_Y                = "dmx.topicmaps.pan_y";
+    public static final String ZOOM                 = "dmx.topicmaps.zoom";
 
     // Props (topic/assoc)
-    static final String X                           = "dmx.topicmaps.x";    // topic only
-    static final String Y                           = "dmx.topicmaps.y";    // topic only
-    static final String VISIBILITY                  = "dmx.topicmaps.visibility";
-    static final String PINNED                      = "dmx.topicmaps.pinned";
+    public static final String X                    = "dmx.topicmaps.x";    // topic only
+    public static final String Y                    = "dmx.topicmaps.y";    // topic only
+    public static final String VISIBILITY           = "dmx.topicmaps.visibility";
+    public static final String PINNED               = "dmx.topicmaps.pinned";
 }
