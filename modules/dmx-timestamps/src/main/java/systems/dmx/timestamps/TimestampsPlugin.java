@@ -1,5 +1,6 @@
 package systems.dmx.timestamps;
 
+import static systems.dmx.timestamps.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
@@ -47,9 +48,6 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String PROP_CREATED  = "dmx.timestamps.created";
-    private static String PROP_MODIFIED = "dmx.timestamps.modified";
-
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -78,7 +76,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @Override
     public long getCreationTime(@PathParam("id") long objectId) {
         try {
-            return dmx.hasProperty(objectId, PROP_CREATED) ? (Long) dmx.getProperty(objectId, PROP_CREATED) : 0;
+            return dmx.hasProperty(objectId, CREATED) ? (Long) dmx.getProperty(objectId, CREATED) : 0;
         } catch (Exception e) {
             throw new RuntimeException("Fetching creation time of object " + objectId + " failed", e);
         }
@@ -89,7 +87,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @Override
     public long getModificationTime(@PathParam("id") long objectId) {
         try {
-            return dmx.hasProperty(objectId, PROP_MODIFIED) ? (Long) dmx.getProperty(objectId, PROP_MODIFIED) : 0;
+            return dmx.hasProperty(objectId, MODIFIED) ? (Long) dmx.getProperty(objectId, MODIFIED) : 0;
         } catch (Exception e) {
             throw new RuntimeException("Fetching modification time of object " + objectId + " failed", e);
         }
@@ -110,28 +108,28 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @Path("/from/{from}/to/{to}/topics/created")
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from, @PathParam("to") long to) {
-        return dmx.getTopicsByPropertyRange(PROP_CREATED, from, to);
+        return dmx.getTopicsByPropertyRange(CREATED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/topics/modified")
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from, @PathParam("to") long to) {
-        return dmx.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
+        return dmx.getTopicsByPropertyRange(MODIFIED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/assocs/created")
     @Override
     public Collection<Assoc> getAssocsByCreationTime(@PathParam("from") long from, @PathParam("to") long to) {
-        return dmx.getAssocsByPropertyRange(PROP_CREATED, from, to);
+        return dmx.getAssocsByPropertyRange(CREATED, from, to);
     }
 
     @GET
     @Path("/from/{from}/to/{to}/assocs/modified")
     @Override
     public Collection<Assoc> getAssocsByModificationTime(@PathParam("from") long from, @PathParam("to") long to) {
-        return dmx.getAssocsByPropertyRange(PROP_MODIFIED, from, to);
+        return dmx.getAssocsByPropertyRange(MODIFIED, from, to);
     }
 
 
@@ -219,11 +217,11 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     // ---
 
     private void storeCreationTime(DMXObject object, long time) {
-        storeTime(object, PROP_CREATED, time);
+        storeTime(object, CREATED, time);
     }
 
     private void storeModificationTime(DMXObject object, long time) {
-        storeTime(object, PROP_MODIFIED, time);
+        storeTime(object, MODIFIED, time);
     }
 
     // ---
@@ -243,8 +241,8 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     private void enrichWithTimestamp(DMXObject object) {
         long objectId = object.getId();
         ChildTopicsModel childTopics = object.getChildTopics().getModel()
-            .set(PROP_CREATED, getCreationTime(objectId))
-            .set(PROP_MODIFIED, getModificationTime(objectId));
+            .set(CREATED, getCreationTime(objectId))
+            .set(MODIFIED, getModificationTime(objectId));
     }
 
     // ---
