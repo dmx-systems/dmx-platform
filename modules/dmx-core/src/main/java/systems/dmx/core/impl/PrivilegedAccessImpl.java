@@ -57,7 +57,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ### TODO: copy in WorkspaceService.java
     private static final String DMX_WORKSPACE_URI = "dmx.workspaces.dmx";
     // ### TODO: copy in AccessControlService.java
-    private static final String ADMINISTRATION_WORKSPACE_URI = "dmx.workspaces.administration";
+    private static final String ADMIN_WORKSPACE_URI = "dmx.workspaces.administration";
     private static final String SYSTEM_WORKSPACE_URI = "dmx.workspaces.system";
 
     // ### TODO: copy in Credentials.java
@@ -294,9 +294,9 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     }
 
     @Override
-    public long getAdministrationWorkspaceId() {
+    public long getAdminWorkspaceId() {
         if (adminWorkspaceId == -1) {
-            adminWorkspaceId = _getWorkspace(ADMINISTRATION_WORKSPACE_URI).getId();
+            adminWorkspaceId = _getWorkspace(ADMIN_WORKSPACE_URI).getId();
         }
         return adminWorkspaceId;
     }

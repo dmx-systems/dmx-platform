@@ -48,9 +48,9 @@ public class Migration2 extends Migration {
         //
         // "Administration"
         Topic adminWorkspace = wsService.createWorkspace(
-            AccessControlService.ADMINISTRATION_WORKSPACE_NAME,
-            AccessControlService.ADMINISTRATION_WORKSPACE_URI,
-            AccessControlService.ADMINISTRATION_WORKSPACE_SHARING_MODE
+            AccessControlService.ADMIN_WORKSPACE_NAME,
+            AccessControlService.ADMIN_WORKSPACE_URI,
+            AccessControlService.ADMIN_WORKSPACE_SHARING_MODE
         );
         acService.setWorkspaceOwner(adminWorkspace, AccessControlService.ADMIN_USERNAME);
         //

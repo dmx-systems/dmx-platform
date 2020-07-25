@@ -143,7 +143,7 @@ public interface PrivilegedAccess {
     /**
      * Returns the ID of the "Administration" workspace.
      */
-    long getAdministrationWorkspaceId();
+    long getAdminWorkspaceId();
 
     /**
      * Returns the ID of the "System" workspace.

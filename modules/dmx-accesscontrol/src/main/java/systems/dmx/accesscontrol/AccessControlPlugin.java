@@ -379,7 +379,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/workspace/admin/id")
     @Override
     public long getAdminWorkspaceId() {
-        return dmx.getPrivilegedAccess().getAdministrationWorkspaceId();
+        return dmx.getPrivilegedAccess().getAdminWorkspaceId();
     }
 
 

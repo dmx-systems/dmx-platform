@@ -175,7 +175,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         PrivilegedAccess pa = dmx.getPrivilegedAccess();
         switch (role) {
         case ADMIN:
-            return pa.getAdministrationWorkspaceId();
+            return pa.getAdminWorkspaceId();
         case SYSTEM:
             return pa.getSystemWorkspaceId();
         default:
