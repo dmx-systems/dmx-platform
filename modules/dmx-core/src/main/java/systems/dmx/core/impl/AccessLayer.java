@@ -109,7 +109,7 @@ public final class AccessLayer {
 
     List<TopicModelImpl> queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics) {
         try {
-            logger.info("Querying topics fulltext, query=\"" + query + "\", topicTypeUri=\"" +
+            logger.fine("Querying topics fulltext, query=\"" + query + "\", topicTypeUri=\"" +
                 topicTypeUri + "\", searchChildTopics=" + searchChildTopics);
             List<TopicModelImpl> topics;
             if (topicTypeUri != null && searchChildTopics) {

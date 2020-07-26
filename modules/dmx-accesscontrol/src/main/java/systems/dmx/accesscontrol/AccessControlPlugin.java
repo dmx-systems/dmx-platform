@@ -39,9 +39,11 @@ import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
 import systems.dmx.core.service.event.PostUpdateAssoc;
 import systems.dmx.core.service.event.PostUpdateTopic;
+import systems.dmx.core.service.event.PreCreateAssoc;
 import systems.dmx.core.service.event.PreUpdateTopic;
 import systems.dmx.core.service.event.ServiceRequestFilter;
 import systems.dmx.core.service.event.StaticResourceFilter;
+import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
 import systems.dmx.files.FilesService;
 import systems.dmx.files.event.CheckDiskQuota;
@@ -85,6 +87,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                           CheckTopicWriteAccess,
                                                                                           CheckAssocReadAccess,
                                                                                           CheckAssocWriteAccess,
+                                                                                          PreCreateAssoc,
                                                                                           PreUpdateTopic,
                                                                                           PostCreateTopic,
                                                                                           PostCreateAssoc,
@@ -140,9 +143,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject private WorkspacesService wsService;
-    @Inject private FilesService filesService;
-    @Inject private ConfigService configService;
+    @Inject private WorkspacesService ws;
+    @Inject private FilesService fs;
+    @Inject private ConfigService cs;
 
     @Context
     private HttpServletRequest request;
@@ -300,8 +303,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             });
             // 3) create private workspace
             setWorkspaceOwner(
-                wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE),
-                username
+                ws.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE), username
             );
             // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's
             // private workspace has been created by the new user itself. Instead we set the *current* user as the
@@ -357,11 +359,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            Assoc assoc = dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
+            dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
                 mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
                 mf.newTopicPlayerModel(workspaceId, DEFAULT)
             ));
-            assignMembershipToWorkspace(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -480,7 +481,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preInstall() {
-        configService.registerConfigDefinition(new ConfigDefinition(
+        cs.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, USERNAME,
             mf.newTopicModel(LOGIN_ENABLED, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
             ConfigModificationRole.ADMIN, this
@@ -493,8 +494,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // (at preInstall() time) would fail as the Config service already holds such a registration.
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Access Control plugin is stopped/started as well but at shutdown() time the Config service is already gone.
-        if (configService != null) {
-            configService.unregisterConfigDefinition(LOGIN_ENABLED);
+        if (cs != null) {
+            cs.unregisterConfigDefinition(LOGIN_ENABLED);
         }
     }
 
@@ -564,7 +565,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
+    public void preCreateAssoc(AssocModel assoc) {
+        // Membership auto-typing
+        DMXUtils.assocAutoTyping(assoc, USERNAME, WORKSPACE, MEMBERSHIP, DEFAULT, DEFAULT);
+    }
+
+    // Note: we don't do the custom workspace assignment in preCreateAssoc() as this would create a race condition
+    // with the Workspaces module, which is responsible for the default workspace assignment.
+    @Override
     public void postCreateAssoc(Assoc assoc) {
+        if (assoc.getTypeUri().equals(MEMBERSHIP)) {
+            assignMembershipToWorkspace(assoc);
+        }
+        //
         setCreatorAndModifier(assoc);
     }
 
@@ -591,8 +604,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             passwordTopic.setSimpleValue(encodePassword(password));
             // reassign workspace
             long workspaceId = getPrivateWorkspace().getId();
-            wsService.assignToWorkspace(passwordTopic, workspaceId);
-            wsService.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
+            ws.assignToWorkspace(passwordTopic, workspaceId);
+            ws.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
         }
         //
         setModifier(topic);
@@ -600,10 +613,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
-        if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
-            assignMembershipToWorkspace(assoc);
-        }
-        //
         setModifier(assoc);
     }
 
@@ -659,22 +668,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }
 
-    private boolean isMembership(AssocModel assoc) {
-        return assoc.getTypeUri().equals(MEMBERSHIP);
-    }
-
     /**
-     * Assigns a Membership to its workspace player.
+     * Assigns a Membership to its Workspace player.
      *
-     * @throws  RuntimeException    if the given assoc has no workspace player
+     * @throws  RuntimeException    if the given assoc has no Workspace player
      */
     private void assignMembershipToWorkspace(Assoc assoc) {
         try {
             DMXObject workspace = assoc.getDMXObjectByType(WORKSPACE);
             if (workspace == null) {
-                throw new RuntimeException("Assoc " + assoc.getId() + " has no workspace player");
+                throw new RuntimeException("Assoc " + assoc.getId() + " has no Workspace player");
             }
-            wsService.assignToWorkspace(assoc, workspace.getId());
+            ws.assignToWorkspace(assoc, workspace.getId());
         } catch (Exception e) {
             throw new RuntimeException("Assigning membership " + assoc.getId() + " to a workspace failed", e);
         }
@@ -687,7 +692,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         for (Topic fileTopic : dmx.getTopicsByType("dmx.files.file")) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
-                occupiedSpace += filesService.getFile(fileTopicId).length();
+                occupiedSpace += fs.getFile(fileTopicId).length();
             }
         }
         return occupiedSpace;
