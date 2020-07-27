@@ -235,7 +235,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === User Accounts ===
 
     @POST
-    @Path("/user_account")
+    @Path("/user-account")
     @Transactional
     @Override
     public Topic createUserAccount(Credentials cred) {

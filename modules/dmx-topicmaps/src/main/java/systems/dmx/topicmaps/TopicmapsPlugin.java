@@ -82,7 +82,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public Topic createTopicmap(@QueryParam("name") String name,
-                                @QueryParam("topicmap_type_uri") String topicmapTypeUri,
+                                @QueryParam("topicmapTypeUri") String topicmapTypeUri,
                                 ViewProps viewProps) {
         try {
             logger.info("Creating topicmap \"" + name + "\", topicmapTypeUri=\"" + topicmapTypeUri + "\", viewProps=" +

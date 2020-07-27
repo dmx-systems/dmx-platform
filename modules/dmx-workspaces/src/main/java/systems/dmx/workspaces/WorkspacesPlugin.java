@@ -100,7 +100,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Transactional
     @Override
     public Topic createWorkspace(@QueryParam("name") final String name, @QueryParam("uri") final String uri,
-                                 @QueryParam("sharing_mode_uri") final SharingMode sharingMode) {
+                                 @QueryParam("sharingModeUri") final SharingMode sharingMode) {
         final String operation = "Creating workspace \"" + name + "\" ";
         final String info = "(uri=" + uri + ", sharingMode=" + sharingMode + ")";
         try {
@@ -232,10 +232,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // Note: the "children" query parameter is handled by core's JerseyResponseFilter
     @GET
-    @Path("/{id}/topics/{topic_type_uri}")
+    @Path("/{id}/topics/{topicTypeUri}")
     @Override
     public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId,
-                                         @PathParam("topic_type_uri") String topicTypeUri) {
+                                         @PathParam("topicTypeUri") String topicTypeUri) {
         // TODO: optimization. Use getRelatedTopics() by using "Workspace Assignment" type.
         List<Topic> topics = dmx.getTopicsByType(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
@@ -244,10 +244,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // Note: the "children" query parameter is handled by core's JerseyResponseFilter
     @GET
-    @Path("/{id}/assocs/{assoc_type_uri}")
+    @Path("/{id}/assocs/{assocTypeUri}")
     @Override
     public List<Assoc> getAssignedAssocs(@PathParam("id") long workspaceId,
-                                         @PathParam("assoc_type_uri") String assocTypeUri) {
+                                         @PathParam("assocTypeUri") String assocTypeUri) {
         List<Assoc> assocs = dmx.getAssocsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
