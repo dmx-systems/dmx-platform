@@ -224,28 +224,26 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Topic Types ===
 
-    // ### TODO: change URI templates to "/topic-types" / "/assoc-types"
-
     @GET
-    @Path("/topictype/{uri}")
+    @Path("/topic-type/{uri}")
     public TopicType getTopicType(@PathParam("uri") String uri) {
         return dmx.getTopicType(uri);
     }
 
     @GET
-    @Path("/topictype/topic/{id}")
+    @Path("/topic-type/topic/{id}")
     public TopicType getTopicTypeImplicitly(@PathParam("id") long topicId) {
         return dmx.getTopicTypeImplicitly(topicId);
     }
 
     @GET
-    @Path("/topictype/all")
+    @Path("/topic-types")
     public List<TopicType> getAllTopicTypes() {
         return dmx.getAllTopicTypes();
     }
 
     @POST
-    @Path("/topictype")
+    @Path("/topic-type")
     @Transactional
     public TopicType createTopicType(TopicTypeModel model) {
         TopicType topicType = dmx.createTopicType(model);
@@ -253,8 +251,9 @@ public class WebservicePlugin extends PluginActivator {
         return topicType;
     }
 
+    // TODO: append URI to path; compare to updateTopic()
     @PUT
-    @Path("/topictype")
+    @Path("/topic-type")
     @Transactional
     public DirectivesResponse updateTopicType(TopicTypeModel model) {
         dmx.updateTopicType(model);
@@ -262,7 +261,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @DELETE
-    @Path("/topictype/{uri}")
+    @Path("/topic-type/{uri}")
     @Transactional
     public DirectivesResponse deleteTopicType(@PathParam("uri") String uri) {
         dmx.deleteTopicType(uri);
@@ -274,25 +273,25 @@ public class WebservicePlugin extends PluginActivator {
     // === Assoc Types ===
 
     @GET
-    @Path("/assoctype/{uri}")
+    @Path("/assoc-type/{uri}")
     public AssocType getAssocType(@PathParam("uri") String uri) {
         return dmx.getAssocType(uri);
     }
 
     @GET
-    @Path("/assoctype/assoc/{id}")
+    @Path("/assoc-type/assoc/{id}")
     public AssocType getAssocTypeImplicitly(@PathParam("id") long assocId) {
         return dmx.getAssocTypeImplicitly(assocId);
     }
 
     @GET
-    @Path("/assoctype/all")
+    @Path("/assoc-types")
     public List<AssocType> getAllAssocTypes() {
         return dmx.getAllAssocTypes();
     }
 
     @POST
-    @Path("/assoctype")
+    @Path("/assoc-type")
     @Transactional
     public AssocType createAssocType(AssocTypeModel model) {
         AssocType assocType = dmx.createAssocType(model);
@@ -300,8 +299,9 @@ public class WebservicePlugin extends PluginActivator {
         return assocType;
     }
 
+    // TODO: append URI to path; compare to updateAssoc()
     @PUT
-    @Path("/assoctype")
+    @Path("/assoc-type")
     @Transactional
     public DirectivesResponse updateAssocType(AssocTypeModel model) {
         dmx.updateAssocType(model);
@@ -309,7 +309,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @DELETE
-    @Path("/assoctype/{uri}")
+    @Path("/assoc-type/{uri}")
     @Transactional
     public DirectivesResponse deleteAssocType(@PathParam("uri") String uri) {
         dmx.deleteAssocType(uri);
@@ -565,9 +565,6 @@ public class WebservicePlugin extends PluginActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    // Note: client-sync for new types is only performed when type is created through REST API, not when type is created
-    // through Core Service (e.g. while running a migration). This is because message-to-all-but-one requires a request.
-    // Technically the Core Service is not a JAX-RS root resource, so injection (e.g. the request) does not work there.
     private class Messenger {
 
         private String pluginUri;
