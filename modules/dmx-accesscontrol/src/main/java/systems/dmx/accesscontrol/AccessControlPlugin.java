@@ -79,7 +79,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/accesscontrol")
+@Path("/access-control")
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
@@ -333,10 +333,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Workspaces / Memberships ===
 
     @GET
-    @Path("/workspace/{workspace_id}/owner")
+    @Path("/workspace/{workspaceId}/owner")
     @Produces("text/plain")
     @Override
-    public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
+    public String getWorkspaceOwner(@PathParam("workspaceId") long workspaceId) {
         // ### TODO: delegate to Core's PrivilegedAccess.getOwner()?
         return dmx.hasProperty(workspaceId, PROP_OWNER) ? (String) dmx.getProperty(workspaceId, PROP_OWNER) : null;
     }
@@ -354,10 +354,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @POST
-    @Path("/user/{username}/workspace/{workspace_id}")
+    @Path("/user/{username}/workspace/{workspaceId}")
     @Transactional
     @Override
-    public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
+    public void createMembership(@PathParam("username") String username, @PathParam("workspaceId") long workspaceId) {
         try {
             dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
                 mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),

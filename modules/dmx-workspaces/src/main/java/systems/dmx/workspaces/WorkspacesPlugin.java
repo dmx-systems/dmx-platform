@@ -164,10 +164,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // Note: part of REST API, not part of OSGi service
     @PUT
-    @Path("/{workspace_id}/object/{object_id}")
+    @Path("/{workspaceId}/object/{objectId}")
     @Transactional
-    public DirectivesResponse assignToWorkspace(@PathParam("object_id") long objectId,
-                                                @PathParam("workspace_id") long workspaceId) {
+    public DirectivesResponse assignToWorkspace(@PathParam("objectId") long objectId,
+                                                @PathParam("workspaceId") long workspaceId) {
         try {
             DMXObject object = dmx.getObject(objectId);
             checkAssignmentArgs(object, workspaceId);

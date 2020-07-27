@@ -55,10 +55,10 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ConfigService
 
     @GET
-    @Path("/{config_type_uri}/topic/{topic_id}")
+    @Path("/{configTypeUri}/topic/{topicId}")
     @Override
-    public RelatedTopic getConfigTopic(@PathParam("config_type_uri") String configTypeUri,
-                                       @PathParam("topic_id") long topicId) {
+    public RelatedTopic getConfigTopic(@PathParam("configTypeUri") String configTypeUri,
+                                       @PathParam("topicId") long topicId) {
         return _getConfigTopic(configTypeUri, topicId);
     }
 

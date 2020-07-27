@@ -159,11 +159,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @POST
-    @Path("/{id}/topic/{topic_id}")
+    @Path("/{id}/topic/{topicId}")
     @Transactional
     @Override
     public void addTopicToTopicmap(@PathParam("id") final long topicmapId,
-                                   @PathParam("topic_id") final long topicId, final ViewProps viewProps) {
+                                   @PathParam("topicId") final long topicId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
@@ -183,11 +183,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @POST
-    @Path("/{id}/assoc/{assoc_id}")
+    @Path("/{id}/assoc/{assocId}")
     @Transactional
     @Override
     public void addAssocToTopicmap(@PathParam("id") final long topicmapId,
-                                   @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
+                                   @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
@@ -207,12 +207,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @POST
-    @Path("/{id}/topic/{topic_id}/assoc/{assoc_id}")
+    @Path("/{id}/topic/{topicId}/assoc/{assocId}")
     @Transactional
     @Override
     public void addRelatedTopicToTopicmap(@PathParam("id") final long topicmapId,
-                                          @PathParam("topic_id") final long topicId,
-                                          @PathParam("assoc_id") final long assocId, final ViewProps viewProps) {
+                                          @PathParam("topicId") final long topicId,
+                                          @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
@@ -244,28 +244,28 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     @PUT
-    @Path("/{id}/topic/{topic_id}")
+    @Path("/{id}/topic/{topicId}")
     @Transactional
     @Override
-    public void setTopicViewProps(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+    public void setTopicViewProps(@PathParam("id") long topicmapId, @PathParam("topicId") long topicId,
                                   ViewProps viewProps) {
         storeTopicViewProps(topicmapId, topicId, viewProps);
     }
 
     @PUT
-    @Path("/{id}/assoc/{assoc_id}")
+    @Path("/{id}/assoc/{assocId}")
     @Transactional
     @Override
-    public void setAssocViewProps(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
+    public void setAssocViewProps(@PathParam("id") long topicmapId, @PathParam("assocId") long assocId,
                                   ViewProps viewProps) {
         storeAssocViewProps(topicmapId, assocId, viewProps);
     }
 
     @PUT
-    @Path("/{id}/topic/{topic_id}/x/{x}/y/{y}")
+    @Path("/{id}/topic/{topicId}/x/{x}/y/{y}")
     @Transactional
     @Override
-    public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+    public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topicId") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
         try {
             storeTopicViewProps(topicmapId, topicId, mf.newViewProps(x, y));
@@ -287,10 +287,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/topic/{topic_id}/visibility/{visibility}")
+    @Path("/{id}/topic/{topicId}/visibility/{visibility}")
     @Transactional
     @Override
-    public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+    public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topicId") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
             // TODO: idempotence?
@@ -302,10 +302,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/assoc/{assoc_id}/visibility/{visibility}")
+    @Path("/{id}/assoc/{assocId}/visibility/{visibility}")
     @Transactional
     @Override
-    public void setAssocVisibility(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
+    public void setAssocVisibility(@PathParam("id") long topicmapId, @PathParam("assocId") long assocId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
             Assoc assocMapcontext = getAssocMapcontext(topicmapId, assocId);
@@ -409,7 +409,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // Note: not part of topicmaps service
     @GET
-    @Path("/{id}/topic/{topic_id}")
+    @Path("/{id}/topic/{topicId}")
     @Produces("text/html")
     public InputStream getTopicmapAndTopicInWebclient() {
         // Note: the path parameters are evaluated at client-side
