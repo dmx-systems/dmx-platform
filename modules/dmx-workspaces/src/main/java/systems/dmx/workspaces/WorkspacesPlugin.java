@@ -101,8 +101,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public Topic createWorkspace(@QueryParam("name") final String name, @QueryParam("uri") final String uri,
                                  @QueryParam("sharingModeUri") final SharingMode sharingMode) {
-        final String operation = "Creating workspace \"" + name + "\" ";
-        final String info = "(uri=" + uri + ", sharingMode=" + sharingMode + ")";
+        final String operation = "Creating workspace \"" + name + "\"";
+        final String info = ", uri=" + uri + ", sharingMode=" + sharingMode;
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
@@ -134,7 +134,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             me.newWorkspace(workspace);     // FIXME: broadcast to eligible users only
             return workspace;
         } catch (Exception e) {
-            throw new RuntimeException(operation + "failed " + info, e);
+            throw new RuntimeException(operation + " failed" + info, e);
         }
     }
 

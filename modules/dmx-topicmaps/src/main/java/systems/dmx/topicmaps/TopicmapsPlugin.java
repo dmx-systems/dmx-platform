@@ -61,17 +61,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    public TopicmapsPlugin() {
-        // Note: registering the default topicmap type in the init() hook would be too late.
-        // The topicmap type is already needed at install-in-DB time ### Still true? Use preInstall() hook?
-        registerTopicmapType(new DefaultTopicmapType());
-        //
-        registerViewmodelCustomizer(this);
-        // ### FIXME: unregister is missing
-    }
-
-
-
     // ************************
     // *** TopicmapsService ***
     // ************************
@@ -463,7 +452,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     @Override
-    public void init() {
+    public void preInstall() {
+        // Note: topicmaps are created early at install-in-DB time.
+        // So we set up the required facilities here in preInstall() (init() on the other hand would be too late).
+        registerTopicmapType(new DefaultTopicmapType());
+        registerViewmodelCustomizer(this);      // ### FIXME: unregister is missing
+        //
         me = new Messenger(dmx.getWebSocketService());
     }
 
