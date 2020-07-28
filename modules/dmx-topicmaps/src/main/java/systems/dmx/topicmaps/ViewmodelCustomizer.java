@@ -7,5 +7,5 @@ import systems.dmx.core.model.topicmaps.ViewProps;
 
 public interface ViewmodelCustomizer {
 
-    void enrichViewProps(RelatedTopic topic, ViewProps viewProps);
+    void customizeTopic(RelatedTopic topic, ViewProps viewProps);
 }

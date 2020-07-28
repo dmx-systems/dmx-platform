@@ -55,7 +55,7 @@ public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServl
     private String clientId(HttpServletRequest request) {
         String clientId = JavaUtils.cookieValue(request, "dmx_client_id");
         if (clientId == null) {
-            throw new RuntimeException("Missing \"dmx_client_id\" cookie in upgrade request");
+            throw new RuntimeException("Missing \"dmx_client_id\" cookie in connection upgrade request");
         }
         return clientId;
     }
@@ -64,7 +64,7 @@ public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServl
         // logger.info("request=" + JavaUtils.requestDump(request));
         HttpSession session = request.getSession(false);
         if (session == null) {
-            throw new RuntimeException("No (valid) session associated with upgrade request");
+            throw new RuntimeException("No (valid) session associated with connection upgrade request");
         }
         return session;
     }

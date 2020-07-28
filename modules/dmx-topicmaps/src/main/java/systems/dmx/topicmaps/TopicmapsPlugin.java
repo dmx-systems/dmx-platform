@@ -418,7 +418,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
      * ViewmodelCustomizer.
      */
     @Override
-    public void enrichViewProps(RelatedTopic topic, ViewProps viewProps) {
+    public void customizeTopic(RelatedTopic topic, ViewProps viewProps) {
         if (topic.getTypeUri().equals(TOPICMAP)) {
             topic.loadChildTopics();
         }
@@ -704,7 +704,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, RelatedTopic topic,
                                                                            ViewProps viewProps) {
         try {
-            customizer.enrichViewProps(topic, viewProps);
+            customizer.customizeTopic(topic, viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed, " +
                 "customizer=\"" + customizer.getClass().getName() + "\"", e);
