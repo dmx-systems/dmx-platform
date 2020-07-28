@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 @Path("/topicmaps")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, ViewmodelCustomizer, PreSendTopic {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, TopicmapCustomizer, PreSendTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -51,7 +51,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
      */
     private Map<String, TopicmapType> topicmapTypes = new HashMap();
 
-    private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
+    private List<TopicmapCustomizer> topicmapCustomizers = new ArrayList();
 
     private Messenger me;
 
@@ -372,16 +372,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     @Override
-    public void registerViewmodelCustomizer(ViewmodelCustomizer customizer) {
-        logger.info("### Registering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
-        viewmodelCustomizers.add(customizer);
+    public void registerTopicmapCustomizer(TopicmapCustomizer customizer) {
+        logger.info("### Registering topicmap customizer \"" + customizer.getClass().getName() + "\"");
+        topicmapCustomizers.add(customizer);
     }
 
     @Override
-    public void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer) {
-        logger.info("### Unregistering viewmodel customizer \"" + customizer.getClass().getName() + "\"");
-        if (!viewmodelCustomizers.remove(customizer)) {
-            throw new RuntimeException("Unregistering viewmodel customizer failed, customizer=" + customizer);
+    public void unregisterTopicmapCustomizer(TopicmapCustomizer customizer) {
+        logger.info("### Unregistering topicmap customizer \"" + customizer.getClass().getName() + "\"");
+        if (!topicmapCustomizers.remove(customizer)) {
+            throw new RuntimeException("Unregistering topicmap customizer failed, customizer=" + customizer);
         }
     }
 
@@ -407,15 +407,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // ***************************
-    // *** ViewmodelCustomizer ***
-    // ***************************
+    // **************************
+    // *** TopicmapCustomizer ***
+    // **************************
 
 
 
     /**
      * Note: as Topicmap is not a DMXObject no PRE_SEND event is fired, so for customizing the topicmap we use a
-     * ViewmodelCustomizer.
+     * TopicmapCustomizer.
      */
     @Override
     public void customizeTopic(RelatedTopic topic, ViewProps viewProps) {
@@ -456,7 +456,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // Note: topicmaps are created early at install-in-DB time.
         // So we set up the required facilities here in preInstall() (init() on the other hand would be too late).
         registerTopicmapType(new DefaultTopicmapType());
-        registerViewmodelCustomizer(this);      // ### FIXME: unregister is missing
+        registerTopicmapCustomizer(this);      // ### FIXME: unregister is missing
         //
         me = new Messenger(dmx.getWebSocketService());
     }
@@ -495,7 +495,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private ViewTopic buildViewTopic(RelatedTopic topic) {
         try {
             ViewProps viewProps = fetchTopicViewProps(topic.getRelatingAssoc());
-            invokeViewmodelCustomizers(topic, viewProps);
+            invokeTopicmapCustomizers(topic, viewProps);
             return mf.newViewTopic(topic.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Building ViewTopic " + topic.getId() + " failed", e);
@@ -505,7 +505,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private ViewAssoc buildViewAssoc(RelatedAssoc assoc) {
         try {
             ViewProps viewProps = fetchAssocViewProps(assoc.getRelatingAssoc());
-            // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
+            // invokeTopicmapCustomizers(assoc, viewProps);    // TODO: assoc customizers?
             return mf.newViewAssoc(assoc.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Building ViewAssoc " + assoc.getId() + " failed", e);
@@ -693,20 +693,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         me.addAssocToTopicmap(topicmapId, assoc);
     }
 
-    // --- Viewmodel Customizers ---
+    // --- Topicmap Customizers ---
 
-    private void invokeViewmodelCustomizers(RelatedTopic topic, ViewProps viewProps) {
-        for (ViewmodelCustomizer customizer : viewmodelCustomizers) {
-            invokeViewmodelCustomizer(customizer, topic, viewProps);
+    private void invokeTopicmapCustomizers(RelatedTopic topic, ViewProps viewProps) {
+        for (TopicmapCustomizer customizer : topicmapCustomizers) {
+            invokeTopicmapCustomizer(customizer, topic, viewProps);
         }
     }
 
-    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, RelatedTopic topic,
-                                                                           ViewProps viewProps) {
+    private void invokeTopicmapCustomizer(TopicmapCustomizer customizer, RelatedTopic topic, ViewProps viewProps) {
         try {
             customizer.customizeTopic(topic, viewProps);
         } catch (Exception e) {
-            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed, " +
+            throw new RuntimeException("Invoking topicmap customizer for topic " + topic.getId() + " failed, " +
                 "customizer=\"" + customizer.getClass().getName() + "\"", e);
         }
     }

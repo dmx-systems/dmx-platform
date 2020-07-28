@@ -115,7 +115,7 @@ public interface TopicmapsService {
 
     // ---
 
-    void registerViewmodelCustomizer(ViewmodelCustomizer customizer);
+    void registerTopicmapCustomizer(TopicmapCustomizer customizer);
 
-    void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer);
+    void unregisterTopicmapCustomizer(TopicmapCustomizer customizer);
 }
