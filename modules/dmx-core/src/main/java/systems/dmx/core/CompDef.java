@@ -5,8 +5,9 @@ import systems.dmx.core.model.CompDefModel;
 
 
 /**
- * Definition of an association between 2 topic types -- part of DMX's type system,
- * like an association in a class diagram. Used to represent both, aggregations and compositions. ### FIXDOC
+ * A composition definition of a <i>parent type</i> and a <i>child type</i> -- part of DMX's type system.
+ * <p>
+ * The parent type is either a {@link TopicType} or an {@link AssocType}. The child type is always a {@link TopicType}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

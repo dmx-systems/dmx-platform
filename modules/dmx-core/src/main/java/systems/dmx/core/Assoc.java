@@ -9,7 +9,8 @@ import java.util.List;
 
 
 /**
- * ### FIXDOC: Specification of an association -- A n-ary connection between topics and other associations.
+ * An association with 2 ends. At each end can be a {@link DMXObject}, that is either a {@link Topic} or another
+ * {@link Assoc}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

@@ -4,6 +4,9 @@ import systems.dmx.core.JSONEnabled;
 
 
 
+/**
+ * The data that underly a {@link Player}.
+ */
 public interface PlayerModel extends JSONEnabled, Cloneable {
 
     long getId();

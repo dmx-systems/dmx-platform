@@ -5,7 +5,7 @@ import systems.dmx.core.model.TopicModel;
 
 
 /**
- * Specification of a topic -- DMX's central data object.
+ * A topic -- DMX's central data object.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

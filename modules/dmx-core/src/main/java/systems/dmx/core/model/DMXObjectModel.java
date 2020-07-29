@@ -5,6 +5,9 @@ import systems.dmx.core.JSONEnabled;
 
 
 
+/**
+ * The data that underly a {@link DMXObject}.
+ */
 public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     // --- ID ---

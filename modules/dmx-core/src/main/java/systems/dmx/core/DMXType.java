@@ -7,6 +7,14 @@ import java.util.Collection;
 
 
 
+/**
+ * The (abstract) base class of both, {@link TopicType} and {@link AssocType}.
+ * <p>
+ * Besides the parts derived from {@link Topic} a <code>DMXType</code> has 3 parts: a <b>data type</b>, a
+ * collection of <b>Composition Definitions</b> ({@link CompDef}), and a {@link ViewConfig}.
+ * <p>
+ * Types are referred to by <b>type URI</b>.
+ */
 public interface DMXType extends Topic, Iterable<String> {
 
 

@@ -7,10 +7,7 @@ import java.util.List;
 
 
 /**
- * A recursive composite of key/value pairs. ### FIXDOC
- * <p>
- * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
- * or again a <code>ChildTopicsModel</code>. ### FIXDOC
+ * The data that underly a {@link ChildTopics} object.
  */
 public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 

@@ -5,9 +5,7 @@ import systems.dmx.core.model.TopicTypeModel;
 
 
 /**
- * Specification of a topic type -- part of DMX's type system, like a class.
- *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * Part of DMX's type system, like a class whose instances are {@link Topic}s.
  */
 public interface TopicType extends DMXType {
 

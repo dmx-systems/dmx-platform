@@ -3,7 +3,10 @@ package systems.dmx.core.model;
 
 
 /**
- * Collection of the data that makes up an {@link Assoc}.
+ * The data that underly an {@link Assoc}.
+ * <p>
+ * An <code>AssocModel</code> can also be used to provide the data for an association <i>create</i> or <i>update</i>
+ * operation. To instantiate an <code>AssocModel</code> use the {@link ModelFactory}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

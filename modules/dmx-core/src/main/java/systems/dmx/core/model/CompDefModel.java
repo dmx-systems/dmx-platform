@@ -3,10 +3,7 @@ package systems.dmx.core.model;
 
 
 /**
- * Definition of an association between a parent type and a child type -- part of DMX's type system;
- * like a composition/aggregation in an UML class diagram.
- * <p>
- * The child type is a topic type. The parent type is either a topic type or an association type.
+ * The data that underly a {@link CompDef}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

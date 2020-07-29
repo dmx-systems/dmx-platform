@@ -21,18 +21,11 @@ import java.util.List;
 
 
 /**
- * Specification of the DMX core service -- the heart of DMX.
+ * The DMX Core Service provides generic database operations (create, retrieve, update, delete) to deal with the DMX
+ * Core objects: Topics, Associations, Topic Types, Association Types.
  * <p>
- * The responsibility of the DMX core service is to orchestrate the control flow and allow plugins to hook in.
- * The main duties of the DMX core service are to provide access to the storage layer and to dispatch events to
- * the installed plugins. ### FIXDOC
- * <p>
- * The DMX core service is a realization of the <i>Inversion of Control</i> pattern.
- * <p>
- * The DMX core service provides methods to deal with topics, associations, types, and plugins.
- * <p>
- * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
- * DMX core service is available through the <code>dmx</code> object.
+ * Inside the {@link PluginActivator} and {@link Migration} (sub)classes an instance of the DMX Core Service is
+ * available as the <code>dmx</code> object.
  */
 public interface CoreService {
 

@@ -10,8 +10,6 @@ import systems.dmx.core.model.ViewConfigModel;
  * <p>
  * Config topics can be accessed by their type URI.
  * A view config can contain only one config topic with a certain type URI.
- *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public interface ViewConfig {
 

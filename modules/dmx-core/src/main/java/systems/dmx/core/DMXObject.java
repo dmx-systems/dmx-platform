@@ -9,6 +9,14 @@ import java.util.List;
 
 
 
+/**
+ * The (abstract) base class of both, {@link Topic} and {@link Assoc}.
+ * <p>
+ * A <code>DMXObject</code> has 5 parts: an <b>ID</b>, an <b>URI</b>, a <b>type URI</b>, a {@link SimpleValue}, and,
+ * in case of a <i>composite</i> DMXObject, a (recursive) collection of {@link ChildTopics} objects.
+ * <p>
+ * <code>DMXObject</code> provides methods for updating, deleting, and traversal alongside associations.
+ */
 public interface DMXObject extends Identifiable, JSONEnabled {
 
 
