@@ -495,7 +495,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             String repoPath = getPath(path);
             //
             if (!repoPath.startsWith(FILE_REPOSITORY_PATH)) {
-                throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path");
+                throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path, " +
+                    "dmx.filerepo.path=\"" + FILE_REPOSITORY_PATH + "\"");
             }
             // The repository path is calculated by removing the repository base path from the absolute path.
             // Because the base path never ends with a slash the calculated repo path will always begin with a slash
@@ -741,7 +742,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
-            throw new FileRepositoryException("\"" + path + "\" does not point to file repository", Status.FORBIDDEN);
+            throw new FileRepositoryException("\"" + path + "\" does not point to file repository, " +
+                "dmx.filerepo.path=\"" + FILE_REPOSITORY_PATH + "\"", Status.FORBIDDEN);
         }
         //
         return path;
@@ -867,14 +869,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         return repoPath;
     }
 
-    // --- System independent File API wrapper ---
+    // --- System-independent File API wrapper ---
 
     private String getPath(File file) {
-        return replaceBS(file.getPath());       // Note: getPath() is system dependent
+        return replaceBS(file.getPath());       // Note: getPath() is system-dependent
     }
 
     private String replaceBS(String path) {
-        return path.replace("\\", "/");
+        return path.replace('\\', '/');
     }
 
     // --- Per-workspace file repositories ---
