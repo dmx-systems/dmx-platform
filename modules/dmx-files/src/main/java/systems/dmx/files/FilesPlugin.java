@@ -492,7 +492,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Override
     public String repoPath(File path) {
         try {
-            String repoPath = path.getPath();
+            String repoPath = getPath(path);
             //
             if (!repoPath.startsWith(FILE_REPOSITORY_PATH)) {
                 throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path");
@@ -735,7 +735,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
         // Thats why "dmx.filerepo.path" is expected to have no "/" at the end as well.
         path = path.getCanonicalFile();     // throws IOException
-        boolean pointsToRepository = path.getPath().startsWith(FILE_REPOSITORY_PATH);
+        boolean pointsToRepository = getPath(path).startsWith(FILE_REPOSITORY_PATH);
         //
         logger.fine("Checking path \"" + path + "\"\n  dmx.filerepo.path=" +
             "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
@@ -859,12 +859,22 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         String repoPath = null;
         String requestURI = request.getRequestURI();
         if (requestURI.startsWith(FILE_REPOSITORY_URI)) {
-            // Note: the request URI is e.g. /filerepo/%2Fworkspace-1821%2Flogo-escp-europe.gif
+            // Note: the request URI is e.g. /filerepo/%2Fworkspace-1234%2Flogo.gif
             // +1 cuts off the slash following /filerepo
             repoPath = requestURI.substring(FILE_REPOSITORY_URI.length() + 1);
             repoPath = JavaUtils.decodeURIComponent(repoPath);
         }
         return repoPath;
+    }
+
+    // --- System independent File API wrapper ---
+
+    private String getPath(File file) {
+        return replaceBS(file.getPath());       // Note: getPath() is system dependent
+    }
+
+    private String replaceBS(String path) {
+        return path.replace("\\", "/");
     }
 
     // --- Per-workspace file repositories ---
