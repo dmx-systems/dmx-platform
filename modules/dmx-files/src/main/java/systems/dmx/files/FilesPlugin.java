@@ -58,7 +58,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String FILE_REPOSITORY_PATH = System.getProperty("dmx.filerepo.path", "/");
+    public static final String FILE_REPOSITORY_PATH = replaceBS(System.getProperty("dmx.filerepo.path", "/"));
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
@@ -495,8 +495,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             String repoPath = getPath(path);
             //
             if (!repoPath.startsWith(FILE_REPOSITORY_PATH)) {
-                throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path, " +
-                    "dmx.filerepo.path=\"" + FILE_REPOSITORY_PATH + "\"");
+                throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path");
             }
             // The repository path is calculated by removing the repository base path from the absolute path.
             // Because the base path never ends with a slash the calculated repo path will always begin with a slash
@@ -733,17 +732,17 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @return  The canonized absolute path.
      */
     private File checkPath(File path) throws FileRepositoryException, IOException {
-        // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
-        // Thats why "dmx.filerepo.path" is expected to have no "/" at the end as well.
+        // Note 1: on Windows a path returned by getCanonicalPath() always contains a drive letter.
+        // Note 2: a directory path returned by getCanonicalPath() never contains a "/" (resp. "\") at the end.
         path = path.getCanonicalFile();     // throws IOException
-        boolean pointsToRepository = getPath(path).startsWith(FILE_REPOSITORY_PATH);
+        boolean isRepoPath = getPath(path).startsWith(FILE_REPOSITORY_PATH);
         //
-        logger.fine("Checking path \"" + path + "\"\n  dmx.filerepo.path=" +
-            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
+        logger.fine("Checking absolute path \"" + path + "\"\n  dmx.filerepo.path=" +
+            "\"" + FILE_REPOSITORY_PATH + "\" => " + (isRepoPath ? "PATH OK" : "FORBIDDEN"));
         //
-        if (!pointsToRepository) {
-            throw new FileRepositoryException("\"" + path + "\" does not point to file repository, " +
-                "dmx.filerepo.path=\"" + FILE_REPOSITORY_PATH + "\"", Status.FORBIDDEN);
+        if (!isRepoPath) {
+            throw new FileRepositoryException("Absolute path \"" + path + "\" is not a repository path",
+                Status.FORBIDDEN);
         }
         //
         return path;
@@ -871,11 +870,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // --- System-independent File API wrapper ---
 
-    private String getPath(File file) {
+    private static String getPath(File file) {
         return replaceBS(file.getPath());       // Note: getPath() is system-dependent
     }
 
-    private String replaceBS(String path) {
+    private static String replaceBS(String path) {
         return path.replace('\\', '/');
     }
 
