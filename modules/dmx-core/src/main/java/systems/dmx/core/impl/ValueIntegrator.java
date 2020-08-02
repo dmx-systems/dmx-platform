@@ -340,7 +340,7 @@ class ValueIntegrator {
                     return null;
                 }
                 Map<String, Object> childTopics = identityChildValues(childValues, identityCompDefUris);
-                return unifyChildTopics(childTopics, identityCompDefUris)
+                return unifyChildTopics(childTopics, identityCompDefUris);
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
                 // Note: for value-types this is fixed meanwhile, but not for entity-types.
