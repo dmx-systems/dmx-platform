@@ -400,31 +400,25 @@ class ValueIntegrator {
      *   - newChildTopic's type is compDef's child type
      *
      * @param   parent          to parent to be updated; not null
-     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     key: compDefUri
+     *                          value: UnifiedValue or List<UnifiedValue>
      *
      * @return  the updated parent (passed through)
      */
     private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
-        // sanity check
-        if (!parent.getTypeUri().equals(type.getUri())) {
-            throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\", parent type=\"" +
-                parent.getTypeUri() + "\"");
-        }
-        //
         for (String compDefUri : compDefUris()) {
             // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
             // levels) as it is build bottom-up (starting from the simple values at the leaves).
             parent.loadChildTopics(compDef(compDefUri), true);    // deep=true
-            Object childTopic = childValues.get(compDefUri);
-            if (isOne(compDefUri)) {
-                TopicModel _childTopic = (TopicModel) (childTopic != null ? ((UnifiedValue) childTopic).value : null);
-                updateAssignmentsOne(parent, _childTopic, compDefUri);
-            } else {
-                // Note: for partial create/update requests childTopic might be null
-                if (childTopic != null) {
-                    updateAssignmentsMany(parent, (List<UnifiedValue>) childTopic, compDefUri);
+            Object childValue = childValues.get(compDefUri);
+            // Note: for partial create/update requests childValue might be null
+            if (childValue != null) {
+                if (isOne(compDefUri)) {
+                    updateAssignmentsOne(parent, (UnifiedValue) childValue, compDefUri);
+                } else {
+                    updateAssignmentsMany(parent, (List<UnifiedValue>) childValue, compDefUri);
                 }
             }
         }
@@ -432,15 +426,16 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopic    may be null
+     * @param   childValue      never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel childTopic, String compDefUri) {
+    private void updateAssignmentsOne(DMXObjectModelImpl parent, UnifiedValue childValue, String compDefUri) {
         try {
             ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
             RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(compDefUri);     // may be null
             if (oldValue != null && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
+            TopicModel childTopic = (TopicModel) childValue.value;
             boolean newValueIsEmpty = childTopic == null;
             //
             // 1) delete assignment if exists AND value has changed or emptied
@@ -478,7 +473,7 @@ class ValueIntegrator {
                 updateRelatingAssoc(assoc, compDefUri, newChildValue);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childTopic=" + childTopic +
+            throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childValue=" + childValue +
                 ", compDefUri=\"" + compDefUri + "\"", e);
         }
     }
@@ -633,16 +628,12 @@ class ValueIntegrator {
      *   - compDef's parent type is this.type
      *   - childTopic's type is compDef's child type
      *
-     * @param   childValues     not empty
-     *                              key: compDefUri
-     *                              value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     key: compDefUri
+     *                          value: UnifiedValue or List<UnifiedValue>
      *
      * @return  the list of parent candidates (may be empty), or null if there was nothing to integrate.
      */
     private List<? extends TopicModelImpl> parentCandidates(Map<String, Object> childValues) {
-        if (childValues.isEmpty()) {
-            throw new IllegalArgumentException("Can't determine parent candidates from no values");
-        }
         DMXObjectModel childTopic = null;
         String compDefUri = null;
         for (String _compDefUri : childValues.keySet()) {

@@ -204,8 +204,14 @@ class ChildTopicsImpl implements ChildTopics {
 
 
 
-    // === Iterable Implementation ===
+    // === Java API ===
 
+    @Override
+    public String toString() {
+        return model.toString();
+    }
+
+    // Iterable
     @Override
     public Iterator<String> iterator() {
         return model.iterator();

@@ -255,7 +255,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // change Person Description in-place
             person.update(mf.newChildTopicsModel().set(PERSON_DESCRIPTION, "<p>Cook</p>"));
             assertEquals("<p>Cook</p>", children.getString(PERSON_DESCRIPTION));
-            // there is still only 1 person in the DB (it was mutated in-place), refetch ...
+            // refetch ... there is still only 1 person in the DB (it was mutated in-place)
             List<Topic> persons = dmx.getTopicsByType(PERSON);
             assertEquals(1, persons.size());
             // no children are loaded yet
