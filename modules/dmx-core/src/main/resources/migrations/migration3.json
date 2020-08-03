@@ -1,38 +1,38 @@
 {
-    "topic_types": [
+  "topic_types": [
+    {
+      "value":       "Plugin Name",
+      "uri":         "dmx.core.plugin_name",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Symbolic Name",
+      "uri":         "dmx.core.plugin_symbolic_name",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Migration Nr.",
+      "uri":         "dmx.core.plugin_migration_nr",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Plugin",
+      "uri":         "dmx.core.plugin",
+      "dataTypeUri": "dmx.core.entity",
+      "compDefs": [
         {
-            "value":       "Plugin Name",
-            "uri":         "dmx.core.plugin_name",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.core.plugin_name",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":       "Symbolic Name",
-            "uri":         "dmx.core.plugin_symbolic_name",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.core.plugin_symbolic_name",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":       "Migration Nr.",
-            "uri":         "dmx.core.plugin_migration_nr",
-            "dataTypeUri": "dmx.core.number"
-        },
-        {
-            "value":       "Plugin",
-            "uri":         "dmx.core.plugin",
-            "dataTypeUri": "dmx.core.entity",
-            "compDefs": [
-                {
-                    "childTypeUri":        "dmx.core.plugin_name",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.core.plugin_symbolic_name",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.core.plugin_migration_nr",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ]
+          "childTypeUri":        "dmx.core.plugin_migration_nr",
+          "childCardinalityUri": "dmx.core.one"
         }
-    ]
+      ]
+    }
+  ]
 }

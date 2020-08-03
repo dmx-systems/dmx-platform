@@ -75,7 +75,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static Logger logger = Logger.getLogger(FilesPlugin.class.getName());
 
     static {
-        logger.info("Filerepo config:" +
+        logger.info("File repo config:" +
             "\n  FILE_REPOSITORY_PATH = \"" + FILE_REPOSITORY_PATH + "\"" +
             "\n  ENTIRE_DISC_REPO = " + ENTIRE_DISC_REPO);
     }

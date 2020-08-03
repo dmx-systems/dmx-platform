@@ -1,151 +1,151 @@
 {
-    "topic_types": [
-        // Note: The meta types "Topic Type" and "Association Type",
-        // and the topic type "Data Type" are created while bootstrap.
-        // See CoreServiceImpl.setupBootstrapContent()
-        /*{
-            "value":       "Data Type",
-            "uri":         "dmx.core.data_type",
-            "dataTypeUri": "dmx.core.text"
-        },*/
-        {
-            "value":       "Role Type",
-            "uri":         "dmx.core.role_type",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Cardinality",
-            "uri":         "dmx.core.cardinality",
-            "dataTypeUri": "dmx.core.text"
-        }
-    ],
-    "assoc_types": [
-        // Note: The association types "Composition" and "Instantiation" are created while bootstrap.
-        // See CoreServiceImpl.setupBootstrapContent()
-        //
-        // Note: The association type "Composition Definition" is created in migration 2.
-        /*{
-            "value":       "Composition",
-            "uri":         "dmx.core.composition",
-            "dataTypeUri": "dmx.core.text"
-        },*/
-        /*{
-            "value":       "Instantiation",
-            "uri":         "dmx.core.instantiation",
-            "dataTypeUri": "dmx.core.text"
-        },*/
-        {
-            "value":       "Association",
-            "uri":         "dmx.core.association",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Sequence",
-            "uri":         "dmx.core.sequence",
-            "dataTypeUri": "dmx.core.text"
-        }
-    ],
-    "topics": [
-        // Data Types
-        //
-        // Note: The data type "Text" is created while bootstrap.
-        // See CoreServiceImpl.setupBootstrapContent()
-        /*{
-            "value":   "Text",
-            "uri":     "dmx.core.text",
-            "typeUri": "dmx.core.data_type"
-        },*/
-        {
-            "value":   "HTML",
-            "uri":     "dmx.core.html",
-            "typeUri": "dmx.core.data_type"
-        },
-        {
-            "value":   "Number",
-            "uri":     "dmx.core.number",
-            "typeUri": "dmx.core.data_type"
-        },
-        {
-            "value":   "Boolean",
-            "uri":     "dmx.core.boolean",
-            "typeUri": "dmx.core.data_type"
-        },
-        {
-            "value":   "Composite",
-            "uri":     "dmx.core.composite",
-            "typeUri": "dmx.core.data_type"
-        },
-        {
-            "value":   "Value",
-            "uri":     "dmx.core.value",
-            "typeUri": "dmx.core.data_type"
-        },
-        {
-            "value":   "Entity",
-            "uri":     "dmx.core.entity",
-            "typeUri": "dmx.core.data_type"
-        },
-        // Role Types
-        {
-            "value":   "Default",
-            "uri":     "dmx.core.default",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Type",
-            "uri":     "dmx.core.type",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Instance",
-            "uri":     "dmx.core.instance",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Parent",
-            "uri":     "dmx.core.parent",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Child",
-            "uri":     "dmx.core.child",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Parent Type",
-            "uri":     "dmx.core.parent_type",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Child Type",
-            "uri":     "dmx.core.child_type",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Predecessor",
-            "uri":     "dmx.core.predecessor",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Successor",
-            "uri":     "dmx.core.successor",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Sequence Start",
-            "uri":     "dmx.core.sequence_start",
-            "typeUri": "dmx.core.role_type"
-        },
-        // Cardinalities
-        {
-            "value":   "One",
-            "uri":     "dmx.core.one",
-            "typeUri": "dmx.core.cardinality"
-        },
-        {
-            "value":   "Many",
-            "uri":     "dmx.core.many",
-            "typeUri": "dmx.core.cardinality"
-        }
-    ]
+  "topic_types": [
+    // Note: The meta types "Topic Type" and "Association Type",
+    // and the topic type "Data Type" are created while bootstrap.
+    // See CoreServiceImpl.setupBootstrapContent()
+    /*{
+        "value":       "Data Type",
+        "uri":         "dmx.core.data_type",
+        "dataTypeUri": "dmx.core.text"
+    },*/
+    {
+      "value":       "Role Type",
+      "uri":         "dmx.core.role_type",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Cardinality",
+      "uri":         "dmx.core.cardinality",
+      "dataTypeUri": "dmx.core.text"
+    }
+  ],
+  "assoc_types": [
+    // Note: The association types "Composition" and "Instantiation" are created while bootstrap.
+    // See CoreServiceImpl.setupBootstrapContent()
+    //
+    // Note: The association type "Composition Definition" is created in migration 2.
+    /*{
+        "value":       "Composition",
+        "uri":         "dmx.core.composition",
+        "dataTypeUri": "dmx.core.text"
+    },*/
+    /*{
+        "value":       "Instantiation",
+        "uri":         "dmx.core.instantiation",
+        "dataTypeUri": "dmx.core.text"
+    },*/
+    {
+      "value":       "Association",
+      "uri":         "dmx.core.association",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Sequence",
+      "uri":         "dmx.core.sequence",
+      "dataTypeUri": "dmx.core.text"
+    }
+  ],
+  "topics": [
+    // Data Types
+    //
+    // Note: The data type "Text" is created while bootstrap.
+    // See CoreServiceImpl.setupBootstrapContent()
+    /*{
+        "value":   "Text",
+        "uri":     "dmx.core.text",
+        "typeUri": "dmx.core.data_type"
+    },*/
+    {
+      "value":   "HTML",
+      "uri":     "dmx.core.html",
+      "typeUri": "dmx.core.data_type"
+    },
+    {
+      "value":   "Number",
+      "uri":     "dmx.core.number",
+      "typeUri": "dmx.core.data_type"
+    },
+    {
+      "value":   "Boolean",
+      "uri":     "dmx.core.boolean",
+      "typeUri": "dmx.core.data_type"
+    },
+    {
+      "value":   "Composite",
+      "uri":     "dmx.core.composite",
+      "typeUri": "dmx.core.data_type"
+    },
+    {
+      "value":   "Value",
+      "uri":     "dmx.core.value",
+      "typeUri": "dmx.core.data_type"
+    },
+    {
+      "value":   "Entity",
+      "uri":     "dmx.core.entity",
+      "typeUri": "dmx.core.data_type"
+    },
+    // Role Types
+    {
+      "value":   "Default",
+      "uri":     "dmx.core.default",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Type",
+      "uri":     "dmx.core.type",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Instance",
+      "uri":     "dmx.core.instance",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Parent",
+      "uri":     "dmx.core.parent",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Child",
+      "uri":     "dmx.core.child",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Parent Type",
+      "uri":     "dmx.core.parent_type",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Child Type",
+      "uri":     "dmx.core.child_type",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Predecessor",
+      "uri":     "dmx.core.predecessor",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Successor",
+      "uri":     "dmx.core.successor",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Sequence Start",
+      "uri":     "dmx.core.sequence_start",
+      "typeUri": "dmx.core.role_type"
+    },
+    // Cardinalities
+    {
+      "value":   "One",
+      "uri":     "dmx.core.one",
+      "typeUri": "dmx.core.cardinality"
+    },
+    {
+      "value":   "Many",
+      "uri":     "dmx.core.many",
+      "typeUri": "dmx.core.cardinality"
+    }
+  ]
 }

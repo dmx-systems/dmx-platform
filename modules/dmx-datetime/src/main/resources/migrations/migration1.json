@@ -1,100 +1,100 @@
 {
-    "topic_types": [
-        // Date
+  "topic_types": [
+    // Date
+    {
+      "value":       "Month",
+      "uri":         "dmx.datetime.month",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Day",
+      "uri":         "dmx.datetime.day",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Year",
+      "uri":         "dmx.datetime.year",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Date",
+      "uri":         "dmx.datetime.date",
+      "dataTypeUri": "dmx.core.value",
+      "compDefs": [
         {
-            "value":       "Month",
-            "uri":         "dmx.datetime.month",
-            "dataTypeUri": "dmx.core.number"
+          "childTypeUri":        "dmx.datetime.month",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         },
         {
-            "value":       "Day",
-            "uri":         "dmx.datetime.day",
-            "dataTypeUri": "dmx.core.number"
+          "childTypeUri":        "dmx.datetime.day",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         },
         {
-            "value":       "Year",
-            "uri":         "dmx.datetime.year",
-            "dataTypeUri": "dmx.core.number"
-        },
-        {
-            "value":       "Date",
-            "uri":         "dmx.datetime.date",
-            "dataTypeUri": "dmx.core.value",
-            "compDefs": [
-                {
-                    "childTypeUri":        "dmx.datetime.month",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.datetime.day",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.datetime.year",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                }
-            ]
-        },
-        // Time
-        {
-            "value":       "Hour",
-            "uri":         "dmx.datetime.hour",
-            "dataTypeUri": "dmx.core.number"
-        },
-        {
-            "value":       "Minute",
-            "uri":         "dmx.datetime.minute",
-            "dataTypeUri": "dmx.core.number"
-        },
-        {
-            "value":       "Time",
-            "uri":         "dmx.datetime.time",
-            "dataTypeUri": "dmx.core.value",
-            "compDefs": [
-                {
-                    "childTypeUri":        "dmx.datetime.hour",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.datetime.minute",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                }
-            ]
-        },
-        // Date/Time
-        {
-            "value":       "Date/Time",
-            "uri":         "dmx.datetime",
-            "dataTypeUri": "dmx.core.value",
-            "compDefs": [
-                {
-                    "childTypeUri":        "dmx.datetime.date",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.datetime.time",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                }
-            ]
+          "childTypeUri":        "dmx.datetime.year",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         }
-    ],
-    "assoc_types": [
+      ]
+    },
+    // Time
+    {
+      "value":       "Hour",
+      "uri":         "dmx.datetime.hour",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Minute",
+      "uri":         "dmx.datetime.minute",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Time",
+      "uri":         "dmx.datetime.time",
+      "dataTypeUri": "dmx.core.value",
+      "compDefs": [
         {
-            "value":       "From",
-            "uri":         "dmx.datetime.from",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.datetime.hour",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         },
         {
-            "value":       "To",
-            "uri":         "dmx.datetime.to",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.datetime.minute",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         }
-    ]
+      ]
+    },
+    // Date/Time
+    {
+      "value":       "Date/Time",
+      "uri":         "dmx.datetime",
+      "dataTypeUri": "dmx.core.value",
+      "compDefs": [
+        {
+          "childTypeUri":        "dmx.datetime.date",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.datetime.time",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        }
+      ]
+    }
+  ],
+  "assoc_types": [
+    {
+      "value":       "From",
+      "uri":         "dmx.datetime.from",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "To",
+      "uri":         "dmx.datetime.to",
+      "dataTypeUri": "dmx.core.text"
+    }
+  ]
 }
