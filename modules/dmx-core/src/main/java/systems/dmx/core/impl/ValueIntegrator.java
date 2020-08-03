@@ -428,14 +428,15 @@ class ValueIntegrator {
     /**
      * @param   childValue      never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsOne(DMXObjectModelImpl parent, UnifiedValue childValue, String compDefUri) {
+    private void updateAssignmentsOne(DMXObjectModelImpl parent, UnifiedValue<TopicModelImpl> childValue,
+                                                                 String compDefUri) {
         try {
             ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
             RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(compDefUri);     // may be null
             if (oldValue != null && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
-            TopicModel childTopic = (TopicModel) childValue.value;
+            TopicModel childTopic = childValue.value;
             boolean newValueIsEmpty = childTopic == null;
             //
             // 1) delete assignment if exists AND value has changed or emptied

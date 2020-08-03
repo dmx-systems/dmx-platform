@@ -58,16 +58,27 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String FILE_REPOSITORY_PATH = replaceBS(System.getProperty("dmx.filerepo.path", "/"));
+    // transform FILE_REPOSITORY_PATH to have 1) slashes, no backslashes, and 2) a drive letter (on Windows)
+    public static final String FILE_REPOSITORY_PATH = getPath(new File(System.getProperty("dmx.filerepo.path", "/")));
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
+    private static final boolean ENTIRE_DISC_REPO = Pattern.compile("([A-Z]:)?\\/").matcher(FILE_REPOSITORY_PATH)
+                                                                                   .matches();
 
     private static final String WORKSPACE_DIRECTORY_PREFIX = "/workspace-";
     private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile(WORKSPACE_DIRECTORY_PREFIX + "(\\d+).*");
+
+    private static Logger logger = Logger.getLogger(FilesPlugin.class.getName());
+
+    static {
+        logger.info("Filerepo config:" +
+            "\n  FILE_REPOSITORY_PATH = \"" + FILE_REPOSITORY_PATH + "\"" +
+            "\n  ENTIRE_DISC_REPO = " + ENTIRE_DISC_REPO);
+    }
 
     // Events
     public static DMXEvent CHECK_DISK_QUOTA = new DMXEvent(CheckDiskQuota.class) {
@@ -83,8 +94,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     @Inject
     private ConfigService configService;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -501,14 +510,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // Because the base path never ends with a slash the calculated repo path will always begin with a slash
             // (it is never removed). There is one exception: the base path *does* end with a slash if it represents
             // the entire file system, that is "/". In that case it must *not* be removed from the absolute path.
-            // In that case the repository path is the same as the absolute path.
-            if (!FILE_REPOSITORY_PATH.equals("/")) {
-                repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
-                if (repoPath.equals("")) {
-                    repoPath = "/";
-                }
+            // In that case the repository path is the same as the absolute path. ### FIXDOC
+            repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
+            if (ENTIRE_DISC_REPO) {
+                repoPath = "/" + repoPath;
+            } else if (repoPath.equals("")) {
+                repoPath = "/";
             }
-            // ### FIXME: Windows drive letter?
             return repoPath;
         } catch (Exception e) {
             throw new RuntimeException("Mapping absolute path \"" + path + "\" to a repository path failed", e);
