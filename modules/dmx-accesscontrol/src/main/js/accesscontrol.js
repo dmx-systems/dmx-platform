@@ -1,4 +1,4 @@
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 import SHA256 from './lib/sha256'
 
 const ENCODED_PASSWORD_PREFIX = '-SHA256-'

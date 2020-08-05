@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 
 export default {
 

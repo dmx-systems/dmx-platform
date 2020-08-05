@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 import Selection from './selection'
 
 const state = {
@@ -253,7 +253,7 @@ const actions = {
    */
   revealTopic ({dispatch}, {topic, pos, noSelect}) {
     // Note: in case selection is requested (noSelect=falsish) auto-panning is performed through route change
-    // (see "renderAsSelected" action in topicmap-model, dm5-cytoscape-renderer module)
+    // (see "renderAsSelected" action in topicmap-model, dmx-cytoscape-renderer module)
     dispatch('renderTopic', {topic, pos, autoPan: noSelect})        // dispatch into topicmap renderer
     !noSelect && dispatch('callTopicRoute', topic.id)               // dispatch into app
   },
@@ -265,7 +265,7 @@ const actions = {
 
   revealRelatedTopic ({getters, dispatch}, {relTopic, noSelect}) {
     // Note: in case selection is requested (noSelect=falsish) auto-panning is performed through route change
-    // (see "renderAsSelected" action in topicmap-model, dm5-cytoscape-renderer module)
+    // (see "renderAsSelected" action in topicmap-model, dmx-cytoscape-renderer module)
     dispatch('renderRelatedTopic', {relTopic, autoPan: noSelect})   // dispatch into topicmap renderer
     !noSelect && dispatch('callTopicRoute', relTopic.id)            // dispatch into app
   },

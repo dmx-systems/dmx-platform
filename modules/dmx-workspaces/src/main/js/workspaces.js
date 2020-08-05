@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 
 window.addEventListener('focus', updateWorkspaceCookie)
 

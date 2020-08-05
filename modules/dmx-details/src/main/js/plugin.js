@@ -19,7 +19,7 @@ export default ({store}) => {
 
     components: [
       {
-        comp: require('dm5-detail-panel').default,
+        comp: require('dmx-detail-panel').default,
         mount: 'webclient',
         props: {
           object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?

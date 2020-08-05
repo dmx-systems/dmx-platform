@@ -9,7 +9,7 @@ import VueRouter from 'vue-router'
 import { MessageBox } from 'element-ui'
 import Webclient from './components/dm5-webclient'
 import store from './store/webclient'
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 
 Vue.use(VueRouter)
 

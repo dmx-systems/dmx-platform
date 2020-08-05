@@ -8,7 +8,7 @@ export default ({store, dm5}) => {
 
     components: [
       {
-        comp: require('dm5-topicmap-panel').default,
+        comp: require('dmx-topicmap-panel').default,
         mount: 'webclient',
         props: {
           object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
@@ -87,7 +87,7 @@ export default ({store, dm5}) => {
     topicmapType: {
       uri: 'dmx.topicmaps.topicmap',
       name: 'Topicmap',
-      renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "dm5-cytoscape-renderer" */)
+      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
     }
   }
 

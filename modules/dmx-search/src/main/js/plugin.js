@@ -1,4 +1,4 @@
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 
 export default ({store}) => {
   return {
@@ -10,7 +10,7 @@ export default ({store}) => {
 
     components: [
       {
-        comp: require('dm5-search-widget').default,
+        comp: require('dmx-search-widget').default,
         mount: 'webclient',
         props: {
           visible:        state => state.search.visible,

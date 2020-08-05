@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './components/App'
-import dm5 from 'dm5'
+import dm5 from 'dmx-api'
 import store from './store/webclient'
 import router from './router'
 import loadPlugins from './plugin-manager'
@@ -9,7 +9,7 @@ import extraElementUI from './element-ui'
 import 'font-awesome/css/font-awesome.css'
 import './websocket'
 
-console.log('[DMX] 2020/08/03')
+console.log('[DMX] 2020/08/05')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.

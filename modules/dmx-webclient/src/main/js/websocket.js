@@ -1,4 +1,4 @@
-import DM5WebSocket from 'dm5-websocket'
+import DM5WebSocket from 'dmx-websocket'
 import store from './store/webclient'
 
 /* eslint no-new: 0 */

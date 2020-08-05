@@ -7,7 +7,7 @@ export default ({store}) => ({
 
   components: [
     {
-      comp: require('dm5-login-dialog').default,
+      comp: require('dmx-login-dialog').default,
       mount: 'webclient',
       props: {
         visible: state => state.accesscontrol.visible
