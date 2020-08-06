@@ -27,7 +27,7 @@ abstract class PlayerImpl implements Player {
 
 
 
-    // === Player Implementation ===
+    // === Player ===
 
     @Override
     public long getId() {

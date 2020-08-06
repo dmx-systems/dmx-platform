@@ -20,9 +20,9 @@ class TopicTypeImpl extends DMXTypeImpl implements TopicType {
 
 
 
-    // ********************************
-    // *** TopicType Implementation ***
-    // ********************************
+    // *****************
+    // *** TopicType ***
+    // *****************
 
 
 

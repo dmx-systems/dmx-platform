@@ -27,7 +27,7 @@ public class JSONEnabledProvider implements MessageBodyWriter<JSONEnabled> {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** MessageBodyWriter Implementation ***
+    // *** MessageBodyWriter ***
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

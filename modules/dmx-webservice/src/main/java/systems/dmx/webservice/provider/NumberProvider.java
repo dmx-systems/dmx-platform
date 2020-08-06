@@ -20,7 +20,7 @@ public class NumberProvider implements MessageBodyWriter<Number> {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** MessageBodyWriter Implementation ***
+    // *** MessageBodyWriter ***
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

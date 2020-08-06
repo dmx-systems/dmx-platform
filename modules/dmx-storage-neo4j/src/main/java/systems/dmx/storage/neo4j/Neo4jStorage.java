@@ -112,9 +112,9 @@ public class Neo4jStorage implements DMXStorage {
 
 
 
-    // *********************************
-    // *** DMXStorage Implementation ***
-    // *********************************
+    // ******************
+    // *** DMXStorage ***
+    // ******************
 
 
 

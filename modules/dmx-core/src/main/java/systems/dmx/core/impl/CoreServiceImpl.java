@@ -70,9 +70,9 @@ public class CoreServiceImpl implements CoreService {
 
 
 
-    // **********************************
-    // *** CoreService Implementation ***
-    // **********************************
+    // *******************
+    // *** CoreService ***
+    // *******************
 
 
 

@@ -151,7 +151,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Iterable Implementation ===
+    // === Iterable ===
 
     /**
      * Returns an interator which iterates this TypeModel's comp def URIs.

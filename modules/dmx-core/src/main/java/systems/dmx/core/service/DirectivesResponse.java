@@ -42,7 +42,7 @@ public class DirectivesResponse implements JSONEnabled {
         return directives;
     }
 
-    // *** JSONEnabled Implementation ***
+    // *** JSONEnabled ***
 
     @Override
     public JSONObject toJSON() {

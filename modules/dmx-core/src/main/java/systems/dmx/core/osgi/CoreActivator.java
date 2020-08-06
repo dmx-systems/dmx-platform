@@ -50,9 +50,9 @@ public class CoreActivator implements BundleActivator {
 
 
 
-    // **************************************
-    // *** BundleActivator Implementation ***
-    // **************************************
+    // ***********************
+    // *** BundleActivator ***
+    // ***********************
 
 
 

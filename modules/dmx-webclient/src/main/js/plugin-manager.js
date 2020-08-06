@@ -43,7 +43,6 @@ export default extraElementUI => {
   }
   // invoke init hook
   return p.then(() => {
-    console.log('Initializing plugins', plugins.length)
     plugins.forEach(plugin => plugin.init && plugin.init())
   })
 }

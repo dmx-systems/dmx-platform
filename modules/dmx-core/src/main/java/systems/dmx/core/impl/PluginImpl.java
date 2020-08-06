@@ -156,7 +156,7 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginUri;
     }
 
-    // --- Plugin Implementation ---
+    // === Plugin ===
 
     @Override
     public InputStream getStaticResource(String name) {
@@ -921,7 +921,7 @@ public class PluginImpl implements Plugin, EventHandler {
         eventService.postEvent(new Event(PLUGIN_ACTIVATED, properties));
     }
 
-    // --- EventHandler Implementation ---
+    // === EventHandler ===
 
     @Override
     public void handleEvent(Event event) {

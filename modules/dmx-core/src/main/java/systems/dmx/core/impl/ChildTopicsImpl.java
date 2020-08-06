@@ -45,9 +45,9 @@ class ChildTopicsImpl implements ChildTopics {
 
 
 
-    // **********************************
-    // *** ChildTopics Implementation ***
-    // **********************************
+    // *******************
+    // *** ChildTopics ***
+    // *******************
 
 
 

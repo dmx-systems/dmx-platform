@@ -22,9 +22,9 @@ class CompDefImpl extends AssocImpl implements CompDef {
 
 
 
-    // ******************************
-    // *** CompDef Implementation ***
-    // ******************************
+    // ***************
+    // *** CompDef ***
+    // ***************
 
 
 

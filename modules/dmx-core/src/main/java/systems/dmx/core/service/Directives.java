@@ -56,7 +56,7 @@ public class Directives implements Iterable<Directives.Entry> {
         threadLocalDirectives.remove();
     }
 
-    // *** Iterable Implementation ***
+    // *** Iterable ***
 
     @Override
     public Iterator<Entry> iterator() {

@@ -44,7 +44,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** MessageBodyReader Implementation ***
+    // *** MessageBodyReader ***
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -63,7 +63,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
         }
     }
 
-    // *** DiskQuotaCheck Implementation ***
+    // *** DiskQuotaCheck ***
 
     @Override
     public void check(long fileSize) {

@@ -25,9 +25,9 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
 
 
-    // ******************************
-    // *** DMXType Implementation ***
-    // ******************************
+    // ***************
+    // *** DMXType ***
+    // ***************
 
 
 
@@ -115,7 +115,7 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
 
 
-    // === Iterable Implementation ===
+    // === Iterable ===
 
     /**
      * Returns an interator which iterates this Type's comp def URIs.

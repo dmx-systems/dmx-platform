@@ -43,7 +43,7 @@ class ViewConfigImpl implements ViewConfig {
 
 
 
-    // === ViewConfig Implementation ===
+    // === ViewConfig ===
 
     @Override
     public Iterable<Topic> getConfigTopics() {

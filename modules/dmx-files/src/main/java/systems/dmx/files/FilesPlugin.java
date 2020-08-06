@@ -100,9 +100,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
 
 
-    // ***********************************
-    // *** FilesService Implementation ***
-    // ***********************************
+    // ********************
+    // *** FilesService ***
+    // ********************
 
 
 
@@ -429,9 +429,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
 
 
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
@@ -464,9 +464,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 
@@ -493,9 +493,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
 
 
-    // *********************************
-    // *** PathMapper Implementation ***
-    // *********************************
+    // ******************
+    // *** PathMapper ***
+    // ******************
 
 
 

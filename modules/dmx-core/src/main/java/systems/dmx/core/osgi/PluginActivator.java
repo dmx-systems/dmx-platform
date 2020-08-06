@@ -37,9 +37,9 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
 
 
-    // **************************************
-    // *** BundleActivator Implementation ***
-    // **************************************
+    // ***********************
+    // *** BundleActivator ***
+    // ***********************
 
 
 
@@ -81,9 +81,9 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
 
 
-    // ************************************
-    // *** PluginContext Implementation ***
-    // ************************************
+    // *********************
+    // *** PluginContext ***
+    // *********************
 
 
 

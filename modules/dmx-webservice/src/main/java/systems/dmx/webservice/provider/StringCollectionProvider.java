@@ -36,7 +36,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** MessageBodyReader Implementation ***
+    // *** MessageBodyReader ***
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -65,7 +65,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
         }
     }
 
-    // *** MessageBodyWriter Implementation ***
+    // *** MessageBodyWriter ***
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
