@@ -155,7 +155,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
 
     static {
-        logger.info("Security settings:" +
+        logger.info("Security config:" +
             "\n  dmx.security.anonymous_read_allowed = " + accessFilter.dumpReadSetting() +
             "\n  dmx.security.anonymous_write_allowed = " + accessFilter.dumpWriteSetting() +
             "\n  dmx.security.subnet_filter = " + SUBNET_FILTER +

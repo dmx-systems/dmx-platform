@@ -58,15 +58,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String FILE_REPOSITORY_PATH = canonizePath(System.getProperty("dmx.filerepo.path", "/"));
-    public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
-    public static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
+    private static final String FILE_REPO_PATH = System.getProperty("dmx.filerepo.path", "/");
+    private static final String FILE_REPOSITORY_PATH = canonizePath(FILE_REPO_PATH);
+    private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
+    private static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
-    private static final boolean ENTIRE_DISC_REPO = Pattern.compile("([A-Z]:)?\\/").matcher(FILE_REPOSITORY_PATH)
-                                                                                   .matches();
+    private static final boolean IS_ROOT_DIR = FILE_REPOSITORY_PATH.matches("([A-Z]:)?\\/");
 
     private static final String WORKSPACE_DIRECTORY_PREFIX = "/workspace-";
     private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile(WORKSPACE_DIRECTORY_PREFIX + "(\\d+).*");
@@ -74,9 +74,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static Logger logger = Logger.getLogger(FilesPlugin.class.getName());
 
     static {
-        logger.info("File repo config:" +
-            "\n  FILE_REPOSITORY_PATH = \"" + FILE_REPOSITORY_PATH + "\"" +
-            "\n  ENTIRE_DISC_REPO = " + ENTIRE_DISC_REPO);
+        logger.info("File repository config:" +
+            "\n  dmx.filerepo.path = \"" + FILE_REPO_PATH + "\" (canonized = \"" + FILE_REPOSITORY_PATH +
+                "\", root_dir = " + IS_ROOT_DIR + ")" +
+            "\n  dmx.filerepo.per_workspace = " + FILE_REPOSITORY_PER_WORKSPACE +
+            "\n  dmx.filerepo.disk_quota = " + DISK_QUOTA_MB);
     }
 
     // Events
@@ -511,7 +513,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // the entire file system, that is "/". In that case it must *not* be removed from the absolute path.
             // In that case the repository path is the same as the absolute path. ### FIXDOC
             repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
-            if (ENTIRE_DISC_REPO) {
+            if (IS_ROOT_DIR) {
                 repoPath = "/" + repoPath;
             } else if (repoPath.equals("")) {
                 repoPath = "/";
