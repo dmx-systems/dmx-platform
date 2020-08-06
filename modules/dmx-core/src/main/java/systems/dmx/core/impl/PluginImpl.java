@@ -48,7 +48,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private static final String PLUGIN_DEFAULT_PACKAGE = "systems.dmx.core.osgi";
     private static final String PLUGIN_CONFIG_FILE = "/plugin.properties";
-    private static final String PLUGIN_ACTIVATED = "de/deepamehta/core/plugin_activated";   // topic of the OSGi event
+    private static final String PLUGIN_ACTIVATED = "systems/dmx/core/plugin_activated";     // topic of the OSGi event
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

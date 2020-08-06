@@ -11,10 +11,10 @@
     <packaging>pom</packaging>
 
     <description>DMX is a platform for knowledge management and collaboration</description>
-    <url>http://www.deepamehta.de/</url>
+    <url>https://dmx.berlin/</url>
     <scm>
-        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
-        <url>https://github.com/jri/deepamehta</url>
+        <connection>scm:git:https://git.dmx.systems/dmx-platform/dmx-platform.git</connection>
+        <url>https://git.dmx.systems/dmx-platform/dmx-platform</url>
     </scm>
 
     <licenses>

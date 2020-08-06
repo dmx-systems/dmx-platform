@@ -8,7 +8,7 @@
     <artifactId>3rd-party-bundles</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>3rd-party (= non-DeepaMehta) libraries to be provisioned in the OSGi runtime.</description>
+    <description>3rd-party (= non-DMX) libraries to be provisioned in the OSGi runtime.</description>
 
     <parent>
         <groupId>systems.dmx</groupId>
@@ -18,9 +18,9 @@
     </parent>
 
     <dependencies>
-        <!-- DeepaMehta Storage - Neo4j -->
-        <!-- Note: deepamehta-storage-neo4j can not be statically deployed because it depends on Core. -->
-        <!-- Core is hot-deployed and not yet available.                                               -->
+        <!-- DMX Storage - Neo4j -->
+        <!-- Note: dmx-storage-neo4j can not be statically deployed because it depends on Core. -->
+        <!-- Core is hot-deployed and not yet available.                                        -->
         <!--dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-storage-neo4j</artifactId>

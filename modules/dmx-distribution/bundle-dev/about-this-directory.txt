@@ -2,7 +2,7 @@
 About the bundle-dev directory
 ------------------------------
 
-This is where you develop your own DeepaMehta plugins.
+This is where you develop your own DMX plugins.
 
 Create a new directory here for each plugin.
 Every time you build your plugin it gets automatically (re)deployed.
