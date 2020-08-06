@@ -58,8 +58,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // transform FILE_REPOSITORY_PATH to have 1) slashes, no backslashes, and 2) a drive letter (on Windows)
-    public static final String FILE_REPOSITORY_PATH = getPath(new File(System.getProperty("dmx.filerepo.path", "/")));
+    public static final String FILE_REPOSITORY_PATH = canonizePath(System.getProperty("dmx.filerepo.path", "/"));
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
@@ -876,7 +875,26 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         return repoPath;
     }
 
-    // --- System-independent File API wrapper ---
+    // --- Cross-platform path handling ---
+
+    /**
+     * A canonized path 1) has slashes, no backslashes), 2) has a drive letter (on Windows)
+     */
+    private static String canonizePath(String path) {
+        String _path = replaceBS(path);
+        if (onWindows() && !hasDriveLetter(_path)) {
+            _path = "C:" + _path;
+        }
+        return _path;
+    }
+
+    private static boolean onWindows() {
+        return File.separatorChar == '\\';
+    }
+
+    private static boolean hasDriveLetter(String path) {
+        return path.matches("[A-Z]:.*");
+    }
 
     private static String getPath(File file) {
         return replaceBS(file.getPath());       // Note: getPath() is system-dependent
