@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Collection of the data that makes up an {@link Assoc}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 

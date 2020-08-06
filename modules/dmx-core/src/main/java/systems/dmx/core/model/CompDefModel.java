@@ -5,7 +5,7 @@ package systems.dmx.core.model;
 /**
  * The data that underly a {@link CompDef}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface CompDefModel extends AssocModel {
 

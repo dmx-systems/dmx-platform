@@ -7,7 +7,7 @@ import systems.dmx.core.model.TopicModel;
 /**
  * A topic -- DMX's central data object.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface Topic extends DMXObject {
 

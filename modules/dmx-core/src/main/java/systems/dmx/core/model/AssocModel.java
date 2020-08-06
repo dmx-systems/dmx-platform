@@ -8,7 +8,7 @@ package systems.dmx.core.model;
  * An <code>AssocModel</code> can also be used to provide the data for an association <i>create</i> or <i>update</i>
  * operation. To instantiate an <code>AssocModel</code> use the {@link ModelFactory}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface AssocModel extends DMXObjectModel {
 

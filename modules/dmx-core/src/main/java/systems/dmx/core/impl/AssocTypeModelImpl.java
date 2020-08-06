@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Data that underlies a {@link AssocType}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel {
 

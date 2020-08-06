@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Data that underlies a {@link TopicType}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 

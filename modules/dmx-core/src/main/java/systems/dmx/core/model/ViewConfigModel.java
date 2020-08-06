@@ -10,7 +10,7 @@ import org.codehaus.jettison.json.JSONArray;
  * Config topics can be accessed by their type URI.
  * A view config can contain only one config topic with a certain type URI.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface ViewConfigModel {
 

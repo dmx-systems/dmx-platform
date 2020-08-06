@@ -12,7 +12,7 @@ import java.util.List;
  * An association with 2 ends. At each end can be a {@link DMXObject}, that is either a {@link Topic} or another
  * {@link Assoc}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface Assoc extends DMXObject {
 

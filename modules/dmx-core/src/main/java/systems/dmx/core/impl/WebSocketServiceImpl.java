@@ -101,7 +101,7 @@ public class WebSocketServiceImpl implements WebSocketService {
     void stop() {
         try {
             if (pool != null) {
-                logger.info("### Stopping WebSocket service (httpService=" + CoreActivator.getHttpService() + ")");
+                logger.info("### Stopping WebSocket service");
                 // CoreActivator.getHttpService().unregister("/websocket");     // HTTP service already gone
                 worker.interrupt();
                 pool.close();

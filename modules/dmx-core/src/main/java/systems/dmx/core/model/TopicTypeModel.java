@@ -8,7 +8,7 @@ package systems.dmx.core.model;
  * A <code>TopicTypeModel</code> can also be used to provide the data for a topic type <i>create</i> or <i>update</i>
  * operation. To instantiate a <code>TopicTypeModel</code> use the {@link ModelFactory}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface TopicTypeModel extends TypeModel {
 

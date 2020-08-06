@@ -9,7 +9,7 @@ import systems.dmx.core.model.CompDefModel;
  * <p>
  * The parent type is either a {@link TopicType} or an {@link AssocType}. The child type is always a {@link TopicType}.
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public interface CompDef extends Assoc {
 

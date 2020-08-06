@@ -17,7 +17,7 @@ import java.io.InputStream;
  * <code>dm4c.get_plugin("systems.dmx.files").open_upload_dialog()</code> that allows the user to
  * choose and upload a file.</p>
  *
- * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
+ * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
 public class UploadedFile {
 
