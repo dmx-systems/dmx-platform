@@ -51,10 +51,5 @@ DMX 5 is available freely under the GNU Affero General Public License, version 3
 All third party components incorporated into the DMX Software are licensed under the original license provided by the owner of the applicable component.
 
 
-### Disclaimer
-
-DMX is under heavy development. While you can do productive work with it, DMX does not meet professional standards yet. At least there are lacks in a) security, b) robustness, and c) usability. Do not put sensitive data in DMX, in particular when you setup DMX for network access. Be aware that data loss may occur when you use DMX improperly. The DMX developers assume no liability for lost or compromised data. Please keep this in mind when using this software.
-
-
 ------------
 Aug 7, 2020
