@@ -7,13 +7,13 @@
     <name>DMX Core</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-core</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-hot-deploy</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
         <relativePath>../dmx-hot-deploy/pom.xml</relativePath>
     </parent>
 

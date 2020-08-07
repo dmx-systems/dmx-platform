@@ -7,13 +7,13 @@
     <name>DMX Bookmarks</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-bookmarks</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 </project>

@@ -7,13 +7,13 @@
     <name>DMX Test</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-test</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -21,32 +21,32 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-workspaces</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-contacts</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-events</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-datetime</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-storage-neo4j</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
     </dependencies>
 </project>

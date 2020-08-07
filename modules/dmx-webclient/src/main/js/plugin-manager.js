@@ -127,7 +127,7 @@ function registerIconRenderers (renderers) {
 /**
  * Fetches the list of installed plugins from the server, then fetches the frontend script and style of those
  * plugins which provide one.
- * Note: only frontend script/style of *external* plugins (not included in the DMX standard distro) is fetched.
+ * Note: only frontend script/style of *external* plugins (not included in the DMX distro) is fetched.
  * In contrast the frontend script of the *standard* plugins is "linked" into the Webclient at build time.
  * A standard plugin's .jar file does not contain a `plugin.js` file.
  *

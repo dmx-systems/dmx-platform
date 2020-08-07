@@ -7,17 +7,17 @@
     <name>DMX Provision</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-provision</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <!--
-        POM projects with main dependency sets of the DMX Standard Distribution.
+        POM projects with main dependency sets of the DMX distribution.
         More precisely:
         1) The `dmx-distribution` POM depends on these POMs when assembling the Distribution.
            The assembly descriptor uses the project POM dependencies to transitive include artifacts.

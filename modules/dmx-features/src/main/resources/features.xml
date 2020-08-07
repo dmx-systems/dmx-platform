@@ -35,7 +35,7 @@
         <bundle>mvn:systems.dmx/deepamehta-storage-neo4j/${project.version}</bundle>
     </feature>
 
-    <feature name="dmx-standard-distribution" description="DMX Standard Distribution" version="${project.version}">
+    <feature name="dmx-distribution" description="DMX Distribution" version="${project.version}">
 
         <feature>dmx-platform</feature>
 
