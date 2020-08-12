@@ -21,33 +21,16 @@ copy-and-deploy-ci:
   only:
     - master
   script:
-    # add plugins and copy to CI download area
     - DISTDIR='modules/dmx-distribution/target'
-    # - PLUGINS=( dmx-geomaps dmx-mobile dmx-ldap dmx-tableview dmx-cooking )
-    # - WEBCGI='https://download.dmx.systems/cgi-bin/v1/latest-version.cgi?'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
     - FILENAME="$( basename ${ZIPFILE} .zip )"
     - NUNC="$( date +%F )"
     - MY_JOB_TOKEN="$(</home/gitlab-runner/.after-maven-build.token)"
-    # - DSTDIR='bundle-available'
-    # - ZIPINFO="$( zipinfo -1 ${ZIPFILE} )"
-    # - DMXDIR="$( head -n1 <<<${ZIPINFO} )"
-    # - echo "DMXDIR = ${DMXDIR}"
-    # - mkdir -p ${DMXDIR}${DSTDIR}
-    # - echo -e "About the bundle-available directory" >${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "------------------------------------\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "This directory contains a set of selected DMX plugins.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - for plugin in "${PLUGINS[@]}"; do LATEST="$( wget -q -O - ${WEBCGI}/ci/${plugin}/${plugin}-latest.jar )"; wget -q ${LATEST} -P ${DMXDIR}${DSTDIR}; done
-    # - zip -mr ${ZIPFILE} ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
-    # trigger `dmx-build-deb` pipeline
+    ## trigger `dmx-build-deb` pipeline
     - curl -s -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline >/dev/null
-
 
 copy-and-deploy-release:
   stage: deploy
@@ -56,30 +39,7 @@ copy-and-deploy-release:
   only:
     - tags
   script:
-    # add plugins to release and copy to download area
-    # - |
-    #  PLUGINS=( \
-    #    dmx-geomaps/dmx-geomaps-0.1.jar \
-    #    dmx-mobile/dmx-mobile-5.0-beta-2.jar \
-    #    dmx-ldap/dmx-ldap-0.5.1.jar \
-    #    dmx-tableview/dmx-tableview-0.4.0.jar \
-    #    dmx-cooking/dmx-cooking-0.1.jar \
-    #  )
     - DISTDIR='modules/dmx-distribution/target'
-    # - WEBSRC='https://download.dmx.systems/plugins'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
-    # - DSTDIR='bundle-available'
-    # - ZIPINFO="$( zipinfo -1 ${ZIPFILE} )"
-    # - DMXDIR="$( head -n1 <<<${ZIPINFO} )"
-    # - echo "DMXDIR = ${DMXDIR}"
-    # - mkdir -p ${DMXDIR}${DSTDIR}
-    # - echo -e "About the bundle-available directory" >${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "------------------------------------\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "This directory contains a set of selected DMX plugins.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "To activate a plugin copy or link it to the bundles-deploy folder.\n" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "Find more information on DMX plugins at" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - echo -e "https://git.dmx.systems/dmx-plugins" >>${DMXDIR}${DSTDIR}/about-this-directory.txt
-    # - for plugin in "${PLUGINS[@]}"; do wget -q ${WEBSRC}/${plugin} -P ${DMXDIR}${DSTDIR}; done
-    # - zip -mr ${ZIPFILE} ${DMXDIR}${DSTDIR}/*
     - cp ${ZIPFILE} /var/www/download.dmx.systems/dmx-${CI_COMMIT_TAG}.zip
