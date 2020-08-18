@@ -7,13 +7,13 @@
     <name>DMX Storage - Neo4j</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-storage-neo4j</artifactId>
-    <version>5.0</version>
+    <version>5.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-hot-deploy</artifactId>
-        <version>5.0</version>
+        <version>5.0.1-SNAPSHOT</version>
         <relativePath>../dmx-hot-deploy/pom.xml</relativePath>
     </parent>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
-            <version>5.0</version>
+            <version>5.0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- Neo4j -->

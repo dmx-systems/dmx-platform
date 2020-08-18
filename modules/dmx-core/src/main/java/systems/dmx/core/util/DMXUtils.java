@@ -32,7 +32,7 @@ public class DMXUtils {
 
     private static final String DM4_HOST_URL = System.getProperty("dmx.host.url");  // ### TODO: default value (#734)
     static {
-        logger.info("Host setting:\ndmx.host.url=\"" + DM4_HOST_URL + "\"");
+        logger.info("Host config:\n  dmx.host.url = \"" + DM4_HOST_URL + "\"");
     }
 
 

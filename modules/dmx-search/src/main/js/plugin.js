@@ -21,8 +21,8 @@ export default ({store}) => {
           topicmapTypes:  state => Object.values(state.topicmaps.topicmapTypes)
         },
         listeners: {
-          'topic-click': revealTopic,
-          'icon-click':  revealTopicNoSelect,
+          'topic-click':     revealTopic,
+          'icon-click':      revealTopicNoSelect,
           'topic-create':    createTopic,
           'extra-create':    createExtra,
           'topicmap-create': createTopicmap,

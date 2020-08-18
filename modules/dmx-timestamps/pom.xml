@@ -7,13 +7,13 @@
     <name>DMX Timestamps</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-timestamps</artifactId>
-    <version>5.0</version>
+    <version>5.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0</version>
+        <version>5.0.1-SNAPSHOT</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 

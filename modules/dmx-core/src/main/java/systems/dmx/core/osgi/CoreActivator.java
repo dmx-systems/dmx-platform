@@ -124,8 +124,8 @@ public class CoreActivator implements BundleActivator {
 
     public static DMXStorage openDB(String databaseFactory, String databasePath) {
         try {
-            logger.info("##### Opening the database\n  databaseFactory=\"" + databaseFactory + "\"\n  databasePath=\"" +
-                databasePath + "\"");
+            logger.info("##### Opening the database\n  databaseFactory = \"" + databaseFactory +
+                "\"\n  databasePath = \"" + databasePath + "\"");
             DMXStorageFactory factory = (DMXStorageFactory) Class.forName(databaseFactory).newInstance();
             DMXStorage db = factory.newDMXStorage(databasePath, mf);
             logger.info("Database opened successfully");

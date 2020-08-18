@@ -7,7 +7,7 @@
     <name>DMX</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx</artifactId>
-    <version>5.0</version>
+    <version>5.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>DMX is a platform for knowledge management and collaboration</description>
@@ -137,6 +137,10 @@
 
         <!-- OSGi Container -->
         <org.osgi.framework.bootdelegation>javax.xml.*,org.xml.*,org.w3c.dom</org.osgi.framework.bootdelegation>
+
+        <dmx.dita.install_dir>/usr/local/Cellar/dita-ot/3.4/libexec</dmx.dita.install_dir>
+        <dmx.dita.output_dir>/Users/jri/Documents/Test/dita-ot</dmx.dita.output_dir>
+        <dmx.dita.temp_dir>/Users/jri/Documents/Test/dita-ot/tmp</dmx.dita.temp_dir>
     </properties>
 
     <dependencyManagement>
