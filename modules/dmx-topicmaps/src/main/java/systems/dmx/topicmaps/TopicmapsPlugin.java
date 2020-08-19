@@ -154,7 +154,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addTopicToTopicmap(@PathParam("id") final long topicmapId,
                                    @PathParam("topicId") final long topicId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
+            // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
@@ -178,7 +178,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addAssocToTopicmap(@PathParam("id") final long topicmapId,
                                    @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
+            // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
@@ -203,7 +203,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("topicId") final long topicId,
                                           @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
-            // Note: a Mapcontext association must have no workspace assignment as it is "system" owned
+            // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
             dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {

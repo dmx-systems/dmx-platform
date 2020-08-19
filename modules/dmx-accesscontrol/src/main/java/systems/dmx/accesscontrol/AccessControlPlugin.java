@@ -567,11 +567,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preCreateAssoc(AssocModel assoc) {
         // Membership auto-typing
-        DMXUtils.assocAutoTyping(assoc, USERNAME, WORKSPACE, MEMBERSHIP, DEFAULT, DEFAULT);
+        DMXUtils.assocAutoTyping(assoc, USERNAME, WORKSPACE, MEMBERSHIP, DEFAULT, DEFAULT, players -> {
+            try {
+                // creating a Membership requires WRITE permission for the involved workspace
+                PlayerModel wp = players[1];
+                if (!wp.getTypeUri().equals(WORKSPACE)) {
+                    throw new RuntimeException("Unexpected players: " + players);
+                }
+                checkWriteAccess(wp.getId());
+                return true;
+            } catch (AccessControlException e) {
+                return false;
+            }
+        });
     }
 
-    // Note: we don't do the custom workspace assignment in preCreateAssoc() as this would create a race condition
-    // with the Workspaces module, which is responsible for the default workspace assignment.
+    // FIXME: the Workspaces module creates the standard workspace assignment in postCreateAssoc() as well,
+    // resulting in a race condition. The standard assignment may override the custom assignment done here.
     @Override
     public void postCreateAssoc(Assoc assoc) {
         if (assoc.getTypeUri().equals(MEMBERSHIP)) {

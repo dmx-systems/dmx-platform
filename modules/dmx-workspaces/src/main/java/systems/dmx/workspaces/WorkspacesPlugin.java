@@ -342,7 +342,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     /**
-     * Assigns every created topic to the current workspace.
+     * Standard workspace assignment for topics.
      */
     @Override
     public void postCreateTopic(Topic topic) {
@@ -371,7 +371,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Assigns every created association to the current workspace.
+     * Standard workspace assignment for assocs.
      */
     @Override
     public void postCreateAssoc(Assoc assoc) {
