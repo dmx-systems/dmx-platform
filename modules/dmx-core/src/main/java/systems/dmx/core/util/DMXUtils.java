@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 
@@ -185,6 +186,11 @@ public class DMXUtils {
 
 
 
+    public static PlayerModel[] assocAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
+                                                String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
+        return assocAutoTyping(assoc, topicTypeUri1, topicTypeUri2, assocTypeUri, roleTypeUri1, roleTypeUri2, null);
+    }
+
     /**
      * Retypes the given association if its players match the given topic types. The given assoc model is modified
      * in-place. Typically called from a plugin's {@link systems.dmx.core.service.event.PreCreateAssoc}.
@@ -196,17 +202,28 @@ public class DMXUtils {
      * <p>Auto-typing is supported only for topic players, and only if they are identified by-ID. If the given assoc has
      * at least one assoc player, or if a topic player is identfied by-URI, no retyping takes place (null is returned).
      *
+     * @param   playerTest      optional: a predicate tested after a type-match is detected for both players, but
+     *                          before actual auto-typing takes place. You can prohibit auto-typing by returning
+     *                          <code>false</code>. An array of 2 assoc players is passed. [0] is the player that
+     *                          matches "topicTypeUri1", [1] is the player that matches "topicTypeUri2".
+     *                          If no predicate is given (null) no additional test is performed before auto-typing.
+     *
      * @return  a 2-element {@link systems.dmx.core.model.PlayerModel} array if auto-typing took place,
      *          <code>null</code> otherwise. Convenience to access the assoc's players after retyping.
      *          Element 0 is the player of "topicTypeUri1", Element 1 is the player of "topicTypeUri2".
      */
     public static PlayerModel[] assocAutoTyping(AssocModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
+                                                String assocTypeUri, String roleTypeUri1, String roleTypeUri2,
+                                                Predicate<PlayerModel[]> playerTest) {
         if (!assoc.getTypeUri().equals(ASSOCIATION)) {
             return null;
         }
         PlayerModel[] players = getPlayerModels(assoc, topicTypeUri1, topicTypeUri2);
         if (players != null) {
+            if (playerTest != null && !playerTest.test(players)) {
+                logger.info("### Auto typing association into \"" + assocTypeUri + "\" ABORTED by player test");
+                return null;
+            }
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
             assoc.setTypeUri(assocTypeUri);
