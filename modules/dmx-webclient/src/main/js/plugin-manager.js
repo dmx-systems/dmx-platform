@@ -78,7 +78,7 @@ function initPlugin (pluginConfig) {
     _extraElementUI()
   }
   // webclient components
-  const components = _pluginConfig.components    // TODO: rename prop to "webclient"?
+  const components = _pluginConfig.components
   if (components) {
     components.forEach(compDef => {
       store.dispatch('registerComponent', compDef)

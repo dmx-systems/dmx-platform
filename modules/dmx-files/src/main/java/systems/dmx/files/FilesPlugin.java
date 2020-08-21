@@ -632,12 +632,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
         // Note: runWithoutWorkspaceAssignment() throws Exception
-        Topic topic = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Topic>() {
-            @Override
-            public Topic call() {
-                return dmx.createTopic(model);
-            }
-        });
+        Topic topic = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() ->
+            dmx.createTopic(model)
+        );
         createWorkspaceAssignment(topic, repoPath(topic));
         return topic;
     }
@@ -651,15 +648,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             boolean exists = dmx.getAssocs(folderTopicId, topicId, COMPOSITION).size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
-                Assoc assoc = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Assoc>() {
-                    @Override
-                    public Assoc call() {
-                        return dmx.createAssoc(mf.newAssocModel(COMPOSITION,
-                            mf.newTopicPlayerModel(folderTopicId, PARENT),
-                            mf.newTopicPlayerModel(topicId,       CHILD)
-                        ));
-                    }
-                });
+                Assoc assoc = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() ->
+                    dmx.createAssoc(mf.newAssocModel(COMPOSITION,
+                        mf.newTopicPlayerModel(folderTopicId, PARENT),
+                        mf.newTopicPlayerModel(topicId,       CHILD)
+                    ))
+                );
                 createWorkspaceAssignment(assoc, repoPath(topic));
             }
         } catch (Exception e) {

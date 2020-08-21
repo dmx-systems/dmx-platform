@@ -155,15 +155,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("topicId") final long topicId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
-                @Override
-                public Void call() {
-                    if (getTopicMapcontext(topicmapId, topicId) != null) {      // TODO: idempotence?
-                        throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
-                    }
-                    createTopicMapcontext(topicmapId, topicId, viewProps);
-                    return null;
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
+                if (getTopicMapcontext(topicmapId, topicId) != null) {          // TODO: idempotence?
+                    throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                 }
+                createTopicMapcontext(topicmapId, topicId, viewProps);
+                return null;
             });
         } catch (Exception e) {
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed, " +
@@ -179,15 +176,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
-                @Override
-                public Void call() {
-                    if (getAssocMapcontext(topicmapId, assocId) != null) {      // TODO: idempotence?
-                        throw new RuntimeException("Assoc " + assocId + " already added to topicmap " + topicmapId);
-                    }
-                    createAssocMapcontext(topicmapId, assocId, viewProps);
-                    return null;
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
+                if (getAssocMapcontext(topicmapId, assocId) != null) {          // TODO: idempotence?
+                    throw new RuntimeException("Assoc " + assocId + " already added to topicmap " + topicmapId);
                 }
+                createAssocMapcontext(topicmapId, assocId, viewProps);
+                return null;
             });
         } catch (Exception e) {
             throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed, " +
@@ -204,25 +198,22 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
-                @Override
-                public Void call() {
-                    // 1) add topic
-                    Assoc topicMapcontext = getTopicMapcontext(topicmapId, topicId);
-                    if (topicMapcontext == null) {
-                        createTopicMapcontext(topicmapId, topicId, viewProps);
-                    } else if (!visibility(topicMapcontext)) {
-                        _setTopicVisibility(topicmapId, topicId, true, topicMapcontext);
-                    }
-                    // 2) add association
-                    Assoc assocMapcontext = getAssocMapcontext(topicmapId, assocId);
-                    if (assocMapcontext == null) {
-                        createAssocMapcontext(topicmapId, assocId, mf.newViewProps(true, false));
-                    } else if (!visibility(assocMapcontext)) {
-                        _setAssocVisibility(topicmapId, assocId, true, assocMapcontext);
-                    }
-                    return null;
+            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
+                // 1) add topic
+                Assoc topicMapcontext = getTopicMapcontext(topicmapId, topicId);
+                if (topicMapcontext == null) {
+                    createTopicMapcontext(topicmapId, topicId, viewProps);
+                } else if (!visibility(topicMapcontext)) {
+                    _setTopicVisibility(topicmapId, topicId, true, topicMapcontext);
                 }
+                // 2) add association
+                Assoc assocMapcontext = getAssocMapcontext(topicmapId, assocId);
+                if (assocMapcontext == null) {
+                    createAssocMapcontext(topicmapId, assocId, mf.newViewProps(true, false));
+                } else if (!visibility(assocMapcontext)) {
+                    _setAssocVisibility(topicmapId, assocId, true, assocMapcontext);
+                }
+                return null;
             });
         } catch (Exception e) {
             throw new RuntimeException("Adding related topic " + topicId + " (assocId=" + assocId + ") to topicmap " +

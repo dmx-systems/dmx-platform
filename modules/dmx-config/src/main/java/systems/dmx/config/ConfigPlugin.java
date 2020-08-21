@@ -152,18 +152,15 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             // suppress standard workspace assignment as a config topic requires a special assignment
             final PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            return pa.runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
-                @Override
-                public RelatedTopic call() {
-                    Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
-                    dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
-                        mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
-                        mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
-                    ));
-                    pa.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
-                    // ### TODO: extend Core API to avoid re-retrieval
-                    return _getConfigTopic(configTypeUri, topic.getId());
-                }
+            return pa.runWithoutWorkspaceAssignment(() -> {
+                Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
+                dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
+                    mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
+                    mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
+                ));
+                pa.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
+                // ### TODO: extend Core API to avoid re-retrieval
+                return _getConfigTopic(configTypeUri, topic.getId());
             });
         } catch (Exception e) {
             throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " +

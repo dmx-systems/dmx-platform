@@ -106,30 +106,27 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
-            Topic workspace = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(new Callable<Topic>() {
-                @Override
-                public Topic call() {
-                    logger.info(operation + info);
-                    //
-                    // 1) create workspace
-                    Topic workspace = dmx.createTopic(
-                        mf.newTopicModel(uri, WORKSPACE, mf.newChildTopicsModel()
-                            .set(WORKSPACE_NAME, name)
-                            .setRef(SHARING_MODE, sharingMode.getUri())));
-                    //
-                    // 2) create default topicmap and assign to workspace
-                    Topic topicmap = topicmapsService.createTopicmap(
-                        TopicmapsService.DEFAULT_TOPICMAP_NAME,
-                        TopicmapsService.DEFAULT_TOPICMAP_TYPE_URI,
-                        null    // viewProps=null
-                    );
-                    // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
-                    // So we must use the privileged assignToWorkspace() call here. This is to support the
-                    // "DM4 Sign-up" 3rd-party plugin.
-                    dmx.getPrivilegedAccess().assignToWorkspace(topicmap, workspace.getId());
-                    //
-                    return workspace;
-                }
+            Topic workspace = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {
+                logger.info(operation + info);
+                //
+                // 1) create workspace
+                Topic _workspace = dmx.createTopic(
+                    mf.newTopicModel(uri, WORKSPACE, mf.newChildTopicsModel()
+                        .set(WORKSPACE_NAME, name)
+                        .setRef(SHARING_MODE, sharingMode.getUri())));
+                //
+                // 2) create default topicmap and assign to workspace
+                Topic topicmap = topicmapsService.createTopicmap(
+                    TopicmapsService.DEFAULT_TOPICMAP_NAME,
+                    TopicmapsService.DEFAULT_TOPICMAP_TYPE_URI,
+                    null    // viewProps=null
+                );
+                // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
+                // So we must use the privileged assignToWorkspace() call here. This is to support the
+                // "DM4 Sign-up" 3rd-party plugin.
+                dmx.getPrivilegedAccess().assignToWorkspace(topicmap, _workspace.getId());
+                //
+                return _workspace;
             });
             me.newWorkspace(workspace);     // FIXME: broadcast to eligible users only
             return workspace;

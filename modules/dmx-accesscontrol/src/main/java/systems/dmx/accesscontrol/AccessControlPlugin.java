@@ -259,14 +259,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // 2) create User Account
         // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
         // special assignments. See step 3) below.
-        Topic userAccount = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
-            @Override
-            public Topic call() {
-                return dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
-                    .setRef(USERNAME, usernameTopic.getId())
-                    .set(PASSWORD, cred.password)));
-            }
-        });
+        Topic userAccount = pa.runWithoutWorkspaceAssignment(() ->
+            dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
+                .setRef(USERNAME, usernameTopic.getId())
+                .set(PASSWORD, cred.password)))
+        );
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
         // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
@@ -295,12 +292,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 2) create username topic
             // We suppress standard workspace assignment here as a username topic require special assignment.
             // See step 3) below.
-            usernameTopic = pa.runWithoutWorkspaceAssignment(new Callable<Topic>() {
-                @Override
-                public Topic call() {
-                    return dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)));
-                }
-            });
+            usernameTopic = pa.runWithoutWorkspaceAssignment(() ->
+                dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)))
+            );
             // 3) create private workspace
             setWorkspaceOwner(
                 ws.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE), username
