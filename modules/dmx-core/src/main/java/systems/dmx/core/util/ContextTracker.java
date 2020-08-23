@@ -8,26 +8,22 @@ public class ContextTracker {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ThreadLocal<Integer> trackingLevel = new ThreadLocal() {
-        @Override
-        protected Integer initialValue() {
-            return 0;
-        }
-    };
+    private ThreadLocal<Long> tl = new ThreadLocal();
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public <V> V run(Callable<V> callable) throws Exception {
-        int level = trackingLevel.get();
+    public <V> V run(long value, Callable<V> callable) throws Exception {
+        Long _value = null;
         try {
-            trackingLevel.set(level + 1);
+            _value = tl.get();
+            tl.set(value);
             return callable.call();     // throws exception
         } finally {
-            trackingLevel.set(level);
+            tl.set(_value);
         }
     }
 
-    public boolean runsInTrackedContext() {
-        return trackingLevel.get() > 0;
+    public Long getValue() {
+        return tl.get();
     }
 }

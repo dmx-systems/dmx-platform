@@ -182,8 +182,18 @@ public interface PrivilegedAccess {
     // ---
 
     /**
-     * Runs a code block while suppressing the standard workspace assignment for all topics/associations
-     * created within that code block.
+     * Executes a code block and assigns all topics/associations created while that execution to the given workspace.
+     * <p>
+     * Use this method to override the standard workspace assignment (which is based on `dmx_workspace_id` cookie).
+     */
+    <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
+
+    /**
+     * Executes a code block and suppresses the standard workspace assignment (which is based on `dmx_workspace_id`
+     * cookie) for all topics/associations created while that execution. The created topics/associations will have no
+     * workspace assignment.
+     * <p>
+     * Use this method if you want do workspace assignment manually after creation.
      */
     <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception;
 

@@ -63,6 +63,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ### TODO: copy in Credentials.java
     private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
 
+    private static final long NO_WORKSPACE_TOKEN = -1;
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // used for workspace assignment suppression
@@ -350,13 +352,19 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ---
 
     @Override
+    public <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception {
+        return contextTracker.run(workspaceId, callable);
+    }
+
+    @Override
     public <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception {
-        return contextTracker.run(callable);
+        return runInWorkspaceContext(NO_WORKSPACE_TOKEN, callable);
     }
 
     @Override
     public boolean workspaceAssignmentIsSuppressed() {
-        return contextTracker.runsInTrackedContext();
+        Long workspaceId = contextTracker.getValue();
+        return workspaceId != null && workspaceId == NO_WORKSPACE_TOKEN;
     }
 
 

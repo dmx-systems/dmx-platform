@@ -94,7 +94,7 @@ class EventManager {
             // Note: here we also catch errors like NoSuchMethodError or AbstractMethodError.
             // These occur when plugins are not yet adapted to changed Core API.
             throw new RuntimeException("An error occurred in the " + event.getListenerInterface().getSimpleName() +
-                " of " + listener, e);
+                " listener of " + listener, e);
         }
     }
 

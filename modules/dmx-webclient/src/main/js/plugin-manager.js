@@ -34,8 +34,8 @@ export default extraElementUI => {
   //
   let p     // a promise resolved once the assets of all installed plugins are registered
   if (DEV) {
-    console.info('[DMX] You are running the DMX webclient in development mode.\nFrontend code is hot reloaded from ' +
-      'file system (instead retrieved through DMX backend server).\nTo get Hot Module Replacement add your plugin to ' +
+    console.info('[DMX] You are running the DMX webclient in development mode.\nAll frontend code is hot reloaded ' +
+      'from file system (instead retrieved through DMX server).\nTo get Hot Module Replacement add your plugin to ' +
       'modules/dmx-webclient/src/main/js/plugin-manager.js')
     p = Promise.resolve()
   } else {
