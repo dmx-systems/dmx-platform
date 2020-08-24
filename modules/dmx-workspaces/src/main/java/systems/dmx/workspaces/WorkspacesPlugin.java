@@ -16,6 +16,7 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
+import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DirectivesResponse;
@@ -352,7 +353,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return;
         }
         //
-        long workspaceId = workspaceId();
+        long workspaceId = workspaceId(topic);
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
         // the DMX workspace. This would not help in gaining data consistency because the topics created
         // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
@@ -380,7 +381,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return;
         }
         //
-        long workspaceId = workspaceId();
+        long workspaceId = workspaceId(assoc);
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
         // the DMX workspace. This would not help in gaining data consistency because the associations created
         // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
@@ -412,19 +413,29 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private long workspaceId() {
-        Cookies cookies = Cookies.get();
-        if (!cookies.has("dmx_workspace_id")) {
-            return -1;
+    private long workspaceId(DMXObject object) {
+        // Note: a model value (as e.g. set in preCreate listener) overrides the cookie value
+        TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
+        );
+        if (workspace != null) {
+            logger.info("===============> custom workspace assignment (" + workspace.getId() + ")");
+            return workspace.getId();
         }
-        return cookies.getLong("dmx_workspace_id");
+        //
+        Cookies cookies = Cookies.get();
+        if (cookies.has("dmx_workspace_id")) {
+            logger.info("---------------> standard workspace assignment (" + cookies.getLong("dmx_workspace_id") + ")");
+            return cookies.getLong("dmx_workspace_id");
+        }
+        //
+        return -1;
     }
 
     /**
      * Returns the ID of the DMX workspace or -1 to signal abortion of type introduction.
      */
     private long workspaceIdForType(DMXType type) {
-        return workspaceId() == -1 && isDMXStandardType(type) ? getDMXWorkspaceId() : -1;
+        return workspaceId(type) == -1 && isDMXStandardType(type) ? getDMXWorkspaceId() : -1;
     }
 
     // ---
