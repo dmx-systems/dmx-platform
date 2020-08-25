@@ -181,6 +181,7 @@ public interface PrivilegedAccess {
 
     // ---
 
+    // TODO: move to Workspaces module
     /**
      * Executes a code block and assigns all topics/associations created while that execution to the given workspace.
      * <p>
@@ -188,6 +189,7 @@ public interface PrivilegedAccess {
      */
     <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
 
+    // TODO: drop
     /**
      * Executes a code block and suppresses the standard workspace assignment (which is based on `dmx_workspace_id`
      * cookie) for all topics/associations created while that execution. The created topics/associations will have no
@@ -197,10 +199,11 @@ public interface PrivilegedAccess {
      */
     <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception;
 
+    // TODO: move to Workspaces module
     /**
-     * Returns true if standard workspace assignment is currently suppressed for the current thread.
+     * Returns true if standard workspace assignment is currently suppressed for the current thread. ### FIXDOC
      */
-    boolean workspaceAssignmentIsSuppressed();
+    Long getWorkspaceContext();
 
 
 

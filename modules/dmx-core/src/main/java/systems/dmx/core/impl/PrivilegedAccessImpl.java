@@ -362,9 +362,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     }
 
     @Override
-    public boolean workspaceAssignmentIsSuppressed() {
-        Long workspaceId = contextTracker.getValue();
-        return workspaceId != null && workspaceId == NO_WORKSPACE_TOKEN;
+    public Long getWorkspaceContext() {
+        return contextTracker.getValue();
     }
 
 

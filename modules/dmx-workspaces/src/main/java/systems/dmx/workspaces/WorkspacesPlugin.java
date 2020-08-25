@@ -344,9 +344,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateTopic(Topic topic) {
-        if (workspaceAssignmentIsSuppressed(topic)) {
-            return;
-        }
         // Note: when editing a workspace its parts ("Workspace Name" and "Workspace Description") must not be assigned
         // to the workspace itself. This would create an endless recursion while bubbling the modification timestamp.
         if (isWorkspacePart(topic)) {
@@ -373,9 +370,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateAssoc(Assoc assoc) {
-        if (workspaceAssignmentIsSuppressed(assoc)) {
-            return;
-        }
         // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
         if (isWorkspaceAssignment(assoc)) {
             return;
@@ -414,18 +408,25 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private long workspaceId(DMXObject object) {
-        // Note: a model value (as e.g. set in preCreate listener) overrides the cookie value
+        // 1) "Workspace Facet"
         TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
         );
         if (workspace != null) {
-            logger.info("===============> custom workspace assignment (" + workspace.getId() + ")");
+            logger.info("==> " + info(object) + ": workspace " + workspace.getId() + " (from object model)");
             return workspace.getId();
         }
-        //
+        // 2) Execution context
+        Long workspaceId = dmx.getPrivilegedAccess().getWorkspaceContext();
+        if (workspaceId != null) {
+            logger.info("==> " + info(object) + ": workspace " + workspaceId + " (from execution context)");
+            return workspaceId;
+        }
+        // 3) "dmx_workspace_id" cookie
         Cookies cookies = Cookies.get();
         if (cookies.has("dmx_workspace_id")) {
-            logger.info("---------------> standard workspace assignment (" + cookies.getLong("dmx_workspace_id") + ")");
-            return cookies.getLong("dmx_workspace_id");
+            workspaceId = cookies.getLong("dmx_workspace_id");
+            logger.info("--> " + info(object) + ": workspace " + workspaceId + " (from cookie)");
+            return workspaceId;
         }
         //
         return -1;
@@ -560,17 +561,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 objects.remove();
             }
         }
-    }
-
-    /**
-     * Returns true if standard workspace assignment is currently suppressed for the current thread.
-     */
-    private boolean workspaceAssignmentIsSuppressed(DMXObject object) {
-        boolean suppressed = dmx.getPrivilegedAccess().workspaceAssignmentIsSuppressed();
-        if (suppressed) {
-            logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
-        }
-        return suppressed;
     }
 
     // ---
