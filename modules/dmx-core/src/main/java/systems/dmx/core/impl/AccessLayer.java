@@ -150,15 +150,15 @@ public final class AccessLayer {
         return createSingleTopic(model, uriPrefix, null);
     }
 
-    TopicModelImpl createSingleTopic(TopicModelImpl model, Runnable runnable) {
-        return createSingleTopic(model, null, runnable);
+    TopicModelImpl createSingleTopic(TopicModelImpl model, Runnable childCreator) {
+        return createSingleTopic(model, null, childCreator);
     }
 
     /**
      * Creates a single topic in the DB.
      * No child topics are created.
      */
-    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, Runnable runnable) {
+    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, Runnable childCreator) {
         try {
             // 1) store in DB
             db.storeTopic(model);
@@ -174,8 +174,8 @@ public final class AccessLayer {
                 model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
             //
-            if (runnable != null) {
-                runnable.run();
+            if (childCreator != null) {
+                childCreator.run();
             }
             //
             model.postCreate();

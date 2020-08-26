@@ -42,6 +42,7 @@ class ValueIntegrator {
     private boolean isAssoc;
     private boolean isType;
     private boolean isFacetUpdate;
+    private boolean doCreate;
 
     private AccessLayer al;
     private ModelFactoryImpl mf;
@@ -145,7 +146,7 @@ class ValueIntegrator {
         }
     }
 
-    // Simple
+    // --- Simple ---
 
     /**
      * Integrates a simple value into the DB and returns the unified simple value.
@@ -212,14 +213,14 @@ class ValueIntegrator {
             }
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
-            topic = createSimpleTopic();
+            topic = al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
             logger.fine("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
         }
         return topic;
     }
 
-    // Composite
+    // --- Composite ---
 
     /**
      * Integrates a composite value into the DB and returns the unified composite value.
@@ -306,12 +307,17 @@ class ValueIntegrator {
             return unifyChildTopics(childValues, type);
         } else {
             DMXObjectModelImpl parent = identifyParent(childValues);
-            return parent != null ? updateAssignments(parent, childValues) : null;
+            if (parent != null) {
+                return updateAssignments(parent, childValues);
+            } else if (doCreate) {
+                return createCompositeTopic(childValues);
+            }
+            return null;
         }
     }
 
     /**
-     * Identifies the parent to be updated in-place, or creates it.
+     * Identifies the parent to be updated in-place, or creates it. ### FIXDOC
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -322,6 +328,7 @@ class ValueIntegrator {
      * @return  the parent object, or null if there is no parent
      */
     private DMXObjectModelImpl identifyParent(Map<String, Object> childValues) {
+        doCreate = false;
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
@@ -342,12 +349,8 @@ class ValueIntegrator {
                 Map<String, Object> childTopics = identityChildValues(childValues, identityCompDefUris);
                 return unifyChildTopics(childTopics, identityCompDefUris);
             } else {
-                // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
-                // Note: for value-types this is fixed meanwhile, but not for entity-types.
-                DMXObjectModelImpl parent = createSimpleTopic();
-                logger.fine("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
-                    "\")");
-                return parent;
+                doCreate = true;
+                return null;
             }
         }
     }
@@ -753,19 +756,6 @@ class ValueIntegrator {
     }
 
     // --- DB Access ---
-
-    /**
-     * Preconditions:
-     *   - this.newValues is a topic model.
-     */
-    private TopicModelImpl createSimpleTopic() {
-        // sanity check
-        if (isAssoc) {
-            throw new RuntimeException("Tried to create a topic from an assoc model");
-        }
-        //
-        return al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
-    }
 
     /**
      * Convenience

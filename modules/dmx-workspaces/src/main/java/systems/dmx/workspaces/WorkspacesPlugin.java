@@ -408,7 +408,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private long workspaceId(DMXObject object) {
-        // 1) "Workspace Facet"
+        // 1) Object model (Workspace Facet)
         TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
         );
         if (workspace != null) {
@@ -421,7 +421,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             logger.info("==> " + info(object) + ": workspace " + workspaceId + " (from execution context)");
             return workspaceId;
         }
-        // 3) "dmx_workspace_id" cookie
+        // 3) Workspace cookie
         Cookies cookies = Cookies.get();
         if (cookies.has("dmx_workspace_id")) {
             workspaceId = cookies.getLong("dmx_workspace_id");

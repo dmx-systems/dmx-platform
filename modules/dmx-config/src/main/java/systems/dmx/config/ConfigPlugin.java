@@ -52,7 +52,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // ConfigService
+    // --- ConfigService ---
 
     @GET
     @Path("/{configTypeUri}/topic/{topicId}")
@@ -131,7 +131,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         }
     }
 
-    // Listeners
+    // --- Listeners ---
 
     @Override
     public void postCreateTopic(Topic topic) {
