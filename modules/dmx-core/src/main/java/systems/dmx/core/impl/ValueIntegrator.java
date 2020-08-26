@@ -42,7 +42,6 @@ class ValueIntegrator {
     private boolean isAssoc;
     private boolean isType;
     private boolean isFacetUpdate;
-    private boolean doCreate;
 
     private AccessLayer al;
     private ModelFactoryImpl mf;
@@ -99,8 +98,8 @@ class ValueIntegrator {
             // value integration
             // Note: because a facet type is composite by definition a facet update is always a composite operation,
             // even if the faceted object is a simple one.
-            DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ? integrateSimple() :
-                                                                                 integrateComposite();
+            Result r = !isFacetUpdate && newValues.isSimple() ? integrateSimple() : integrateComposite();
+            DMXObjectModelImpl _value = r.value;
             // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
             UnifiedValue value = new UnifiedValue(_value);
             //
@@ -155,18 +154,18 @@ class ValueIntegrator {
      *   - this.newValues is not null
      *   - this.newValues is simple
      *
-     * @return  the unified value, or null if there was nothing to integrate.
+     * @return  Result value: the unified value, or null if there was nothing to integrate.
      *          The latter is the case if this.newValues is the empty string.
      */
-    private DMXObjectModelImpl integrateSimple() {
+    private Result integrateSimple() {
         if (isAssoc || isType) {
             // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
             // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still
             // have different players.) An assoc's simple value is updated in-place.
             // Note 2: a type's simple value is not unified. A type is updated in-place.
-            return storeAssocSimpleValue();
+            return new Result(storeAssocSimpleValue());
         } else if (newValues.getSimpleValue().toString().isEmpty()) {
-            return null;
+            return new Result();
         } else {
             return unifySimple();
         }
@@ -195,10 +194,11 @@ class ValueIntegrator {
      *   - this.newValues is simple
      *   - this.newValues is not empty
      *
-     * @return  the fetched or created topic; never null.
+     * @return  Result value: the fetched or created topic; never null.
      */
-    private TopicModelImpl unifySimple() {
+    private Result unifySimple() {
         TopicModelImpl topic;
+        boolean created = false;
         SimpleValue newValue = newValues.getSimpleValue();
         // Note: only readable topics can be reused (access control is applied)
         List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue);
@@ -214,10 +214,11 @@ class ValueIntegrator {
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
             topic = al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
+            created = true;
             logger.fine("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
         }
-        return topic;
+        return new Result(topic, created);
     }
 
     // --- Composite ---
@@ -228,20 +229,20 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is composite
      *
-     * @return  the unified value, or null if there was nothing to integrate.
+     * @return  Result value: the unified value, or null if there was nothing to integrate.
      */
-    private DMXObjectModelImpl integrateComposite() {
+    private Result integrateComposite() {
         Map<String, Object> childValues = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
-        ChildTopicsModel _childTopics = newValues.getChildTopics();
+        ChildTopicsModel childTopics = newValues.getChildTopics();
         // Iterate through type, not through newValues.
         // newValues might contain children not contained in the type def, e.g. "dmx.timestamps.modified".
         for (String compDefUri : compDefUris()) {
             Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
             if (isOne(compDefUri)) {
-                newChildValue = _childTopics.getTopicOrNull(compDefUri);
+                newChildValue = childTopics.getTopicOrNull(compDefUri);
             } else {
                 // TODO: if empty?
-                newChildValue = _childTopics.getTopicsOrNull(compDefUri);
+                newChildValue = childTopics.getTopicsOrNull(compDefUri);
             }
             // skip if not contained in (partial) update request
             if (newChildValue == null) {
@@ -252,7 +253,8 @@ class ValueIntegrator {
                                                                                 // List<UnifiedValue>; never null
             childValues.put(compDefUri, childValue);
         }
-        DMXObjectModelImpl value = unifyComposite(childValues);
+        Result r = unifyComposite(childValues);
+        DMXObjectModelImpl value = r.value;
         //
         // label calculation
         if (!isFacetUpdate) {
@@ -263,7 +265,7 @@ class ValueIntegrator {
             }
         }
         //
-        return value;
+        return r;
     }
 
     private Iterable<String> compDefUris() {
@@ -298,26 +300,26 @@ class ValueIntegrator {
      * @param   childValues     key: compDefUri
      *                          value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  the unified value, or null if there was nothing to integrate.
+     * @return  Result value: the unified value, or null if there was nothing to integrate.
      */
-    private DMXObjectModelImpl unifyComposite(Map<String, Object> childValues) {
+    private Result unifyComposite(Map<String, Object> childValues) {
         // Note: because a facet does not contribute to the value of a value object
         // a facet update is always an in-place modification
         if (isValueType() && !isFacetUpdate) {
             return unifyChildTopics(childValues, type);
         } else {
-            DMXObjectModelImpl parent = identifyParent(childValues);
+            Result r = identifyParent(childValues);
+            DMXObjectModelImpl parent = r.value;
             if (parent != null) {
-                return updateAssignments(parent, childValues);
-            } else if (doCreate) {
-                return createCompositeTopic(childValues);
+                updateAssignments(parent, childValues);
+                return r;
             }
-            return null;
+            return new Result();
         }
     }
 
     /**
-     * Identifies the parent to be updated in-place, or creates it. ### FIXDOC
+     * Identifies the parent to be updated in-place, or creates it.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -325,32 +327,30 @@ class ValueIntegrator {
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  the parent object, or null if there is no parent
+     * @return  Result value: the parent object, or null if there is no parent
      */
-    private DMXObjectModelImpl identifyParent(Map<String, Object> childValues) {
-        doCreate = false;
+    private Result identifyParent(Map<String, Object> childValues) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
-            return targetObject;
+            return new Result(targetObject);
         } else if (isAssoc) {
             if (newValues.id == -1) {
                 throw new RuntimeException("newValues has no ID set");
             }
             // TODO: partial updates. URI and player models must not expected to be part of the update model.
             AssocModelImpl _newValues = (AssocModelImpl) newValues;
-            return mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.player1,
-                                                                                    _newValues.player2);
+            return new Result(mf.newAssocModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.player1,
+                                                                                               _newValues.player2));
         } else {
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {
                 if (childValues.isEmpty()) {
-                    return null;
+                    return new Result();
                 }
                 Map<String, Object> childTopics = identityChildValues(childValues, identityCompDefUris);
                 return unifyChildTopics(childTopics, identityCompDefUris);
             } else {
-                doCreate = true;
-                return null;
+                return new Result(createCompositeTopic(childValues), true);
             }
         }
     }
@@ -405,10 +405,8 @@ class ValueIntegrator {
      * @param   parent          to parent to be updated; not null
      * @param   childValues     key: compDefUri
      *                          value: UnifiedValue or List<UnifiedValue>
-     *
-     * @return  the updated parent (passed through)
      */
-    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
+    private void updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
         for (String compDefUri : compDefUris()) {
             // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
@@ -425,7 +423,6 @@ class ValueIntegrator {
                 }
             }
         }
-        return parent;
     }
 
     /**
@@ -585,12 +582,12 @@ class ValueIntegrator {
      *
      * @param   compDefUris     only these child topics are respected
      *
-     * @return  the found (or created) parent topic, or null if there was nothing to integrate.
+     * @return  Result value: the found (or created) parent topic, or null if there was nothing to integrate.
      */
-    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> compDefUris) {
+    private Result unifyChildTopics(Map<String, Object> childValues, Iterable<String> compDefUris) {
         List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
         if (candidates == null) {
-            return null;
+            return new Result();
         }
         // logger.info("### " + candidates.size() + " candidates " + DMXUtils.idList(candidates));
         for (String compDefUri : compDefUris) {
@@ -617,10 +614,10 @@ class ValueIntegrator {
                     .size() + " child topics => using " + comp.id + ", child topics " + childValues.values());
             }
             // logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
-            return comp;
+            return new Result(comp);
         } else {
             // logger.info("### no composite found, childValues=" + childValues);
-            return createCompositeTopic(childValues);
+            return new Result(createCompositeTopic(childValues), true);
         }
     }
 
@@ -904,6 +901,25 @@ class ValueIntegrator {
             } catch (Exception e) {
                 throw new RuntimeException("Prettyprinting failed", e);
             }
+        }
+    }
+
+    private static class Result {
+
+        private DMXObjectModelImpl value;
+        private boolean created;
+
+        private Result() {
+            this(null);
+        }
+
+        private Result(DMXObjectModelImpl value) {
+            this(value, false);
+        }
+
+        private Result(DMXObjectModelImpl value, boolean created) {
+            this.value = value;
+            this.created = created;
         }
     }
 }
