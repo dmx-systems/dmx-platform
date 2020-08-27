@@ -142,44 +142,46 @@ public final class AccessLayer {
 
     // ---
 
-    TopicModelImpl createSingleTopic(TopicModelImpl model) {
-        return createSingleTopic(model, null, null);
-    }
-
-    TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix) {
-        return createSingleTopic(model, uriPrefix, null);
-    }
-
-    TopicModelImpl createSingleTopic(TopicModelImpl model, Runnable childCreator) {
-        return createSingleTopic(model, null, childCreator);
-    }
-
     /**
      * Creates a single topic in the DB.
      * No child topics are created.
      */
-    private TopicModelImpl createSingleTopic(TopicModelImpl model, String uriPrefix, Runnable childCreator) {
+    TopicModelImpl createSingleTopic(TopicModelImpl model) {
         try {
-            // 1) store in DB
+            // store in DB
             db.storeTopic(model);
             if (model.getType().isSimple()) {
                 model.storeSimpleValue();
             }
             createTopicInstantiation(model.getId(), model.getTypeUri());
-            // 2) set default URI
+            //
+            return model;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating single topic failed, model=" + model, e);
+        }
+    }
+
+    /**
+     * Creates a single type topic in the DB.
+     * No child topics are created.
+     * <p>
+     * Used to create topic types, assoc types, and role types.
+     * Auto-generates a default URI if no one is set in the model.
+     */
+    private TopicModelImpl createTypeTopic(TopicModelImpl model, String uriPrefix) {
+        try {
+            createSingleTopic(model);
+            // set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
             // Note: this must be done *after* the topic is stored. The ID is not known before.
             // Note: in case no URI was given: once stored a topic's URI is empty (not null).
-            if (uriPrefix != null && model.getUri().equals("")) {
+            if (model.getUri().equals("")) {
                 model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
-            //
-            if (childCreator != null) {
-                childCreator.run();
-            }
-            //
+            // Note: creating a type does not involve value integration, so POST_CREATE_TOPIC is fired from here.
             model.postCreate();
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
+            //
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
@@ -596,7 +598,7 @@ public final class AccessLayer {
             }
         }
         //
-        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE);
+        return createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---
@@ -839,7 +841,7 @@ public final class AccessLayer {
         // comp defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
-        createSingleTopic(typeTopic, uriPrefix);        // create generic topic
+        createTypeTopic(typeTopic, uriPrefix);          // create generic topic
         //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;

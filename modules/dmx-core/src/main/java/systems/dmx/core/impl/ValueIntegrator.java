@@ -45,6 +45,7 @@ class ValueIntegrator {
 
     private AccessLayer al;
     private ModelFactoryImpl mf;
+    private EventManager em;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -53,6 +54,7 @@ class ValueIntegrator {
     ValueIntegrator(AccessLayer al) {
         this.al = al;
         this.mf = al.mf;
+        this.em = al.em;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -95,16 +97,19 @@ class ValueIntegrator {
             // Note: we must get type *after* processing refs. Refs might have no type set.
             this.type = newValues.getType();
             //
-            // value integration
+            // --- Value Integration ---
             // Note: because a facet type is composite by definition a facet update is always a composite operation,
             // even if the faceted object is a simple one.
             Result r = !isFacetUpdate && newValues.isSimple() ? integrateSimple() : integrateComposite();
             DMXObjectModelImpl _value = r.value;
+            //
+            if (r.created) {
+                _value.postCreate();
+                em.fireEvent(CoreEvent.POST_CREATE_TOPIC, _value.instantiate());
+            }
             // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
             UnifiedValue value = new UnifiedValue(_value);
-            //
             idTransfer(_value);
-            //
             return value;
         } catch (Exception e) {
             throw new RuntimeException("Value integration failed, newValues=" + newValues + ", targetObject=" +
@@ -727,29 +732,29 @@ class ValueIntegrator {
      *                          value: UnifiedValue or List<UnifiedValue>
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
-        TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
-        al.createSingleTopic(model, () -> {
-            logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
-            ChildTopicsModelImpl childTopics = model.getChildTopics();
-            for (String compDefUri : childValues.keySet()) {
-                if (isOne(compDefUri)) {
-                    TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
+        TopicModelImpl parent = al.createSingleTopic(
+            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
+        );
+        logger.info("### Creating composite " + parent.id + " (typeUri=\"" + type.uri + "\")");
+        ChildTopicsModelImpl childTopics = parent.getChildTopics();
+        for (String compDefUri : childValues.keySet()) {
+            if (isOne(compDefUri)) {
+                TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
+                if (childTopic != null) {
+                    AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);         // update DB
+                    childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
+                }
+            } else {
+                for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
+                    TopicModel childTopic = value.value;
                     if (childTopic != null) {
-                        AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);         // update DB
-                        childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
-                    }
-                } else {
-                    for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
-                        TopicModel childTopic = value.value;
-                        if (childTopic != null) {
-                            AssocModelImpl assoc = createChildAssoc(model, childTopic, compDefUri);     // update DB
-                            childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
-                        }
+                        AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);     // update DB
+                        childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
                     }
                 }
             }
-        });
-        return model;
+        }
+        return parent;
     }
 
     // --- DB Access ---
