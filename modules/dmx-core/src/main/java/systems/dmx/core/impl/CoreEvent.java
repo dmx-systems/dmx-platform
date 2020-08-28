@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * Events fired by the DMX core service.
- * Plugins can listen to these events by implementing the respective listener interfaces.
+ * Events fired by the DMX Core.
+ * Plugins listen to these events by implementing the respective listener interfaces.
  *
  * @see systems.dmx.core.service.event
  */

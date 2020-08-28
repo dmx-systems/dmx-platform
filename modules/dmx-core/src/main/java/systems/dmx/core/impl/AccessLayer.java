@@ -162,11 +162,10 @@ public final class AccessLayer {
     }
 
     /**
-     * Creates a single type topic in the DB.
-     * No child topics are created.
+     * Creates a sole type topic in the DB, auto-generates a default type URI if due, and fires POST_CREATE_TOPIC.
+     * No type-specific parts are created.
      * <p>
      * Used to create topic types, assoc types, and role types.
-     * Auto-generates a default URI if no one is set in the model.
      */
     private TopicModelImpl createTypeTopic(TopicModelImpl model, String uriPrefix) {
         try {
@@ -184,7 +183,7 @@ public final class AccessLayer {
             //
             return model;
         } catch (Exception e) {
-            throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
+            throw new RuntimeException("Creating type topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
                 "\"", e);
         }
     }

@@ -362,7 +362,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
         // Note: for an object's initial workspace assignment checking the object's WRITE permission would fail
         // as that permission is granted only by the very workspace assignment we're about to create.
-        _assignToWorkspace(topic, workspaceId, false);      // checkObject=false
+        _assignToWorkspace(topic, workspaceId);
     }
 
     /**
@@ -387,7 +387,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
         // Note: for an object's initial workspace assignment checking the object's WRITE permission would fail
         // as that permission is granted only by the very workspace assignment we're about to create.
-        _assignToWorkspace(assoc, workspaceId, false);      // checkObject=false
+        _assignToWorkspace(assoc, workspaceId);
     }
 
     // ---
@@ -446,11 +446,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Performs argument checks and, if positive, does the actual workspace assignment.
+     * Checks arguments -- except object writability --, and performs the actual workspace assignment then.
+     * <p>
+     * Used for *initial* workspace assignment, when object writability is created only through this very assignment.
      */
-    private void _assignToWorkspace(DMXObject object, long workspaceId, boolean checkObject) {
+    private void _assignToWorkspace(DMXObject object, long workspaceId) {
         try {
-            checkAssignmentArgs(checkObject ? object : null, workspaceId);
+            checkAssignmentArgs(null, workspaceId);     // object=null
             __assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
