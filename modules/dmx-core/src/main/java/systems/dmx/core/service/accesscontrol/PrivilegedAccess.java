@@ -181,27 +181,36 @@ public interface PrivilegedAccess {
 
     // ---
 
-    // TODO: move to Workspaces module
+    // Note: thematically these 3 methods belong to the WorkspacesService. However they have moved to Core to avoid
+    // cyclic dependencies. The Workspaces plugin depends on both the TopicmapsService and the ConfigService. Both
+    // of them make use of runWithoutWorkspaceAssignment() but can't depend on WorkspacesService.
+
     /**
      * Executes a code block and assigns all topics/associations created while that execution to the given workspace.
      * <p>
-     * Use this method to override the standard workspace assignment (which is based on `dmx_workspace_id` cookie).
+     * runInWorkspaceContext calls can be nested.
+     * <p>
+     * Use this method to override the standard workspace assignment (which is based on `dmx_workspace_id` cookie or
+     * Workspace facet).
      */
     <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
 
-    // TODO: drop
     /**
      * Executes a code block and suppresses the standard workspace assignment (which is based on `dmx_workspace_id`
-     * cookie) for all topics/associations created while that execution. The created topics/associations will have no
-     * workspace assignment.
+     * cookie or Workspace facet) for all topics/associations created while that execution. The created topics/
+     * associations will have no workspace assignment.
      * <p>
      * Use this method if you want do workspace assignment manually after creation.
+     *
+     * @deprecated      Use {@link #runInWorkspaceContext} with workspaceID <code>-1</code> instead.
+     *                  This method will be dropped from DMX 5.1.
      */
+    @Deprecated
     <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception;
 
-    // TODO: move to Workspaces module
     /**
-     * Returns true if standard workspace assignment is currently suppressed for the current thread. ### FIXDOC
+     * Returns the workspace ID of the most recent {@link #runInWorkspaceContext} call in the current thread, or
+     * <code>null</code> if there was no {@link #runInWorkspaceContext} call.
      */
     Long getWorkspaceContext();
 
