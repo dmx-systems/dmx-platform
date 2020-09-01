@@ -593,6 +593,8 @@ public class DMXObjectModelImpl implements DMXObjectModel {
 
     // === Update (memory + DB) ===
 
+    // TODO: "_" wording is negated
+
     private void _updateUri(String newUri) {
         if (uriChange(newUri, uri)) {                               // abort if no update is requested
             logger.fine("### Changing URI of " + objectInfo() + ": \"" + uri + "\" -> \"" + newUri + "\"");
