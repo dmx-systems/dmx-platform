@@ -191,10 +191,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public void changePassword(Credentials cred) {
         try {
             logger.info("##### Changing password for user \"" + cred.username + "\"");
-            TopicModelImpl userAccount = _getUserAccount(_getUsernameTopicOrThrow(cred.username));
-            userAccount.update(mf.newTopicModel(mf.newChildTopicsModel()
-                .set(PASSWORD, cred.password)
-            ));
+            TopicModelImpl password = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
+            password._updateSimpleValue(new SimpleValue(cred.password));
         } catch (Exception e) {
             throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
         }
@@ -456,7 +454,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      */
-    private TopicModel getPasswordTopic(TopicModel usernameTopic) {
+    private TopicModelImpl getPasswordTopic(TopicModel usernameTopic) {
         return _getPasswordTopic(_getUserAccount(usernameTopic));
     }
 
@@ -469,8 +467,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         RelatedTopicModelImpl userAccount = al.sd.fetchTopicRelatedTopic(usernameTopic.getId(), COMPOSITION, CHILD,
             PARENT, USER_ACCOUNT);
         if (userAccount == null) {
-            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
-                usernameTopic.getSimpleValue() + "\", usernameTopic=" + usernameTopic);
+            throw new RuntimeException("No User Account topic for username \"" + usernameTopic.getSimpleValue() +
+                "\", usernameTopic=" + usernameTopic);
         }
         return userAccount;
     }
@@ -478,14 +476,14 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     /**
      * Prerequisite: userAccount is not <code>null</code>.
      */
-    private TopicModel _getPasswordTopic(TopicModel userAccount) {
+    private TopicModelImpl _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = al.sd.fetchTopicRelatedTopic(userAccount.getId(), COMPOSITION, PARENT,
+        RelatedTopicModelImpl password = al.sd.fetchTopicRelatedTopic(userAccount.getId(), COMPOSITION, PARENT,
             CHILD, PASSWORD);
         if (password == null) {
-            throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
-                userAccount.getSimpleValue() + "\", userAccount=" + userAccount);
+            throw new RuntimeException("No Password topic for User Account \"" + userAccount.getSimpleValue() +
+                "\", userAccount=" + userAccount);
         }
         return password;
     }
@@ -542,8 +540,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = al.sd.fetchTopicRelatedTopic(workspaceId, COMPOSITION,
-            PARENT, CHILD, SHARING_MODE);
+        TopicModel sharingMode = al.sd.fetchTopicRelatedTopic(workspaceId, COMPOSITION, PARENT, CHILD, SHARING_MODE);
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }

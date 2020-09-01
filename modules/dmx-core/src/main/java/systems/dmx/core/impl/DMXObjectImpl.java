@@ -117,7 +117,7 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final void setSimpleValue(SimpleValue value) {
-        model.updateSimpleValue(value);     // TODO: call model._updateSimpleValue() instead?
+        model.updateSimpleValue(value);     // TODO: call model._updateSimpleValue() instead (includes changed-check)?
     }
 
     // --- Child Topics ---

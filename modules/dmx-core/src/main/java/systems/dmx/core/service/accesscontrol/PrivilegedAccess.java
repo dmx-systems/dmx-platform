@@ -55,7 +55,7 @@ public interface PrivilegedAccess {
      * Security: this method is neither called by the DMX platform itself, nor is it callable from outside as it has
      * no REST interface. So the DMX platform is still secure. On the other hand, a 3rd-party plugin which provides a
      * RESTful interface to this method is required to apply an additional authorization measure, e.g. a short-living
-     * access token send via email.
+     * access token sent via email.
      *
      * @param   cred    the username and new password.
      *                  An user account with the given username must exist. (The username can't be changed.)
