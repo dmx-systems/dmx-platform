@@ -49,6 +49,13 @@ public interface PrivilegedAccess {
      * Changes the password of an existing user account.
      * <p>
      * This is a privileged method: it works also if the respective user is not logged in.
+     * The latter is a requirement for the realization of a reset-password feature, as done by 3rd-party plugins.
+     * (If a user forgot her password she is not logged in but still must be allowed to reset her password.)
+     * <p>
+     * Security: this method is neither called by the DMX platform itself, nor is it callable from outside as it has
+     * no REST interface. So the DMX platform is still secure. On the other hand, a 3rd-party plugin which provides a
+     * RESTful interface to this method is required to apply an additional authorization measure, e.g. a short-living
+     * access token send via email.
      *
      * @param   cred    the username and new password.
      *                  An user account with the given username must exist. (The username can't be changed.)
