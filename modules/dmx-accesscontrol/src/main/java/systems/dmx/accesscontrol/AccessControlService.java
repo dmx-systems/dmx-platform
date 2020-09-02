@@ -94,8 +94,8 @@ public interface AccessControlService {
     Topic getPrivateWorkspace();
 
     /**
-     * Checks if the current user is a DMX admin, and throws AccessControlException if not.
-     * Note: if invoked as "system" AccessControlException is not thrown.
+     * Checks if the current user is a DMX admin and throws AccessControlException if not.
+     * Note: if invoked as "System" no AccessControlException is thrown.
      *
      * @throws  AccessControlException  if the current user is not a DMX admin.
      */
@@ -106,7 +106,7 @@ public interface AccessControlService {
     // === User Accounts ===
 
     /**
-     * Checks user's permission and, if granted, creates an user account.
+     * Creates an user account.
      * Only DMX admins are allowed to create user accounts.
      *
      * @throws  RuntimeException    if the requesting user is not a DMX admin.
@@ -117,9 +117,11 @@ public interface AccessControlService {
 
     /**
      * Creates an user account.
-     * This is a privileged method. No permissions are checked.
+     * This is a privileged method: no permissions are checked.
      * <p>
-     * Note: this method is <i>not</i> RESTful.
+     * Security: this method is not callable from outside as it has no REST interface. So the DMX platform is still
+     * secure. On the other hand, a 3rd-party plugin which provides a RESTful interface to this method is required
+     * to apply an additional authorization measure, e.g. a short-living access token sent via email.
      *
      * @return  The "Username" topic of the created user account.
      */
@@ -129,7 +131,7 @@ public interface AccessControlService {
      * Creates a Username topic and a private workspace.
      * TODO: rename to createUsernameAndPrivateWorkspace?
      * 
-     * @return  created "Username" topic.
+     * @return  The created "Username" topic.
      */
     Topic createUsername(String username);
 

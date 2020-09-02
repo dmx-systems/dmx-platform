@@ -155,8 +155,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("topicId") final long topicId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
-                if (getTopicMapcontext(topicmapId, topicId) != null) {          // TODO: idempotence?
+            dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () -> {     // throws Exception
+                if (getTopicMapcontext(topicmapId, topicId) != null) {      // TODO: idempotence?
                     throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                 }
                 createTopicMapcontext(topicmapId, topicId, viewProps);
@@ -176,8 +176,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
-                if (getAssocMapcontext(topicmapId, assocId) != null) {          // TODO: idempotence?
+            dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () -> {     // throws Exception
+                if (getAssocMapcontext(topicmapId, assocId) != null) {      // TODO: idempotence?
                     throw new RuntimeException("Assoc " + assocId + " already added to topicmap " + topicmapId);
                 }
                 createAssocMapcontext(topicmapId, assocId, viewProps);
@@ -198,7 +198,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("assocId") final long assocId, final ViewProps viewProps) {
         try {
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
-            dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {     // throws Exception
+            dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () -> {     // throws Exception
                 // 1) add topic
                 Assoc topicMapcontext = getTopicMapcontext(topicmapId, topicId);
                 if (topicMapcontext == null) {

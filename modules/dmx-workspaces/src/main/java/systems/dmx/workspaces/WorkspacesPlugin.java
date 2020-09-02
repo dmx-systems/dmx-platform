@@ -107,7 +107,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
-            Topic workspace = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() -> {
+            Topic workspace = dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () -> {
                 logger.info(operation + info);
                 //
                 // 1) create workspace
@@ -124,7 +124,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 );
                 // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
                 // So we must use the privileged assignToWorkspace() call here. This is to support the
-                // "DM4 Sign-up" 3rd-party plugin.
+                // "DMX Sign-up" 3rd-party plugin.
                 dmx.getPrivilegedAccess().assignToWorkspace(topicmap, _workspace.getId());
                 //
                 return _workspace;
@@ -412,20 +412,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
         );
         if (workspace != null) {
-            logger.info("==> " + info(object) + ": workspace " + workspace.getId() + " (from object model)");
+            logger.fine("==> " + info(object) + ": workspace " + workspace.getId() + " (from object model)");
             return workspace.getId();
         }
         // 2) Execution context
         Long workspaceId = dmx.getPrivilegedAccess().getWorkspaceContext();
         if (workspaceId != null) {
-            logger.info("==> " + info(object) + ": workspace " + workspaceId + " (from execution context)");
+            logger.fine("==> " + info(object) + ": workspace " + workspaceId + " (from execution context)");
             return workspaceId;
         }
         // 3) Workspace cookie
         Cookies cookies = Cookies.get();
         if (cookies.has("dmx_workspace_id")) {
             workspaceId = cookies.getLong("dmx_workspace_id");
-            logger.info("--> " + info(object) + ": workspace " + workspaceId + " (from cookie)");
+            logger.fine("--> " + info(object) + ": workspace " + workspaceId + " (from cookie)");
             return workspaceId;
         }
         //

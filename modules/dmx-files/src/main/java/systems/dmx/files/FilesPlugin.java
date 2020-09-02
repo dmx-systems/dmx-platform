@@ -630,9 +630,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
-        // We suppress standard workspace assignment here as File and Folder topics require a special assignment
-        // Note: runWithoutWorkspaceAssignment() throws Exception
-        Topic topic = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() ->
+        // We suppress standard workspace assignment here as File and Folder topics require a special assignment.
+        // (We can't set the actual workspace here as privileged "assignToWorkspace" calls are required.)
+        // Note: runInWorkspaceContext() throws Exception
+        Topic topic = dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () ->
             dmx.createTopic(model)
         );
         createWorkspaceAssignment(topic, repoPath(topic));
@@ -647,8 +648,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             final long topicId = topic.getId();
             boolean exists = dmx.getAssocs(folderTopicId, topicId, COMPOSITION).size() > 0;
             if (!exists) {
-                // We suppress standard workspace assignment as the folder association requires a special assignment
-                Assoc assoc = dmx.getPrivilegedAccess().runWithoutWorkspaceAssignment(() ->
+                // We suppress standard workspace assignment as the folder association requires a special assignment.
+                // (We can't set the actual workspace here as privileged "assignToWorkspace" calls are required.)
+                Assoc assoc = dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () ->
                     dmx.createAssoc(mf.newAssocModel(COMPOSITION,
                         mf.newTopicPlayerModel(folderTopicId, PARENT),
                         mf.newTopicPlayerModel(topicId,       CHILD)

@@ -257,16 +257,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         final Topic usernameTopic = createUsername(username);
         //
         // 2) create User Account
-        // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
-        // special assignments. See step 3) below.
-        Topic userAccount = pa.runWithoutWorkspaceAssignment(() ->
+        // Note: a User Account topic (and its child topics) requires special workspace assignments (see next step 3).
+        // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
+        // "assignToWorkspace" calls are required.)
+        Topic userAccount = pa.runInWorkspaceContext(-1, () ->
             dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
                 .setRef(USERNAME, usernameTopic.getId())
                 .set(PASSWORD, cred.password)))
         );
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
-        // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
+        // Privileged assignToWorkspace() calls are required (instead of using the Workspaces service).
         Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
         long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
         pa.assignToWorkspace(userAccount, privateWorkspaceId);
@@ -289,10 +290,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             if (usernameTopic != null) {
                 throw new RuntimeException("Username \"" + username + "\" exists already");
             }
-            // 2) create username topic
-            // We suppress standard workspace assignment here as a username topic require special assignment.
-            // See step 3) below.
-            usernameTopic = pa.runWithoutWorkspaceAssignment(() ->
+            // 2) create Username topic
+            // Note: a Username topic requires special workspace assignment (see step 4 below).
+            // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
+            // "assignToWorkspace" calls are required.)
+            usernameTopic = pa.runInWorkspaceContext(-1, () ->
                 dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)))
             );
             // 3) create private workspace
@@ -306,7 +308,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             //
             // 4) assign username topic to "System" workspace
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
-            // This is to support the "DM4 Sign-up" 3rd-party plugin.
+            // This is to support the "DMX Sign-up" 3rd-party plugin.
             pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
             //
             return usernameTopic;

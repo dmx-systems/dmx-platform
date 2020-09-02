@@ -49,7 +49,7 @@ public interface PrivilegedAccess {
      * Changes the password of an existing user account.
      * <p>
      * This is a privileged method: it works also if the respective user is not logged in.
-     * The latter is a requirement for the realization of a reset-password feature, as done by 3rd-party plugins.
+     * The latter is a requirement for a reset-password feature, as realized by the "DMX Sign-up" 3rd-party plugin.
      * (If a user forgot her password she is not logged in but still must be allowed to reset her password.)
      * <p>
      * Security: this method is neither called by the DMX platform itself, nor is it callable from outside as it has
@@ -180,7 +180,7 @@ public interface PrivilegedAccess {
      * <p>
      * Note: this method can't be used to reassign an object to another workspace; use the `WorkspacesService` instead.
      * Typically this method is used for objects created in a migration or objects created inside a
-     * `runWithoutWorkspaceAssignment` context, and when the `WorkspacesService` is not available for some reason.
+     * <code>runInWorkspaceContext -1</code> context, and when the `WorkspacesService` is not available for some reason.
      *
      * @throws  RuntimeException    if the object is already assigned to another workspace than the given workspace.
      */
@@ -190,15 +190,18 @@ public interface PrivilegedAccess {
 
     // Note: thematically these 3 methods belong to the WorkspacesService. However they have moved to Core to avoid
     // cyclic dependencies. The Workspaces plugin depends on both the TopicmapsService and the ConfigService. Both
-    // of them make use of runWithoutWorkspaceAssignment() but can't depend on WorkspacesService.
+    // of them make use of runInWorkspaceContext() but can't depend on WorkspacesService.
 
     /**
      * Executes a code block and assigns all topics/associations created while that execution to the given workspace.
      * <p>
-     * runInWorkspaceContext calls can be nested.
+     * <code>runInWorkspaceContext()</code> calls can be nested.
      * <p>
      * Use this method to override the standard workspace assignment (which is based on `dmx_workspace_id` cookie or
      * Workspace facet).
+     *
+     * @throws  AccessControlException      if the current user has no WRITE permission for the given workspace.
+     * @throws  IllegalArgumentException    if <code>workspaceId</code> does not refer to a Workspace.
      */
     <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
 
