@@ -7,13 +7,13 @@
     <name>DMX Events</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-events</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.0.1</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0.1-SNAPSHOT</version>
+        <version>5.0.1</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-contacts</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-timestamps</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.0.1</version>
         </dependency>
     </dependencies>
 
@@ -37,9 +37,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>
-                            systems.dmx.events.EventsPlugin
-                        </Bundle-Activator>
+                        <Bundle-Activator>systems.dmx.events.EventsPlugin</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>

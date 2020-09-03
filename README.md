@@ -17,7 +17,7 @@ Company website:
 <https://dmx.systems>
 
 Live demo:  
-<https://demo.dmx.systems> (latest stable release)  
+<https://demo.dmx.systems> (latest release)  
 <https://dev.dmx.systems> (latest snapshot; login as "admin" with no password; content is deleted regularly)
 
 Download:  
@@ -25,7 +25,8 @@ Download:
 <https://download.dmx.systems/ci/> (snapshots)
 
 Documentation:  
-<https://docs.dmx.systems>
+<https://docs.dmx.systems>  
+<https://apidocs.dmx.systems>
 
 Forum:  
 <https://forum.dmx.systems>
@@ -51,5 +52,5 @@ DMX 5 is available freely under the GNU Affero General Public License, version 3
 All third party components incorporated into the DMX Software are licensed under the original license provided by the owner of the applicable component.
 
 
-------------
-Aug 7, 2020
+-----------
+Sep 3, 2020

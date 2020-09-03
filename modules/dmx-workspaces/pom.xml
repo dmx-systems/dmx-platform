@@ -7,13 +7,13 @@
     <name>DMX Workspaces</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-workspaces</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.0.1</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.0.1-SNAPSHOT</version>
+        <version>5.0.1</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,17 +21,17 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-facets</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-topicmaps</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-config</artifactId>
-            <version>5.0.1-SNAPSHOT</version>
+            <version>5.0.1</version>
         </dependency>
     </dependencies>
 
@@ -42,9 +42,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>
-                            systems.dmx.workspaces.WorkspacesPlugin
-                        </Bundle-Activator>
+                        <Bundle-Activator>systems.dmx.workspaces.WorkspacesPlugin</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
