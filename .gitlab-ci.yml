@@ -14,12 +14,10 @@ javadoc:
     - mvn -P all javadoc:aggregate
     - rsync -a --delete target/site/apidocs/ /var/www/apidocs.dmx.systems/apidocs/
 
-copy-and-deploy-ci:
+copy-ci-and-deploy:
   stage: deploy
   dependencies:
     - maven-build
-  only:
-    - master
   script:
     - DISTDIR='modules/dmx-distribution/target'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
@@ -31,15 +29,17 @@ copy-and-deploy-ci:
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
     ## trigger `dmx-build-deb` pipeline
     - curl -s -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline >/dev/null
+  only:
+    - master
 
-copy-and-deploy-release:
+copy-release:
   stage: deploy
   dependencies:
     - maven-build
-  only:
-    - tags
   script:
     - DISTDIR='modules/dmx-distribution/target'
     - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
     - echo "ZIPFILE = ${ZIPFILE}"
     - cp ${ZIPFILE} /var/www/download.dmx.systems/dmx-${CI_COMMIT_TAG}.zip
+  only:
+    - tags
