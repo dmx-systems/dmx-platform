@@ -35,7 +35,7 @@ const actions = {
 }
 
 const getters = {
-  menuTopicTypes: (state, getters, rootState) => {
+  createTopicTypes: (state, getters, rootState) => {
     const topicTypes = rootState.typeCache.topicTypes     // undefined while webclient launch
     return topicTypes && Object.values(topicTypes)
       .filter(topicType => topicType.getViewConfig('dmx.webclient.add_to_create_menu'))

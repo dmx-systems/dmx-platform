@@ -13,12 +13,12 @@ export default ({store}) => {
         comp: require('dmx-search-widget').default,
         mount: 'webclient',
         props: {
-          visible:        state => state.search.visible,
-          extraMenuItems: state => state.search.extraMenuItems,
-          createEnabled:  state => state.workspaces.isWritable,
-          markerIds:      (_, getters) => getters && getters.visibleTopicIds,
-          menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes, // TODO: why is getters undefined on start?
-          topicmapTypes:  state => Object.values(state.topicmaps.topicmapTypes)
+          visible:          state => state.search.visible,
+          extraMenuItems:   state => state.search.extraMenuItems,
+          createEnabled:    state => state.workspaces.isWritable,
+          markerIds:        (_, getters) => getters && getters.visibleTopicIds,
+          createTopicTypes: (_, getters) => getters && getters.createTopicTypes,  // TODO: getters is undefined on start
+          topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
         },
         listeners: {
           'topic-click':     revealTopic,
