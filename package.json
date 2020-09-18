@@ -20,7 +20,7 @@
     "dmx-detail-panel": "1.0.2",
     "dmx-login-dialog": "1.0.1",
     "dmx-object-renderer": "1.0.2",
-    "dmx-search-widget": "1.0.1",
+    "dmx-search-widget": "https://git.dmx.systems/nodejs-modules/dmx-search-widget.git",
     "dmx-topic-list": "1.0.1",
     "dmx-topicmap-panel": "1.0.1",
     "dmx-websocket": "1.0.1",
