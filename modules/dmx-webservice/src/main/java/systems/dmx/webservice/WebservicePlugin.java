@@ -19,6 +19,7 @@ import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.PluginInfo;
+import systems.dmx.core.service.RelatedTopicResult;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.IdList;
 
@@ -111,6 +112,20 @@ public class WebservicePlugin extends PluginActivator {
                                            @QueryParam("topicTypeUri") String topicTypeUri,
                                            @QueryParam("searchChildTopics") boolean searchChildTopics) {
         return dmx.queryTopicsFulltext(query, topicTypeUri, searchChildTopics);
+    }
+
+    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/topics")
+    public RelatedTopicResult queryRelatedTopicsFulltext(
+                                                       @QueryParam("topicQuery") String topicQuery,
+                                                       @QueryParam("topicTypeUri") String topicTypeUri,
+                                                       @QueryParam("searchTopicChildren") boolean searchTopicChildren,
+                                                       @QueryParam("assocQuery") String assocQuery,
+                                                       @QueryParam("assocTypeUri") String assocTypeUri,
+                                                       @QueryParam("searchAssocChildren") boolean searchAssocChildren) {
+        return dmx.queryRelatedTopicsFulltext(topicQuery, topicTypeUri, searchTopicChildren,
+                                              assocQuery, assocTypeUri, searchAssocChildren);
     }
 
     @POST
