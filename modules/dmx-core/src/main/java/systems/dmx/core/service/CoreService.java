@@ -125,7 +125,7 @@ public interface CoreService {
      *      </ul>
      * @param   typeUri             Optional: a topic type URI; only topics of this type are searched. If null all
      *                              topics are searched.<br>
-     *                              If given, all returned topics are of this type (regardless of  the
+     *                              If given, all returned topics are of this type (regardless of the
      *                              "searchChildTopics" setting).
      * @param   searchChildTopics   Applicable only if "topicTypeUri" is given (ignored otherwise): if true the topic's
      *                              child topics are searched as well.<br>
@@ -136,6 +136,9 @@ public interface CoreService {
      *          empty).
      */
     QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
+
+    RelatedTopicResult queryRelatedTopicsFulltext(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                                                  String assocQuery, String assocTypeUri, boolean searchAssocChildren);
 
     // ---
 

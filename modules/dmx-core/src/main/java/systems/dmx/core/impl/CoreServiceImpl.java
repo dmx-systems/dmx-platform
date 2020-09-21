@@ -17,6 +17,7 @@ import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.PluginInfo;
+import systems.dmx.core.service.RelatedTopicResult;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
@@ -122,6 +123,17 @@ public class CoreServiceImpl implements CoreService {
         return new QueryResult(
             query, typeUri, searchChildTopics,
             al.instantiate(al.queryTopicsFulltext(query, typeUri, searchChildTopics))
+        );
+    }
+
+    @Override
+    public RelatedTopicResult queryRelatedTopicsFulltext(
+                                                  String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                                                  String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+        return new RelatedTopicResult(
+            topicQuery, topicTypeUri, searchTopicChildren,
+            assocQuery, assocTypeUri, searchAssocChildren,
+            al.instantiate(al.queryTopicsFulltext(topicQuery, topicTypeUri, searchTopicChildren))  // TODO: query assocs
         );
     }
 
