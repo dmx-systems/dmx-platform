@@ -8,6 +8,7 @@ import java.util.List;
 
 
 
+// TODO: unify with core.QueryResult
 public class RelatedTopicResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
