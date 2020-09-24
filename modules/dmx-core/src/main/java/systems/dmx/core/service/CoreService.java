@@ -92,7 +92,7 @@ public interface CoreService {
      * Search is case-sensitive.
      *
      * @param   typeUri     a topic type URI; only topics of this type are searched; mandatory
-     * @param   query       The query. Lucene query syntax is supported:
+     * @param   query       The query. Must be non-empty. Lucene query syntax is supported:
      *      <ul>
      *          <li>"*" matches arbitrary characters</li>
      *          <li>"?" matches a single character</li>
@@ -114,7 +114,7 @@ public interface CoreService {
      * Lucene query syntax is supported.
      * Search is case-insensitive.
      *
-     * @param   query               The search query. Lucene query syntax is supported:
+     * @param   query               The search query. Must be non-empty. Lucene query syntax is supported:
      *      <ul>
      *          <li>"*" matches arbitrary characters</li>
      *          <li>"?" matches a single character</li>
@@ -212,7 +212,7 @@ public interface CoreService {
      * Search is case-sensitive.
      *
      * @param   typeUri     an association type URI; only associations of this type are searched; mandatory
-     * @param   query       The query. Lucene query syntax is supported:
+     * @param   query       The query. Must be non-empty. Lucene query syntax is supported:
      *      <ul>
      *          <li>"*" matches arbitrary characters</li>
      *          <li>"?" matches a single character</li>

@@ -102,6 +102,11 @@ public interface DMXStorage {
     List<AssocModelImpl> queryAssocs(String key, Object value);
 
     /**
+     * @return  The fetched assocs.
+     */
+    List<AssocModelImpl> queryAssocsFulltext(String key, Object value);
+
+    /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *
      * @param   assocTypeUri    Assoc type filter. Pass <code>null</code> to switch filter off.

@@ -233,6 +233,19 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
+    public List<AssocModelImpl> queryAssocsFulltext(String key, Object value) {
+        if (key == null) {
+            key = KEY_FULLTEXT;
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to call queryAssocsFulltext() with a null value Object (key=\"" +
+                key + "\")");
+        }
+        //
+        return buildAssocs(assocFulltextIndex.query(key, value));
+    }
+
+    @Override
     public List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                                String roleTypeUri2) {
         return queryAssocIndex(assocTypeUri,

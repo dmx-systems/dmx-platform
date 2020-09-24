@@ -735,7 +735,7 @@ class ValueIntegrator {
         TopicModelImpl parent = al.createSingleTopic(
             mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
         );
-        logger.info("### Creating composite " + parent.id + " (typeUri=\"" + type.uri + "\")");
+        logger.fine("### Creating composite " + parent.id + " (typeUri=\"" + type.uri + "\")");
         ChildTopicsModelImpl childTopics = parent.getChildTopics();
         for (String compDefUri : childValues.keySet()) {
             if (isOne(compDefUri)) {
