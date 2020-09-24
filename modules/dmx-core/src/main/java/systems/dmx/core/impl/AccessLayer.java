@@ -75,11 +75,7 @@ public final class AccessLayer {
     }
 
     List<TopicModelImpl> getTopicsByType(String topicTypeUri) {
-        try {
-            return filterReadables(_getTopicType(topicTypeUri).getAllInstances());
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topics by type failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
-        }
+        return filterReadables(_getTopicsByType(topicTypeUri));
     }
 
     TopicModelImpl getTopicByValue(String key, SimpleValue value) {
@@ -113,14 +109,33 @@ public final class AccessLayer {
                 topicTypeUri + "\", searchChildTopics=" + searchChildTopics);
             List<TopicModelImpl> topics;
             if (topicTypeUri != null && searchChildTopics) {
-                topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, query));
+                topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, query));   // key=null
             } else {
                 topics = db.queryTopicsFulltext(topicTypeUri, query);
             }
             return filterReadables(topics);
         } catch (Exception e) {
-            throw new RuntimeException("Querying topics fulltext failed, query=\"" + query + "\", topicTypeUri=\"" +
-                topicTypeUri + "\", searchChildTopics=" + searchChildTopics, e);
+            throw new RuntimeException("Querying topics fulltext failed, query=\"" + query + "\", topicTypeUri=" +
+                topicTypeUri + ", searchChildTopics=" + searchChildTopics, e);
+        }
+    }
+
+    List<TopicModelImpl> queryRelatedTopicsFulltext(
+            String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+            String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+        try {
+            logger.fine("Querying related topics fulltext, topicQuery=\"" + topicQuery + "\", topicTypeUri=" +
+                topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
+                "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
+            //
+            List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
+            List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
+            return filterByPlayer(assocs, topics);
+        } catch (Exception e) {
+            throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
+                "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
+                ", assocQuery=\"" + assocQuery + "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" +
+                searchAssocChildren, e);
         }
     }
 
@@ -245,11 +260,7 @@ public final class AccessLayer {
     }
 
     List<AssocModelImpl> getAssocsByType(String assocTypeUri) {
-        try {
-            return filterReadables(_getAssocType(assocTypeUri).getAllInstances());
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching assocs by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
-        }
+        return filterReadables(_getAssocsByType(assocTypeUri));
     }
 
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
@@ -771,6 +782,80 @@ public final class AccessLayer {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    List<TopicModelImpl> filterTopics(String topicQuery, String topicTypeUri, boolean searchTopicChildren) {
+        List<TopicModelImpl> topics;
+        if (!topicQuery.isEmpty()) {
+            if (topicTypeUri != null) {
+                if (searchTopicChildren) {
+                    topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, topicQuery));      // key=null
+                } else {
+                    topics = db.queryTopicsFulltext(topicTypeUri, topicQuery);
+                }
+            } else {
+                if (searchTopicChildren) {
+                    throw new IllegalArgumentException("If \"searchTopicChildren\" is set \"topicTypeUri\" must be " +
+                        "non-empty");
+                }
+                topics = db.queryTopicsFulltext(null, topicQuery);      // key=null
+            }
+        } else {
+            if (searchTopicChildren) {
+                throw new IllegalArgumentException("If \"searchTopicChildren\" is set \"topicQuery\" must be " +
+                    "set as well");
+            }
+            if (topicTypeUri != null) {
+                topics = _getTopicsByType(topicTypeUri);
+            } else {
+                // do nothing
+                topics = new ArrayList();
+            }
+        }
+        return topics;
+    }
+
+    List<AssocModelImpl> filterAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+        List<AssocModelImpl> assocs;
+        if (!assocQuery.isEmpty()) {
+            if (assocTypeUri != null) {
+                if (searchAssocChildren) {
+                    // assocs = parentTopics(assocTypeUri, db.queryTopicsFulltext(null, assocQuery));   // TODO
+                    assocs = getAssocsByType(assocTypeUri);                                             // TODO
+                } else {
+                    assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
+                }
+            } else {
+                if (searchAssocChildren) {
+                    throw new IllegalArgumentException("If \"searchAssocChildren\" is set \"assocTypeUri\" must be " +
+                        "non-empty");
+                }
+                assocs = db.queryAssocsFulltext(null, assocQuery);      // key=null
+            }
+        } else {
+            if (searchAssocChildren) {
+                throw new IllegalArgumentException("If \"searchAssocChildren\" is set \"assocQuery\" must be " +
+                    "set as well");
+            }
+            if (assocTypeUri != null) {
+                assocs = _getAssocsByType(assocTypeUri);
+            } else {
+                // do nothing
+                assocs = new ArrayList();
+            }
+        }
+        return assocs;
+    }
+
+    private List<TopicModelImpl> filterByPlayer(List<AssocModelImpl> assocs, List<TopicModelImpl> topics) {
+        List<TopicModelImpl> relTopics = new ArrayList();
+        for (AssocModelImpl assoc : assocs) {
+            // TODO
+            int i = topics.indexOf(assoc.getPlayer1().getId());
+        }
+        return topics;
+    }
+
+    // ---
+
     /**
      * Returns parent topics of the given type as found by child-to-parent traversal starting at the given child topics.
      */
@@ -827,6 +912,24 @@ public final class AccessLayer {
             return assocTypeUris;
         } catch (Exception e) {
             throw new RuntimeException("Fetching list of association type URIs failed", e);
+        }
+    }
+
+    // ---
+
+    private List<TopicModelImpl> _getTopicsByType(String topicTypeUri) {
+        try {
+            return _getTopicType(topicTypeUri).getAllInstances();
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics by type failed, topicTypeUri=\"" + topicTypeUri + "\"", e);
+        }
+    }
+
+    private List<AssocModelImpl> _getAssocsByType(String assocTypeUri) {
+        try {
+            return _getAssocType(assocTypeUri).getAllInstances();
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
         }
     }
 

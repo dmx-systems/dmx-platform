@@ -133,7 +133,10 @@ public class CoreServiceImpl implements CoreService {
         return new RelatedTopicResult(
             topicQuery, topicTypeUri, searchTopicChildren,
             assocQuery, assocTypeUri, searchAssocChildren,
-            al.instantiate(al.queryTopicsFulltext(topicQuery, topicTypeUri, searchTopicChildren))  // TODO: query assocs
+            al.instantiate(al.queryRelatedTopicsFulltext(
+                topicQuery, topicTypeUri, searchTopicChildren,
+                assocQuery, assocTypeUri, searchAssocChildren
+            ))
         );
     }
 
