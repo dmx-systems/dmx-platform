@@ -73,7 +73,6 @@ public class DMXUtils {
     }
 
     public static <T extends Identifiable> T findById(long id, Iterable<T> items) {
-        List<Long> ids = new ArrayList();
         for (T item : items) {
             if (item.getId() == id) {
                 return item;

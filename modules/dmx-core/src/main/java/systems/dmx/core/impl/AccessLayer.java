@@ -5,6 +5,7 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.storage.spi.DMXStorage;
+import systems.dmx.core.util.DMXUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,10 +28,11 @@ public final class AccessLayer {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public StorageDecorator sd;     // accessed by storage tests
-           DMXStorage db;
-           TypeStorage typeStorage;
-           EventManager em;
-           ModelFactoryImpl mf;
+
+    DMXStorage db;
+    TypeStorage typeStorage;
+    EventManager em;
+    ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -819,7 +821,7 @@ public final class AccessLayer {
             if (assocTypeUri != null) {
                 if (searchAssocChildren) {
                     // assocs = parentTopics(assocTypeUri, db.queryTopicsFulltext(null, assocQuery));   // TODO
-                    assocs = getAssocsByType(assocTypeUri);                                             // TODO
+                    assocs = _getAssocsByType(assocTypeUri);                                            // TODO
                 } else {
                     assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
                 }
@@ -846,12 +848,26 @@ public final class AccessLayer {
     }
 
     private List<TopicModelImpl> filterByPlayer(List<AssocModelImpl> assocs, List<TopicModelImpl> topics) {
-        List<TopicModelImpl> relTopics = new ArrayList();
-        for (AssocModelImpl assoc : assocs) {
-            // TODO
-            int i = topics.indexOf(assoc.getPlayer1().getId());
+        // no filtering if no assocs available
+        if (assocs.isEmpty()) {
+            return topics;
         }
-        return topics;
+        //
+        List<TopicModelImpl> result = new ArrayList();
+        for (AssocModelImpl assoc : assocs) {
+            _filterByPlayer(assoc, assoc.getPlayer1(), topics, result);
+            _filterByPlayer(assoc, assoc.getPlayer2(), topics, result);
+        }
+        logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: " + result.size());
+        return result;
+    }
+
+    private void _filterByPlayer(AssocModelImpl assoc, PlayerModelImpl player, List<TopicModelImpl> topics,
+                                                                               List<TopicModelImpl> result) {
+        TopicModelImpl topic = DMXUtils.findById(player.getId(), topics);
+        if (topic != null) {
+            result.add(mf.newRelatedTopicModel(topic, assoc));
+        }
     }
 
     // ---
@@ -917,6 +933,7 @@ public final class AccessLayer {
 
     // ---
 
+    // DB direct access. No permission check.
     private List<TopicModelImpl> _getTopicsByType(String topicTypeUri) {
         try {
             return _getTopicType(topicTypeUri).getAllInstances();
@@ -925,6 +942,7 @@ public final class AccessLayer {
         }
     }
 
+    // DB direct access. No permission check.
     private List<AssocModelImpl> _getAssocsByType(String assocTypeUri) {
         try {
             return _getAssocType(assocTypeUri).getAllInstances();
