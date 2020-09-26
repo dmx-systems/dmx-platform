@@ -107,8 +107,8 @@ public final class AccessLayer {
 
     List<TopicModelImpl> queryTopicsFulltext(String query, String topicTypeUri, boolean searchChildTopics) {
         try {
-            logger.fine("Querying topics fulltext, query=\"" + query + "\", topicTypeUri=\"" +
-                topicTypeUri + "\", searchChildTopics=" + searchChildTopics);
+            logger.fine("Querying topics fulltext, query=\"" + query + "\", topicTypeUri=" + topicTypeUri +
+                ", searchChildTopics=" + searchChildTopics);
             List<TopicModelImpl> topics;
             if (topicTypeUri != null && searchChildTopics) {
                 topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, query));   // key=null
@@ -132,7 +132,8 @@ public final class AccessLayer {
             //
             List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
             List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
-            return filterByPlayer(assocs, topics);
+            boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
+            return filterByPlayer(assocs, topics, assocFilter);
         } catch (Exception e) {
             throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
                 "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
@@ -847,10 +848,17 @@ public final class AccessLayer {
         return assocs;
     }
 
-    private List<TopicModelImpl> filterByPlayer(List<AssocModelImpl> assocs, List<TopicModelImpl> topics) {
+    private List<TopicModelImpl> filterByPlayer(List<AssocModelImpl> assocs, List<TopicModelImpl> topics,
+                                                boolean assocFilter) {
         // no filtering if no assocs available
         if (assocs.isEmpty()) {
-            return topics;
+            if (assocFilter) {
+                logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
+                return new ArrayList();
+            } else {
+                logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
+                return topics;
+            }
         }
         //
         List<TopicModelImpl> result = new ArrayList();
