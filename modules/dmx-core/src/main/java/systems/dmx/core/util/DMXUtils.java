@@ -72,6 +72,16 @@ public class DMXUtils {
         return ids;
     }
 
+    public static <T extends Identifiable> T findById(long id, Iterable<T> items) {
+        List<Long> ids = new ArrayList();
+        for (T item : items) {
+            if (item.getId() == id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     public static <M> List<M> toModelList(Iterable<? extends DMXObject> objects) {
         List<M> modelList = new ArrayList();
         for (DMXObject object : objects) {
