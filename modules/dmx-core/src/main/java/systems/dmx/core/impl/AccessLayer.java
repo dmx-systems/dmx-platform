@@ -129,11 +129,29 @@ public final class AccessLayer {
             logger.fine("Querying related topics fulltext, topicQuery=\"" + topicQuery + "\", topicTypeUri=" +
                 topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
                 "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
-            //
+            // topic filter
             List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
+            if (topics.isEmpty()) {
+                boolean topicFilter = !topicQuery.isEmpty() || topicTypeUri != null;
+                if (topicFilter) {
+                    logger.info("topics: " + topics.size() + ", result: -> empty");
+                    return new ArrayList();
+                }
+            }
+            // assoc filter
             List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
-            boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
-            return filterByPlayer(assocs, topics, assocFilter);
+            if (assocs.isEmpty()) {
+                boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
+                if (assocFilter) {
+                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
+                    return new ArrayList();
+                } else {
+                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
+                    return topics;
+                }
+            }
+            // combine filters
+            return filterByPlayer(topics, assocs);
         } catch (Exception e) {
             throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
                 "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
@@ -785,7 +803,7 @@ public final class AccessLayer {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    List<TopicModelImpl> filterTopics(String topicQuery, String topicTypeUri, boolean searchTopicChildren) {
+    private List<TopicModelImpl> filterTopics(String topicQuery, String topicTypeUri, boolean searchTopicChildren) {
         List<TopicModelImpl> topics;
         if (!topicQuery.isEmpty()) {
             if (topicTypeUri != null) {
@@ -795,17 +813,9 @@ public final class AccessLayer {
                     topics = db.queryTopicsFulltext(topicTypeUri, topicQuery);
                 }
             } else {
-                if (searchTopicChildren) {
-                    throw new IllegalArgumentException("If \"searchTopicChildren\" is set \"topicTypeUri\" must be " +
-                        "non-empty");
-                }
                 topics = db.queryTopicsFulltext(null, topicQuery);      // key=null
             }
         } else {
-            if (searchTopicChildren) {
-                throw new IllegalArgumentException("If \"searchTopicChildren\" is set \"topicQuery\" must be " +
-                    "set as well");
-            }
             if (topicTypeUri != null) {
                 topics = _getTopicsByType(topicTypeUri);
             } else {
@@ -816,7 +826,7 @@ public final class AccessLayer {
         return topics;
     }
 
-    List<AssocModelImpl> filterAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+    private List<AssocModelImpl> filterAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
         List<AssocModelImpl> assocs;
         if (!assocQuery.isEmpty()) {
             if (assocTypeUri != null) {
@@ -827,17 +837,9 @@ public final class AccessLayer {
                     assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
                 }
             } else {
-                if (searchAssocChildren) {
-                    throw new IllegalArgumentException("If \"searchAssocChildren\" is set \"assocTypeUri\" must be " +
-                        "non-empty");
-                }
                 assocs = db.queryAssocsFulltext(null, assocQuery);      // key=null
             }
         } else {
-            if (searchAssocChildren) {
-                throw new IllegalArgumentException("If \"searchAssocChildren\" is set \"assocQuery\" must be " +
-                    "set as well");
-            }
             if (assocTypeUri != null) {
                 assocs = _getAssocsByType(assocTypeUri);
             } else {
@@ -848,19 +850,9 @@ public final class AccessLayer {
         return assocs;
     }
 
-    private List<TopicModelImpl> filterByPlayer(List<AssocModelImpl> assocs, List<TopicModelImpl> topics,
-                                                boolean assocFilter) {
-        // no filtering if no assocs available
-        if (assocs.isEmpty()) {
-            if (assocFilter) {
-                logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
-                return new ArrayList();
-            } else {
-                logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
-                return topics;
-            }
-        }
-        //
+    // ---
+
+    private List<TopicModelImpl> filterByPlayer(List<TopicModelImpl> topics, List<AssocModelImpl> assocs) {
         List<TopicModelImpl> result = new ArrayList();
         for (AssocModelImpl assoc : assocs) {
             _filterByPlayer(assoc, assoc.getPlayer1(), topics, result);
@@ -872,9 +864,14 @@ public final class AccessLayer {
 
     private void _filterByPlayer(AssocModelImpl assoc, PlayerModelImpl player, List<TopicModelImpl> topics,
                                                                                List<TopicModelImpl> result) {
-        TopicModelImpl topic = DMXUtils.findById(player.getId(), topics);
-        if (topic != null) {
-            result.add(mf.newRelatedTopicModel(topic, assoc));
+        if (topics.isEmpty()) {
+            // FIXME: only if player is TopicPlayerModel?
+            result.add((RelatedTopicModelImpl) player.getDMXObject(assoc));
+        } else {
+            TopicModelImpl topic = DMXUtils.findById(player.getId(), topics);
+            if (topic != null) {
+                result.add(mf.newRelatedTopicModel(topic, assoc));
+            }
         }
     }
 
@@ -883,7 +880,7 @@ public final class AccessLayer {
     /**
      * Returns parent topics of the given type as found by child-to-parent traversal starting at the given child topics.
      */
-    List<TopicModelImpl> parentTopics(String topicTypeUri, List<TopicModelImpl> childTopics) {
+    private List<TopicModelImpl> parentTopics(String topicTypeUri, List<TopicModelImpl> childTopics) {
         List<TopicModelImpl> parentTopics = new ArrayList();
         for (TopicModelImpl childTopic : childTopics) {
             for (TopicModelImpl parentTopic : parentTopics(topicTypeUri, childTopic)) {
@@ -895,7 +892,7 @@ public final class AccessLayer {
         return parentTopics;
     }
 
-    List<TopicModelImpl> parentTopics(String topicTypeUri, TopicModelImpl childTopic) {
+    private List<TopicModelImpl> parentTopics(String topicTypeUri, TopicModelImpl childTopic) {
         List<TopicModelImpl> parentTopics = new ArrayList();
         // FIXME: check child topic read permission
         if (childTopic.typeUri.equals(topicTypeUri)) {
