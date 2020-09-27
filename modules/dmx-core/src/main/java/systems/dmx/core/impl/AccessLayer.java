@@ -865,8 +865,9 @@ public final class AccessLayer {
     private void _filterByPlayer(AssocModelImpl assoc, PlayerModelImpl player, List<TopicModelImpl> topics,
                                                                                List<TopicModelImpl> result) {
         if (topics.isEmpty()) {
-            // FIXME: only if player is TopicPlayerModel?
-            result.add((RelatedTopicModelImpl) player.getDMXObject(assoc));
+            if (player instanceof TopicPlayerModelImpl) {
+                result.add((RelatedTopicModelImpl) player.getDMXObject(assoc));
+            }
         } else {
             TopicModelImpl topic = DMXUtils.findById(player.getId(), topics);
             if (topic != null) {

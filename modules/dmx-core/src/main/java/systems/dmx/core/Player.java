@@ -16,6 +16,7 @@ public interface Player extends JSONEnabled {
 
     String getRoleTypeUri();
 
+    // TODO: use generics
     DMXObject getDMXObject();
 
     // ---
@@ -24,5 +25,6 @@ public interface Player extends JSONEnabled {
 
     // ---
 
+    // TODO: use generics
     PlayerModel getModel();
 }
