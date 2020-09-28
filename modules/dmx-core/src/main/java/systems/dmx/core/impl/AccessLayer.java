@@ -111,7 +111,7 @@ public final class AccessLayer {
                 ", searchChildTopics=" + searchChildTopics);
             List<TopicModelImpl> topics;
             if (topicTypeUri != null && searchChildTopics) {
-                topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, query));   // key=null
+                topics = parentObjects(topicTypeUri, db.queryTopicsFulltext(null, query));      // key=null
             } else {
                 topics = db.queryTopicsFulltext(topicTypeUri, query);
             }
@@ -808,7 +808,7 @@ public final class AccessLayer {
         if (!topicQuery.isEmpty()) {
             if (topicTypeUri != null) {
                 if (searchTopicChildren) {
-                    topics = parentTopics(topicTypeUri, db.queryTopicsFulltext(null, topicQuery));      // key=null
+                    topics = parentObjects(topicTypeUri, db.queryTopicsFulltext(null, topicQuery));     // key=null
                 } else {
                     topics = db.queryTopicsFulltext(topicTypeUri, topicQuery);
                 }
@@ -831,8 +831,7 @@ public final class AccessLayer {
         if (!assocQuery.isEmpty()) {
             if (assocTypeUri != null) {
                 if (searchAssocChildren) {
-                    // assocs = parentTopics(assocTypeUri, db.queryTopicsFulltext(null, assocQuery));   // TODO
-                    assocs = _getAssocsByType(assocTypeUri);                                            // TODO
+                    assocs = parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery));     // key=null
                 } else {
                     assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
                 }
@@ -879,31 +878,33 @@ public final class AccessLayer {
     // ---
 
     /**
-     * Returns parent topics of the given type as found by child-to-parent traversal starting at the given child topics.
+     * Returns parent topics of the given type as found by child-to-parent traversal starting at the given topics.
+     * ### FIXDOC
      */
-    private List<TopicModelImpl> parentTopics(String topicTypeUri, List<TopicModelImpl> childTopics) {
-        List<TopicModelImpl> parentTopics = new ArrayList();
-        for (TopicModelImpl childTopic : childTopics) {
-            for (TopicModelImpl parentTopic : parentTopics(topicTypeUri, childTopic)) {
-                if (!parentTopics.contains(parentTopic)) {
-                    parentTopics.add(parentTopic);
+    private <M extends DMXObjectModelImpl> List<M> parentObjects(String typeUri, List<TopicModelImpl> topics) {
+        List<M> result = new ArrayList();
+        for (TopicModelImpl topic : topics) {
+            for (DMXObjectModelImpl parentObject : _parentObjects(typeUri, topic)) {
+                if (!result.contains(parentObject)) {
+                    result.add((M) parentObject);
                 }
             }
         }
-        return parentTopics;
+        return result;
     }
 
-    private List<TopicModelImpl> parentTopics(String topicTypeUri, TopicModelImpl childTopic) {
-        List<TopicModelImpl> parentTopics = new ArrayList();
+    private List<DMXObjectModelImpl> _parentObjects(String typeUri, DMXObjectModelImpl object) {
+        List<DMXObjectModelImpl> result = new ArrayList();
         // FIXME: check child topic read permission
-        if (childTopic.typeUri.equals(topicTypeUri)) {
-            parentTopics.add(childTopic);
+        if (object.typeUri.equals(typeUri)) {
+            result.add(object);
         } else {
-            for (TopicModelImpl parentTopic : childTopic.getRelatedTopics((String) null, CHILD, PARENT, null)) {
-                parentTopics.addAll(parentTopics(topicTypeUri, parentTopic));
+            // FIXME: use getRelatedObjects()
+            for (DMXObjectModelImpl parentObject : object.getRelatedTopics((String) null, CHILD, PARENT, null)) {
+                result.addAll(_parentObjects(typeUri, parentObject));
             }
         }
-        return parentTopics;
+        return result;
     }
 
     // ---
