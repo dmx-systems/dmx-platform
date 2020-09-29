@@ -6,6 +6,7 @@ import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
@@ -279,8 +280,16 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    // TODO: drop it?
     List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
+        throw new UnsupportedOperationException();
+    }
+
+    // TODO: add assoc traversal methods
+
+    <M extends RelatedObjectModel> List<M> getRelatedObjects(String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersTypeUri) {
         throw new UnsupportedOperationException();
     }
 

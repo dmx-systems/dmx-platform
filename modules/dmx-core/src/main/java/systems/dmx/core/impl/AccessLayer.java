@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.util.DMXUtils;
@@ -900,8 +901,8 @@ public final class AccessLayer {
             result.add(object);
         } else {
             // FIXME: use getRelatedObjects()
-            for (DMXObjectModelImpl parentObject : object.getRelatedTopics((String) null, CHILD, PARENT, null)) {
-                result.addAll(_parentObjects(typeUri, parentObject));
+            for (RelatedObjectModel parentObject : object.getRelatedObjects((String) null, CHILD, PARENT, null)) {
+                result.addAll(_parentObjects(typeUri, (DMXObjectModelImpl) parentObject));
             }
         }
         return result;

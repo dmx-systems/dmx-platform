@@ -5,6 +5,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.service.DMXEvent;
@@ -201,6 +202,12 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
         return al.db.fetchAssocRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+    }
+
+    @Override
+    final <M extends RelatedObjectModel> List<M> getRelatedObjects(String assocTypeUri, String myRoleTypeUri,
+                                                                   String othersRoleTypeUri, String othersTypeUri) {
+        return al.db.fetchAssocRelatedObjects(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri);
     }
 
     // ---

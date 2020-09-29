@@ -4,6 +4,7 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
@@ -86,6 +87,12 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
                                                                                            String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
         return al.db.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+    }
+
+    @Override
+    final <M extends RelatedObjectModel> List<M> getRelatedObjects(String assocTypeUri, String myRoleTypeUri,
+                                                                   String othersRoleTypeUri, String othersTypeUri) {
+        return al.db.fetchTopicRelatedObjects(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTypeUri);
     }
 
     // ---
