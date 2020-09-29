@@ -9,6 +9,7 @@ import systems.dmx.core.impl.RelatedTopicModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.storage.spi.DMXStorage;
@@ -428,6 +429,28 @@ public class Neo4jStorage implements DMXStorage {
         return buildRelatedAssocs(queryAssocIndex(assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
             othersRoleTypeUri, NodeType.ASSOC, -1,      othersAssocTypeUri
+        ), assocId);
+    }
+
+    // ---
+
+    @Override
+    public <M extends RelatedObjectModel> List<M> fetchTopicRelatedObjects(
+                                                          long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersTypeUri) {
+        return buildRelatedObjects(queryAssocIndex(assocTypeUri,
+            myRoleTypeUri,     NodeType.TOPIC, topicId, null,
+            othersRoleTypeUri, null,           -1,      othersTypeUri
+        ), topicId);
+    }
+
+    @Override
+    public <M extends RelatedObjectModel> List<M> fetchAssocRelatedObjects(
+                                                          long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersTypeUri) {
+        return buildRelatedObjects(queryAssocIndex(assocTypeUri,
+            myRoleTypeUri,     NodeType.ASSOC, assocId, null,
+            othersRoleTypeUri, null,           -1,      othersTypeUri
         ), assocId);
     }
 
@@ -1123,6 +1146,22 @@ public class Neo4jStorage implements DMXStorage {
 
 
     // --- DMX Helper ---
+
+    private <M extends RelatedObjectModel> List<M> buildRelatedObjects(List<AssocModelImpl> assocs, long playerId) {
+        if (!assocs.isEmpty()) {
+            NodeType nodeType = NodeType.of(fetchNode(assocs.get(0).getOtherPlayerId(playerId)));
+            switch (nodeType) {
+            case TOPIC:
+                return (List<M>) buildRelatedTopics(assocs, playerId);
+            case ASSOC:
+                return (List<M>) buildRelatedAssocs(assocs, playerId);
+            default:
+                throw new RuntimeException("Unexpected node type: " + nodeType);
+            }
+        } else {
+            return new ArrayList();
+        }
+    }
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
     private List<RelatedTopicModelImpl> buildRelatedTopics(List<AssocModelImpl> assocs, long playerId) {

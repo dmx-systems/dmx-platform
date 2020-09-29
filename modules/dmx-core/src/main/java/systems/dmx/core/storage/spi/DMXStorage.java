@@ -7,6 +7,7 @@ import systems.dmx.core.impl.RelatedAssocModelImpl;
 import systems.dmx.core.impl.RelatedTopicModelImpl;
 import systems.dmx.core.impl.TopicModelImpl;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 
 import java.util.List;
@@ -207,6 +208,16 @@ public interface DMXStorage {
      */
     List<RelatedAssocModelImpl> fetchAssocRelatedAssocs(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                         String othersRoleTypeUri, String othersAssocTypeUri);
+
+    // ---
+
+    <M extends RelatedObjectModel> List<M> fetchTopicRelatedObjects(
+                                                        long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTypeUri);
+
+    <M extends RelatedObjectModel> List<M> fetchAssocRelatedObjects(
+                                                        long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                        String othersRoleTypeUri, String othersTypeUri);
 
     // ---
 
