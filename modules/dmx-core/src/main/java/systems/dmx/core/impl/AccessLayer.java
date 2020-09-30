@@ -831,10 +831,11 @@ public final class AccessLayer {
         List<AssocModelImpl> assocs;
         if (!assocQuery.isEmpty()) {
             if (assocTypeUri != null) {
+                // While children are always topics direct assoc matches are supported as well.
+                // So the filterAssocs() logic is little different from filterTopics() above.
+                assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
                 if (searchAssocChildren) {
-                    assocs = parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery));     // key=null
-                } else {
-                    assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
+                    assocs.addAll(parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery)));  // key=null);
                 }
             } else {
                 assocs = db.queryAssocsFulltext(null, assocQuery);      // key=null
@@ -886,7 +887,7 @@ public final class AccessLayer {
         List<M> result = new ArrayList();
         for (TopicModelImpl topic : topics) {
             for (DMXObjectModelImpl parentObject : _parentObjects(typeUri, topic)) {
-                if (!result.contains(parentObject)) {
+                if (!result.contains(parentObject)) {       // TODO: equality and rel-objects?
                     result.add((M) parentObject);
                 }
             }
@@ -896,12 +897,10 @@ public final class AccessLayer {
 
     private List<DMXObjectModelImpl> _parentObjects(String typeUri, DMXObjectModelImpl object) {
         List<DMXObjectModelImpl> result = new ArrayList();
-        // FIXME: check child topic read permission
         if (object.typeUri.equals(typeUri)) {
             result.add(object);
         } else {
-            // FIXME: use getRelatedObjects()
-            for (RelatedObjectModel parentObject : object.getRelatedObjects((String) null, CHILD, PARENT, null)) {
+            for (RelatedObjectModel parentObject : object.getRelatedObjects(null, CHILD, PARENT, null)) {
                 result.addAll(_parentObjects(typeUri, (DMXObjectModelImpl) parentObject));
             }
         }
