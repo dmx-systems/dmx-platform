@@ -23,6 +23,7 @@ export default ({store}) => {
         listeners: {
           'topic-click':     revealTopic,
           'icon-click':      revealTopicNoSelect,
+          'assoc-click':     revealAssoc,
           'topic-create':    createTopic,
           'extra-create':    createExtra,
           'topicmap-create': createTopicmap,
@@ -44,6 +45,15 @@ export default ({store}) => {
       noSelect: noSelect || state.options.noSelect
     })
     state.options.topicHandler && state.options.topicHandler(topic)
+  }
+
+  function revealAssoc (relTopic) {
+    store.dispatch('revealTopicById', {
+      id: relTopic.assoc.getOtherPlayerId(relTopic.id),
+      noSelect: true
+    }).then(() => {
+      store.dispatch('revealRelatedTopic', {relTopic, noSelect: true})
+    })
   }
 
   function createTopic ({topicType, value}) {
