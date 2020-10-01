@@ -237,9 +237,18 @@ const actions = {
     }
   },
 
+  /**
+   * @param   topicId   the ID (number), or an object with `id`, `pos`, `noSelect` properties.
+   */
   revealTopicById ({dispatch}, topicId) {
-    dm5.restClient.getTopic(topicId).then(topic => {
-      dispatch('revealTopic', {topic})
+    let id, pos, noSelect
+    if (typeof topicId === 'object') {
+      ({id, pos, noSelect} = topicId)
+    } else {
+      id = topicId
+    }
+    dm5.restClient.getTopic(id).then(topic => {
+      dispatch('revealTopic', {topic, pos, noSelect})
     })
   },
 
@@ -258,6 +267,11 @@ const actions = {
     !noSelect && dispatch('callTopicRoute', topic.id)               // dispatch into app
   },
 
+  /**
+   * Reveals an assoc on the topicmap panel.
+   *
+   * Prerequisite: both players are revealed already.
+   */
   revealAssoc ({dispatch}, {assoc, noSelect}) {
     dispatch('renderAssoc', assoc)                                  // dispatch into topicmap renderer
     !noSelect && dispatch('callAssocRoute', assoc.id)               // dispatch into app
