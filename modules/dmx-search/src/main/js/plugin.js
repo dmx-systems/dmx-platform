@@ -53,6 +53,7 @@ export default ({store}) => {
       noSelect: true
     }).then(() => {
       store.dispatch('revealRelatedTopic', {relTopic, noSelect: true})
+      store.dispatch('selectAssoc', relTopic.assoc.id)
     })
   }
 
