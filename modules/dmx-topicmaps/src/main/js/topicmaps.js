@@ -247,7 +247,7 @@ const actions = {
     } else {
       id = topicId
     }
-    dm5.restClient.getTopic(id).then(topic => {
+    return dm5.restClient.getTopic(id).then(topic => {
       dispatch('revealTopic', {topic, pos, noSelect})
     })
   },
