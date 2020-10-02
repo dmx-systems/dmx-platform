@@ -48,11 +48,13 @@ export default ({store}) => {
   }
 
   function revealAssoc (relTopic) {
+    const pos = store.state.search.pos.model
     store.dispatch('revealTopicById', {
       id: relTopic.assoc.getOtherPlayerId(relTopic.id),
+      pos: {x: pos.x + 340, y: pos.y - 40},
       noSelect: true
     }).then(() => {
-      store.dispatch('revealRelatedTopic', {relTopic, noSelect: true})
+      store.dispatch('revealRelatedTopic', {relTopic, pos, noSelect: true})
       store.dispatch('selectAssoc', relTopic.assoc.id)
     })
   }
