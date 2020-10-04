@@ -105,6 +105,9 @@ const actions = {
   /**
    * Preconditions:
    * - the route is *not* yet set.
+   *
+   * Note: this action handles *interactive* selection only.
+   * For *programmatic* selection dispatch `callTopicRoute` instead.
    */
   selectTopic ({getters}, id) {
     // console.log('selectTopic', id)
@@ -115,6 +118,9 @@ const actions = {
   /**
    * Preconditions:
    * - the route is *not* yet set.
+   *
+   * Note: this action handles *interactive* selection only.
+   * For *programmatic* selection dispatch `callAssocRoute` instead.
    */
   selectAssoc ({getters}, id) {
     // console.log('selectAssoc', id)

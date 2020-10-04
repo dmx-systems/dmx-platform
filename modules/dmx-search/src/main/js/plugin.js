@@ -55,7 +55,7 @@ export default ({store}) => {
       noSelect: true
     }).then(() => {
       store.dispatch('revealRelatedTopic', {relTopic, pos, noSelect: true})
-      store.dispatch('selectAssoc', relTopic.assoc.id)
+      store.dispatch('callAssocRoute', relTopic.assoc.id)
     })
   }
 
