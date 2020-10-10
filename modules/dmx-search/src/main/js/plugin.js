@@ -18,6 +18,7 @@ export default ({store}) => {
           createEnabled:    state => state.workspaces.isWritable,
           markerIds:        (_, getters) => getters && getters.visibleTopicIds,
           createTopicTypes: (_, getters) => getters && getters.createTopicTypes,  // TODO: getters is undefined on start
+          searchAssocTypes: () => dm5.typeCache.getAllAssocTypes(),
           topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
         },
         listeners: {
