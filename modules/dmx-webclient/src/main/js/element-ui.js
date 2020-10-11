@@ -4,6 +4,7 @@ import {
   Dialog, MessageBox, Collapse, CollapseItem, Tabs, TabPane, Autocomplete, ColorPicker, Loading, Notification
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
+import DialogDraggable from "vue-element-dialog-draggable"
 
 export default () => import('./element-ui-ext' /* webpackChunkName: "element-ui-ext" */)
 
@@ -44,3 +45,5 @@ Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$prompt  = MessageBox.prompt;
 
 Vue.prototype.$notify = Notification
+
+Vue.use(DialogDraggable);

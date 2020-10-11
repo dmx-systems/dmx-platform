@@ -27,6 +27,7 @@
     "element-ui": "2.13.2",
     "font-awesome": "4.7.0",
     "vue": "2.6.11",
+    "vue-element-dialog-draggable": "^1.0.3",
     "vue-font-awesome-search": "1.1.0",
     "vue-router": "3.0.7",
     "vuedraggable": "2.23.2",
