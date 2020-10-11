@@ -115,17 +115,19 @@ button {
 }
 
 .el-dialog__header {
-  padding: 15px 15px 5px !important;              /* was 20px 20px 10px */
+  padding: 4px 15px 3px !important;               /* was 20px 20px 10px */
+  background-image: url("../../resources/dots.png");
 }
 
 .el-dialog__title {
   font-size: var(--main-font-size) !important;    /* was 18px */
   line-height: unset !important;                  /* was 24px */
+  color: var(--label-color) !important;
 }
 
 .el-dialog__headerbtn {
-  top: 3px !important;                            /* was 20px */
-  right: 5px !important;                          /* was 20px */
+  top: 1px !important;                            /* was 20px */
+  right: 2px !important;                          /* was 20px */
 }
 
 .el-dialog__body {
