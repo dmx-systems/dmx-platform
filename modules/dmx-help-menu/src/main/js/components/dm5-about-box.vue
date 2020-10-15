@@ -1,5 +1,6 @@
 <template>
-  <el-dialog custom-class="dm5-about-box" :visible="visible" @close="close">
+  <el-dialog title="About DMX" custom-class="dm5-about-box" :visible="visible" :modal="false" v-draggable
+      @close="close">
     <img src="../dmx-logo.svg">
     <div>
       <div class="field">
@@ -8,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Oct 14, 2020
+        Oct 15, 2020
       </div>
       <div class="field">
         <div class="field-label">License</div>
