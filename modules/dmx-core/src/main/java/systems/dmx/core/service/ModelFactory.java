@@ -142,11 +142,15 @@ public interface ModelFactory {
 
     RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssocModel relatingAssoc);
 
+    RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssocModel relatingAssoc, DMXObjectModel otherObject);
+
 
 
     // === RelatedAssocModel ===
 
     RelatedAssocModel newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc);
+
+    RelatedAssocModel newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc, DMXObjectModel otherObject);
 
 
 

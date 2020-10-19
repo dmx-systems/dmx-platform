@@ -4,6 +4,7 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
+import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
@@ -501,6 +502,13 @@ public class ModelFactoryImpl implements ModelFactory {
         return new RelatedTopicModelImpl((TopicModelImpl) topic, (AssocModelImpl) relatingAssoc);
     }
 
+    @Override
+    public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic, AssocModel relatingAssoc,
+                                                      DMXObjectModel otherObject) {
+        return new RelatedTopicModelImpl((TopicModelImpl) topic, (AssocModelImpl) relatingAssoc,
+            (DMXObjectModelImpl) otherObject);
+    }
+
 
 
     // === RelatedAssocModel ===
@@ -508,6 +516,13 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public RelatedAssocModelImpl newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc) {
         return new RelatedAssocModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc);
+    }
+
+    @Override
+    public RelatedAssocModelImpl newRelatedAssocModel(AssocModel assoc, AssocModel relatingAssoc,
+                                                      DMXObjectModel otherObject) {
+        return new RelatedAssocModelImpl((AssocModelImpl) assoc, (AssocModelImpl) relatingAssoc,
+            (DMXObjectModelImpl) otherObject);
     }
 
 
