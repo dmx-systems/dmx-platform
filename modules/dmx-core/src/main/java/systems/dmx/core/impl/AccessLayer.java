@@ -853,26 +853,36 @@ public final class AccessLayer {
 
     // ---
 
+    // Prerequisite: "topics" and "assocs" are permission checked already
     private List<TopicModelImpl> filterByPlayer(List<TopicModelImpl> topics, List<AssocModelImpl> assocs) {
         List<TopicModelImpl> result = new ArrayList();
         for (AssocModelImpl assoc : assocs) {
-            _filterByPlayer(assoc, assoc.getPlayer1(), topics, result);
-            _filterByPlayer(assoc, assoc.getPlayer2(), topics, result);
+            _filterByPlayer(assoc, topics, result);
         }
         logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: " + result.size());
         return result;
     }
 
-    private void _filterByPlayer(AssocModelImpl assoc, PlayerModelImpl player, List<TopicModelImpl> topics,
-                                                                               List<TopicModelImpl> result) {
+    private void _filterByPlayer(AssocModelImpl assoc, List<TopicModelImpl> topics, List<TopicModelImpl> result) {
+        PlayerModelImpl p1 = assoc.getPlayer1();
+        PlayerModelImpl p2 = assoc.getPlayer2();
+        if (!(p1 instanceof TopicPlayerModelImpl) || !(p2 instanceof TopicPlayerModelImpl)) {
+            return;
+        }
         if (topics.isEmpty()) {
-            if (player instanceof TopicPlayerModelImpl) {
-                result.add((RelatedTopicModelImpl) player.getDMXObject(assoc));
-            }
+            result.add(mf.newRelatedTopicModel(
+                db.fetchTopic(p1.getId()), assoc,
+                db.fetchTopic(p2.getId())
+            ));
         } else {
-            TopicModelImpl topic = DMXUtils.findById(player.getId(), topics);
-            if (topic != null) {
-                result.add(mf.newRelatedTopicModel(topic, assoc));
+            TopicModelImpl topic1 = DMXUtils.findById(p1.getId(), topics);
+            TopicModelImpl topic2 = DMXUtils.findById(p2.getId(), topics);
+            if (topic1 != null && topic2 != null) {
+                result.add(mf.newRelatedTopicModel(topic1, assoc, topic2));
+            } else if (topic1 != null) {
+                result.add(mf.newRelatedTopicModel(topic1, assoc, db.fetchTopic(p2.getId())));
+            } else if (topic2 != null) {
+                result.add(mf.newRelatedTopicModel(topic2, assoc, db.fetchTopic(p1.getId())));
             }
         }
     }
