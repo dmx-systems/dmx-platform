@@ -47,9 +47,6 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
             // ### TODO: remodel enrichments? Don't put them in a child topics model but in a proprietary field?
             if (relatingAssoc.getPlayer1() != null) {
                 o.put("assoc", relatingAssoc.toJSON());
-                if (otherObject != null) {
-                    o.put("player", otherObject.toJSON());
-                }
             }
             //
             return o;
