@@ -1,7 +1,9 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.DMXObjectModel;
+import systems.dmx.core.RelatedTopic;
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
+import systems.dmx.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -12,24 +14,17 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private AssocModelImpl relatingAssoc;
-    private DMXObjectModelImpl otherObject;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     RelatedTopicModelImpl(TopicModelImpl topic, AssocModelImpl relatingAssoc) {
-        this(topic, relatingAssoc, null);
-    }
-
-    RelatedTopicModelImpl(TopicModelImpl topic, AssocModelImpl relatingAssoc, DMXObjectModelImpl otherObject) {
         super(topic);
         this.relatingAssoc = relatingAssoc;
-        this.otherObject = otherObject;
     }
 
     RelatedTopicModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
         this.relatingAssoc = relatedTopic.getRelatingAssoc();
-        this.otherObject = relatedTopic.getOtherDMXObject();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -37,11 +32,6 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
     @Override
     public AssocModelImpl getRelatingAssoc() {
         return relatingAssoc;
-    }
-
-    @Override
-    public <M extends DMXObjectModel> M getOtherDMXObject() {
-        return (M) otherObject;
     }
 
 

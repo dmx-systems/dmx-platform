@@ -1,6 +1,5 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedAssocModel;
 
 
@@ -10,18 +9,12 @@ public class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAsso
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private AssocModelImpl relatingAssoc;
-    private DMXObjectModelImpl otherObject;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     RelatedAssocModelImpl(AssocModelImpl assoc, AssocModelImpl relatingAssoc) {
-        this(assoc, relatingAssoc, null);
-    }
-
-    RelatedAssocModelImpl(AssocModelImpl assoc, AssocModelImpl relatingAssoc, DMXObjectModelImpl otherObject) {
         super(assoc);
         this.relatingAssoc = relatingAssoc;
-        this.otherObject = otherObject;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -30,13 +23,6 @@ public class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAsso
     public AssocModelImpl getRelatingAssoc() {
         return relatingAssoc;
     }
-
-    @Override
-    public <M extends DMXObjectModel> M getOtherDMXObject() {
-        return (M) otherObject;
-    }
-
-    // Note: no toJSON() and clone() here as not needed so far
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
