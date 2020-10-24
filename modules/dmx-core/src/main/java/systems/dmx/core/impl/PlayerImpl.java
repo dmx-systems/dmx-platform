@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Player;
+import systems.dmx.core.RelatedObject;
 import systems.dmx.core.model.PlayerModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -40,7 +41,7 @@ abstract class PlayerImpl implements Player {
     }
 
     @Override
-    public DMXObject getDMXObject() {
+    public <O extends RelatedObject> O getDMXObject() {
         return model.getDMXObject(assoc).instantiate();    // ### TODO: permission check?
     }
 

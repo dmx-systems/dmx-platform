@@ -9,8 +9,9 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    long id = -1;           // id of the player (a topic, or an association)
-    String roleTypeUri;     // is never null
+    long id = -1;                   // id of the player (a topic, or an association)
+    String roleTypeUri;             // is never null
+    DMXObjectModelImpl object;
 
     AccessLayer al;
     ModelFactoryImpl mf;
@@ -90,4 +91,13 @@ abstract class PlayerModelImpl implements PlayerModel {
      * @param   assoc   the association this player is involved in
      */
     abstract DMXObjectModelImpl getDMXObject(AssocModelImpl assoc);
+
+    // ---
+
+    <M extends DMXObjectModelImpl> M getDMXObject() {
+        if (object == null) {
+            object = al.db.fetchObject(getId());
+        }
+        return (M) object;
+    }
 }
