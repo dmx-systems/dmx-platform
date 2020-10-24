@@ -123,44 +123,6 @@ public final class AccessLayer {
         }
     }
 
-    List<TopicModelImpl> queryRelatedTopicsFulltext(
-            String topicQuery, String topicTypeUri, boolean searchTopicChildren,
-            String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
-        try {
-            logger.fine("Querying related topics fulltext, topicQuery=\"" + topicQuery + "\", topicTypeUri=" +
-                topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
-                "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
-            // topic filter
-            List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
-            if (topics.isEmpty()) {
-                boolean topicFilter = !topicQuery.isEmpty() || topicTypeUri != null;
-                if (topicFilter) {
-                    logger.info("topics: " + topics.size() + ", result: -> empty");
-                    return new ArrayList();
-                }
-            }
-            // assoc filter
-            List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
-            if (assocs.isEmpty()) {
-                boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
-                if (assocFilter) {
-                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
-                    return new ArrayList();
-                } else {
-                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
-                    return topics;
-                }
-            }
-            // combine filters
-            return filterByPlayer(topics, assocs);
-        } catch (Exception e) {
-            throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
-                "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
-                ", assocQuery=\"" + assocQuery + "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" +
-                searchAssocChildren, e);
-        }
-    }
-
     Iterable<TopicModelImpl> getAllTopics() {
         return new ReadableIterable(db.fetchAllTopics());
     }
@@ -655,6 +617,44 @@ public final class AccessLayer {
 
     DMXObjectModelImpl getObject(long id) {
         return db.fetchObject(id).checkReadAccess();
+    }
+
+    <M extends DMXObjectModelImpl> List<M> query(
+            String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+            String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+        try {
+            logger.fine("Querying related topics fulltext, topicQuery=\"" + topicQuery + "\", topicTypeUri=" +
+                topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
+                "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
+            // topic filter
+            List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
+            if (topics.isEmpty()) {
+                boolean topicFilter = !topicQuery.isEmpty() || topicTypeUri != null;
+                if (topicFilter) {
+                    logger.info("topics: " + topics.size() + ", result: -> empty");
+                    return new ArrayList();
+                }
+            }
+            // assoc filter
+            List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
+            if (assocs.isEmpty()) {
+                boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
+                if (assocFilter) {
+                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
+                    return new ArrayList();
+                } else {
+                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
+                    return (List<M>) topics;
+                }
+            }
+            // combine filters -> returns assocs
+            return (List<M>) filterByPlayer(topics, assocs);
+        } catch (Exception e) {
+            throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
+                "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
+                ", assocQuery=\"" + assocQuery + "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" +
+                searchAssocChildren, e);
+        }
     }
 
 

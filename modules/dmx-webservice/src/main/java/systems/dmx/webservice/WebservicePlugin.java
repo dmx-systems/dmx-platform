@@ -114,20 +114,6 @@ public class WebservicePlugin extends PluginActivator {
         return dmx.queryTopicsFulltext(query, topicTypeUri, searchChildTopics);
     }
 
-    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
-    @GET
-    @Path("/topics")
-    public RelatedTopicResult queryRelatedTopicsFulltext(
-                                                       @QueryParam("topicQuery") String topicQuery,
-                                                       @QueryParam("topicTypeUri") String topicTypeUri,
-                                                       @QueryParam("searchTopicChildren") boolean searchTopicChildren,
-                                                       @QueryParam("assocQuery") String assocQuery,
-                                                       @QueryParam("assocTypeUri") String assocTypeUri,
-                                                       @QueryParam("searchAssocChildren") boolean searchAssocChildren) {
-        return dmx.queryRelatedTopicsFulltext(topicQuery, topicTypeUri, searchTopicChildren,
-                                              assocQuery, assocTypeUri, searchAssocChildren);
-    }
-
     @POST
     @Path("/topic")
     @Transactional
@@ -427,6 +413,19 @@ public class WebservicePlugin extends PluginActivator {
     // ***********************
 
 
+
+    // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/objects")
+    public RelatedTopicResult query(@QueryParam("topicQuery") String topicQuery,
+                                    @QueryParam("topicTypeUri") String topicTypeUri,
+                                    @QueryParam("searchTopicChildren") boolean searchTopicChildren,
+                                    @QueryParam("assocQuery") String assocQuery,
+                                    @QueryParam("assocTypeUri") String assocTypeUri,
+                                    @QueryParam("searchAssocChildren") boolean searchAssocChildren) {
+        return dmx.query(topicQuery, topicTypeUri, searchTopicChildren,
+                         assocQuery, assocTypeUri, searchAssocChildren);
+    }
 
     @GET
     @Path("/object/{id}/related-topics")
