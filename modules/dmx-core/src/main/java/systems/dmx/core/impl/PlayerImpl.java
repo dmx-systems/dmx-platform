@@ -41,12 +41,7 @@ abstract class PlayerImpl implements Player {
     }
 
     @Override
-    public DMXObject getDMXObject() {
-        return getObject();
-    }
-
-    @Override
-    public <M extends RelatedObject> M getObject() {
+    public <O extends RelatedObject> O getDMXObject() {
         return model.getDMXObject(assoc).instantiate();    // ### TODO: permission check?
     }
 

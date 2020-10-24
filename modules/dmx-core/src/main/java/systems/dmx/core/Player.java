@@ -16,11 +16,7 @@ public interface Player extends JSONEnabled {
 
     String getRoleTypeUri();
 
-    // TODO: use generics
-    @Deprecated
-    DMXObject getDMXObject();
-
-    <M extends RelatedObject> M getObject();
+    <O extends RelatedObject> O getDMXObject();
 
     // ---
 
