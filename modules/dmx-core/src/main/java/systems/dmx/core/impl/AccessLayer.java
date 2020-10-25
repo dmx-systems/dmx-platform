@@ -627,7 +627,7 @@ public final class AccessLayer {
                 topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
                 "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
             // topic filter
-            List<TopicModelImpl> topics = filterReadables(filterTopics(topicQuery, topicTypeUri, searchTopicChildren));
+            List<TopicModelImpl> topics = filterReadables(queryTopics(topicQuery, topicTypeUri, searchTopicChildren));
             if (topics.isEmpty()) {
                 boolean topicFilter = !topicQuery.isEmpty() || topicTypeUri != null;
                 if (topicFilter) {
@@ -636,7 +636,7 @@ public final class AccessLayer {
                 }
             }
             // assoc filter
-            List<AssocModelImpl> assocs = filterReadables(filterAssocs(assocQuery, assocTypeUri, searchAssocChildren));
+            List<AssocModelImpl> assocs = filterReadables(queryAssocs(assocQuery, assocTypeUri, searchAssocChildren));
             if (assocs.isEmpty()) {
                 boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
                 if (assocFilter) {
@@ -648,7 +648,7 @@ public final class AccessLayer {
                 }
             }
             // combine filters -> returns assocs
-            return (List<M>) filterByPlayer(topics, assocs);
+            return (List<M>) filterAssocsByPlayer(topics, assocs);
         } catch (Exception e) {
             throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
                 "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
@@ -804,7 +804,7 @@ public final class AccessLayer {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private List<TopicModelImpl> filterTopics(String topicQuery, String topicTypeUri, boolean searchTopicChildren) {
+    private List<TopicModelImpl> queryTopics(String topicQuery, String topicTypeUri, boolean searchTopicChildren) {
         List<TopicModelImpl> topics;
         if (!topicQuery.isEmpty()) {
             if (topicTypeUri != null) {
@@ -827,12 +827,12 @@ public final class AccessLayer {
         return topics;
     }
 
-    private List<AssocModelImpl> filterAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+    private List<AssocModelImpl> queryAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
         List<AssocModelImpl> assocs;
         if (!assocQuery.isEmpty()) {
             if (assocTypeUri != null) {
                 // While children are always topics direct assoc matches are supported as well.
-                // So the filterAssocs() logic is little different from filterTopics() above.
+                // So the queryAssocs() logic is little different from queryTopics() above.
                 assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
                 if (searchAssocChildren) {
                     assocs.addAll(parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery)));  // key=null);
@@ -853,42 +853,43 @@ public final class AccessLayer {
 
     // ---
 
-    // Prerequisite: "topics" and "assocs" are permission checked already
-    private List<AssocModelImpl> filterByPlayer(List<TopicModelImpl> topics, List<AssocModelImpl> assocs) {
+    /**
+     * Prerequisites:
+     *   - "topics" and "assocs" are permission checked already
+     *   - only called with empty "topics" if no topic filter was set
+     */
+    private List<AssocModelImpl> filterAssocsByPlayer(List<TopicModelImpl> topics, List<AssocModelImpl> assocs) {
         List<AssocModelImpl> result = new ArrayList();
         for (AssocModelImpl assoc : assocs) {
-            _filterByPlayer(assoc, topics, result);
+            PlayerModelImpl p1 = assoc.getPlayer1();
+            PlayerModelImpl p2 = assoc.getPlayer2();
+            if (!(p1 instanceof TopicPlayerModelImpl) || !(p2 instanceof TopicPlayerModelImpl)) {
+                continue;
+            }
+            if (topics.isEmpty()) {
+                p1.getDMXObject();      // fetch player object
+                p2.getDMXObject();      // fetch player object
+                result.add(assoc);
+            } else {
+                TopicModelImpl topic1 = DMXUtils.findById(p1.getId(), topics);
+                TopicModelImpl topic2 = DMXUtils.findById(p2.getId(), topics);
+                if (topic1 == null && topic2 == null) {
+                    continue;
+                }
+                initPlayerObject(p1, topic1);
+                initPlayerObject(p2, topic2);
+                result.add(assoc);
+            }
         }
         logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: " + result.size());
         return result;
     }
 
-    private void _filterByPlayer(AssocModelImpl assoc, List<TopicModelImpl> topics, List<AssocModelImpl> result) {
-        PlayerModelImpl p1 = assoc.getPlayer1();
-        PlayerModelImpl p2 = assoc.getPlayer2();
-        if (!(p1 instanceof TopicPlayerModelImpl) || !(p2 instanceof TopicPlayerModelImpl)) {
-            return;
-        }
-        if (topics.isEmpty()) {
-            assoc.getPlayer1().getDMXObject();      // load player object
-            assoc.getPlayer2().getDMXObject();      // load player object
-            result.add(assoc);
+    private void initPlayerObject(PlayerModelImpl player, TopicModelImpl topic) {
+        if (topic != null) {
+            player.object = topic;
         } else {
-            TopicModelImpl topic1 = DMXUtils.findById(p1.getId(), topics);
-            TopicModelImpl topic2 = DMXUtils.findById(p2.getId(), topics);
-            if (topic1 != null && topic2 != null) {
-                p1.object = topic1;
-                p2.object = topic2;
-                result.add(assoc);
-            } else if (topic1 != null) {
-                p1.object = topic1;
-                p2.getDMXObject();
-                result.add(assoc);
-            } else if (topic2 != null) {
-                p1.getDMXObject();
-                p2.object = topic2;
-                result.add(assoc);
-            }
+            player.getDMXObject();      // fetch player object
         }
     }
 
