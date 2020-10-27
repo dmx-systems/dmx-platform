@@ -11,7 +11,7 @@ abstract class PlayerModelImpl implements PlayerModel {
 
     long id = -1;                   // id of the player (a topic, or an association)
     String roleTypeUri;             // is never null
-    DMXObjectModelImpl object;
+    DMXObjectModelImpl object;      // the player object, inited on-demand by getDMXObject()
 
     AccessLayer al;
     ModelFactoryImpl mf;

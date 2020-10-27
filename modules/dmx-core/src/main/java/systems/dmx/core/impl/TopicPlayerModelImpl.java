@@ -53,7 +53,8 @@ class TopicPlayerModelImpl extends PlayerModelImpl implements TopicPlayerModel {
             return new JSONObject()
                 .put("topicId", id)       // TODO: call getId() but results in endless recursion if thwows
                 .put("topicUri", topicUri)
-                .put("roleTypeUri", roleTypeUri);
+                .put("roleTypeUri", roleTypeUri)
+                .put("topic", object != null ? object.toJSON() : null);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

@@ -137,9 +137,6 @@ public interface CoreService {
      */
     QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
 
-    RelatedTopicResult queryRelatedTopicsFulltext(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
-                                                  String assocQuery, String assocTypeUri, boolean searchAssocChildren);
-
     // ---
 
     Topic createTopic(TopicModel model);
@@ -292,6 +289,9 @@ public interface CoreService {
     // === Generic Object ===
 
     DMXObject getObject(long id);
+
+    RelatedTopicResult query(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                             String assocQuery, String assocTypeUri, boolean searchAssocChildren);
 
 
 

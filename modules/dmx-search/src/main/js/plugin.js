@@ -48,16 +48,11 @@ export default ({store}) => {
     state.options.topicHandler && state.options.topicHandler(topic)
   }
 
-  function revealAssoc (relTopic) {
+  function revealAssoc (assoc) {
     const pos = store.state.search.pos.model
-    store.dispatch('revealTopicById', {
-      id: relTopic.assoc.getOtherPlayerId(relTopic.id),
-      pos: {x: pos.x + 340, y: pos.y - 40},
-      noSelect: true
-    }).then(() => {
-      store.dispatch('revealRelatedTopic', {relTopic, pos, noSelect: true})
-      store.dispatch('callAssocRoute', relTopic.assoc.id)
-    })
+    store.dispatch('revealTopic', {topic: assoc.player1.topic, pos,                                  noSelect: true})
+    store.dispatch('revealTopic', {topic: assoc.player2.topic, pos: {x: pos.x + 340, y: pos.y - 40}, noSelect: true})
+    store.dispatch('revealAssoc', {assoc})
   }
 
   function createTopic ({topicType, value}) {

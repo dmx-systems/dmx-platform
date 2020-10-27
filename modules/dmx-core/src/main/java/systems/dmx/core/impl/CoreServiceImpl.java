@@ -126,20 +126,6 @@ public class CoreServiceImpl implements CoreService {
         );
     }
 
-    @Override
-    public RelatedTopicResult queryRelatedTopicsFulltext(
-                                                  String topicQuery, String topicTypeUri, boolean searchTopicChildren,
-                                                  String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
-        return new RelatedTopicResult(
-            topicQuery, topicTypeUri, searchTopicChildren,
-            assocQuery, assocTypeUri, searchAssocChildren,
-            al.instantiate(al.queryRelatedTopicsFulltext(
-                topicQuery, topicTypeUri, searchTopicChildren,
-                assocQuery, assocTypeUri, searchAssocChildren
-            ))
-        );
-    }
-
     // ---
 
     @Override
@@ -325,6 +311,19 @@ public class CoreServiceImpl implements CoreService {
     @Override
     public DMXObject getObject(long id) {
         return al.getObject(id).instantiate();
+    }
+
+    @Override
+    public RelatedTopicResult query(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                                    String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+        return new RelatedTopicResult(
+            topicQuery, topicTypeUri, searchTopicChildren,
+            assocQuery, assocTypeUri, searchAssocChildren,
+            al.instantiate(al.query(
+                topicQuery, topicTypeUri, searchTopicChildren,
+                assocQuery, assocTypeUri, searchAssocChildren
+            ))
+        );
     }
 
 

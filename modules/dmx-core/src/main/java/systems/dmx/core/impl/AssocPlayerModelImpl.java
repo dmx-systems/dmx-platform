@@ -26,7 +26,8 @@ class AssocPlayerModelImpl extends PlayerModelImpl implements AssocPlayerModel {
         try {
             return new JSONObject()
                 .put("assocId", id)       // TODO: call getId() but results in endless recursion if thwows
-                .put("roleTypeUri", roleTypeUri);
+                .put("roleTypeUri", roleTypeUri)
+                .put("assoc", object != null ? object.toJSON() : null);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }
