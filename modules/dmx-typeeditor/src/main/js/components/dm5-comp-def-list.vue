@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style>
-/* copy in dm5-topic-list.vue */
+/* principle copy in dm5-topic-list.vue */
 .dm5-comp-def-list .dm5-comp-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);
