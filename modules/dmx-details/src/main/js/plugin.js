@@ -28,7 +28,7 @@ export default ({store}) => {
           pinned:          state => state.details.pinned,
           tab:             state => state.details.tab,
           mode:            state => state.details.mode,
-          markerIds:       (_, getters) => getters && getters.visibleTopicIds,
+          markerTopicIds:  (_, getters) => getters && getters.visibleTopicIds,
           detailRenderers: state => state.detailRenderers,
           types:           state => ({
                              assocTypes: state.typeCache.assocTypes,
