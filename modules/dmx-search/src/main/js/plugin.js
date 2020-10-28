@@ -17,6 +17,7 @@ export default ({store}) => {
           extraMenuItems:   state => state.search.extraMenuItems,
           createEnabled:    state => state.workspaces.isWritable,
           markerTopicIds:   (_, getters) => getters && getters.visibleTopicIds,
+          markerAssocIds:   (_, getters) => getters && getters.visibleAssocIds,
           createTopicTypes: (_, getters) => getters && getters.createTopicTypes,  // TODO: getters is undefined on start
           searchAssocTypes: () => dm5.typeCache.getAllAssocTypes(),
           topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
