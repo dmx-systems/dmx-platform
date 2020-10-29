@@ -647,7 +647,7 @@ public final class AccessLayer {
                     return (List<M>) topics;
                 }
             }
-            // combine filters -> returns assocs
+            // combine filters -> return assocs
             return (List<M>) filterAssocsByPlayer(topics, assocs);
         } catch (Exception e) {
             throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
@@ -888,6 +888,7 @@ public final class AccessLayer {
     private void initPlayerObject(PlayerModelImpl player, TopicModelImpl topic) {
         if (topic != null) {
             player.object = topic;
+            topic.getChildTopics().set("dmx.core.is_match", true);
         } else {
             player.getDMXObject();      // fetch player object
         }
