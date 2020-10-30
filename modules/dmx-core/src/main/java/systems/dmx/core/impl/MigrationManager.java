@@ -113,7 +113,9 @@ class MigrationManager {
             _runMigration(mi, isCleanInstall);
             //
             updateVersionNumber(mi);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // Note: here we also catch errors like NoSuchMethodError or AbstractMethodError.
+            // These occur when plugins are not yet adapted to changed Core API.
             // Note: mi is instantiated for sure
             throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
         }
