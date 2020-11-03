@@ -4,7 +4,6 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.QueryResult;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -119,11 +118,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics) {
-        return new QueryResult(
-            query, typeUri, searchChildTopics,
-            al.instantiate(al.queryTopicsFulltext(query, typeUri, searchChildTopics))
-        );
+    public List<Topic> queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics) {
+        return al.instantiate(al.queryTopicsFulltext(query, typeUri, searchChildTopics));
     }
 
     // ---

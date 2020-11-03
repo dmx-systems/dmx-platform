@@ -3,7 +3,6 @@ package systems.dmx.core.service;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.QueryResult;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -132,10 +131,9 @@ public interface CoreService {
      *                              Example: to search for Persons where "Berlin" appears in *any* child topic pass
      *                              "dmx.contacts.person" for "topicTypeUri", and set "searchChildTopics" to true.
      *
-     * @return  a QueryResult object that wraps both the original query parameters and the resulting topic list (may be
-     *          empty).
+     * @return  a list of topics, may be empty.
      */
-    QueryResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
+    List<Topic> queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
 
     // ---
 
