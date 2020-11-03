@@ -290,8 +290,8 @@ public interface CoreService {
 
     DMXObject getObject(long id);
 
-    RelatedTopicResult query(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
-                             String assocQuery, String assocTypeUri, boolean searchAssocChildren);
+    QueryResult query(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                      String assocQuery, String assocTypeUri, boolean searchAssocChildren);
 
 
 

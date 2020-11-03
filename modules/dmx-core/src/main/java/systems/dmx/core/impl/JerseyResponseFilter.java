@@ -9,7 +9,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
-import systems.dmx.core.service.RelatedTopicResult;
+import systems.dmx.core.service.QueryResult;
 import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.websocket.WebSocketService;
 
@@ -95,8 +95,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend((Iterable<DMXObject>) entity);
                 } else if (entity instanceof TopicResult) {
                     firePreSend(((TopicResult) entity).topics);
-                } else if (entity instanceof RelatedTopicResult) {
-                    firePreSend(((RelatedTopicResult) entity).topics);
+                } else if (entity instanceof QueryResult) {
+                    firePreSend(((QueryResult) entity).objects);
                 } else if (entity instanceof DirectivesResponse) {
                     firePreSend(((DirectivesResponse) entity).getObject());
                     //

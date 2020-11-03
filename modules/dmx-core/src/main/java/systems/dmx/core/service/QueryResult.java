@@ -1,35 +1,35 @@
 package systems.dmx.core.service;
 
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.util.DMXUtils;
 import org.codehaus.jettison.json.JSONObject;
 import java.util.List;
 
 
 
-// TODO: rename QueryResult
-public class RelatedTopicResult implements JSONEnabled {
+public class QueryResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public String topicQuery,           assocQuery;
     public String topicTypeUri,         assocTypeUri;
     public boolean searchTopicChildren, searchAssocChildren;
-    public List<RelatedTopic> topics;
+
+    public List<? extends DMXObject> objects;       // result objects
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public RelatedTopicResult(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
-                              String assocQuery, String assocTypeUri, boolean searchAssocChildren,
-                              List<RelatedTopic> topics) {
+    public QueryResult(String topicQuery, String topicTypeUri, boolean searchTopicChildren,
+                       String assocQuery, String assocTypeUri, boolean searchAssocChildren,
+                       List<? extends DMXObject> objects) {
         this.topicQuery = topicQuery;
         this.topicTypeUri = topicTypeUri;
         this.searchTopicChildren = searchTopicChildren;
         this.assocQuery = assocQuery;
         this.assocTypeUri = assocTypeUri;
         this.searchAssocChildren = searchAssocChildren;
-        this.topics = topics;
+        this.objects = objects;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -44,7 +44,7 @@ public class RelatedTopicResult implements JSONEnabled {
                 .put("assocQuery", assocQuery)
                 .put("assocTypeUri", assocTypeUri)
                 .put("searchAssocChildren", searchAssocChildren)
-                .put("topics", DMXUtils.toJSONArray(topics));
+                .put("objects", DMXUtils.toJSONArray(objects));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }
