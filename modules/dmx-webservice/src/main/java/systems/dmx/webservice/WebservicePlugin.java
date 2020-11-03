@@ -6,6 +6,7 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.QueryResult;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -107,7 +108,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "children" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topics/query/{query}")
-    public List<Topic> queryTopicsFulltext(@PathParam("query") String query,
+    public QueryResult queryTopicsFulltext(@PathParam("query") String query,
                                            @QueryParam("topicTypeUri") String topicTypeUri,
                                            @QueryParam("searchChildTopics") boolean searchChildTopics) {
         return dmx.queryTopicsFulltext(query, topicTypeUri, searchChildTopics);

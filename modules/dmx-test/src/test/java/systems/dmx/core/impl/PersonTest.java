@@ -128,21 +128,21 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // Note: by default search terms are combined by "OR" (Lucene default), not "AND".
             // Use "AND" (uppercase is required) or synonymous "&&" explicitly.
             // Search is case-insensitive.
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  STREET, false).size());
-            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. AND XYZ", STREET, false).size());
-            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. && XYZ",  STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. and XYZ", STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("3 AND Parkstr.",   STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("XYZ Parkstr.",     STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("parkSTR.",         STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Park*",            STREET, false).size());
-            assertEquals(0, dmx.queryTopicsFulltext("Park",             STREET, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("Park????",         STREET, false).size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. 3",       STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. XYZ",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. OR XYZ",  STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. AND XYZ", STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Parkstr. && XYZ",  STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr. and XYZ", STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("3 AND Parkstr.",   STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("XYZ Parkstr.",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.\\ 3",     STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("\"Parkstr. 3\"",   STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Parkstr.",         STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("parkSTR.",         STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park*",            STREET, false).topics.size());
+            assertEquals(0, dmx.queryTopicsFulltext("Park",             STREET, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("Park????",         STREET, false).topics.size());
             //
             tx.success();
         } finally {
@@ -203,8 +203,8 @@ public class PersonTest extends CoreServiceTestEnvironment {
             assertEquals(1, dmx.queryTopics(YEAR, "19*").size());
             assertEquals(0, dmx.queryTopics(YEAR, "19?").size());
             assertEquals(1, dmx.queryTopics(YEAR, "19??").size());
-            assertEquals(1, dmx.queryTopicsFulltext("1972", YEAR, false).size());
-            assertEquals(1, dmx.queryTopicsFulltext("19*", YEAR, false).size());
+            assertEquals(1, dmx.queryTopicsFulltext("1972", YEAR, false).topics.size());
+            assertEquals(1, dmx.queryTopicsFulltext("19*", YEAR, false).topics.size());
             //
             tx.success();
         } finally {
