@@ -6,7 +6,7 @@ import java.util.List;
 
 
 
-public class QueryResult implements JSONEnabled {
+public class TopicResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,7 +17,7 @@ public class QueryResult implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public QueryResult(String query, String topicTypeUri, boolean searchChildTopics, List<Topic> topics) {
+    public TopicResult(String query, String topicTypeUri, boolean searchChildTopics, List<Topic> topics) {
         this.query = query;
         this.topicTypeUri = topicTypeUri;
         this.searchChildTopics = searchChildTopics;

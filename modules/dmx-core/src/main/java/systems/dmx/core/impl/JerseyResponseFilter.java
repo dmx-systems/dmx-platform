@@ -4,9 +4,9 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.ChildTopics;
-import systems.dmx.core.QueryResult;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
+import systems.dmx.core.TopicResult;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
@@ -93,8 +93,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend((DMXObject) entity);
                 } else if (isIterable(response, DMXObject.class)) {
                     firePreSend((Iterable<DMXObject>) entity);
-                } else if (entity instanceof QueryResult) {
-                    firePreSend(((QueryResult) entity).topics);
+                } else if (entity instanceof TopicResult) {
+                    firePreSend(((TopicResult) entity).topics);
                 } else if (entity instanceof RelatedTopicResult) {
                     firePreSend(((RelatedTopicResult) entity).topics);
                 } else if (entity instanceof DirectivesResponse) {
