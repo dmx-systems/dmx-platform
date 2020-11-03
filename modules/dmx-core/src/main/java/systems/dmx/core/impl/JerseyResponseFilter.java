@@ -6,11 +6,11 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicResult;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.RelatedTopicResult;
+import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.websocket.WebSocketService;
 
 import com.sun.jersey.spi.container.ContainerRequest;

@@ -9,7 +9,6 @@ import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicResult;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
@@ -20,6 +19,7 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.PluginInfo;
 import systems.dmx.core.service.RelatedTopicResult;
+import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.IdList;
 

@@ -5,7 +5,6 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicResult;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
@@ -18,6 +17,7 @@ import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.PluginInfo;
 import systems.dmx.core.service.RelatedTopicResult;
+import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.storage.spi.DMXTransaction;
 

@@ -1,5 +1,7 @@
-package systems.dmx.core;
+package systems.dmx.core.service;
 
+import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.Topic;
 import systems.dmx.core.util.DMXUtils;
 import org.codehaus.jettison.json.JSONObject;
 import java.util.List;
