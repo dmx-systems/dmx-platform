@@ -55,9 +55,9 @@ export default ({store, dm5}) => {
 
     topicmapCommands: {
       "dmx.topicmaps.topicmap": [
-        require('./components/dm5-topicmap-info-button').default,
-        require('./components/dm5-topicmap-fit-button').default,
-        require('./components/dm5-topicmap-reset-button').default
+        require('./components/dm5-topicmap-info').default,
+        require('./components/dm5-topicmap-fit').default,
+        require('./components/dm5-topicmap-reset').default
       ]
     },
 
