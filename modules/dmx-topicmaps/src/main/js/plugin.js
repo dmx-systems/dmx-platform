@@ -19,7 +19,6 @@ export default ({store, dm5}) => {
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
           }),
-          topicmapCommands: state => state.topicmaps.topicmapCommands,
           contextCommands:  state => state.topicmaps.contextCommands,
           quillConfig:      state => state.quillConfig
         },

@@ -535,10 +535,13 @@ const getters = {
     return topicmapId
   },
 
+  /**
+   * Topicmap topic of the selected topicmap; undefined if no topicmap is selected.
+   */
   topicmapTopic (state, getters, rootState) {
     const topicmapId = getters.topicmapId
-    if (typeof topicmapId !== 'number') {
-      throw Error(`topicmapId is expected to be of type 'number', but is ${typeof topicmapId}`)
+    if (!topicmapId) {
+      return
     }
     const workspaceId = _workspaceId(rootState)
     const topicmapTopics = state.topicmapTopics[workspaceId]

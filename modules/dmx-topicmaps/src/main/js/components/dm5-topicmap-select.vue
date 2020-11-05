@@ -16,10 +16,6 @@ import dm5 from 'dmx-api'
 
 export default {
 
-  props: {
-    topicmapCommands: Object
-  },
-
   computed: {
 
     topicmapId: {
@@ -43,11 +39,12 @@ export default {
     },
 
     topicmapTypeUri () {
-      return this.$store.getters.topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+      const topicmapTopic = this.$store.getters.topicmapTopic
+      return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
     },
 
     commands () {
-      return this.topicmapCommands[this.topicmapTypeUri]
+      return this.$store.state.topicmaps.topicmapCommands[this.topicmapTypeUri]
     },
   }
 }
