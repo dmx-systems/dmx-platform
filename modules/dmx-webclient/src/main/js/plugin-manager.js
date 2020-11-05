@@ -91,11 +91,6 @@ function initPlugin (pluginConfig) {
   // icon renderers
   registerIconRenderers(_pluginConfig.iconRenderers)
   //
-  // context commands
-  const contextCommands = _pluginConfig.contextCommands
-  if (contextCommands) {
-    store.dispatch('registerContextCommands', contextCommands)
-  }
   // extra menu items
   const extraMenuItems = _pluginConfig.extraMenuItems
   if (extraMenuItems) {
@@ -105,6 +100,20 @@ function initPlugin (pluginConfig) {
   const topicmapType = _pluginConfig.topicmapType
   if (topicmapType) {
     store.dispatch('registerTopicmapType', topicmapType)
+  }
+  // topicmap commands
+  const commands = _pluginConfig.topicmapCommands
+  if (commands) {
+    Object.entries(commands).forEach(([topicmapTypeUri, comps]) => {
+      comps.forEach(comp => {
+        store.dispatch('registerTopicmapCommand', {topicmapTypeUri, comp})
+      })
+    })
+  }
+  // context commands
+  const contextCommands = _pluginConfig.contextCommands
+  if (contextCommands) {
+    store.dispatch('registerContextCommands', contextCommands)
   }
 }
 

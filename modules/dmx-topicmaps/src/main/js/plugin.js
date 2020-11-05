@@ -11,18 +11,17 @@ export default ({store, dm5}) => {
         comp: require('dmx-topicmap-panel').default,
         mount: 'webclient',
         props: {
-          object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
-          writable:        state => state.writable,
-          detailRenderers: state => state.detailRenderers,
-          topicmapTypes:   state => state.topicmaps.topicmapTypes,
-          toolbarCompDefs: state => ({
+          object:           (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
+          writable:         state => state.writable,
+          detailRenderers:  state => state.detailRenderers,
+          topicmapTypes:    state => state.topicmaps.topicmapTypes,
+          toolbarCompDefs:  state => ({
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
           }),
-          // Note: command definitions are static; "contextCommands" does not operate on "state"
-          // TODO: make the commands extensible for 3rd-party plugins
-          contextCommands: state => state.topicmaps.contextCommands,
-          quillConfig:     state => state.quillConfig
+          topicmapCommands: state => state.topicmaps.topicmapCommands,
+          contextCommands:  state => state.topicmaps.contextCommands,
+          quillConfig:      state => state.quillConfig
         },
         listeners: {
           'topic-select':         id             => store.dispatch('selectTopic', id),

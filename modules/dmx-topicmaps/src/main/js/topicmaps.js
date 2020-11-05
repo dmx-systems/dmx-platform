@@ -36,6 +36,11 @@ const state = {
                               //     }
                               //   }
 
+  topicmapCommands: {},       // Registered topicmap commands:
+                              //   {
+                              //      topicmapTypeUri: [comp]
+                              //   }
+
   contextCommands: {
     topic: [],
     topic_danger: [],
@@ -424,6 +429,12 @@ const actions = {
 
   registerTopicmapType (_, topicmapType) {
     state.topicmapTypes[topicmapType.uri] = topicmapType
+  },
+
+  registerTopicmapCommand (_, command) {
+    const commands = state.topicmapCommands[command.topicmapTypeUri] ||
+                    (state.topicmapCommands[command.topicmapTypeUri] = [])
+    commands.push(command.comp)
   },
 
   registerContextCommands (_, commands) {
