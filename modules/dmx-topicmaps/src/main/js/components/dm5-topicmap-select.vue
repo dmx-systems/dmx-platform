@@ -7,11 +7,7 @@
         </el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" class="fa fa-info-circle" title="Reveal Topicmap Topic" @click="revealTopicmapTopic">
-    </el-button>
-    <el-button type="text" class="fa fa-arrows-alt" title="Zoom to Fit" @click="fitTopicmapViewport"></el-button>
-    <el-button type="text" class="fa fa-compress" title="Reset Zoom and Center" @click="resetTopicmapViewport">
-    </el-button>
+    <component v-for="(command, i) in commands" :is="command" :key="i"></component>
   </div>
 </template>
 
@@ -20,7 +16,15 @@ import dm5 from 'dmx-api'
 
 export default {
 
+  props: {
+    topicmapCommands: Object
+  },
+
   computed: {
+
+    commands () {
+      return this.topicmapCommands['dmx.topicmaps.topicmap']    // TODO
+    },
 
     topicmapId: {
       get () {
@@ -40,21 +44,6 @@ export default {
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
       const topics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
       return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
-    }
-  },
-
-  methods: {
-
-    revealTopicmapTopic () {
-      this.$store.dispatch('revealTopicById', this.topicmapId)
-    },
-
-    fitTopicmapViewport () {
-      this.$store.dispatch('fitTopicmapViewport')
-    },
-
-    resetTopicmapViewport () {
-      this.$store.dispatch('resetTopicmapViewport')
     }
   }
 }

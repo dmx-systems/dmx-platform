@@ -47,6 +47,20 @@ export default ({store, dm5}) => {
       }
     ],
 
+    topicmapType: {
+      uri: 'dmx.topicmaps.topicmap',
+      name: 'Topicmap',
+      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
+    },
+
+    topicmapCommands: {
+      "dmx.topicmaps.topicmap": [
+        require('./components/dm5-topicmap-info-button').default,
+        require('./components/dm5-topicmap-fit-button').default,
+        require('./components/dm5-topicmap-reset-button').default
+      ]
+    },
+
     contextCommands: {
       topic: [
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
@@ -81,12 +95,6 @@ export default ({store, dm5}) => {
         const mapTypeUri = topic.children['dmx.topicmaps.topicmap_type_uri'].value
         return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
       }
-    },
-
-    topicmapType: {
-      uri: 'dmx.topicmaps.topicmap',
-      name: 'Topicmap',
-      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
     }
   }
 
