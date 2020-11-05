@@ -22,10 +22,6 @@ export default {
 
   computed: {
 
-    commands () {
-      return this.topicmapCommands['dmx.topicmaps.topicmap']    // TODO
-    },
-
     topicmapId: {
       get () {
         return this.$store.getters.topicmapId
@@ -44,7 +40,15 @@ export default {
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
       const topics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
       return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
-    }
+    },
+
+    topicmapTypeUri () {
+      return this.$store.getters.topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+    },
+
+    commands () {
+      return this.topicmapCommands[this.topicmapTypeUri]
+    },
   }
 }
 </script>
