@@ -49,4 +49,8 @@ export default {
   padding-left:  2px !important;
   padding-right: 2px !important;
 }
+
+.dm5-workspace-commands .el-button + .el-button {
+  margin-left: 4px;     /* Element UI default is 10px */
+}
 </style>
