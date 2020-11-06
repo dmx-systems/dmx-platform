@@ -26,7 +26,8 @@ export default {
       }
     }
     TopicLink.blotName = 'topic-link'     // Used in "toolbar" config, quill.format() and module.addHandler() calls.
-                                          // Will be prefixed by "ql-" to form the CSS class name for the toolbar button.
+                                          // Will be prefixed by "ql-" to form the CSS class name for the toolbar
+                                          // button.
     // TopicLink.tagName = 'A'            // not needed as it is derived
     TopicLink.className = 'topic-link'    // CSS class to be added to the <a> element
     return TopicLink

@@ -9,9 +9,14 @@ const state = {
 
   isWritable: undefined,            // true if selected workspace is writable
 
-  workspaceTopics: undefined,       // all workspace topics readable by current user (array of dm5.Topic)
+  workspaceTopics: undefined,       // All workspace topics readable by current user (array of dm5.Topic)
 
-  ready: fetchWorkspaceTopics()     // a promise resolved once the workspace topics are loaded
+  workspaceCommands: {},            // Registered workspace commands:
+                                    //   {
+                                    //      topicmapTypeUri: [comp]
+                                    //   }
+
+  ready: fetchWorkspaceTopics()     // A promise resolved once the workspace topics are loaded
 }
 
 const actions = {
@@ -69,6 +74,13 @@ const actions = {
         state.isWritable = writable
       }
     )
+  },
+
+  registerWorkspaceCommand (_, command) {
+    const c = state.workspaceCommands
+    const uri = command.topicmapTypeUri
+    const commands = c[uri] || (c[uri] = [])
+    commands.push(command.comp)
   },
 
   //

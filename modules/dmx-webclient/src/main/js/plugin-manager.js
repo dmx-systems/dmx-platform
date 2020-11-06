@@ -91,11 +91,6 @@ function initPlugin (pluginConfig) {
   // icon renderers
   registerIconRenderers(_pluginConfig.iconRenderers)
   //
-  // context commands
-  const contextCommands = _pluginConfig.contextCommands
-  if (contextCommands) {
-    store.dispatch('registerContextCommands', contextCommands)
-  }
   // extra menu items
   const extraMenuItems = _pluginConfig.extraMenuItems
   if (extraMenuItems) {
@@ -105,6 +100,14 @@ function initPlugin (pluginConfig) {
   const topicmapType = _pluginConfig.topicmapType
   if (topicmapType) {
     store.dispatch('registerTopicmapType', topicmapType)
+  }
+  // topicmap commands / workspace commands
+  registerToolbarCommands(_pluginConfig.topicmapCommands,  'registerTopicmapCommand')
+  registerToolbarCommands(_pluginConfig.workspaceCommands, 'registerWorkspaceCommand')
+  // context commands
+  const contextCommands = _pluginConfig.contextCommands
+  if (contextCommands) {
+    store.dispatch('registerContextCommands', contextCommands)
   }
 }
 
@@ -119,6 +122,14 @@ function registerDetailRenderers (renderers, renderer) {
 function registerIconRenderers (renderers) {
   renderers && Object.entries(renderers).forEach(([typeUri, iconFunc]) => {
     store.dispatch('registerIconRenderer', {typeUri, iconFunc})
+  })
+}
+
+function registerToolbarCommands (commands, action) {
+  commands && Object.entries(commands).forEach(([topicmapTypeUri, comps]) => {
+    comps.forEach(comp => {
+      store.dispatch(action, {topicmapTypeUri, comp})
+    })
   })
 }
 

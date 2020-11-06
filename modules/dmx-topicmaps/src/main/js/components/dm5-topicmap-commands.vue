@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-topicmap-select">
+  <div class="dm5-topicmap-commands">
     <el-select v-model="topicmapId">
       <el-option-group label="Topicmap">
         <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id">
@@ -7,11 +7,7 @@
         </el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" class="fa fa-info-circle" title="Reveal Topicmap Topic" @click="revealTopicmapTopic">
-    </el-button>
-    <el-button type="text" class="fa fa-arrows-alt" title="Zoom to Fit" @click="fitTopicmapViewport"></el-button>
-    <el-button type="text" class="fa fa-compress" title="Reset Zoom and Center" @click="resetTopicmapViewport">
-    </el-button>
+    <component v-for="(command, i) in commands" :is="command" :key="i"></component>
   </div>
 </template>
 
@@ -40,34 +36,31 @@ export default {
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
       const topics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
       return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
-    }
-  },
-
-  methods: {
-
-    revealTopicmapTopic () {
-      this.$store.dispatch('revealTopicById', this.topicmapId)
     },
 
-    fitTopicmapViewport () {
-      this.$store.dispatch('fitTopicmapViewport')
+    topicmapTypeUri () {
+      const topicmapTopic = this.$store.getters.topicmapTopic
+      return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
     },
 
-    resetTopicmapViewport () {
-      this.$store.dispatch('resetTopicmapViewport')
-    }
+    commands () {
+      return this.$store.state.topicmaps.topicmapCommands[this.topicmapTypeUri]
+    },
   }
 }
 </script>
 
 <style>
-.dm5-topicmap-select {
+.dm5-topicmap-commands {
   margin-left: 18px;
 }
 
-.dm5-topicmap-select .el-button {
+.dm5-topicmap-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
-  margin-left: 0 !important;
+}
+
+.dm5-topicmap-commands .el-button + .el-button {
+  margin-left: 4px;     /* Element UI default is 10px */
 }
 </style>

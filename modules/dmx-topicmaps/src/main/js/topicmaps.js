@@ -36,6 +36,11 @@ const state = {
                               //     }
                               //   }
 
+  topicmapCommands: {},       // Registered topicmap commands:
+                              //   {
+                              //      topicmapTypeUri: [comp]
+                              //   }
+
   contextCommands: {
     topic: [],
     topic_danger: [],
@@ -85,7 +90,7 @@ const actions = {
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
     dm5.utils.setCookie('dmx_topicmap_id', id)
     // update state + update view
-    return _displayTopicmap(getters, rootState, dispatch)
+    return _displayTopicmap(getters, dispatch)
   },
 
   /**
@@ -362,7 +367,7 @@ const actions = {
     // update state
     dispatch('clearTopicmapCache', topicmapId)
     // update view
-    _displayTopicmap(getters, rootState, dispatch).then(() => {
+    _displayTopicmap(getters, dispatch).then(() => {
       const selection = getters.selection
       if (selection.isSingle()) {
         const id = selection.getObjectId()
@@ -424,6 +429,13 @@ const actions = {
 
   registerTopicmapType (_, topicmapType) {
     state.topicmapTypes[topicmapType.uri] = topicmapType
+  },
+
+  registerTopicmapCommand (_, command) {
+    const c = state.topicmapCommands
+    const uri = command.topicmapTypeUri
+    const commands = c[uri] || (c[uri] = [])
+    commands.push(command.comp)
   },
 
   registerContextCommands (_, commands) {
@@ -525,6 +537,26 @@ const getters = {
   },
 
   /**
+   * Topicmap topic of the selected topicmap; undefined if no topicmap is selected.
+   */
+  topicmapTopic (state, getters, rootState) {
+    const topicmapId = getters.topicmapId
+    if (!topicmapId) {
+      return
+    }
+    const workspaceId = _workspaceId(rootState)
+    const topicmapTopics = state.topicmapTopics[workspaceId]
+    if (!topicmapTopics) {
+      throw Error(`topicmap topics of workspace ${workspaceId} not yet loaded`)
+    }
+    const topicmapTopic = topicmapTopics.find(topic => topic.id === topicmapId)
+    if (!topicmapTopic) {
+      throw Error(`topicmap topic ${topicmapId} not found (workspace ${workspaceId})`)
+    }
+    return topicmapTopic
+  },
+
+  /**
    * Selection instance of the selected topicmap.
    */
   selection: (state, getters) => {
@@ -609,11 +641,11 @@ function _selectTopicmap (id, dispatch) {
  * @returns   a promise resolved once topicmap rendering is complete.
  *            At this time the "topicmap" state is up-to-date as well.
  */
-function _displayTopicmap (getters, rootState, dispatch) {
-  const topicmapTopic = getTopicmapTopic(rootState)
+function _displayTopicmap (getters, dispatch) {
+  const topicmapTopic = getters.topicmapTopic
   const selection = getters.selection
   return topicmapTopic.isWritable()
-    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))
+    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))    // dispatch into topicmap-panel
     .then(topicmap => {
       state.topicmap = topicmap
       _syncSelectMulti(selection, dispatch)
@@ -651,31 +683,6 @@ function unselectIfCascade(id, dispatch) {
 }
 
 // State helper
-
-/**
- * Returns the selected topicmap topic, according to current state.
- *
- * Preconditions:
- * - "selectedTopicmapId" state is up-to-date
- * - "workspaceId" state is up-to-date (see workspaces module)
- * - the workspace's topicmap topics are available ("topicmapTopics" state is up-to-date)
- */
-function getTopicmapTopic (rootState) {
-  const workspaceId = _workspaceId(rootState)
-  const topicmapId = state.selectedTopicmapId[workspaceId]
-  if (typeof topicmapId !== 'number') {
-    throw Error(`topicmapId is expected to be of type 'number', but is ${typeof topicmapId}`)
-  }
-  const topicmapTopics = state.topicmapTopics[workspaceId]
-  if (!topicmapTopics) {
-    throw Error(`topicmap topics of workspace ${workspaceId} not yet loaded`)
-  }
-  const topicmapTopic = topicmapTopics.find(topic => topic.id === topicmapId)
-  if (!topicmapTopic) {
-    throw Error(`topicmap topic ${topicmapId} not found (workspace ${workspaceId})`)
-  }
-  return topicmapTopic
-}
 
 function findTopicmapTopic (id, callback) {
   for (const topics of Object.values(state.topicmapTopics)) {

@@ -19,8 +19,6 @@ export default ({store, dm5}) => {
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
           }),
-          // Note: command definitions are static; "contextCommands" does not operate on "state"
-          // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => state.topicmaps.contextCommands,
           quillConfig:     state => state.quillConfig
         },
@@ -43,10 +41,24 @@ export default ({store, dm5}) => {
         }
       },
       {
-        comp: require('./components/dm5-topicmap-select').default,
+        comp: require('./components/dm5-topicmap-commands').default,
         mount: 'toolbar-left'
       }
     ],
+
+    topicmapType: {
+      uri: 'dmx.topicmaps.topicmap',
+      name: 'Topicmap',
+      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
+    },
+
+    topicmapCommands: {
+      "dmx.topicmaps.topicmap": [
+        require('./components/dm5-topicmap-info').default,
+        require('./components/dm5-topicmap-fit').default,
+        require('./components/dm5-topicmap-reset').default
+      ]
+    },
 
     contextCommands: {
       topic: [
@@ -82,12 +94,6 @@ export default ({store, dm5}) => {
         const mapTypeUri = topic.children['dmx.topicmaps.topicmap_type_uri'].value
         return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
       }
-    },
-
-    topicmapType: {
-      uri: 'dmx.topicmaps.topicmap',
-      name: 'Topicmap',
-      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
     }
   }
 
