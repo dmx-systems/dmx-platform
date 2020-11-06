@@ -38,14 +38,13 @@ export default {
       return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
     },
 
-    topicmapTypeUri () {
-      const topicmapTopic = this.$store.getters.topicmapTopic
-      return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
-    },
-
     commands () {
       return this.$store.state.topicmaps.topicmapCommands[this.topicmapTypeUri]
     },
+
+    topicmapTypeUri () {
+      return this.$store.getters.topicmapTypeUri
+    }
   }
 }
 </script>

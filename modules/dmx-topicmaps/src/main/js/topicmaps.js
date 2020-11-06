@@ -556,6 +556,11 @@ const getters = {
     return topicmapTopic
   },
 
+  topicmapTypeUri (state, getters) {
+    const topicmapTopic = getters.topicmapTopic
+    return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+  },
+
   /**
    * Selection instance of the selected topicmap.
    */
