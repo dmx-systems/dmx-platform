@@ -16,6 +16,12 @@ export default ({store}) => {
       mount: 'toolbar-left'
     }],
 
+    workspaceCommands: {
+      "dmx.topicmaps.topicmap": [
+        require('./components/dm5-workspace-info').default
+      ]
+    },
+
     extraMenuItems: [{
       uri: 'dmx.workspaces.workspace',
       optionsComp: require('./components/dm5-workspace-options').default,
