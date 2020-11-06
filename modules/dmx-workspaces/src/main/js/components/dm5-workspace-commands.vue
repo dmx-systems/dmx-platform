@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-workspace-select">
+  <div class="dm5-workspace-commands">
     <el-select v-model="workspaceId">
       <el-option-group label="Workspace">
         <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id">
@@ -8,8 +8,7 @@
         </el-option>
       </el-option-group>
     </el-select>
-    <el-button type="text" class="fa fa-info-circle" title="Reveal Workspace Topic" @click="revealWorkspaceTopic">
-    </el-button>
+    <component v-for="(command, i) in commands" :is="command" :key="i"></component>
   </div>
 </template>
 
@@ -31,19 +30,22 @@ export default {
       // Note: while initial rendering the workspace topics might not yet loaded
       const topics = this.$store.state.workspaces.workspaceTopics
       return topics && topics.sort((t1, t2) => t1.value.localeCompare(t2.value))
-    }
-  },
+    },
 
-  methods: {
-    revealWorkspaceTopic () {
-      this.$store.dispatch('revealTopicById', this.workspaceId)
+    topicmapTypeUri () {
+      const topicmapTopic = this.$store.getters.topicmapTopic
+      return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+    },
+
+    commands () {
+      return this.$store.state.workspaces.workspaceCommands[this.topicmapTypeUri]
     }
   }
 }
 </script>
 
 <style>
-.dm5-workspace-select .el-button {
+.dm5-workspace-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
 }

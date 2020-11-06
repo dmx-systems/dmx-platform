@@ -41,7 +41,7 @@ export default ({store, dm5}) => {
         }
       },
       {
-        comp: require('./components/dm5-topicmap-select').default,
+        comp: require('./components/dm5-topicmap-commands').default,
         mount: 'toolbar-left'
       }
     ],

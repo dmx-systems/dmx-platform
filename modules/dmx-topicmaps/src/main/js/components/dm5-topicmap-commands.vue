@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-topicmap-select">
+  <div class="dm5-topicmap-commands">
     <el-select v-model="topicmapId">
       <el-option-group label="Topicmap">
         <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id">
@@ -51,11 +51,11 @@ export default {
 </script>
 
 <style>
-.dm5-topicmap-select {
+.dm5-topicmap-commands {
   margin-left: 18px;
 }
 
-.dm5-topicmap-select .el-button {
+.dm5-topicmap-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
   margin-left: 0 !important;

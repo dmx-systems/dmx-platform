@@ -432,8 +432,9 @@ const actions = {
   },
 
   registerTopicmapCommand (_, command) {
-    const commands = state.topicmapCommands[command.topicmapTypeUri] ||
-                    (state.topicmapCommands[command.topicmapTypeUri] = [])
+    const c = state.topicmapCommands
+    const uri = command.topicmapTypeUri
+    const commands = c[uri] || (c[uri] = [])
     commands.push(command.comp)
   },
 
