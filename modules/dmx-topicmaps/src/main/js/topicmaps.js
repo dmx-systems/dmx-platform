@@ -320,15 +320,32 @@ const actions = {
     unselectIfCascade(id, dispatch)
   },
 
-  _deleteTopic ({rootState, dispatch}, id) {
-    const topic = state.topicmap.getTopic(id)
-    if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-      return
+  /**
+   * Updates "topicmapTopics" and "selectedTopicmapId" state in case the deleted topic is a topicmap.
+   * Supports deletion of both standard maps, and special maps (e.g. a Geomap or Tableview).
+   *
+   * Preconditions:
+   * - the current topicmap is a standard map OR the given "id" is a topicmap ID.
+   *
+   * Low-level action that updates client state and view when a topic is about to be deleted.
+   * The caller is responsible for updating the server state.
+   *
+   * Note: there is no universal high-level action to delete a single topic.
+   * This is to realize a delete-multi operation as a single request.
+   */
+  _deleteTopic ({getters, rootState, dispatch}, id) {
+    if (getters.topicmapTypeUri === 'dmx.topicmaps.topicmap') {
+      // abort if deleted topic is not a topicmap
+      const topic = state.topicmap.getTopic(id)
+      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+        return
+      }
+      // sanity check
+      if (state.topicmap.id !== id) {
+        throw Error(`topicmap ${id} can't be deleted as it is not selected`)
+      }
     }
-    if (state.topicmap.id !== id) {
-      throw Error(`topicmap ${id} can't be deleted as it is not selected`)
-    }
-    console.log('_deleteTopic', id)
+    // select another topicmap, or create a new one if this was the last one
     const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
     if (topicmapTopic) {
       // Note: selecting a new topicmap is not strictly required. It would be selected while directives processing
