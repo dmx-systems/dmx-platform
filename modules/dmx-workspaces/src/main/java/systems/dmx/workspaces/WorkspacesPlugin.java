@@ -594,11 +594,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
         private void newWorkspace(Topic workspace) {
             try {
-                sendToAllButOrigin(new JSONObject()
+                sendToReadAllowed(new JSONObject()
                     .put("type", "newWorkspace")
                     .put("args", new JSONObject()
                         .put("workspace", workspace.toJSON())
-                    )
+                    ), workspace.getId()
                 );
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error while sending a \"newWorkspace\" message:", e);
@@ -607,8 +607,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
         // ---
 
-        private void sendToAllButOrigin(JSONObject message) {
-            dmx.getWebSocketService().sendToAllButOrigin(message.toString());
+        private void sendToReadAllowed(JSONObject message, long objectId) {
+            Messages.get().add(Dest.READ_ALLOWED, message.toString(), objectId);
         }
     }
 }
