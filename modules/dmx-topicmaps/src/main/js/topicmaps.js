@@ -12,7 +12,6 @@ const state = {
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
                               //   }
-                              // TODO: make the array a map, key by topicmap ID?
 
   selectedTopicmapId: {},     // Per-workspace selected topicmap:
                               //   {
@@ -322,10 +321,13 @@ const actions = {
 
   /**
    * Updates "topicmapTopics" and "selectedTopicmapId" state in case the deleted topic is a topicmap.
-   * Supports deletion of both standard maps, and special maps (e.g. a Geomap or Tableview).
+   * Supports deletion of both, standard maps and special maps (e.g. a Geomap or Tableview).
    *
    * Preconditions:
-   * - the current topicmap is a standard map OR the given "id" is a topicmap ID.
+   * - the current topicmap is a standard map AND
+   * - the given "id" refers to a topic in that topicmap
+   * OR
+   * - the given "id" refers to a topicmap (standard or special).
    *
    * Low-level action that updates client state and view when a topic is about to be deleted.
    * The caller is responsible for updating the server state.

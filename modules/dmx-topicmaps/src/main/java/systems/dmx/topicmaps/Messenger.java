@@ -3,6 +3,8 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
+import systems.dmx.core.service.Messages;
+import systems.dmx.core.service.Messages.Dest;
 import systems.dmx.core.service.websocket.WebSocketService;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -14,21 +16,9 @@ import java.util.logging.Logger;
 
 class Messenger {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String pluginUri = "systems.dmx.webclient";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private WebSocketService wss;
-
     private Logger logger = Logger.getLogger(getClass().getName());
-
-    // ---------------------------------------------------------------------------------------------------- Constructors
-
-    Messenger(WebSocketService wss) {
-        this.wss = wss;
-    }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
@@ -129,10 +119,10 @@ class Messenger {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void sendToAllButOrigin(JSONObject message) {
-        wss.sendToAllButOrigin(message.toString());
+        Messages.get().add(Dest.ALL_BUT_ORIGIN, message.toString());
     }
 
     private void sendToReadAllowed(JSONObject message, long objectId) {
-        wss.sendToReadAllowed(message.toString(), objectId);
+        Messages.get().add(Dest.READ_ALLOWED, message.toString(), objectId);
     }
 }

@@ -21,6 +21,8 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Inject;
+import systems.dmx.core.service.Messages;
+import systems.dmx.core.service.Messages.Dest;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.IntroduceAssocType;
@@ -83,7 +85,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Inject
     private ConfigService configService;
 
-    private Messenger me = new Messenger("systems.dmx.webclient");
+    private Messenger me = new Messenger();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -589,14 +591,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     private class Messenger {
-
-        private String pluginUri;
-
-        private Messenger(String pluginUri) {
-            this.pluginUri = pluginUri;
-        }
-
-        // ---
 
         private void newWorkspace(Topic workspace) {
             try {
