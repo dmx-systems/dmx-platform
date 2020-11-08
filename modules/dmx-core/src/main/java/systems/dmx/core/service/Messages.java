@@ -19,32 +19,32 @@ public class Messages implements Iterable<Messages.Message> {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    public enum Dest {
-        ORIGIN() {
+    public static enum Dest {
+        ORIGIN {
             @Override
             public void send(Message message, WebSocketService wss) {
                 wss.sendToOrigin(message.message);
             }
         },
-        ALL() {
+        ALL {
             @Override
             public void send(Message message, WebSocketService wss) {
                 wss.sendToAll(message.message);
             }
         },
-        ALL_BUT_ORIGIN() {
+        ALL_BUT_ORIGIN {
             @Override
             public void send(Message message, WebSocketService wss) {
                 wss.sendToAllButOrigin(message.message);
             }
         },
-        READ_ALLOWED() {
+        READ_ALLOWED {
             @Override
             public void send(Message message, WebSocketService wss) {
                 wss.sendToReadAllowed(message.message, (Long) message.params[0]);
             }
         },
-        SOME() {
+        SOME {
             @Override
             public void send(Message message, WebSocketService wss) {
                 wss.sendToSome(message.message, (Predicate<WebSocketConnection>) message.params[0]);
