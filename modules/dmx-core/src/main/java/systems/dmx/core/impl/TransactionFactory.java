@@ -88,7 +88,7 @@ class TransactionFactory implements ResourceFilterFactory {
                 @Override
                 public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
                     DMXTransaction tx = threadLocalTransaction.get();
-                    boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
+                    boolean success = response.getMappedThrowable() == null;
                     if (success) {
                         logger.fine("### Comitting transaction of " + info(method));
                         tx.success();

@@ -23,8 +23,7 @@ public class DirectivesResponse implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public DirectivesResponse() {
-        this.object = null;
-        initDirectives();
+        this(null);
     }
 
     public DirectivesResponse(DMXObject object) {
