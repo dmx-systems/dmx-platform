@@ -21,6 +21,8 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Inject;
+import systems.dmx.core.service.Messages;
+import systems.dmx.core.service.Messages.Dest;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.IntroduceAssocType;
@@ -83,7 +85,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Inject
     private ConfigService configService;
 
-    private Messenger me = new Messenger("systems.dmx.webclient");
+    private Messenger me = new Messenger();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -590,21 +592,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private class Messenger {
 
-        private String pluginUri;
-
-        private Messenger(String pluginUri) {
-            this.pluginUri = pluginUri;
-        }
-
-        // ---
-
         private void newWorkspace(Topic workspace) {
             try {
-                sendToAllButOrigin(new JSONObject()
+                sendToReadAllowed(new JSONObject()
                     .put("type", "newWorkspace")
                     .put("args", new JSONObject()
                         .put("workspace", workspace.toJSON())
-                    )
+                    ), workspace.getId()
                 );
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error while sending a \"newWorkspace\" message:", e);
@@ -613,8 +607,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
         // ---
 
-        private void sendToAllButOrigin(JSONObject message) {
-            dmx.getWebSocketService().sendToAllButOrigin(message.toString());
+        private void sendToReadAllowed(JSONObject message, long objectId) {
+            Messages.get().add(Dest.READ_ALLOWED, message.toString(), objectId);
         }
     }
 }

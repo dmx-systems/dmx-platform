@@ -9,6 +9,8 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
+import systems.dmx.core.service.Messages;
+import systems.dmx.core.service.Messages.Message;
 import systems.dmx.core.service.QueryResult;
 import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.websocket.WebSocketService;
@@ -86,7 +88,6 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 } else if (isIterable(response, DMXObject.class)) {
                     loadChildTopics((Iterable<DMXObject>) entity, includeChildren, includeAssocChildren);
                 }
-                //
                 // 2) Firing PRE_SEND events
                 Directives directives = null;
                 if (entity instanceof DMXObject) {
@@ -109,13 +110,13 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     directives = ((DirectivesResponse) entity).getDirectives();
                     firePreSend(directives);
                 }
-                //
                 // 3) Client-Sync
                 if (directives != null) {
                     broadcast(directives);
                 }
             }
-            //
+            broadcast(Messages.get());
+            Messages.remove();
             Directives.remove();
             //
             return response;
@@ -203,7 +204,13 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
 
 
-    // === Broadcast ===
+    // === Client-Sync ===
+
+    private void broadcast(Messages messages) {
+        for (Message message : messages) {
+            message.dest.send(message, wss);
+        }
+    }
 
     private void broadcast(Directives directives) throws JSONException {
         JSONObject message = new JSONObject()
