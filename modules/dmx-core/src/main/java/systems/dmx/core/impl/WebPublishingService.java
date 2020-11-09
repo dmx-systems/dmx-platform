@@ -60,7 +60,7 @@ class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(AccessLayer al, WebSocketService wss) {
+    WebPublishingService(AccessLayer al, WebSocketServiceImpl wss) {
         try {
             logger.info("Setting up the WebPublishingService");
             this.al = al;
