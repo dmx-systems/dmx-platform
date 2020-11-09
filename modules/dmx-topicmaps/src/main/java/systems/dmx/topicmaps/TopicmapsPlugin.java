@@ -449,7 +449,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         registerTopicmapType(new DefaultTopicmapType());
         registerTopicmapCustomizer(this);      // ### FIXME: unregister is missing
         //
-        me = new Messenger();
+        me = new Messenger(dmx.getWebSocketService());
     }
 
 

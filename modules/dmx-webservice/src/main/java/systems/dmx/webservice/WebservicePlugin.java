@@ -17,8 +17,6 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.DirectivesResponse;
-import systems.dmx.core.service.Messages;
-import systems.dmx.core.service.Messages.Dest;
 import systems.dmx.core.service.PluginInfo;
 import systems.dmx.core.service.QueryResult;
 import systems.dmx.core.service.TopicResult;
@@ -619,7 +617,7 @@ public class WebservicePlugin extends PluginActivator {
         }
 
         private void sendToAllButOrigin(JSONObject message) {
-            Messages.get().add(Dest.ALL_BUT_ORIGIN, message.toString());
+            dmx.getWebSocketService().sendToAllButOrigin(message.toString());
         }
     }
 }

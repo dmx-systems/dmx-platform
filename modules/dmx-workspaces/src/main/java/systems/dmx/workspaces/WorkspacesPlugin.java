@@ -21,8 +21,6 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.Messages;
-import systems.dmx.core.service.Messages.Dest;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.IntroduceAssocType;
@@ -608,7 +606,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // ---
 
         private void sendToReadAllowed(JSONObject message, long objectId) {
-            Messages.get().add(Dest.READ_ALLOWED, message.toString(), objectId);
+            dmx.getWebSocketService().sendToReadAllowed(message.toString(), objectId);
         }
     }
 }
