@@ -7,10 +7,9 @@ import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
+import systems.dmx.core.impl.Messages.Message;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.DirectivesResponse;
-import systems.dmx.core.service.Messages;
-import systems.dmx.core.service.Messages.Message;
 import systems.dmx.core.service.QueryResult;
 import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.websocket.WebSocketService;
@@ -56,7 +55,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EventManager em;
-    private WebSocketService wss;
+    private WebSocketServiceImpl wss;
 
     @Context
     private HttpServletRequest request;
@@ -65,7 +64,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EventManager em, WebSocketService wss) {
+    JerseyResponseFilter(EventManager em, WebSocketServiceImpl wss) {
         this.em = em;
         this.wss = wss;
     }
@@ -216,7 +215,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         JSONObject message = new JSONObject()
             .put("type", "processDirectives")
             .put("args", directives.toJSONArray());
-        wss.sendToAllButOrigin(message.toString());
+        wss._sendToAllButOrigin(message.toString());
         // FIXME: don't send update directives to unauthorized parties
     }
 

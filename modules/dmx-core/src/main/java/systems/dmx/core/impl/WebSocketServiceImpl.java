@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.impl.Messages.Dest;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.CoreService;
@@ -46,32 +47,27 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void sendToOrigin(String message) {
-        WebSocketConnectionImpl connection = getConnection();
-        if (connection != null) {
-            queueMessage(message, connection);
-        }
+        Messages.get().add(Dest.ORIGIN, message);
     }
 
     @Override
     public void sendToAll(String message) {
-        queueMessage(message, conn -> true);
+        Messages.get().add(Dest.ALL, message);
     }
 
     @Override
     public void sendToAllButOrigin(String message) {
-        queueMessage(message, isOrigin().negate());
+        Messages.get().add(Dest.ALL_BUT_ORIGIN, message);
     }
 
     @Override
     public void sendToReadAllowed(String message, long objectId) {
-        // don't send back to origin
-        // only send if receiver has READ permission for object
-        queueMessage(message, isOrigin().negate().and(isReadAllowed(objectId)));
+        Messages.get().add(Dest.READ_ALLOWED, message, objectId);
     }
 
     @Override
     public void sendToSome(String message, Predicate<WebSocketConnection> connectionFilter) {
-        queueMessage(message, connectionFilter);
+        Messages.get().add(Dest.SOME, message, connectionFilter);
     }
 
     // ---
@@ -97,6 +93,33 @@ public class WebSocketServiceImpl implements WebSocketService {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void _sendToOrigin(String message) {
+        WebSocketConnectionImpl connection = getConnection();
+        if (connection != null) {
+            queueMessage(message, connection);
+        }
+    }
+
+    void _sendToAll(String message) {
+        queueMessage(message, conn -> true);
+    }
+
+    void _sendToAllButOrigin(String message) {
+        queueMessage(message, isOrigin().negate());
+    }
+
+    void _sendToReadAllowed(String message, long objectId) {
+        // don't send back to origin
+        // only send if receiver has READ permission for object
+        queueMessage(message, isOrigin().negate().and(isReadAllowed(objectId)));
+    }
+
+    void _sendToSome(String message, Predicate<WebSocketConnection> connectionFilter) {
+        queueMessage(message, connectionFilter);
+    }
+
+    // ---
 
     void stop() {
         try {

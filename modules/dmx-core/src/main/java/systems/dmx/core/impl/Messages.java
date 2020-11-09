@@ -1,7 +1,6 @@
-package systems.dmx.core.service;
+package systems.dmx.core.impl;
 
 import systems.dmx.core.service.websocket.WebSocketConnection;
-import systems.dmx.core.service.websocket.WebSocketService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,7 +10,7 @@ import java.util.logging.Logger;
 
 
 
-public class Messages implements Iterable<Messages.Message> {
+class Messages implements Iterable<Messages.Message> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -19,42 +18,42 @@ public class Messages implements Iterable<Messages.Message> {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    public static enum Dest {
+    static enum Dest {
         ORIGIN {
             @Override
-            public void send(Message message, WebSocketService wss) {
-                wss.sendToOrigin(message.message);
+            void send(Message message, WebSocketServiceImpl wss) {
+                wss._sendToOrigin(message.message);
             }
         },
         ALL {
             @Override
-            public void send(Message message, WebSocketService wss) {
-                wss.sendToAll(message.message);
+            void send(Message message, WebSocketServiceImpl wss) {
+                wss._sendToAll(message.message);
             }
         },
         ALL_BUT_ORIGIN {
             @Override
-            public void send(Message message, WebSocketService wss) {
-                wss.sendToAllButOrigin(message.message);
+            void send(Message message, WebSocketServiceImpl wss) {
+                wss._sendToAllButOrigin(message.message);
             }
         },
         READ_ALLOWED {
             @Override
-            public void send(Message message, WebSocketService wss) {
-                wss.sendToReadAllowed(message.message, (Long) message.params[0]);
+            void send(Message message, WebSocketServiceImpl wss) {
+                wss._sendToReadAllowed(message.message, (Long) message.params[0]);
             }
         },
         SOME {
             @Override
-            public void send(Message message, WebSocketService wss) {
-                wss.sendToSome(message.message, (Predicate<WebSocketConnection>) message.params[0]);
+            void send(Message message, WebSocketServiceImpl wss) {
+                wss._sendToSome(message.message, (Predicate<WebSocketConnection>) message.params[0]);
             }
         };
 
-        public abstract void send(Message message, WebSocketService wss);
+        abstract void send(Message message, WebSocketServiceImpl wss);
     }
 
-    private static Logger logger = Logger.getLogger("systems.dmx.core.service.Messages");
+    private static Logger logger = Logger.getLogger("systems.dmx.core.impl.Messages");
 
     private static final ThreadLocal<Messages> threadLocalDirectives = new ThreadLocal() {
         @Override
@@ -66,15 +65,15 @@ public class Messages implements Iterable<Messages.Message> {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public static Messages get() {
+    static Messages get() {
         return threadLocalDirectives.get();
     }
 
-    public void add(Dest dest, String message, Object... params) {
+    void add(Dest dest, String message, Object... params) {
         messages.add(new Message(dest, message, params));
     }
 
-    public static void remove() {
+    static void remove() {
         logger.fine("### Removing tread-local messages");
         threadLocalDirectives.remove();
     }
@@ -88,7 +87,7 @@ public class Messages implements Iterable<Messages.Message> {
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    public class Message {
+    class Message {
 
         public Dest dest;
         public String message;
