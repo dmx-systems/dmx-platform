@@ -21,7 +21,7 @@
     "dmx-login-dialog": "https://github.com/jri/dm5-login-dialog.git",
     "dmx-object-renderer": "1.0.2",
     "dmx-search-widget": "https://github.com/jri/dm5-search-widget.git",
-    "dmx-topicmap-panel": "1.0.1",
+    "dmx-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dmx-websocket": "1.0.1",
     "element-ui": "2.13.2",
     "font-awesome": "4.7.0",

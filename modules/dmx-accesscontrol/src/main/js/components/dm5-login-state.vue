@@ -35,7 +35,7 @@ export default {
     },
 
     signIn () {
-      this.$store.dispatch('openSignInDialog')
+      this.$store.dispatch('openLoginDialog')
     }
   }
 }
