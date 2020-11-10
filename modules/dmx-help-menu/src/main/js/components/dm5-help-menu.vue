@@ -30,10 +30,6 @@ export default {
 </script>
 
 <style>
-.dm5-help-menu {
-  margin-left: 1em;
-}
-
 .dm5-help-menu .el-button {
   padding-left:  0px !important;
   padding-right: 0px !important;

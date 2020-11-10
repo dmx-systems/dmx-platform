@@ -25,7 +25,7 @@ const actions = {
     })
   },
 
-  openLoginDialog () {
+  openSignInDialog () {
     state.visible = true
   },
 

@@ -19,6 +19,7 @@ export default extraElementUI => {
   //  2. dmx-accesscontrol must be inited *before* dmx-workspaces.
   //     dmx-workspaces watches dmx-accesscontrol's "username" store state.
   initPlugin(require('modules/dmx-base/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-help-menu/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
@@ -27,7 +28,6 @@ export default extraElementUI => {
   initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-contacts/src/main/js/plugin.js').default)
-  initPlugin(require('modules/dmx-help-menu/src/main/js/plugin.js').default)
   //
   // while development add your plugins here
   // initPlugin(require('modules-external/my-plugin/src/main/js/plugin.js').default)

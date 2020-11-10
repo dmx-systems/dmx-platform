@@ -1,9 +1,19 @@
 <template>
-  <div class="login-state">
-    <div v-if="username" class="info">
-      Logged in as <span class="username">{{username}}</span>
-    </div>
-    <el-button type="text" @click="dispatch">{{buttonLabel}}</el-button>
+  <div class="dm5-login-state">
+    <el-dropdown v-if="username" size="medium" trigger="click" @command="handle">
+      <el-button type="text" class="fa fa-user-circle">
+        <span class="el-icon-arrow-down el-icon--right"></span>
+      </el-button>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item>
+          {{username}}
+        </el-dropdown-item>
+        <el-dropdown-item command="logout" divided>
+          Logout
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
+    <el-button v-else class="sign-in" type="primary" @click="signIn">Sign in</el-button>
   </div>
 </template>
 
@@ -11,44 +21,38 @@
 export default {
 
   computed: {
-
     username () {
       return this.$store.state.accesscontrol.username
-    },
-
-    buttonLabel () {
-      return this.username ? 'Logout' : 'Login'
-    },
-
-    buttonAction () {
-      return this.username ? 'logout' : 'openLoginDialog'
     }
   },
 
   methods: {
-    dispatch () {
-      this.$store.dispatch(this.buttonAction)
+
+    handle (command) {
+      if (command) {
+        this.$store.dispatch(command)
+      }
+    },
+
+    signIn () {
+      this.$store.dispatch('openSignInDialog')
     }
   }
 }
 </script>
 
 <style>
-.login-state {
-  text-align: right;
+.dm5-login-state {
+  margin-left: 12px;
 }
 
-.login-state .info {
-  font-size: var(--label-font-size);
-  color:     var(--label-color);
+.dm5-login-state .el-dropdown .el-button {
+  padding-left:  0px !important;
+  padding-right: 0px !important;
 }
 
-.login-state .info .username {
-  color: black;
-}
-
-.login-state .el-button {
+.dm5-login-state .el-button.sign-in {
   font-size: var(--label-font-size) !important;
-  padding: 0 !important;
+  padding: 4px 8px !important;
 }
 </style>
