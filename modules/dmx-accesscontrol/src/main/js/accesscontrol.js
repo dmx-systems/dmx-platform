@@ -5,7 +5,9 @@ const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
   username: undefined,      // the logged in user (string); falsish if no user is logged in
-  visible: false            // Login dialog visibility
+  // Login dialog
+  visible: false,           // Login dialog visibility
+  extensions: []            // extra Vue components for the Login dialog
 }
 
 const actions = {
@@ -31,6 +33,10 @@ const actions = {
 
   closeLoginDialog () {
     state.visible = false
+  },
+
+  registerLoginExtension (_, ext) {
+    state.extensions.push(ext)
   },
 
   createUserAccount (_, {username, password}) {

@@ -109,6 +109,9 @@ function initPlugin (pluginConfig) {
   if (contextCommands) {
     store.dispatch('registerContextCommands', contextCommands)
   }
+  // login extensions
+  const loginExtensions = _pluginConfig.loginExtensions
+  loginExtensions && loginExtensions.forEach(ext => store.dispatch('registerLoginExtension', ext))
 }
 
 function registerDetailRenderers (renderers, renderer) {
