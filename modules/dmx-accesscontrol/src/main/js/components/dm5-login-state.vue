@@ -6,7 +6,7 @@
       </el-button>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item>
-          {{username}}
+          <b>{{username}}</b>
         </el-dropdown-item>
         <el-dropdown-item command="logout" divided>
           Logout
