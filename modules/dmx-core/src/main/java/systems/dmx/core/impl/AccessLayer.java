@@ -833,12 +833,23 @@ public final class AccessLayer {
             if (assocTypeUri != null) {
                 // While children are always topics direct assoc matches are supported as well.
                 // So the queryAssocs() logic is little different from queryTopics() above.
-                assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
+                if (!assocQuery.equals("*")) {
+                    assocs = db.queryAssocsFulltext(assocTypeUri, assocQuery);
+                } else {
+                    assocs = _getAssocsByType(assocTypeUri);
+                }
                 if (searchAssocChildren) {
-                    assocs.addAll(parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery)));  // key=null);
+                    assocs.addAll(parentObjects(assocTypeUri, db.queryTopicsFulltext(null, assocQuery)));    // key=null
                 }
             } else {
-                assocs = db.queryAssocsFulltext(null, assocQuery);      // key=null
+                if (!assocQuery.equals("*")) {
+                    assocs = db.queryAssocsFulltext(null, assocQuery);                                       // key=null
+                } else {
+                    // TODO: optimization.
+                    // If there is a topic result: collect the topic's assocs directly.
+                    // If no topic filter is set: possibly do nothing. A plain "all assocs" query might make no sense.
+                    assocs = _getAllAssocs();
+                }
             }
         } else {
             if (assocTypeUri != null) {
@@ -973,6 +984,15 @@ public final class AccessLayer {
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
         }
+    }
+
+    // DB direct access. No permission check.
+    private List<AssocModelImpl> _getAllAssocs() {
+        List<AssocModelImpl> assocs = new ArrayList();
+        for (AssocModelImpl assoc : db.fetchAllAssocs()) {
+            assocs.add(assoc);
+        }
+        return assocs;
     }
 
     // ---
