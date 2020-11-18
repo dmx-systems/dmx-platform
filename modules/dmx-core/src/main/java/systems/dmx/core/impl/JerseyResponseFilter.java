@@ -178,7 +178,10 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         } else if (object instanceof Topic) {
             em.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);
         } else if (object instanceof Assoc) {
-            em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, object);
+            Assoc assoc = (Assoc) object;
+            em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc);
+            firePreSend(assoc.getDMXObject1());
+            firePreSend(assoc.getDMXObject2());
         }
     }
 
