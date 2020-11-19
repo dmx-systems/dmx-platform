@@ -9,8 +9,10 @@ import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.util.DMXUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -636,7 +638,9 @@ public final class AccessLayer {
                 }
             }
             // assoc filter
-            List<AssocModelImpl> assocs = filterReadables(queryAssocs(assocQuery, assocTypeUri, searchAssocChildren));
+            List<AssocModelImpl> assocs = filterReadables(
+                queryAssocs(assocQuery, assocTypeUri, searchAssocChildren, topics
+            ));
             if (assocs.isEmpty()) {
                 boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
                 if (assocFilter) {
@@ -827,7 +831,8 @@ public final class AccessLayer {
         return topics;
     }
 
-    private List<AssocModelImpl> queryAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
+    private List<AssocModelImpl> queryAssocs(String assocQuery, String assocTypeUri, boolean searchAssocChildren,
+                                 List<TopicModelImpl> topics) {
         List<AssocModelImpl> assocs;
         if (!assocQuery.isEmpty()) {
             if (assocTypeUri != null) {
@@ -845,10 +850,7 @@ public final class AccessLayer {
                 if (!assocQuery.equals("*")) {
                     assocs = db.queryAssocsFulltext(null, assocQuery);                                       // key=null
                 } else {
-                    // TODO: optimization.
-                    // If there is a topic result: collect the topic's assocs directly.
-                    // If no topic filter is set: possibly do nothing. A plain "all assocs" query might make no sense.
-                    assocs = _getAllAssocs();
+                    assocs = getAssocs(topics);
                 }
             }
         } else {
@@ -912,7 +914,7 @@ public final class AccessLayer {
      * ### FIXDOC
      */
     private <M extends DMXObjectModelImpl> List<M> parentObjects(String typeUri, List<TopicModelImpl> topics) {
-        List<M> result = new ArrayList();
+        List<M> result = new ArrayList();                   // TODO: use rather a set?
         for (TopicModelImpl topic : topics) {
             for (DMXObjectModelImpl parentObject : _parentObjects(typeUri, topic)) {
                 if (!result.contains(parentObject)) {       // TODO: equality and rel-objects?
@@ -933,6 +935,16 @@ public final class AccessLayer {
             }
         }
         return result;
+    }
+
+    // ---
+
+    private List<AssocModelImpl> getAssocs(List<TopicModelImpl> topics) {
+        Set<AssocModelImpl> assocs = new HashSet();
+        for (TopicModelImpl topic : topics) {
+            assocs.addAll(db.fetchTopicAssocs(topic.id));
+        }
+        return new ArrayList(assocs);
     }
 
     // ---
@@ -984,15 +996,6 @@ public final class AccessLayer {
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed, assocTypeUri=\"" + assocTypeUri + "\"", e);
         }
-    }
-
-    // DB direct access. No permission check.
-    private List<AssocModelImpl> _getAllAssocs() {
-        List<AssocModelImpl> assocs = new ArrayList();
-        for (AssocModelImpl assoc : db.fetchAllAssocs()) {
-            assocs.add(assoc);
-        }
-        return assocs;
     }
 
     // ---
