@@ -40,14 +40,15 @@ const state = {
             ['blockquote', 'code-block'],
             [{'list': 'ordered'}, {'list': 'bullet'}],
             [{'header': [1, 2, 3, false]}],
-            ['topic-link', 'link', 'image', 'video']
+            ['topic-link', 'link', 'image', 'x-video']
           ]
         }
       }
     },
     // TODO: allow DMX webclient plugins to provide Quill extensions
     extensions: [
-      require('../quill-extensions/topic-link').default
+      require('../quill-extensions/topic-link').default,
+      require('../quill-extensions/x-video').default
     ]
   }
 }
