@@ -14,7 +14,7 @@ export default {
           node = document.createElement('video')
           node.classList.add('x-video')
           node.setAttribute('src', super.sanitize(value))
-          node.setAttribute('type', 'video/mp4')
+          // node.setAttribute('type', 'video/mp4')
           node.setAttribute('controls', '')
           console.log('XVideo direct-link', node)
         } else {

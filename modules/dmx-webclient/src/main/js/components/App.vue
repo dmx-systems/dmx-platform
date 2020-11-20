@@ -151,4 +151,8 @@ button.ql-topic-link {
   font-size: 16px !important;
   color: #ccc;
 }
+
+video.x-video {
+  width: 100%;
+}
 </style>
