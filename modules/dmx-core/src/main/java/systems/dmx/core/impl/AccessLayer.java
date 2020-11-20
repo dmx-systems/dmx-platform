@@ -625,8 +625,8 @@ public final class AccessLayer {
             String topicQuery, String topicTypeUri, boolean searchTopicChildren,
             String assocQuery, String assocTypeUri, boolean searchAssocChildren) {
         try {
-            logger.fine("Querying related topics fulltext, topicQuery=\"" + topicQuery + "\", topicTypeUri=" +
-                topicTypeUri + ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
+            logger.fine("Query, topicQuery=\"" + topicQuery + "\", topicTypeUri=" + topicTypeUri +
+                ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery +
                 "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" + searchAssocChildren);
             // topic filter
             List<TopicModelImpl> topics = filterReadables(queryTopics(topicQuery, topicTypeUri, searchTopicChildren));
@@ -654,10 +654,9 @@ public final class AccessLayer {
             // combine filters -> return assocs
             return (List<M>) filterAssocsByPlayer(topics, assocs);
         } catch (Exception e) {
-            throw new RuntimeException("Querying related topics fulltext failed, topicQuery=\"" + topicQuery +
-                "\", topicTypeUri=" + topicTypeUri + ", searchTopicChildren=" + searchTopicChildren +
-                ", assocQuery=\"" + assocQuery + "\", assocTypeUri=" + assocTypeUri + ", searchAssocChildren=" +
-                searchAssocChildren, e);
+            throw new RuntimeException("Query failed, topicQuery=\"" + topicQuery + "\", topicTypeUri=" + topicTypeUri +
+                ", searchTopicChildren=" + searchTopicChildren + ", assocQuery=\"" + assocQuery + "\", assocTypeUri=" +
+                assocTypeUri + ", searchAssocChildren=" + searchAssocChildren, e);
         }
     }
 

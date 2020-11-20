@@ -1,8 +1,8 @@
-import store from './store/webclient'
+import store from '../store/webclient'
 
 export default {
 
-  name: 'topic-link',
+  name: 'topic-link',     // Same as blotName. Used in module.addHandler() calls to register toolbarHandler()
 
   extension (Quill) {
     class TopicLink extends Quill.import('formats/link') {    // Note: 'formats/link' extends 'blots/inline'

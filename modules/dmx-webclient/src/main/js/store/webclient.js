@@ -47,7 +47,7 @@ const state = {
     },
     // TODO: allow DMX webclient plugins to provide Quill extensions
     extensions: [
-      require('../topic-link').default
+      require('../quill-extensions/topic-link').default
     ]
   }
 }
