@@ -5,6 +5,8 @@ export default {
   extension (Quill) {
 
     const Video = Quill.import('formats/video')
+    const icons = Quill.import('ui/icons')
+    icons['x-video'] = icons['video']
 
     class XVideo extends Video {
 
