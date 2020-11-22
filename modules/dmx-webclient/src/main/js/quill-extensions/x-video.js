@@ -1,6 +1,6 @@
 export default {
 
-  name: 'x-video',
+  name: 'x-video',      // Same as blotName. Used in module.addHandler() calls to register toolbarHandler()
 
   extension (Quill) {
 
@@ -12,9 +12,8 @@ export default {
         let node
         if (value.endsWith('.mp4')) {
           node = document.createElement('video')
-          node.classList.add('x-video')
+          node.classList.add('x-video')   // set manually as we don't call super.create()
           node.setAttribute('src', super.sanitize(value))
-          // node.setAttribute('type', 'video/mp4')
           node.setAttribute('controls', '')
           console.log('XVideo direct-link', node)
         } else {
@@ -24,9 +23,9 @@ export default {
         return node
       }
     }
-    XVideo.blotName = 'x-video';
-    // XVideo.className = 'x-video';
-    // XVideo.tagName = 'DIV';
+    XVideo.blotName = 'x-video'
+    XVideo.className = 'x-video'          // Note: x-video tag name varies, so while HTML->Parchment transformation
+    // XVideo.tagName = 'DIV'             // ... we detect DOM elements by class name
     return XVideo
   },
 
