@@ -69,24 +69,5 @@ export default {
     XVideo.className = 'ql-video'           // Note: video tag name varies, so while HTML->Parchment transformation
     // XVideo.tagName = 'IFRAME'            // ... we detect DOM elements by class name
     return XVideo
-  },
-
-  /*toolbarHandler (value) {
-    console.log('x-video toolbarHandler', value, this)
-    this.quill.theme.tooltip.edit('video');
-    // this.handlers.video.call(this, value)
-  },*/
-
-  /*quillReady (quill) {
-    // console.log('x-video quillReady', quill)
-    // FIXME: handle multiple Quill instances
-    // const button = document.querySelector('button.ql-x-video')
-    // button.classList.add('ql-video')
-    // button.textContent = 'T'    // TODO: use real (SVG) icon
-    // button.setAttribute('title', 'Insert topic link')
-  },*/
-
-  /* infoDOMReady (dom) {
-    // console.log('x-video infoDOMReady', dom)
-  } */
+  }
 }

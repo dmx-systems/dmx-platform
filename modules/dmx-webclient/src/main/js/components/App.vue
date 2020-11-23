@@ -152,7 +152,7 @@ button.ql-topic-link {
   color: #ccc;
 }
 
-video.x-video {
+video.ql-video {
   width: 100%;
 }
 </style>
