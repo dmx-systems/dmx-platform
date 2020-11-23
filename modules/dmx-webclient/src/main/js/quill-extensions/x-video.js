@@ -16,15 +16,21 @@ export default {
     class XVideo extends BlockEmbed {
 
       static create(value) {
-        const node = super.create(value)
-        let src = this.sanitize(value)
+        let node
         if (value.endsWith('.mp4')) {
-          src = `data:text/html,<html><body><video src="${src}" controls></video></body></html>`
+          node = document.createElement('video')
+          node.classList.add('ql-video')    // set manually as we don't call super.create()
+          node.setAttribute('src', this.sanitize(value))
+          node.setAttribute('controls', '')
+          console.log('XVideo direct-link', node)
+        } else {
+          node = document.createElement('iframe')
+          node.classList.add('ql-video')    // set manually as we don't call super.create()
+          node.setAttribute('src', this.sanitize(value));
+          node.setAttribute('frameborder', '0');
+          node.setAttribute('allowfullscreen', true);
+          console.log('XVideo embed', node)
         }
-        node.setAttribute('src', src);
-        node.setAttribute('frameborder', '0');
-        node.setAttribute('allowfullscreen', true);
-        console.log('XVideo.create()', node)
         return node;
       }
 
@@ -43,7 +49,7 @@ export default {
       }
 
       static value(domNode) {
-        console.log('value', domNode, domNode.getAttribute('src'))
+        // console.log('value', domNode, domNode.getAttribute('src'))
         return domNode.getAttribute('src');
       }
 
@@ -60,8 +66,8 @@ export default {
       }
     }
     XVideo.blotName = 'video'
-    XVideo.className = 'ql-video'          // Note: x-video tag name varies, so while HTML->Parchment transformation
-    XVideo.tagName = 'IFRAME'              // ... we detect DOM elements by class name ### FIXDOC
+    XVideo.className = 'ql-video'           // Note: video tag name varies, so while HTML->Parchment transformation
+    // XVideo.tagName = 'IFRAME'            // ... we detect DOM elements by class name
     return XVideo
   },
 
