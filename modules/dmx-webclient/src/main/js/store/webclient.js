@@ -40,7 +40,7 @@ const state = {
             ['blockquote', 'code-block'],
             [{'list': 'ordered'}, {'list': 'bullet'}],
             [{'header': [1, 2, 3, false]}],
-            ['topic-link', 'link', 'image', 'x-video']
+            ['topic-link', 'link', 'image', 'video']
           ]
         }
       }
