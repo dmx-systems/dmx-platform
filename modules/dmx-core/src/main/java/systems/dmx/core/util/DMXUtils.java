@@ -31,9 +31,9 @@ public class DMXUtils {
 
     private static final Logger logger = Logger.getLogger(DMXUtils.class.getName());
 
-    private static final String DM4_HOST_URL = System.getProperty("dmx.host.url");  // ### TODO: default value (#734)
+    private static final String DMX_HOST_URL = System.getProperty("dmx.host.url");  // ### TODO: default value (#734)
     static {
-        logger.info("Host config:\n  dmx.host.url = \"" + DM4_HOST_URL + "\"");
+        logger.info("Host config:\n  dmx.host.url = \"" + DMX_HOST_URL + "\"");
     }
 
 
@@ -50,7 +50,7 @@ public class DMXUtils {
      */
     public static boolean isDMXURL(URL url) {
         try {
-            return url.toString().startsWith(DM4_HOST_URL);
+            return url.toString().startsWith(DMX_HOST_URL);
         } catch (Exception e) {
             throw new RuntimeException("Checking for DMX URL failed (url=\"" + url + "\")", e);
         }
