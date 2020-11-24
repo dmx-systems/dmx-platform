@@ -19,7 +19,7 @@
     "dmx-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dmx-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dmx-login-dialog": "https://github.com/jri/dm5-login-dialog.git",
-    "dmx-object-renderer": "1.0.2",
+    "dmx-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dmx-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dmx-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dmx-websocket": "1.0.1",
