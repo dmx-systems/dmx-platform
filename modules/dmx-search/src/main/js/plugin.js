@@ -1,4 +1,5 @@
 import dm5 from 'dmx-api'
+import '../style/style.css'
 
 export default ({store}) => {
   return {
