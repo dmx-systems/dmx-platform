@@ -9,7 +9,6 @@ import dm5 from 'dmx-api'
 import axios from 'axios'
 import Vue from 'vue'
 
-Vue.component('dm5-topic-list',      require('dmx-topic-list').default)
 Vue.component('dm5-object-renderer', require('dmx-object-renderer').default)
 Vue.component('dm5-assoc',           require('dmx-object-renderer/src/components/dm5-assoc').default)
 Vue.component('dm5-boolean-field',   require('dmx-object-renderer/src/components/dm5-boolean-field').default)
