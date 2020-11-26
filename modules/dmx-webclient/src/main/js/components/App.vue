@@ -84,14 +84,14 @@ button {
 /* Reusable classes */
 
 .label {
-  font-size: var(--label-font-size);
-  color:     var(--label-color);
+  font-size: var(--label-font-size) !important;
+  color:     var(--label-color) !important;
 }
 
 .field-label {
-  font-size: var(--label-font-size);
-  color:     var(--label-color);
-  margin-bottom: 0.2em;
+  font-size: var(--label-font-size) !important;
+  color:     var(--label-color) !important;
+  margin-bottom: 0.2em !important;
 }
 
 /* Element UI */
