@@ -13,7 +13,7 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <el-button v-else class="sign-in" type="primary" @click="signIn">Sign in</el-button>
+    <el-button v-else class="sign-in" type="primary" @click="login">Sign in</el-button>
   </div>
 </template>
 
@@ -34,7 +34,7 @@ export default {
       }
     },
 
-    signIn () {
+    login () {
       this.$store.dispatch('openLoginDialog')
     }
   }

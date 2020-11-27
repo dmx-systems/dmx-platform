@@ -8,7 +8,7 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './websocket'
 
-console.log('[DMX] 2020/11/26')
+console.log('[DMX] 2020/11/27')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
