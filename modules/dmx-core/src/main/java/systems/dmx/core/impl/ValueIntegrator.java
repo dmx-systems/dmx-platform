@@ -204,7 +204,7 @@ class ValueIntegrator {
     private Result unifySimple() {
         TopicModelImpl topic;
         boolean created = false;
-        SimpleValue newValue = newValues.getSimpleValue();
+        SimpleValue newValue = newValues.value.trim();
         // Note: only readable topics can be reused (access control is applied)
         List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue);
         int size = topics.size();

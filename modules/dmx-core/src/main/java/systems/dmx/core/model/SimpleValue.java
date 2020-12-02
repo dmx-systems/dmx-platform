@@ -65,11 +65,6 @@ public class SimpleValue {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    @Override
-    public String toString() {
-        return value.toString();
-    }
-
     public int intValue() {
         return (Integer) value;
     }
@@ -90,7 +85,24 @@ public class SimpleValue {
         return value;
     }
 
+    /**
+     * Trims this value in-place, provided it is of type String. Does nothing otherwise.
+     *
+     * @return  this object
+     */
+    public SimpleValue trim() {
+        if (value instanceof String) {
+            value = ((String) value).trim();
+        }
+        return this;
+    }
+
     // ---
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 
     @Override
     public boolean equals(Object o) {
