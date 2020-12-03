@@ -4,14 +4,9 @@
       <span class="el-icon-arrow-down el-icon--right"></span>
     </el-button>
     <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item>
-        <el-link href="https://docs.dmx.systems" target="_blank" :underline="false">Documentation</el-link>
-      </el-dropdown-item>
-      <el-dropdown-item>
-        <el-link href="https://forum.dmx.systems" target="_blank" :underline="false">Forum</el-link>
-      </el-dropdown-item>
-      <el-dropdown-item command="openAboutBox" divided>
-        About DMX
+      <el-dropdown-item v-for="item in items" :command="item.action" :divided="item.divided" :key="item.label">
+        <el-link v-if="item.href" :href="item.href" target="_blank" :underline="false">{{item.label}}</el-link>
+        <template v-else>{{item.label}}</template>
       </el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
@@ -19,11 +14,16 @@
 
 <script>
 export default {
+
+  computed: {
+    items () {
+      return this.$store.state.helpmenu.items
+    }
+  },
+
   methods: {
     handle (command) {
-      if (command) {
-        this.$store.dispatch(command)
-      }
+      command && this.$store.dispatch(command)
     }
   }
 }
