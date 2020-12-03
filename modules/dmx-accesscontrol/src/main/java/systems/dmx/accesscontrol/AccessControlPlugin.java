@@ -147,8 +147,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Inject private FilesService fs;
     @Inject private ConfigService cs;
 
-    @Context
-    private HttpServletRequest request;
+    @Context private HttpServletRequest request;
+    @Context private HttpServletResponse response;
 
     private Map<String, AuthorizationMethod> authorizationMethods = new HashMap();
 
@@ -629,14 +629,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void serviceRequestFilter(ContainerRequest containerRequest) {
-        // Note: we pass the injected HttpServletRequest
-        requestFilter(request);
+        // Note: HttpServletRequest and HttpServletResponse are injected through JAX-RS.
+        requestFilter(request, response);
     }
 
     @Override
     public void staticResourceFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-        // Note: for the resource filter no HttpServletRequest is injected
-        requestFilter(servletRequest);
+        // Note: the static resource filter is triggered through our custom OSGi HTTP Context. JAX-RS injection is not
+        // in place.
+        requestFilter(servletRequest, servletResponse);
     }
 
     // ---
@@ -694,25 +695,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Request Filter ===
 
-    private void requestFilter(HttpServletRequest request) {
+    private void requestFilter(HttpServletRequest request, HttpServletResponse response) {
         logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
             "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
             "\n      ##### " + info(request.getSession(false)));    // create=false
         // 1) apply subnet filter
         checkRequestOrigin(request);        // throws WebApplicationException 403 Forbidden
         // 2) create session (if needed)
-        HttpSession session = getSession(request);
+        HttpSession session = getSession(request, response);
         // 3) check authorization (if not yet logged in)
         if (username(session) == null) {
             checkAuthorization(request);    // throws WebApplicationException 401 Unauthorized
         }
     }
 
-    private HttpSession getSession(HttpServletRequest request) {
+    private HttpSession getSession(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         if (session == null) {
             session = request.getSession();
-            logger.info("### Creating " + info(session));
+            String cookie = response.getHeader("Set-Cookie");
+            response.setHeader("Set-Cookie", cookie + ";SameSite=Strict");
+            logger.info("### Creating " + info(session) + ", response=" + response);
         }
         return session;
     }
