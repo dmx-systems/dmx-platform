@@ -35,6 +35,12 @@ const actions = {
     state.visible = false
   },
 
+  revealUsername ({dispatch}) {
+    dm5.restClient.getTopicByValue('dmx.accesscontrol.username', state.username).then(topic => {
+      dispatch('revealTopic', {topic})
+    })
+  },
+
   registerLoginExtension (_, ext) {
     state.extensions.push(ext)
   },

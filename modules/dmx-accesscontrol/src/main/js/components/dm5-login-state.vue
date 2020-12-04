@@ -5,7 +5,7 @@
         <span class="el-icon-arrow-down el-icon--right"></span>
       </el-button>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>
+        <el-dropdown-item command="revealUsername" title="Reveal Username topic">
           <b>{{username}}</b>
         </el-dropdown-item>
         <el-dropdown-item command="logout" divided>
@@ -29,9 +29,7 @@ export default {
   methods: {
 
     handle (command) {
-      if (command) {
-        this.$store.dispatch(command)
-      }
+      command && this.$store.dispatch(command)
     },
 
     login () {
