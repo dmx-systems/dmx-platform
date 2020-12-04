@@ -68,47 +68,34 @@ function initPlugin (pluginConfig) {
   }
   // store watcher
   const storeWatcher = _pluginConfig.storeWatcher
-  if (storeWatcher) {
-    storeWatcher.forEach(watcher => {
-      store.watch(watcher.getter, watcher.callback)
-    })
-  }
+  storeWatcher && storeWatcher.forEach(watcher => {
+    store.watch(watcher.getter, watcher.callback)
+  })
   // extra Element UI components
-  if (_pluginConfig.extraElementUI) {
-    _extraElementUI()
-  }
+  _pluginConfig.extraElementUI && _extraElementUI()
   // webclient components
   const components = _pluginConfig.components
-  if (components) {
-    components.forEach(compDef => {
-      store.dispatch('registerComponent', compDef)
-    })
-  }
+  components && components.forEach(compDef => store.dispatch('registerComponent', compDef))
   // detail renderers
   registerDetailRenderers(_pluginConfig.objectRenderers, 'object')
   registerDetailRenderers(_pluginConfig.valueRenderers,  'value')
-  //
   // icon renderers
   registerIconRenderers(_pluginConfig.iconRenderers)
-  //
-  // extra menu items
+  // extra menu items (create menu)
   const extraMenuItems = _pluginConfig.extraMenuItems
-  if (extraMenuItems) {
-    store.dispatch('registerExtraMenuItems', extraMenuItems)
-  }
+  extraMenuItems && store.dispatch('registerExtraMenuItems', extraMenuItems)
+  // help menu items
+  const helpMenuItems = _pluginConfig.helpMenuItems
+  helpMenuItems && helpMenuItems.forEach(item => store.dispatch('registerHelpMenuItem', item))
   // topicmap type
   const topicmapType = _pluginConfig.topicmapType
-  if (topicmapType) {
-    store.dispatch('registerTopicmapType', topicmapType)
-  }
+  topicmapType && store.dispatch('registerTopicmapType', topicmapType)
   // topicmap commands / workspace commands
   registerToolbarCommands(_pluginConfig.topicmapCommands,  'registerTopicmapCommand')
   registerToolbarCommands(_pluginConfig.workspaceCommands, 'registerWorkspaceCommand')
   // context commands
   const contextCommands = _pluginConfig.contextCommands
-  if (contextCommands) {
-    store.dispatch('registerContextCommands', contextCommands)
-  }
+  contextCommands && store.dispatch('registerContextCommands', contextCommands)
   // login extensions
   const loginExtensions = _pluginConfig.loginExtensions
   loginExtensions && loginExtensions.forEach(ext => store.dispatch('registerLoginExtension', ext))
