@@ -73,9 +73,9 @@ export default ({store}) => {
       return `/core/topictype/${object.uri}`
     } else if (object.typeUri === 'dmx.core.assoc_type') {
       return `/core/assoctype/${object.uri}`
-    } else if (object.isTopic()) {
+    } else if (object.isTopic) {
       return `/core/topic/${object.id}?children=true&assocChildren=true`
-    } else if (object.isAssoc()) {
+    } else if (object.isAssoc) {
       return `/core/assoc/${object.id}?children=true&assocChildren=true`
     }
     throw Error('unexpected object')

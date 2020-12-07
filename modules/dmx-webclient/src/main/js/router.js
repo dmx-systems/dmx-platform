@@ -143,7 +143,7 @@ store.registerModule('routerModule', {
         throw Error('callDetailRoute() when there is no single selection')
       }
       router.push({
-        name: object.isTopic() ? 'topicDetail' : 'assocDetail',
+        name: object.isTopic ? 'topicDetail' : 'assocDetail',
         params: {detail}
       })
     },
@@ -180,7 +180,7 @@ store.registerModule('routerModule', {
         throw Error('stripDetailFromRoute() when there is no single selection')
       }
       router.push({
-        name: object.isTopic() ? 'topic' : 'assoc'
+        name: object.isTopic ? 'topic' : 'assoc'
       })
     }
   }

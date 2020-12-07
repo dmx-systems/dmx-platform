@@ -120,7 +120,7 @@ export default ({store, dm5}) => {
     // copy in dm5-object-renderer.vue (as editDisabled())
     // copy in dm5-info-tab.vue (as buttonDisabled())
     // only entity topics are enabled; assocs and types are always enabled
-    const disabled = object.isTopic() && !object.isType() && !object.type.isEntity
+    const disabled = object.isTopic && !object.isType && !object.type.isEntity
     //
     return disabled ? Promise.resolve(true) : isWritable(id).then(writable => !writable)
   }
