@@ -51,7 +51,7 @@ export default {
     },
 
     dataType () {
-      return this.type.getDataType()
+      return this.type.dataType
     },
 
     compDefs () {
