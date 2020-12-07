@@ -28,7 +28,7 @@ export default {
 
     // TODO: copy in dm5-value-renderer.vue
     fieldLabel () {
-      const customAssocType = this.compDef && this.compDef.getCustomAssocType()
+      const customAssocType = this.compDef && this.compDef.customAssocType
       return customAssocType && customAssocType.isSimple() ? customAssocType.value : this.type.value
     },
 

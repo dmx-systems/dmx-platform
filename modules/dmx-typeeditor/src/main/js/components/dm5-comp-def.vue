@@ -17,15 +17,15 @@ export default {
   computed: {
 
     card () {
-      return this.compDef.isOne() ? "One" : "Many"     // TODO: do not hardcode labels?
+      return this.compDef.isOne ? "One" : "Many"     // TODO: do not hardcode labels?
     },
 
     childType () {
-      return this.compDef.getChildType()
+      return this.compDef.childType
     },
 
     info () {
-      const type = this.compDef.getCustomAssocType()
+      const type = this.compDef.customAssocType
       return type && `(${type.value})`
     }
   }

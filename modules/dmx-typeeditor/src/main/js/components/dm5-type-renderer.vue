@@ -61,7 +61,7 @@ export default {
 
   methods: {
     click (compDef) {
-      const childType = compDef.getChildType()
+      const childType = compDef.childType
       childType.assoc = compDef    // type cache side effect ### FIXME
       this.$store.dispatch('revealRelatedTopic', {relTopic: childType})
     }
