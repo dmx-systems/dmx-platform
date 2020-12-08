@@ -23,7 +23,7 @@ const actions = {
 
   createWorkspace ({dispatch}, {name, sharingModeUri}) {
     console.log('createWorkspace', name, sharingModeUri)
-    dm5.restClient.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
+    dm5.rpc.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
       console.log('Workspace', topic)
       state.workspaceTopics.push(topic)
       selectWorkspace(topic.id, dispatch)
@@ -158,7 +158,7 @@ function _selectWorkspace (id, dispatch) {
 // State helper
 
 function fetchWorkspaceTopics () {
-  return dm5.restClient.getTopicsByType('dmx.workspaces.workspace').then(topics => {
+  return dm5.rpc.getTopicsByType('dmx.workspaces.workspace').then(topics => {
     // console.log('### Workspaces ready!')
     state.workspaceTopics = topics
   })

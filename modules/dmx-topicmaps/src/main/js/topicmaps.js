@@ -54,7 +54,7 @@ const actions = {
                                           topicmapTypeUri = 'dmx.topicmaps.topicmap',
                                           viewProps = {}}) {
     // console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
-    dm5.restClient.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
+    dm5.rpc.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
       // console.log('Topicmap topic', topic)
       // update state
       topicmapTopics(rootState).push(topic)
@@ -257,7 +257,7 @@ const actions = {
     } else {
       id = topicId
     }
-    return dm5.restClient.getTopic(id).then(topic => {
+    return dm5.rpc.getTopic(id).then(topic => {
       dispatch('revealTopic', {topic, pos, noSelect})
     })
   },
@@ -302,7 +302,7 @@ const actions = {
       player2: {roleTypeUri: 'dmx.core.default', ...playerId2}
     }
     // console.log('createAssoc', assocModel)
-    dm5.restClient.createAssoc(assocModel).then(assoc => {
+    dm5.rpc.createAssoc(assocModel).then(assoc => {
       // console.log('Created', assoc)
       dispatch('revealAssoc', {assoc})
       dispatch('_processDirectives', assoc.directives)
@@ -432,8 +432,8 @@ const actions = {
       p = Promise.resolve()
     } else {
       // console.log('fetchTopicmapTopics', workspaceId)
-      p = dm5.restClient.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
-        // console.log('### Topicmap topics ready!', topics.length)               // includeChildren=true
+      p = dm5.rpc.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
+        // console.log('### Topicmap topics ready!', topics.length)        // includeChildren=true
         if (!topics.length) {
           throw Error(`workspace ${workspaceId} has no topicmap`)
         }

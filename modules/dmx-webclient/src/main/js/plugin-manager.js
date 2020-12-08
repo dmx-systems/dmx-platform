@@ -136,7 +136,7 @@ function registerToolbarCommands (commands, action) {
  *          are resolved once the respective plugin is fetched and its assets are registered.
  */
 function fetchPluginsFromServer () {
-  return dm5.restClient.getPlugins().then(pluginInfos => {
+  return dm5.rpc.getPlugins().then(pluginInfos => {
     const plugins = []      // array of promises for plugin exports
     console.group("[DMX] Fetching plugins")
     pluginInfos.forEach(pluginInfo => {

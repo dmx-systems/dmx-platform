@@ -79,7 +79,7 @@ const actions = {
       idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
       idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
       // update server state
-      dm5.restClient.deleteMulti(idLists).then(response => {
+      dm5.rpc.deleteMulti(idLists).then(response => {
         dispatch('_processDirectives', response.directives)
       })
     }).catch(() => {})    // suppress unhandled rejection on cancel

@@ -60,7 +60,7 @@ export default ({store}) => {
   function createTopic ({topicType, value}) {
     const topicModel = topicType.newTopicModel(value)
     // console.log('createTopic', topicModel)
-    dm5.restClient.createTopic(topicModel).then(topic => {
+    dm5.rpc.createTopic(topicModel).then(topic => {
       // console.log('Created', topic)
       revealTopic(topic)
       store.dispatch('_processDirectives', topic.directives)

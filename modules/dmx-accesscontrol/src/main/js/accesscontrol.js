@@ -21,7 +21,7 @@ const actions = {
     console.log('Logout', state.username)
     // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
-    dm5.restClient.logout().then(() => {
+    dm5.rpc.logout().then(() => {
       setUsername()
       dispatch('loggedOut')
     })
@@ -36,7 +36,7 @@ const actions = {
   },
 
   revealUsername ({dispatch}) {
-    dm5.restClient.getTopicByValue('dmx.accesscontrol.username', state.username).then(topic => {
+    dm5.rpc.getTopicByValue('dmx.accesscontrol.username', state.username).then(topic => {
       dispatch('revealTopic', {topic})
     })
   },
@@ -46,13 +46,13 @@ const actions = {
   },
 
   createUserAccount (_, {username, password}) {
-    return dm5.restClient.createUserAccount(username, encodePassword(password))
+    return dm5.rpc.createUserAccount(username, encodePassword(password))
   }
 }
 
 // init state
 
-dm5.restClient.getUsername().then(username => {
+dm5.rpc.getUsername().then(username => {
   state.username = username
 })
 
