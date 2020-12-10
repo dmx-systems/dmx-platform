@@ -6,12 +6,12 @@
 </template>
 
 <script>
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 export default {
 
   props: {
-    compDef: {type: dm5.CompDef, required: true}
+    compDef: {type: dmx.CompDef, required: true}
   },
 
   computed: {

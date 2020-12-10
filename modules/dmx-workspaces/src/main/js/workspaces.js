@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 window.addEventListener('focus', updateWorkspaceCookie)
 
@@ -9,7 +9,7 @@ const state = {
 
   isWritable: undefined,            // true if selected workspace is writable
 
-  workspaceTopics: undefined,       // All workspace topics readable by current user (array of dm5.Topic)
+  workspaceTopics: undefined,       // All workspace topics readable by current user (array of dmx.Topic)
 
   workspaceCommands: {},            // Registered workspace commands:
                                     //   {
@@ -23,7 +23,7 @@ const actions = {
 
   createWorkspace ({dispatch}, {name, sharingModeUri}) {
     console.log('createWorkspace', name, sharingModeUri)
-    dm5.rpc.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
+    dmx.rpc.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
       console.log('Workspace', topic)
       state.workspaceTopics.push(topic)
       selectWorkspace(topic.id, dispatch)
@@ -68,7 +68,7 @@ const actions = {
 
   _initWorkspaceIsWritable () {
     // workspaceId might be uninitialized. Accesscontrol "username" state is inited *before* workspaceId state. TODO?
-    state.workspaceId && dm5.permCache.isWritable(state.workspaceId).then(
+    state.workspaceId && dmx.permCache.isWritable(state.workspaceId).then(
       writable => {
         // console.log('_initWorkspaceIsWritable', state.workspaceId, writable)
         state.isWritable = writable
@@ -113,13 +113,13 @@ const actions = {
       let topic
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        topic = new dm5.Topic(dir.arg)
+        topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.workspaces.workspace') {
           updateWorkspace(topic)
         }
         break
       case "DELETE_TOPIC":
-        topic = new dm5.Topic(dir.arg)
+        topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.workspaces.workspace') {
           deleteWorkspace(topic, dispatch)
         }
@@ -158,7 +158,7 @@ function _selectWorkspace (id, dispatch) {
 // State helper
 
 function fetchWorkspaceTopics () {
-  return dm5.rpc.getTopicsByType('dmx.workspaces.workspace').then(topics => {
+  return dmx.rpc.getTopicsByType('dmx.workspaces.workspace').then(topics => {
     // console.log('### Workspaces ready!')
     state.workspaceTopics = topics
   })
@@ -177,7 +177,7 @@ function isWorkspaceReadable () {
 
 function updateWorkspaceCookie () {
   // console.log('dmx_workspace_id', state.workspaceId)
-  dm5.utils.setCookie('dmx_workspace_id', state.workspaceId)
+  dmx.utils.setCookie('dmx_workspace_id', state.workspaceId)
 }
 
 // Process directives

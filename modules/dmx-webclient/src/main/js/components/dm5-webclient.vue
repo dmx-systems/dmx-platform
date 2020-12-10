@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import axios from 'axios'
 import Vue from 'vue'
 
@@ -24,7 +24,7 @@ Vue.component('dm5-value-renderer',  require('dmx-object-renderer/src/components
 export default {
 
   provide: {
-    dm5, axios, Vue
+    dmx, axios, Vue
   },
 
   computed: {

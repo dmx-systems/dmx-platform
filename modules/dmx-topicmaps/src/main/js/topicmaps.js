@@ -1,16 +1,16 @@
 import Vue from 'vue'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import Selection from './selection'
 
 const state = {
 
-  topicmap: undefined,        // The rendered topicmap (dm5.Topicmap).
+  topicmap: undefined,        // The rendered topicmap (dmx.Topicmap).
                               // Set by _displayTopicmap()
                               // TODO: undefined for non-standard topicmaps, e.g. Geomap
 
   topicmapTopics: {},         // Per-workspace loaded topicmap topics (including children):
                               //   {
-                              //     workspaceId: [topicmapTopic]    # array of dm5.Topic
+                              //     workspaceId: [topicmapTopic]    # array of dmx.Topic
                               //   }
 
   selectedTopicmapId: {},     // Per-workspace selected topicmap:
@@ -54,7 +54,7 @@ const actions = {
                                           topicmapTypeUri = 'dmx.topicmaps.topicmap',
                                           viewProps = {}}) {
     // console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
-    dm5.rpc.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
+    dmx.rpc.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
       // console.log('Topicmap topic', topic)
       // update state
       topicmapTopics(rootState).push(topic)
@@ -87,7 +87,7 @@ const actions = {
     // console.log('displayTopicmap', id)
     // update state
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
-    dm5.utils.setCookie('dmx_topicmap_id', id)
+    dmx.utils.setCookie('dmx_topicmap_id', id)
     // update state + update view
     return _displayTopicmap(getters, dispatch)
   },
@@ -257,7 +257,7 @@ const actions = {
     } else {
       id = topicId
     }
-    return dm5.rpc.getTopic(id).then(topic => {
+    return dmx.rpc.getTopic(id).then(topic => {
       dispatch('revealTopic', {topic, pos, noSelect})
     })
   },
@@ -265,7 +265,7 @@ const actions = {
   /**
    * Reveals a topic on the topicmap panel.
    *
-   * @param   topic     the topic to reveal (dm5.Topic).
+   * @param   topic     the topic to reveal (dmx.Topic).
    * @param   pos       Optional: the topic position in model coordinates (object with "x", "y" props).
    *                    If not given it's up to the topicmap renderer to position the topic.
    * @param   noSelect  Optional: if trueish the programmatic topic selection is suppressed.
@@ -302,7 +302,7 @@ const actions = {
       player2: {roleTypeUri: 'dmx.core.default', ...playerId2}
     }
     // console.log('createAssoc', assocModel)
-    dm5.rpc.createAssoc(assocModel).then(assoc => {
+    dmx.rpc.createAssoc(assocModel).then(assoc => {
       // console.log('Created', assoc)
       dispatch('revealAssoc', {assoc})
       dispatch('_processDirectives', assoc.directives)
@@ -432,7 +432,7 @@ const actions = {
       p = Promise.resolve()
     } else {
       // console.log('fetchTopicmapTopics', workspaceId)
-      p = dm5.rpc.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
+      p = dmx.rpc.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
         // console.log('### Topicmap topics ready!', topics.length)        // includeChildren=true
         if (!topics.length) {
           throw Error(`workspace ${workspaceId} has no topicmap`)
@@ -476,7 +476,7 @@ const actions = {
   // WebSocket messages
 
   _newTopicmap ({dispatch}, {topicmapTopic}) {
-    const _topicmapTopic = new dm5.Topic(topicmapTopic)
+    const _topicmapTopic = new dmx.Topic(topicmapTopic)
     const workspace = _topicmapTopic.children['dmx.workspaces.workspace#dmx.workspaces.workspace_assignment']
     // Note: the default topicmap created for new workspaces have no workspace assignment yet
     if (!workspace) {
@@ -517,13 +517,13 @@ const actions = {
       let topic
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        topic = new dm5.Topic(dir.arg)
+        topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           updateTopicmap(topic)
         }
         break
       case "DELETE_TOPIC":
-        topic = new dm5.Topic(dir.arg)
+        topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           deleteTopicmap(topic, getters, rootState, dispatch)
         }

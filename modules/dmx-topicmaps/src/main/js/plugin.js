@@ -1,4 +1,4 @@
-export default ({store, dm5}) => {
+export default ({store, dmx}) => {
   return {
 
     storeModule: {
@@ -92,7 +92,7 @@ export default ({store, dm5}) => {
     iconRenderers: {
       'dmx.topicmaps.topicmap': topic => {
         const mapTypeUri = topic.children['dmx.topicmaps.topicmap_type_uri'].value
-        return dm5.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
+        return dmx.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
       }
     }
   }
@@ -162,6 +162,6 @@ export default ({store, dm5}) => {
   }
 
   function isWritable (id) {
-    return dm5.permCache.isWritable(id)
+    return dmx.permCache.isWritable(id)
   }
 }

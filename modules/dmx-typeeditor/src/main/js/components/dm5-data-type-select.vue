@@ -24,13 +24,13 @@
 </template>
 
 <script>
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 export default {
 
   props: {
     type: {   // the type whose data type to render
-      type: dm5.Type,
+      type: dmx.Type,
       required: true
     }
   },

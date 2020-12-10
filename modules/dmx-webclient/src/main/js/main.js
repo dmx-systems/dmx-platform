@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './components/App'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import store from './store/webclient'
 import router from './router'
 import loadPlugins from './plugin-manager'
@@ -12,8 +12,8 @@ console.log('[DMX] 2020/12/10')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
-// The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init(). ### TODO: still true?
-const dm5ready = dm5.init({
+// The dm5-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
+const dm5ready = dmx.init({
   store,
   onHttpError,
   iconRenderers: store.state.iconRenderers

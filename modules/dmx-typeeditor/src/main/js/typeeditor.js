@@ -1,10 +1,10 @@
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 const actions = {
 
   createTopicType ({dispatch}, {name, pos}) {
     // console.log('Creating topic type', name)
-    dm5.rpc.createTopicType(defaultTopicType(name)).then(topicType => {
+    dmx.rpc.createTopicType(defaultTopicType(name)).then(topicType => {
       // console.log('Created', topicType)
       dispatch('putTopicType', topicType)
       dispatch('revealTopic', {topic: topicType, pos})
@@ -13,7 +13,7 @@ const actions = {
 
   createAssocType ({dispatch}, {name, pos}) {
     // console.log('Creating assoc type', name)
-    dm5.rpc.createAssocType(defaultAssocType(name)).then(assocType => {
+    dmx.rpc.createAssocType(defaultAssocType(name)).then(assocType => {
       // console.log('Created', assocType)
       dispatch('putAssocType', assocType)
       dispatch('revealTopic', {topic: assocType, pos})
@@ -22,7 +22,7 @@ const actions = {
 
   createRoleType ({dispatch}, {name, pos}) {
     // console.log('Creating role type', name)
-    dm5.rpc.createRoleType(defaultRoleType(name)).then(roleType => {
+    dmx.rpc.createRoleType(defaultRoleType(name)).then(roleType => {
       // console.log('Created', roleType)
       dispatch('putRoleType', roleType)
       dispatch('revealTopic', {topic: roleType, pos})

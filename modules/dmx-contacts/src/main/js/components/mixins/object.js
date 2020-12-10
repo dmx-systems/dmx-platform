@@ -1,9 +1,9 @@
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 export default {
   props: {
     object: {
-      type: dm5.DMXObject,
+      type: dmx.DMXObject,
       required: true
     }
   }

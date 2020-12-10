@@ -1,4 +1,4 @@
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import SHA256 from './lib/sha256'
 
 const ENCODED_PASSWORD_PREFIX = '-SHA256-'
@@ -21,7 +21,7 @@ const actions = {
     console.log('Logout', state.username)
     // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
-    dm5.rpc.logout().then(() => {
+    dmx.rpc.logout().then(() => {
       setUsername()
       dispatch('loggedOut')
     })
@@ -36,7 +36,7 @@ const actions = {
   },
 
   revealUsername ({dispatch}) {
-    dm5.rpc.getTopicByValue('dmx.accesscontrol.username', state.username).then(topic => {
+    dmx.rpc.getTopicByValue('dmx.accesscontrol.username', state.username).then(topic => {
       dispatch('revealTopic', {topic})
     })
   },
@@ -46,13 +46,13 @@ const actions = {
   },
 
   createUserAccount (_, {username, password}) {
-    return dm5.rpc.createUserAccount(username, encodePassword(password))
+    return dmx.rpc.createUserAccount(username, encodePassword(password))
   }
 }
 
 // init state
 
-dm5.rpc.getUsername().then(username => {
+dmx.rpc.getUsername().then(username => {
   state.username = username
 })
 

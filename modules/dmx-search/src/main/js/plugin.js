@@ -1,4 +1,4 @@
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import '../style/style.css'
 
 export default ({store}) => {
@@ -20,7 +20,7 @@ export default ({store}) => {
           markerTopicIds:   (_, getters) => getters && getters.visibleTopicIds,
           markerAssocIds:   (_, getters) => getters && getters.visibleAssocIds,
           createTopicTypes: (_, getters) => getters && getters.createTopicTypes,  // TODO: getters is undefined on start
-          searchAssocTypes: () => dm5.typeCache.getAllAssocTypes(),
+          searchAssocTypes: () => dmx.typeCache.getAllAssocTypes(),
           topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
         },
         listeners: {
@@ -60,7 +60,7 @@ export default ({store}) => {
   function createTopic ({topicType, value}) {
     const topicModel = topicType.newTopicModel(value)
     // console.log('createTopic', topicModel)
-    dm5.rpc.createTopic(topicModel).then(topic => {
+    dmx.rpc.createTopic(topicModel).then(topic => {
       // console.log('Created', topic)
       revealTopic(topic)
       store.dispatch('_processDirectives', topic.directives)

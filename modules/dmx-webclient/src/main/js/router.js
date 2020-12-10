@@ -9,7 +9,7 @@ import VueRouter from 'vue-router'
 import { MessageBox } from 'element-ui'
 import Webclient from './components/dm5-webclient'
 import store from './store/webclient'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 Vue.use(VueRouter)
 
@@ -245,7 +245,7 @@ function initialNavigation (route) {
     // assocId)
     urlPresent = true
   } else {
-    topicmapId = id(dm5.utils.getCookie('dmx_topicmap_id'))
+    topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
     if (topicmapId) {
       // console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
     } else {
@@ -264,7 +264,7 @@ function initialNavigation (route) {
       // console.log('Workspace retrieved', workspace)
       workspaceId = workspace.id
       // console.log(`Retrieving topic ${topicmapId}`)
-      return dm5.rpc.getTopic(topicmapId)
+      return dmx.rpc.getTopic(topicmapId)
     }).then(topic => {
       // console.log('Topic retrieved', topic)
       if (topic.typeUri !== "dmx.topicmaps.topicmap") {
@@ -370,7 +370,7 @@ function navigate (to, from) {
   }
 }
 
-const getAssignedWorkspace = dm5.rpc.getAssignedWorkspace
+const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
 
 /**
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.
@@ -380,7 +380,7 @@ const getAssignedWorkspace = dm5.rpc.getAssignedWorkspace
 function fetchTopic (id, p) {
   // console.log('requesting topic', id)
   // detail panel
-  const p2 = dm5.rpc.getTopic(id, true, true).then(topic => {  // includeChildren=true, includeAssocChildren=true
+  const p2 = dmx.rpc.getTopic(id, true, true).then(topic => {  // includeChildren=true, includeAssocChildren=true
     // console.log('topic', id, 'arrived')
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
@@ -405,7 +405,7 @@ function fetchTopic (id, p) {
  */
 function fetchAssoc (id, p) {
   // detail panel
-  const p2 = dm5.rpc.getAssoc(id, true, true).then(assoc => {  // includeChildren=true, includeAssocChildren=true
+  const p2 = dmx.rpc.getAssoc(id, true, true).then(assoc => {  // includeChildren=true, includeAssocChildren=true
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
     p.then(() => {
@@ -467,7 +467,7 @@ function topicmapId(route) {
  */
 function id (v) {
   // Note: Number(undefined) is NaN, and NaN != NaN is true!
-  // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')
+  // Note: dmx.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')
   if (typeof v === 'number') {
     return v
   } else if (typeof v === 'string') {

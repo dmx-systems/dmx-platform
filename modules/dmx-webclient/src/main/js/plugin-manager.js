@@ -1,5 +1,5 @@
 import store from './store/webclient'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 import axios from 'axios'
 import Vue from 'vue'
 
@@ -53,7 +53,7 @@ export default extraElementUI => {
  * @param   pluginConfig    either a plugin config object or a function that returns a plugin config object.
  */
 function initPlugin (pluginConfig) {
-  const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dm5, axios, Vue}) : pluginConfig
+  const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dmx, axios, Vue}) : pluginConfig
   // register plugin
   plugins.push(_pluginConfig)
   // store module
@@ -63,7 +63,7 @@ function initPlugin (pluginConfig) {
     // console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
-      typeof module === 'function' ? module({dm5, axios, Vue}) : module
+      typeof module === 'function' ? module({dmx, axios, Vue}) : module
     )
   }
   // store watcher
@@ -136,7 +136,7 @@ function registerToolbarCommands (commands, action) {
  *          are resolved once the respective plugin is fetched and its assets are registered.
  */
 function fetchPluginsFromServer () {
-  return dm5.rpc.getPlugins().then(pluginInfos => {
+  return dmx.rpc.getPlugins().then(pluginInfos => {
     const plugins = []      // array of promises for plugin exports
     console.group("[DMX] Fetching plugins")
     pluginInfos.forEach(pluginInfo => {

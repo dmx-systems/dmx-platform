@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { MessageBox } from 'element-ui'
-import dm5 from 'dmx-api'
+import dmx from 'dmx-api'
 
 Vue.use(Vuex)
 
@@ -79,7 +79,7 @@ const actions = {
       idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
       idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
       // update server state
-      dm5.rpc.deleteMulti(idLists).then(response => {
+      dmx.rpc.deleteMulti(idLists).then(response => {
         dispatch('_processDirectives', response.directives)
       })
     }).catch(() => {})    // suppress unhandled rejection on cancel
@@ -163,13 +163,13 @@ const actions = {
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        displayObjectIf(new dm5.Topic(dir.arg))
+        displayObjectIf(new dmx.Topic(dir.arg))
         break
       case "DELETE_TOPIC":
         dispatch('unselectIf', dir.arg.id)
         break
       case "UPDATE_ASSOCIATION":
-        displayObjectIf(new dm5.Assoc(dir.arg))
+        displayObjectIf(new dmx.Assoc(dir.arg))
         break
       case "DELETE_ASSOCIATION":
         dispatch('unselectIf', dir.arg.id)
