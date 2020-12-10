@@ -1,23 +1,23 @@
 <template>
   <el-select v-model="type.dataTypeUri">
     <el-option-group label="Simple">
-      <el-option :label="dataTypes['dmx.core.text'].value"      :value="dataTypes['dmx.core.text'].uri">
+      <el-option :label="dataTypes['dmx.core.text'].value"     :value="dataTypes['dmx.core.text'].uri">
       </el-option>
-      <el-option :label="dataTypes['dmx.core.number'].value"    :value="dataTypes['dmx.core.number'].uri">
+      <el-option :label="dataTypes['dmx.core.number'].value"   :value="dataTypes['dmx.core.number'].uri">
       </el-option>
-      <el-option :label="dataTypes['dmx.core.boolean'].value"   :value="dataTypes['dmx.core.boolean'].uri">
+      <el-option :label="dataTypes['dmx.core.boolean'].value"  :value="dataTypes['dmx.core.boolean'].uri">
       </el-option>
-      <el-option :label="dataTypes['dmx.core.html'].value"      :value="dataTypes['dmx.core.html'].uri">
+      <el-option :label="dataTypes['dmx.core.html'].value"     :value="dataTypes['dmx.core.html'].uri">
       </el-option>
     </el-option-group>
     <el-option-group label="Composite">
       <template v-if="isTopicType">
-        <el-option :label="dataTypes['dmx.core.value'].value"   :value="dataTypes['dmx.core.value'].uri">
+        <el-option :label="dataTypes['dmx.core.value'].value"  :value="dataTypes['dmx.core.value'].uri">
         </el-option>
-        <el-option :label="dataTypes['dmx.core.entity'].value"  :value="dataTypes['dmx.core.entity'].uri">
+        <el-option :label="dataTypes['dmx.core.entity'].value" :value="dataTypes['dmx.core.entity'].uri">
         </el-option>
       </template>
-      <el-option :label="dataTypes['dmx.core.composite'].value" :value="dataTypes['dmx.core.composite'].uri" v-else>
+      <el-option v-else :label="dataTypes['dmx.core.composite'].value" :value="dataTypes['dmx.core.composite'].uri">
       </el-option>
     </el-option-group>
   </el-select>
@@ -38,7 +38,7 @@ export default {
   computed: {
 
     isTopicType () {
-      return this.type.isTopicType()
+      return this.type.isTopicType
     },
 
     dataTypes () {
