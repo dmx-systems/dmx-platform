@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-type-renderer">
     <!-- Type Value -->
-    <dm5-value-renderer :object="object" :level="0" :path="[]" :context="context"></dm5-value-renderer>
+    <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context"></dmx-value-renderer>
     <!-- Type URI -->
     <div class="field">
       <div class="field-label">Type URI</div>
@@ -12,10 +12,10 @@
     <div class="field">
       <div class="field-label">Data Type</div>
       <div v-if="infoMode">{{dataType.value}}</div>
-      <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
+      <dmx-data-type-select v-else :type="type"></dmx-data-type-select>
     </div>
     <!-- Comp Defs -->
-    <dm5-comp-def-list :comp-defs="compDefs" :mode="mode" @comp-def-click="click"></dm5-comp-def-list>
+    <dmx-comp-def-list :comp-defs="compDefs" :mode="mode" @comp-def-click="click"></dmx-comp-def-list>
   </div>
 </template>
 
@@ -68,8 +68,8 @@ export default {
   },
 
   components: {
-    'dm5-data-type-select': require('./dmx-data-type-select').default,
-    'dm5-comp-def-list':    require('./dmx-comp-def-list').default
+    'dmx-data-type-select': require('./dmx-data-type-select').default,
+    'dmx-comp-def-list':    require('./dmx-comp-def-list').default
   }
 }
 </script>

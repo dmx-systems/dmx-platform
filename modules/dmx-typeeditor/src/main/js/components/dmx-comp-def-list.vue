@@ -2,15 +2,15 @@
   <div :class="['dm5-comp-def-list', mode]">
     <div class="field-label">Composition Definitions ({{compDefs.length}})</div>
     <template v-if="infoMode">
-      <dm5-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
+      <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
         :key="compDef.compDefUri" @click.native="click(compDef)">
-      </dm5-comp-def>
+      </dmx-comp-def>
     </template>
     <draggable v-else :list="compDefs" :animation="300">
       <!-- 3 lines duplicated in favor of code splitting; TODO: avoid -->
-      <dm5-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
+      <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
         :key="compDef.compDefUri" @click.native="click(compDef)">
-      </dm5-comp-def>
+      </dmx-comp-def>
     </draggable>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
   },
 
   components: {
-    'dm5-comp-def': require('./dmx-comp-def').default,
+    'dmx-comp-def': require('./dmx-comp-def').default,
     draggable: () => ({
       component: import('vuedraggable' /* webpackChunkName: "vuedraggable" */),
       loading: require('modules/dmx-webclient/src/main/js/components/dmx-spinner')
