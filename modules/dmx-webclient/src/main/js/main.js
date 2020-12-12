@@ -8,7 +8,7 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './websocket'
 
-console.log('[DMX] 2020/12/10')
+console.log('[DMX] 2020/12/12')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is instantiated.
@@ -45,12 +45,12 @@ loadPlugins(extraElementUI).then(() => {
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.icon',
-  component: require('./components/dm5-icon-picker').default
+  component: require('./components/dmx-icon-picker').default
 })
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.color',
-  component: require('./components/dm5-color-picker').default
+  component: require('./components/dmx-color-picker').default
 })
 
 // 5) Initial navigation

@@ -19,14 +19,14 @@ export default ({store}) => ({
       }
     },
     {
-      comp: require('./components/dm5-login-state').default,
+      comp: require('./components/dmx-login-state').default,
       mount: 'toolbar-right'
     }
   ],
 
   extraMenuItems: [{
     uri: 'dmx.accesscontrol.user_account',
-    optionsComp: require('./components/dm5-user-account-options').default,
+    optionsComp: require('./components/dmx-user-account-options').default,
     create: (username, options, pos) => {
       store.dispatch('createUserAccount', {
         username,

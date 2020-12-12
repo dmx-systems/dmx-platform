@@ -41,7 +41,7 @@ export default ({store, dmx}) => {
         }
       },
       {
-        comp: require('./components/dm5-topicmap-commands').default,
+        comp: require('./components/dmx-topicmap-commands').default,
         mount: 'toolbar-left'
       }
     ],
@@ -54,9 +54,9 @@ export default ({store, dmx}) => {
 
     topicmapCommands: {
       "dmx.topicmaps.topicmap": [
-        require('./components/dm5-topicmap-info').default,
-        require('./components/dm5-topicmap-fit').default,
-        require('./components/dm5-topicmap-reset').default
+        require('./components/dmx-topicmap-info').default,
+        require('./components/dmx-topicmap-fit').default,
+        require('./components/dmx-topicmap-reset').default
       ]
     },
 

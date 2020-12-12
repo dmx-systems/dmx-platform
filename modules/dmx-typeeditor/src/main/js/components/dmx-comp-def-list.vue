@@ -43,10 +43,10 @@ export default {
   },
 
   components: {
-    'dm5-comp-def': require('./dm5-comp-def').default,
+    'dm5-comp-def': require('./dmx-comp-def').default,
     draggable: () => ({
       component: import('vuedraggable' /* webpackChunkName: "vuedraggable" */),
-      loading: require('modules/dmx-webclient/src/main/js/components/dm5-spinner')
+      loading: require('modules/dmx-webclient/src/main/js/components/dmx-spinner')
     })
   }
 }

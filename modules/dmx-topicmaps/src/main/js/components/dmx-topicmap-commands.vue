@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import dmx from 'dmx-api'
-
 export default {
 
   computed: {

@@ -12,19 +12,19 @@ export default ({store}) => {
     ],
 
     components: [{
-      comp: require('./components/dm5-workspace-commands').default,
+      comp: require('./components/dmx-workspace-commands').default,
       mount: 'toolbar-left'
     }],
 
     workspaceCommands: {
       "dmx.topicmaps.topicmap": [
-        require('./components/dm5-workspace-info').default
+        require('./components/dmx-workspace-info').default
       ]
     },
 
     extraMenuItems: [{
       uri: 'dmx.workspaces.workspace',
-      optionsComp: require('./components/dm5-workspace-options').default,
+      optionsComp: require('./components/dmx-workspace-options').default,
       create: (name, data) => {
         store.dispatch('createWorkspace', {
           name,

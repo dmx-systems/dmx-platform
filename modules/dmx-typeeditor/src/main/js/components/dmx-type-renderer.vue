@@ -68,8 +68,8 @@ export default {
   },
 
   components: {
-    'dm5-data-type-select': require('./dm5-data-type-select').default,
-    'dm5-comp-def-list':    require('./dm5-comp-def-list').default
+    'dm5-data-type-select': require('./dmx-data-type-select').default,
+    'dm5-comp-def-list':    require('./dmx-comp-def-list').default
   }
 }
 </script>

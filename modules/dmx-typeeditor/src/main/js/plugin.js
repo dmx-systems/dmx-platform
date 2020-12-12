@@ -6,8 +6,8 @@ export default ({store}) => ({
   },
 
   objectRenderers: {
-    'dmx.core.topic_type': require('./components/dm5-type-renderer').default,
-    'dmx.core.assoc_type': require('./components/dm5-type-renderer').default
+    'dmx.core.topic_type': require('./components/dmx-type-renderer').default,
+    'dmx.core.assoc_type': require('./components/dmx-type-renderer').default
   },
 
   extraMenuItems: [

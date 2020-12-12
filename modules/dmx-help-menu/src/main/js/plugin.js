@@ -7,11 +7,11 @@ export default {
 
   components: [
     {
-      comp: require('./components/dm5-help-menu').default,
+      comp: require('./components/dmx-help-menu').default,
       mount: 'toolbar-right'
     },
     {
-      comp: require('./components/dm5-about-box').default,
+      comp: require('./components/dmx-about-box').default,
       mount: 'webclient'
     }
   ],
