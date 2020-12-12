@@ -10,16 +10,16 @@ import axios from 'axios'
 import Vue from 'vue'
 
 Vue.component('dmx-object-renderer', require('dmx-object-renderer').default)
-Vue.component('dmx-assoc',           require('dmx-object-renderer/src/components/dm5-assoc').default)
-Vue.component('dmx-boolean-field',   require('dmx-object-renderer/src/components/dm5-boolean-field').default)
-Vue.component('dmx-child-topic',     require('dmx-object-renderer/src/components/dm5-child-topic').default)
-Vue.component('dmx-child-topics',    require('dmx-object-renderer/src/components/dm5-child-topics').default)
-Vue.component('dmx-html-field',      require('dmx-object-renderer/src/components/dm5-html-field').default)
-Vue.component('dmx-number-field',    require('dmx-object-renderer/src/components/dm5-number-field').default)
-Vue.component('dmx-player',          require('dmx-object-renderer/src/components/dm5-player').default)
-Vue.component('dmx-select-field',    require('dmx-object-renderer/src/components/dm5-select-field').default)
-Vue.component('dmx-text-field',      require('dmx-object-renderer/src/components/dm5-text-field').default)
-Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components/dm5-value-renderer').default)
+Vue.component('dmx-assoc',           require('dmx-object-renderer/src/components/dmx-assoc').default)
+Vue.component('dmx-boolean-field',   require('dmx-object-renderer/src/components/dmx-boolean-field').default)
+Vue.component('dmx-child-topic',     require('dmx-object-renderer/src/components/dmx-child-topic').default)
+Vue.component('dmx-child-topics',    require('dmx-object-renderer/src/components/dmx-child-topics').default)
+Vue.component('dmx-html-field',      require('dmx-object-renderer/src/components/dmx-html-field').default)
+Vue.component('dmx-number-field',    require('dmx-object-renderer/src/components/dmx-number-field').default)
+Vue.component('dmx-player',          require('dmx-object-renderer/src/components/dmx-player').default)
+Vue.component('dmx-select-field',    require('dmx-object-renderer/src/components/dmx-select-field').default)
+Vue.component('dmx-text-field',      require('dmx-object-renderer/src/components/dmx-text-field').default)
+Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components/dmx-value-renderer').default)
 
 export default {
 
