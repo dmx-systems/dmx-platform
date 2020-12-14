@@ -284,7 +284,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             //
             // 1) check username uniqueness
             // Note: we can't do this check in the preCreateTopic() listener. If such an username topic exists already
-            // the DM5 value integrator will reuse this one instead of trying to create a new one. The preCreateTopic()
+            // the DMX value integrator will reuse this one instead of trying to create a new one. The preCreateTopic()
             // listener will not trigger.
             Topic usernameTopic = getUsernameTopic(username);
             if (usernameTopic != null) {

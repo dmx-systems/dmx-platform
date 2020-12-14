@@ -708,7 +708,7 @@ class TypeStorage {
             TopicModel topic = null;
             for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {
                 if (topic != null) {
-                    throw new RuntimeException("DM5 does not support more than one view config topic per configurable");
+                    throw new RuntimeException("DMX does not support more than one view config topic per configurable");
                 }
                 topic = storeViewConfigTopic(configurable, configTopic);
             }

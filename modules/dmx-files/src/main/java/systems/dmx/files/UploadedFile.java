@@ -15,7 +15,7 @@ import java.io.InputStream;
  * <p>
  * Client-side support: the public API of the Files plugin provides a method
  * <code>dm4c.get_plugin("systems.dmx.files").open_upload_dialog()</code> that allows the user to
- * choose and upload a file.</p> ### FIXDOC: update to DM5
+ * choose and upload a file.</p> ### FIXDOC: update to DMX
  *
  * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */

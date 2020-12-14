@@ -135,7 +135,7 @@ class ValueIntegrator {
     // Note: this is a side effect, but we keep it for pragmatic reasons.
     //
     // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
-    // In DM5 the update model is not passed directly to the storage layer, but a new model object is created (see
+    // In DMX the update model is not passed directly to the storage layer, but a new model object is created (see
     // createSimpleTopic()). The ID transfer is here to emulate the DM4 behavior.
     //
     // Without this side effect e.g. managing view configs would be more hard. When creating a type through a migration

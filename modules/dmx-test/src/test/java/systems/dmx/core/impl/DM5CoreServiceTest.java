@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 
 
-public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
+public class DMXCoreServiceTest extends CoreServiceTestEnvironment {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
