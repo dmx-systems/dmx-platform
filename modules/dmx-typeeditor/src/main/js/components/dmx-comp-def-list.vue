@@ -19,7 +19,7 @@
 export default {
 
   created () {
-    // console.log('dm5-comp-def-list created')
+    // console.log('dmx-comp-def-list created')
   },
 
   mixins: [
@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style>
-/* principle copy in dm5-topic-list.vue */
+/* principle copy in dmx-topic-list.vue */
 .dmx-comp-def-list .dmx-comp-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);

@@ -117,8 +117,8 @@ export default ({store, dmx}) => {
   function isEditDisabled (id) {
     const object = store.state.topicmaps.topicmap.getObject(id)
     //
-    // copy in dm5-object-renderer.vue (as editDisabled())
-    // copy in dm5-info-tab.vue (as buttonDisabled())
+    // copy in dmx-object-renderer.vue (as editDisabled())
+    // copy in dmx-info-tab.vue (as buttonDisabled())
     // only entity topics are enabled; assocs and types are always enabled
     const disabled = object.isTopic && !object.isType && !object.type.isEntity
     //

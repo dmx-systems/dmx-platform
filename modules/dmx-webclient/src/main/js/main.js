@@ -10,17 +10,17 @@ import './websocket'
 
 console.log('[DMX] 2020/12/14')
 
-// 1) Init dm5 library
-// The dm5 library must be inited *before* the dm5-webclient component is instantiated.
-// The dm5-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
-const dm5ready = dmx.init({
+// 1) Init dmx library
+// The dmx library must be inited *before* the dmx-webclient component is instantiated.
+// The dmx-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
+const dmxReady = dmx.init({
   store,
   onHttpError,
   iconRenderers: store.state.iconRenderers
 })
 
 // 2) Create Vue root instance
-// Instantiates router-view and dm5-webclient components.
+// Instantiates router-view and dmx-webclient components.
 const root = new Vue({
   el: '#app',
   store,
@@ -37,7 +37,7 @@ const root = new Vue({
 // the Search plugin on the other hand depends on Workspaces `isWritable` state.
 loadPlugins(extraElementUI).then(() => {
   // Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
-  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
+  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dmx-webclient>
   store.dispatch('mountComponents', webclient)
 })
 
@@ -59,7 +59,7 @@ store.dispatch('registerDetailRenderer', {
 Promise.all([
   // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
   // The type cache must be ready *before* "initialNavigation" is dispatched.
-  dm5ready,
+  dmxReady,
   // Initial navigation might involve "select the 1st workspace", so the workspace
   // topics must be already loaded.
   store.state.workspaces.ready
@@ -74,7 +74,7 @@ Promise.all([
 // Note: in contrast to other platforms on Windows the target of the "contextmenu" event is not the canvas but
 // - a dialog (or its wrapper) e.g. the search/create dialog
 // - a message box (or its wrapper) e.g. the deletion warning
-// Note: in contrast to a dialog the message box is not a child of <dm5-webclient> component, so we attach
+// Note: in contrast to a dialog the message box is not a child of <dmx-webclient> component, so we attach
 // the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
   // console.log('body', e.target.tagName, e.target.classList, e.target.parentNode.classList)

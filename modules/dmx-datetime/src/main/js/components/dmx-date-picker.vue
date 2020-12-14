@@ -10,7 +10,7 @@
 export default {
 
   created () {
-    // console.log('dm5-date-picker created', this.compDef)
+    // console.log('dmx-date-picker created', this.compDef)
   },
 
   mixins: [
@@ -26,7 +26,7 @@ export default {
       return this.object.type
     },
 
-    // TODO: copy in dm5-value-renderer.vue
+    // TODO: copy in dmx-value-renderer.vue
     fieldLabel () {
       const customAssocType = this.compDef && this.compDef.customAssocType
       return customAssocType && customAssocType.isSimple ? customAssocType.value : this.type.value

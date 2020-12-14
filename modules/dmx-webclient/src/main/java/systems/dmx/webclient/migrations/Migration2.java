@@ -24,7 +24,7 @@ public class Migration2 extends Migration {
         addIconToTopicType(ASSOC_TYPE, "\uf192");    // fa-dot-circle-o
         addIconToTopicType(ROLE_TYPE,  "\uf04b");    // fa-play
         addIconToTopicType(PLUGIN,     "\uf12e");    // fa-puzzle-piece
-        // colors match dm5-color-picker
+        // colors match dmx-color-picker
         // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
         addColorToAssocType(ASSOCIATION,       "hsl(0, 0%, 80%)");
         addColorToAssocType(COMPOSITION,       "hsl(5, 50%, 53%)");

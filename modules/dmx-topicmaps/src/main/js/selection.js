@@ -4,7 +4,7 @@ import Vue from 'vue'
  * Tracks single select/unselect operations while current tick
  * and handles the accumulated selection in the next tick.
  *
- * TODO: architecture. The reusable dm5 components must not rely on this application specific class.
+ * TODO: architecture. The reusable dmx components must not rely on this application specific class.
  */
 export default class Selection {
 

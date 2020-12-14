@@ -152,7 +152,7 @@ const actions = {
     // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
-  // TODO: drop it? Meanwhile selection state is updated for *all* cached topicmaps by dm5-topicmap-panel
+  // TODO: drop it? Meanwhile selection state is updated for *all* cached topicmaps by dmx-topicmap-panel
   unselectIf ({getters}, id) {
     // console.log('unselectIf', id)
     getters.selection.remove(id)
@@ -408,7 +408,7 @@ const actions = {
    * @param   topicmapId    optional: ID of the topicmap whose topic/assoc selection will not be removed.
    */
   clearTopicmapCache (_, topicmapId) {
-    // Note: when the topicmap cache is cleared (see dm5-topicmap-panel module) here we remove all topicmap selection
+    // Note: when the topicmap cache is cleared (see dmx-topicmap-panel module) here we remove all topicmap selection
     // states as we can't know if the selected topic/assoc is still contained in the topicmap when loaded with changed
     // authorization.
     emptyAllSelectionsExcept(topicmapId)

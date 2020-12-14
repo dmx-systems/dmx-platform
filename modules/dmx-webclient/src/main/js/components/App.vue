@@ -41,8 +41,8 @@
   --label-color-disabled: #c0c4cc;            /* matches --color-text-placeholder */
   --heading-font-size: 16px;
   --heading-spacing: 17px;                    /* vertical spacing before/after heading */
-  --color-topic-icon:  hsl(210, 50%, 53%);    /* matches dm5-color-picker blue */
-  --color-topic-hover: hsl(210, 50%, 53%);    /* matches dm5-color-picker blue */
+  --color-topic-icon:  hsl(210, 50%, 53%);    /* matches dmx-color-picker blue */
+  --color-topic-hover: hsl(210, 50%, 53%);    /* matches dmx-color-picker blue */
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
   --field-spacing: 1.2em;                     /* vertical spacing between data fields */

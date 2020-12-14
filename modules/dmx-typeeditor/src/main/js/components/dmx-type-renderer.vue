@@ -25,7 +25,7 @@ import dmx from 'dmx-api'
 export default {
 
   created () {
-    // console.log('dm5-type-renderer created', this.type)
+    // console.log('dmx-type-renderer created', this.type)
   },
 
   mixins: [
