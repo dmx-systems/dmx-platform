@@ -9,6 +9,9 @@ import dmx from 'dmx-api'
 import axios from 'axios'
 import Vue from 'vue'
 
+// Global component registrations
+// Allow plugins to reuse Webclient components (instead of rebundle the component along with the plugin)
+
 Vue.component('dmx-object-renderer', require('dmx-object-renderer').default)
 Vue.component('dmx-assoc',           require('dmx-object-renderer/src/components/dmx-assoc').default)
 Vue.component('dmx-boolean-field',   require('dmx-object-renderer/src/components/dmx-boolean-field').default)
@@ -20,6 +23,8 @@ Vue.component('dmx-player',          require('dmx-object-renderer/src/components
 Vue.component('dmx-select-field',    require('dmx-object-renderer/src/components/dmx-select-field').default)
 Vue.component('dmx-text-field',      require('dmx-object-renderer/src/components/dmx-text-field').default)
 Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components/dmx-value-renderer').default)
+
+Vue.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 
 export default {
 
