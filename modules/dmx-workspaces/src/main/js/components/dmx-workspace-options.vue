@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-workspace-options">
+  <div class="dmx-workspace-options">
     <div class="field-label">Sharing Mode</div>
     <el-radio-group v-model="sharingModeUri">
       <el-radio label="dmx.workspaces.private">Private</el-radio>
@@ -31,7 +31,7 @@ export default {
 </script>
 
 <style>
-.dm5-workspace-options .el-radio-group .el-radio {
+.dmx-workspace-options .el-radio-group .el-radio {
   display: block;       /* was inline-block */
   margin-left: 0;       /* was 30px (.el-radio+.el-radio) */
   line-height: 1.8;     /* was 1 */

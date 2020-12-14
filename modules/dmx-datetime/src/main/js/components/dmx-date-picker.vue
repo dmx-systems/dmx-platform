@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-date-picker">
+  <div class="dmx-date-picker">
     <div class="field-label">{{fieldLabel}}</div>
     <div v-if="infoMode">{{dateString}}</div>
     <el-date-picker v-else v-model="date"></el-date-picker>
@@ -75,6 +75,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-comp-def">
+  <div class="dmx-comp-def">
     <div class="card label">{{card}}</div>
     <span class="fa icon">{{childType.icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
   </div>
@@ -33,20 +33,20 @@ export default {
 </script>
 
 <style>
-.dm5-comp-def .card {
+.dmx-comp-def .card {
   margin-bottom: 6px;
 }
 
-.dm5-comp-def .icon {
+.dmx-comp-def .icon {
   color: var(--color-topic-icon);
   margin-right: var(--icon-spacing);
 }
 
-.dm5-comp-def .type {
+.dmx-comp-def .type {
   line-height: var(--line-height);
 }
 
-.dm5-comp-def .info {
+.dmx-comp-def .info {
   color: var(--label-color);
   margin-left: 7px;
 }

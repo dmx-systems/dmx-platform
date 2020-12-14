@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-workspace-commands">
+  <div class="dmx-workspace-commands">
     <el-select v-model="workspaceId">
       <el-option-group label="Workspace">
         <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id">
@@ -44,12 +44,12 @@ export default {
 </script>
 
 <style>
-.dm5-workspace-commands .el-button {
+.dmx-workspace-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
 }
 
-.dm5-workspace-commands .el-button + .el-button {
+.dmx-workspace-commands .el-button + .el-button {
   margin-left: 4px;     /* Element UI default is 10px */
 }
 </style>

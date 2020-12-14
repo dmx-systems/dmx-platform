@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-time-picker">
+  <div class="dmx-time-picker">
     <div class="field-label">{{fieldLabel}}</div>
     <div v-if="infoMode">{{timeString}}</div>
     <el-time-picker v-else v-model="time"></el-time-picker>
@@ -74,6 +74,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="['dm5-color-picker', mode]">
+  <div :class="['dmx-color-picker', mode]">
     <template v-if="infoMode">
       <div class="color-box" :style="{'background-color': object.value}"></div>
       <div class="color-value">{{object.value}}</div>
@@ -58,12 +58,12 @@ export default {
 </script>
 
 <style>
-.dm5-color-picker {
+.dmx-color-picker {
   display: flex;
   align-items: center;
 }
 
-.dm5-color-picker .color-box {
+.dmx-color-picker .color-box {
   width: 24px;
   height: 24px;
   box-sizing: border-box;   /* copied from .el-color-picker__color */
@@ -71,11 +71,11 @@ export default {
   border-radius: 2px;       /* copied from .el-color-picker__color */
 }
 
-.dm5-color-picker .color-value {
+.dmx-color-picker .color-value {
   margin-left: 12px;
 }
 
-.dm5-color-picker.form .color-value {
+.dmx-color-picker.form .color-value {
   width: 12em;
   margin-left: 4px;
   margin-right: 4px;

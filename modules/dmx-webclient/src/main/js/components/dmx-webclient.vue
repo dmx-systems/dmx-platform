@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-webclient">
+  <div class="dmx-webclient">
     <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
   </div>
 </template>
@@ -42,19 +42,19 @@ export default {
 </script>
 
 <style>
-.dm5-webclient {
+.dmx-webclient {
   height: 100%;
   display: flex;
 }
 
-.dm5-webclient .dm5-topicmap-panel {
+.dmx-webclient .dmx-topicmap-panel {
   flex-grow: 1;
   flex-basis: 70%;
   overflow: hidden;     /* leave place for the detail panel */
   position: relative;
 }
 
-.dm5-webclient .dm5-detail-panel {
+.dmx-webclient .dmx-detail-panel {
   flex-grow: 1;
   flex-basis: 30%;
   box-sizing: border-box;

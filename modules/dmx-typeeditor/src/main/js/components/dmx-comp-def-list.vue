@@ -1,5 +1,5 @@
 <template>
-  <div :class="['dm5-comp-def-list', mode]">
+  <div :class="['dmx-comp-def-list', mode]">
     <div class="field-label">Composition Definitions ({{compDefs.length}})</div>
     <template v-if="infoMode">
       <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
@@ -54,7 +54,7 @@ export default {
 
 <style>
 /* principle copy in dm5-topic-list.vue */
-.dm5-comp-def-list .dm5-comp-def {
+.dmx-comp-def-list .dmx-comp-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);
   border-right:  3px solid var(--border-color);
@@ -63,19 +63,19 @@ export default {
   padding: var(--object-item-padding);
 }
 
-.dm5-comp-def-list .dm5-comp-def:nth-child(1) {
+.dmx-comp-def-list .dmx-comp-def:nth-child(1) {
   border-top: 1px solid var(--border-color);
 }
 
-.dm5-comp-def-list .dm5-comp-def.marked {
+.dmx-comp-def-list .dmx-comp-def.marked {
   border-right-color: var(--color-topic-icon);
 }
 
-.dm5-comp-def-list.info .dm5-comp-def:hover {
+.dmx-comp-def-list.info .dmx-comp-def:hover {
   background-color: var(--background-color-darker);
 }
 
-.dm5-comp-def-list.form .dm5-comp-def:hover {
+.dmx-comp-def-list.form .dmx-comp-def:hover {
   cursor: ns-resize;
 }
 </style>

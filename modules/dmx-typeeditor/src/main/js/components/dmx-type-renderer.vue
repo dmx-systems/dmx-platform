@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-type-renderer">
+  <div class="dmx-type-renderer">
     <!-- Type Value -->
     <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context"></dmx-value-renderer>
     <!-- Type URI -->
@@ -75,8 +75,8 @@ export default {
 </script>
 
 <style>
-.dm5-type-renderer > .field,
-.dm5-type-renderer .dm5-comp-def-list {
+.dmx-type-renderer > .field,
+.dmx-type-renderer .dmx-comp-def-list {
   margin-top: var(--field-spacing);
 }
 </style>

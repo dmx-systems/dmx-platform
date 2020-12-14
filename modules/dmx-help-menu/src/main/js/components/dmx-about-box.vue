@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="About DMX" custom-class="dm5-about-box" :visible="visible" :modal="false" v-draggable
+  <el-dialog title="About DMX" custom-class="dmx-about-box" :visible="visible" :modal="false" v-draggable
       @close="close">
     <img src="../dmx-logo.svg">
     <div>
@@ -9,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Dec 12, 2020
+        Dec 14, 2020
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -45,22 +45,22 @@ export default {
 </script>
 
 <style>
-.dm5-about-box .el-dialog__body {
+.dmx-about-box .el-dialog__body {
   display: flex;
   align-items: center;
   padding: 10px 20px 30px 20px !important;    /* Element UI default is 30px 20px (was overrideen in App.vue) */
 }
 
-.dm5-about-box img {
+.dmx-about-box img {
   width: 50%;
   margin-right: 10%;
 }
 
-.dm5-about-box .el-link {
+.dmx-about-box .el-link {
   vertical-align: unset;      /* Element UI default is "middle" */
 }
 
-.dm5-about-box .field + .field {
+.dmx-about-box .field + .field {
   margin-top: var(--field-spacing);
 }
 </style>

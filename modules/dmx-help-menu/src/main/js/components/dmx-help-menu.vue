@@ -1,5 +1,5 @@
 <template>
-  <el-dropdown class="dm5-help-menu" size="medium" trigger="click" @command="handle">
+  <el-dropdown class="dmx-help-menu" size="medium" trigger="click" @command="handle">
     <el-button type="text" class="fa fa-question-circle">
       <span class="el-icon-arrow-down el-icon--right"></span>
     </el-button>
@@ -30,7 +30,7 @@ export default {
 </script>
 
 <style>
-.dm5-help-menu .el-button {
+.dmx-help-menu .el-button {
   padding-left:  0px !important;
   padding-right: 0px !important;
 }
