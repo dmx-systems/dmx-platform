@@ -32,7 +32,7 @@ Forum:
 <https://forum.dmx.systems>
 
 Issues:  
-<https://github.com/jri/deepamehta/issues> (read/write)  
+<https://github.com/dmx-systems/dmx-platform/issues> (read/write)  
 <https://git.dmx.systems/dmx-platform/dmx-platform/issues> (read only)
 
 Source code:  
