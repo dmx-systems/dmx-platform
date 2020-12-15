@@ -36,10 +36,7 @@ Issues:
 <https://git.dmx.systems/dmx-platform/dmx-platform/issues> (read only)
 
 Source code:  
-<https://git.dmx.systems/dmx-platform/dmx-platform>
-
-Continuous integration:  
-<https://git.dmx.systems/dmx-platform/dmx-platform/pipelines>
+<https://github.com/dmx-systems/dmx-platform>
 
 
 ### Copyright + Licensing
@@ -53,4 +50,4 @@ All third party components incorporated into the DMX Software are licensed under
 
 
 -----------
-Sep 3, 2020
+Dec 15, 2020

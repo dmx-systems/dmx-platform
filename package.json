@@ -6,7 +6,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://git.dmx.systems/dmx-platform/dmx-platform.git"
+    "url": "https://github.com/dmx-systems/dmx-platform.git"
   },
   "scripts": {
     "build": "webpack -p --hide-modules",
