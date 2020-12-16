@@ -1,4 +1,4 @@
-> Since version 5 DeepaMehta is named "DMX". The main project is `dmx-systems/dmx-platform`.
+> Since version 5 DeepaMehta is named "DMX". The main project is [`dmx-systems/dmx-platform`](https://github.com/dmx-systems/dmx-platform).
 
 
 DMX
