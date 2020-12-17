@@ -224,10 +224,10 @@ function confirmDeletion (idLists) {
   }
   let message, buttonText
   if (_size > 1) {
-    message = "You're about to delete multiple items"
+    message = "You're about to delete multiple items!"
     buttonText = `Delete ${_size} items`
   } else {
-    message = `You're about to delete a ${viewObject(idLists).typeName}`
+    message = `You're about to delete a ${viewObject(idLists).typeName}!`
     buttonText = 'Delete'
   }
   return MessageBox.confirm(message, 'Warning', {
