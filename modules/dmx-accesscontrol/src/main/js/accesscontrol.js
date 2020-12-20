@@ -63,7 +63,7 @@ function setUsername (username) {
 }
 
 function encodePassword (password) {
-    return ENCODED_PASSWORD_PREFIX + SHA256(password)
+  return ENCODED_PASSWORD_PREFIX + SHA256(password)
 }
 
 //
