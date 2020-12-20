@@ -208,6 +208,9 @@ public class DMXUtils {
      * 1,2 position) then retype it to "assocTypeUri" and use the role types "roleTypeUri1" and "roleTypeUri2".
      * "roleTypeUri1" is used for the "topicTypeUri1" player, "roleTypeUri2" is used for the "topicTypeUri2" player.
      *
+     * <p>Auto-typing takes place only if the given assoc is of type "Association" (that is a generic assoc without any
+     * semantics). If the given assoc is not a generic one, no retyping takes place (null is returned).
+     *
      * <p>Auto-typing is supported only for topic players, and only if they are identified by-ID. If the given assoc has
      * at least one assoc player, or if a topic player is identfied by-URI, no retyping takes place (null is returned).
      *
