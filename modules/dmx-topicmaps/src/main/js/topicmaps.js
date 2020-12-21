@@ -516,13 +516,13 @@ const actions = {
     directives.forEach(dir => {
       let topic
       switch (dir.type) {
-      case "UPDATE_TOPIC":
+      case 'UPDATE_TOPIC':
         topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           updateTopicmap(topic)
         }
         break
-      case "DELETE_TOPIC":
+      case 'DELETE_TOPIC':
         topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           deleteTopicmap(topic, getters, rootState, dispatch)
@@ -530,7 +530,7 @@ const actions = {
         //
         removeFromAllSelections(dir.arg.id)
         break
-      case "DELETE_ASSOCIATION":
+      case 'DELETE_ASSOCIATION':
         removeFromAllSelections(dir.arg.id)
         break
       }
@@ -698,7 +698,7 @@ function _syncUnselectMulti (selection, dispatch) {
 
 // ---
 
-function unselectIfCascade(id, dispatch) {
+function unselectIfCascade (id, dispatch) {
   // console.log('unselectIfCascade', id)
   dispatch('unselectIf', id)
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {

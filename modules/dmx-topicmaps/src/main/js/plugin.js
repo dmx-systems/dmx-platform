@@ -53,7 +53,7 @@ export default ({store, dmx}) => {
     },
 
     topicmapCommands: {
-      "dmx.topicmaps.topicmap": [
+      'dmx.topicmaps.topicmap': [
         require('./components/dmx-topicmap-info').default,
         require('./components/dmx-topicmap-fit').default,
         require('./components/dmx-topicmap-reset').default

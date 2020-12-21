@@ -5,7 +5,9 @@ export default {
   name: 'topic-link',     // Same as blotName. Used in module.addHandler() calls to register toolbarHandler()
 
   extension (Quill) {
+
     class TopicLink extends Quill.import('formats/link') {    // Note: 'formats/link' extends 'blots/inline'
+
       // Creates a DOM node corresponding to the given (model) values
       static create (value) {
         // console.log('TopicLink create()', value)
@@ -16,6 +18,7 @@ export default {
         node.dataset.linkId  = value.linkId
         return node
       }
+
       // Returns the (model) value represented by the given DOM node
       static formats (node) {
         // console.log('TopicLink formats()', node)

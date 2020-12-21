@@ -6,7 +6,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { MessageBox } from 'element-ui'
+import {MessageBox} from 'element-ui'
 import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
 import dmx from 'dmx-api'
@@ -73,11 +73,11 @@ router.beforeEach((to, from, next) => {
         switch (action) {
         case 'cancel':      // -> Discard Changes
           next()
-          break;
+          break
         case 'close':       // -> Abort Navigation
           restoreSelection(from)
           next(false)
-          break;
+          break
         default:
           throw Error(`unexpected MessageBox action: "${action}"`)
         }
@@ -267,7 +267,7 @@ function initialNavigation (route) {
       return dmx.rpc.getTopic(topicmapId)
     }).then(topic => {
       // console.log('Topic retrieved', topic)
-      if (topic.typeUri !== "dmx.topicmaps.topicmap") {
+      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
         throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
       }
     }).catch(error => {
@@ -316,7 +316,7 @@ function initialNavigation (route) {
  */
 function navigate (to, from) {
   // console.log('navigate', to, from)
-  var p     // a promise resolved once the topicmap rendering is complete
+  let p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
   const topicmapId = id(to.params.topicmapId)
   const topicmapChanged = topicmapId !== id(from.params.topicmapId)
@@ -449,11 +449,11 @@ function restoreSelection (route) {
 /**
  * @return  an ID (type Number) or undefined
  */
-function objectId(route) {
+function objectId (route) {
   return id(route.params.assocId || route.params.topicId)     // Note: 0 is a valid topic ID; check assoc ID first
 }
 
-function topicmapId(route) {
+function topicmapId (route) {
   return id(route.params.topicmapId)
 }
 

@@ -3,7 +3,7 @@ import dmx from 'dmx-api'
 import axios from 'axios'
 import Vue from 'vue'
 
-let plugins = []          // installed plugins; array of plugin config objects
+const plugins = []        // installed plugins; array of plugin config objects
 let _extraElementUI       // a function that loads the extra Element UI components
 
 /**
@@ -103,7 +103,7 @@ function initPlugin (pluginConfig) {
 
 function registerDetailRenderers (renderers, renderer) {
   if (renderers) {
-    for (let typeUri in renderers) {
+    for (const typeUri in renderers) {
       store.dispatch('registerDetailRenderer', {renderer, typeUri, component: renderers[typeUri]})
     }
   }
@@ -138,7 +138,7 @@ function registerToolbarCommands (commands, action) {
 function fetchPluginsFromServer () {
   return dmx.rpc.getPlugins().then(pluginInfos => {
     const plugins = []      // array of promises for plugin exports
-    console.group("[DMX] Fetching plugins")
+    console.group('[DMX] Fetching plugins')
     pluginInfos.forEach(pluginInfo => {
       if (pluginInfo.pluginFile || pluginInfo.styleFile) {
         console.group(pluginInfo.pluginUri)

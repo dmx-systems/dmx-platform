@@ -31,7 +31,7 @@ export default {
       }
 
       static formats (domNode) {
-        return ATTRIBUTES.reduce(function(formats, attribute) {
+        return ATTRIBUTES.reduce(function (formats, attribute) {
           if (domNode.hasAttribute(attribute)) {
             formats[attribute] = domNode.getAttribute(attribute)
           }

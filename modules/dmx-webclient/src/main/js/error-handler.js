@@ -1,4 +1,4 @@
-import { Notification } from 'element-ui'
+import {Notification} from 'element-ui'
 
 export default function onHttpError (error) {
   const response = error.response

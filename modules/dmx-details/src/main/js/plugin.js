@@ -38,16 +38,18 @@ export default ({store}) => {
         },
         listeners: {
           'tab-click':           tabClick,
-          'edit':                ()              =>  store.dispatch('callDetailRoute', 'edit'),
-          'submit':              object          => {store.dispatch('submit', object)
-                                                     store.dispatch('callDetailRoute', 'info')},
-          'submit-inline':       object          =>  store.dispatch('submit', object),
-          'submit-view-config':  viewConfigTopic =>  store.dispatch('submit', viewConfigTopic),
-          'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
-          'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
-          'related-icon-click':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
-          'object-id-click':     object          =>  window.open(url(object), '_blank'),
-          'pin':                 pinned          =>  store.dispatch('setDetailPanelPinned', pinned)
+          edit:                  ()              => store.dispatch('callDetailRoute', 'edit'),
+          submit:                object          => {
+                                                      store.dispatch('submit', object)
+                                                      store.dispatch('callDetailRoute', 'info')
+                                                    },
+          'submit-inline':       object          => store.dispatch('submit', object),
+          'submit-view-config':  viewConfigTopic => store.dispatch('submit', viewConfigTopic),
+          'child-topic-reveal':  relTopic        => store.dispatch('revealRelatedTopic', {relTopic}),
+          'related-topic-click': relTopic        => store.dispatch('revealRelatedTopic', {relTopic}),
+          'related-icon-click':  relTopic        => store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
+          'object-id-click':     object          => window.open(url(object), '_blank'),
+          pin:                   pinned          => store.dispatch('setDetailPanelPinned', pinned)
         }
       }
     ]

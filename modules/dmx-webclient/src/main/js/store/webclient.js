@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MessageBox } from 'element-ui'
+import {MessageBox} from 'element-ui'
 import dmx from 'dmx-api'
 
 Vue.use(Vuex)
@@ -38,8 +38,8 @@ const state = {
           container: [
             ['bold', 'italic', 'code'],
             ['blockquote', 'code-block'],
-            [{'list': 'ordered'}, {'list': 'bullet'}],
-            [{'header': [1, 2, 3, false]}],
+            [{list: 'ordered'}, {list: 'bullet'}],
+            [{header: [1, 2, 3, false]}],
             ['topic-link', 'link', 'image', 'video']
           ]
         }
@@ -127,7 +127,7 @@ const actions = {
       // the component receives the declared "default" value (plugin.js), if no value is set already.
       // The default value must not be overridden by an undefined init value.
       const propsData = {}
-      for (let prop in compDef.props) {
+      for (const prop in compDef.props) {
         propsData[prop] = compDef.props[prop](store.state)    // call getter function
       }
       // 2) instantiate & mount
@@ -135,11 +135,11 @@ const actions = {
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
       const comp = new Vue({parent, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
       // 3) make props reactive
-      for (let prop in compDef.props) {
+      for (const prop in compDef.props) {
         watchProp(comp, prop, compDef.props[prop])
       }
       // 4) add event listeners
-      for (let eventName in compDef.listeners) {
+      for (const eventName in compDef.listeners) {
         comp.$on(eventName, compDef.listeners[eventName])
       }
       // TODO: unregister listeners?
@@ -162,16 +162,16 @@ const actions = {
     console.log(`Webclient: processing ${directives.length} directives`, directives)
     directives.forEach(dir => {
       switch (dir.type) {
-      case "UPDATE_TOPIC":
+      case 'UPDATE_TOPIC':
         displayObjectIf(new dmx.Topic(dir.arg))
         break
-      case "DELETE_TOPIC":
+      case 'DELETE_TOPIC':
         dispatch('unselectIf', dir.arg.id)
         break
-      case "UPDATE_ASSOCIATION":
+      case 'UPDATE_ASSOCIATION':
         displayObjectIf(new dmx.Assoc(dir.arg))
         break
-      case "DELETE_ASSOCIATION":
+      case 'DELETE_ASSOCIATION':
         dispatch('unselectIf', dir.arg.id)
         break
       }

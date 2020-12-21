@@ -15,7 +15,7 @@ export default ({store}) => ({
       },
       listeners: {
         'logged-in': username => store.dispatch('loggedIn', username),
-        'close':     _        => store.dispatch('closeLoginDialog')
+        close:       _        => store.dispatch('closeLoginDialog')
       }
     },
     {
