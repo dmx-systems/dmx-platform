@@ -9,8 +9,14 @@
     "sourceType": "module"
   },
   "rules": {
+    "indent": ["error", 2, {
+      "ignoreComments": true
+    }],
+    "key-spacing": ["error", {"mode": "minimum"}],
+    "multiline-ternary": "off",
     "no-multi-spaces": "off",
     "object-curly-spacing": ["error", "never"],
+    "operator-linebreak": ["error", "after", {"overrides": {"?": "before", "|>": "before"}}],
     "padded-blocks": "off"
   }
 }
