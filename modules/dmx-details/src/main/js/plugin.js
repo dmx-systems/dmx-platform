@@ -33,7 +33,7 @@ export default ({store}) => {
           types:           state => ({
                              assocTypes: state.typeCache.assocTypes,
                              roleTypes:  state.typeCache.roleTypes
-                           }),
+                           }),                                                                /* eslint indent: "off" */
           quillConfig:     state => state.quillConfig
         },
         listeners: {

@@ -189,7 +189,7 @@ const getters = {
     // update model with by-URI players while the server expects by-ID players.
     return state.object && (state.object.isType    ? state.object.asType() :
                             state.object.isCompDef ? state.object.asCompDef() :
-                            state.object)
+                            state.object)                                                     /* eslint indent: "off" */
     // logical copy in createDetail()/updateDetail() (topicmap-model.js of dmx-cytoscape-renderer module)
   },
 

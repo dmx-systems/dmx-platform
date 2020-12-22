@@ -54,7 +54,7 @@ const actions = {
                                            name = 'untitled',
                                            topicmapTypeUri = 'dmx.topicmaps.topicmap',
                                            viewProps = {}
-                                         }) {
+                                         }) {                                                 /* eslint indent: "off" */
     // console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
     dmx.rpc.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
       // console.log('Topicmap topic', topic)

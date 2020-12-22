@@ -31,7 +31,7 @@ export default ({store, dmx}) => {
                                                                                         topicId: id,
                                                                                         pinned,
                                                                                         showDetails: showDetails()
-                                                                                     }),
+                                                                                     }),      /* eslint indent: "off" */
           'topics-drag':          topicCoords    => store.dispatch('setTopicPositions', topicCoords),
           'assoc-create':         playerIds      => store.dispatch('createAssoc', playerIds),
           'assoc-select':         id             => store.dispatch('selectAssoc', id),
