@@ -1,23 +1,24 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const { VueLoaderPlugin } = require('vue-loader')
-const { DefinePlugin } = require('webpack')
+const {CleanWebpackPlugin} = require('clean-webpack-plugin')
+const {VueLoaderPlugin} = require('vue-loader')
+const {DefinePlugin} = require('webpack')
+const path = require('path')
 
 module.exports = (env = {}) => {
 
   const webpackConfig = {
     entry: './modules/dmx-webclient/src/main/js/main.js',
     output: {
-      path: __dirname + '/modules/dmx-webclient/src/main/resources/web',
+      path: path.join(__dirname, '/modules/dmx-webclient/src/main/resources/web'),
       filename: env.dev ? '[name].js' : '[chunkhash].[name].js'
     },
     resolve: {
-      extensions: [".js", ".vue"],
+      extensions: ['.js', '.vue'],
       alias: {
         // used by plugin-manager.js
-        'modules':          __dirname + '/modules',
-        'modules-external': __dirname + '/modules-external'
+        modules:            path.join(__dirname, '/modules'),
+        'modules-external': path.join(__dirname, '/modules-external')
       }
     },
     module: {
