@@ -50,9 +50,11 @@ const state = {
 
 const actions = {
 
-  createTopicmap ({rootState, dispatch}, {name = 'untitled',
-                                          topicmapTypeUri = 'dmx.topicmaps.topicmap',
-                                          viewProps = {}}) {
+  createTopicmap ({rootState, dispatch}, {
+                                           name = 'untitled',
+                                           topicmapTypeUri = 'dmx.topicmaps.topicmap',
+                                           viewProps = {}
+                                         }) {
     // console.log('Creating topicmap', name, topicmapTypeUri, viewProps)
     dmx.rpc.createTopicmap(name, topicmapTypeUri, viewProps).then(topic => {
       // console.log('Topicmap topic', topic)
@@ -747,8 +749,8 @@ function removeFromAllSelections (id) {
 
 function emptyAllSelectionsExcept (topicmapId) {
   Object.keys(state.selections).forEach(_topicmapId => {
-    // Note: Object.keys() always returns string keys. So we use non-strict equality here.
-    if (_topicmapId != topicmapId) {
+    // Note: Object.keys() returns string keys. So we use non-strict equality here.
+    if (_topicmapId != topicmapId) {    /* eslint eqeqeq: "off" */
       state.selections[_topicmapId].empty()
     }
   })
@@ -782,7 +784,7 @@ function topicmapTopics (rootState) {
 function _workspaceId (rootState) {
   const workspaceId = __workspaceId(rootState)
   if (!workspaceId) {
-    throw Error(`no selected workspace known`)
+    throw Error('selected workspace unknown')
   }
   return workspaceId
 }

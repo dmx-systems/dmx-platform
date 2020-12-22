@@ -17,7 +17,7 @@ export default ({store}) => {
     }],
 
     workspaceCommands: {
-      "dmx.topicmaps.topicmap": [
+      'dmx.topicmaps.topicmap': [
         require('./components/dmx-workspace-info').default
       ]
     },

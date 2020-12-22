@@ -112,13 +112,13 @@ const actions = {
     directives.forEach(dir => {
       let topic
       switch (dir.type) {
-      case "UPDATE_TOPIC":
+      case 'UPDATE_TOPIC':
         topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.workspaces.workspace') {
           updateWorkspace(topic)
         }
         break
-      case "DELETE_TOPIC":
+      case 'DELETE_TOPIC':
         topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.workspaces.workspace') {
           deleteWorkspace(topic, dispatch)

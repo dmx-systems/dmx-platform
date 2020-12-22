@@ -27,14 +27,20 @@ export default ({store, dmx}) => {
           'topic-unselect':       id             => store.dispatch('unselectTopic', id),
           'topic-double-click':   topic          => selectTopicmapIf(topic),
           'topic-drag':           ({id, pos})    => store.dispatch('setTopicPosition', {id, pos}),
-          'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {topicId: id, pinned,
-                                                                                      showDetails: showDetails()}),
+          'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {
+                                                                                        topicId: id,
+                                                                                        pinned,
+                                                                                        showDetails: showDetails()
+                                                                                     }),
           'topics-drag':          topicCoords    => store.dispatch('setTopicPositions', topicCoords),
           'assoc-create':         playerIds      => store.dispatch('createAssoc', playerIds),
           'assoc-select':         id             => store.dispatch('selectAssoc', id),
           'assoc-unselect':       id             => store.dispatch('unselectAssoc', id),
-          'assoc-pin':            ({id, pinned}) => store.dispatch('setAssocPinned', {assocId: id, pinned,
-                                                                                      showDetails: showDetails()}),
+          'assoc-pin':            ({id, pinned}) => store.dispatch('setAssocPinned', {
+                                                                                        assocId: id,
+                                                                                        pinned,
+                                                                                        showDetails: showDetails()
+                                                                                     }),
           'topicmap-contextmenu': pos            => store.dispatch('openSearchWidget', {pos}),
           'object-submit':        object         => store.dispatch('submit', object),
           'child-topic-reveal':   relTopic       => store.dispatch('revealRelatedTopic', {relTopic})
@@ -64,11 +70,14 @@ export default ({store, dmx}) => {
       topic: [
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
         {
-          label: 'Edit', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
+          label: 'Edit',
+          handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
           disabled: isEditDisabled
         },
         {
-          label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+          label: 'Delete',
+          multi: true,
+          handler: idLists => store.dispatch('deleteMulti', idLists),
           disabled: isTopicDeleteDisabled
         },
         {label: 'Related', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})},
@@ -77,11 +86,14 @@ export default ({store, dmx}) => {
       assoc: [
         {label: 'Hide', multi: true, handler: idLists => store.dispatch('hideMulti', idLists)},
         {
-          label: 'Edit', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
+          label: 'Edit',
+          handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
           disabled: isEditDisabled
         },
         {
-          label: 'Delete', multi: true, handler: idLists => store.dispatch('deleteMulti', idLists),
+          label: 'Delete',
+          multi: true,
+          handler: idLists => store.dispatch('deleteMulti', idLists),
           disabled: isAssocDeleteDisabled
         },
         {label: 'Related', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})},
