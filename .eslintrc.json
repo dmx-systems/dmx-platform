@@ -13,6 +13,7 @@
       "ignoreComments": true
     }],
     "key-spacing": ["error", {"mode": "minimum"}],
+    "max-len": ["error", 120],
     "multiline-ternary": "off",
     "no-multi-spaces": "off",
     "object-curly-spacing": ["error", "never"],
