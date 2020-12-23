@@ -11,7 +11,10 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "ignorePatterns": ["/modules/dmx-webclient/src/main/resources/web"],
+  "ignorePatterns": [
+    "/modules/dmx-webclient/src/main/resources/web",
+    "/modules-nodejs/vue-quill-minimum/dist"
+  ],
   "rules": {
     "indent": ["error", 2, {
       "ignoreComments": true
