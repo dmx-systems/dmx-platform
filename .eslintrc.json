@@ -12,9 +12,9 @@
     "sourceType": "module"
   },
   "ignorePatterns": [
-    "/modules/dmx-webclient/src/main/resources/web",
-    "/modules-nodejs/cytoscape-edge-connections/dist",
-    "/modules-nodejs/vue-quill-minimum/dist"
+    "**/src/main/resources/web",
+    "**/target",
+    "**/dist"
   ],
   "rules": {
     "indent": ["error", 2, {
