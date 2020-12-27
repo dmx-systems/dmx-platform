@@ -6,7 +6,10 @@
   "globals": {
     "DEV": "readonly"
   },
-  "extends": "standard",
+  "extends": [
+    "standard",
+    "plugin:vue/essential"
+  ],
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
@@ -15,6 +18,9 @@
     "**/src/main/resources/web",
     "**/target",
     "**/dist"
+  ],
+  "plugins": [
+    "vue"
   ],
   "rules": {
     "indent": ["error", 2, {
