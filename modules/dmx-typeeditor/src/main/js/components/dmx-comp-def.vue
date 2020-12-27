@@ -1,7 +1,7 @@
 <template>
   <div class="dmx-comp-def">
     <div class="card label">{{card}}</div>
-    <span class="fa icon">{{childType.icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
+    <span class="fa icon">{{childType.icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span><!-- eslint-disable-line max-len -->
   </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
   computed: {
 
     card () {
-      return this.compDef.isOne ? "One" : "Many"     // TODO: do not hardcode labels?
+      return this.compDef.isOne ? 'One' : 'Many'     // TODO: do not hardcode labels?
     },
 
     childType () {

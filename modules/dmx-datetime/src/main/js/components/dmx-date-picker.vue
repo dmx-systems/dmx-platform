@@ -54,7 +54,7 @@ export default {
         // Note: if a date field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
         const c = this.object.children
-        c['dmx.datetime.year'].value  = date && date.getFullYear()  || ''
+        c['dmx.datetime.year'].value  = date && date.getFullYear()  || ''         /* eslint no-mixed-operators: "off" */
         c['dmx.datetime.month'].value = date && date.getMonth() + 1 || ''
         c['dmx.datetime.day'].value   = date && date.getDate()      || ''
       }

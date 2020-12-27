@@ -6,7 +6,7 @@
     <div class="field">
       <div class="field-label">Type URI</div>
       <div v-if="infoMode">{{object.uri}}</div>
-      <el-input v-else v-model="object.uri"></el-input>
+      <el-input v-else v-model="object.uri"></el-input><!-- eslint-disable-line vue/no-mutating-props -->
     </div>
     <!-- Data Type -->
     <div class="field">
