@@ -32,6 +32,7 @@
     "no-multi-spaces": "off",
     "object-curly-spacing": ["error", "never"],
     "operator-linebreak": ["error", "after", {"overrides": {"?": "before", "|>": "before"}}],
-    "padded-blocks": "off"
+    "padded-blocks": "off",
+    "vue/return-in-computed-property": "off"
   }
 }
