@@ -1,4 +1,5 @@
-> Since version 5 DeepaMehta is named "DMX". The main project is [`dmx-systems/dmx-platform`](https://github.com/dmx-systems/dmx-platform).
+> Since version 5 the "DeepaMehta" project is named "DMX".  
+> The main project is [`dmx-systems/dmx-platform`](https://github.com/dmx-systems/dmx-platform).
 
 
 DMX
@@ -50,4 +51,4 @@ All third party components incorporated into the DMX Software are licensed under
 
 
 -----------
-Dec 16, 2020
+Dec 30, 2020
