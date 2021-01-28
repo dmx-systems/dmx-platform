@@ -156,15 +156,15 @@ public class Neo4jStorageTest {
         topics = queryTopicsFulltext("dmx"); assertEquals(2, topics.size());
         topics = queryTopicsFulltext("DMX"); assertEquals(2, topics.size());
         // Lucene's default operator is OR:
-        topics = queryTopicsFulltext("collaboration platform");         assertEquals(1, topics.size());
-        topics = queryTopicsFulltext("collaboration plaXXXform");       assertEquals(1, topics.size());
-        topics = queryTopicsFulltext("collaboration AND plaXXXform");   assertEquals(0, topics.size());
-        topics = queryTopicsFulltext("collaboration AND platform");     assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("knowledge platform");              assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("knowledge plaXXXform");            assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("knowledge AND plaXXXform");        assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("knowledge AND platform");          assertEquals(1, topics.size());
         // Phrases are set in ".."
-        topics = queryTopicsFulltext("\"collaboration platform\"");     assertEquals(0, topics.size());
-        topics = queryTopicsFulltext("\"platform for collaboration\""); assertEquals(1, topics.size());
+        topics = queryTopicsFulltext("\"knowledge platform\"");          assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("\"knowledge building platform\""); assertEquals(1, topics.size());
         // Within phrases wildcards do not work:
-        topics = queryTopicsFulltext("\"platform * collaboration\"");   assertEquals(0, topics.size());
+        topics = queryTopicsFulltext("\"knowledge * platform\"");        assertEquals(0, topics.size());
     }
 
     @Test
