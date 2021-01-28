@@ -633,7 +633,7 @@ public final class AccessLayer {
             if (topics.isEmpty()) {
                 boolean topicFilter = !topicQuery.isEmpty() || topicTypeUri != null;
                 if (topicFilter) {
-                    logger.info("topics: " + topics.size() + ", result: -> empty");
+                    logger.fine("topics: " + topics.size() + ", result: -> empty");
                     return new ArrayList();
                 }
             }
@@ -644,10 +644,10 @@ public final class AccessLayer {
             if (assocs.isEmpty()) {
                 boolean assocFilter = !assocQuery.isEmpty() || assocTypeUri != null;
                 if (assocFilter) {
-                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
+                    logger.fine("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> empty");
                     return new ArrayList();
                 } else {
-                    logger.info("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
+                    logger.fine("topics: " + topics.size() + ", assocs: " + assocs.size() + ", result: -> topics");
                     return (List<M>) topics;
                 }
             }
