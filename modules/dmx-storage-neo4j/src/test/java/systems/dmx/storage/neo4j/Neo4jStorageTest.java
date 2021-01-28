@@ -278,7 +278,7 @@ public class Neo4jStorageTest {
             //
             // Fulltext indexing
             //
-            createTopic("note-1", "dmx.notes.note", "DMX is a platform for collaboration and knowledge management");
+            createTopic("note-1", "dmx.notes.note", "DMX is a knowledge building platform");
             createTopic("note-2", "dmx.notes.note", "Lead developer of DMX is Jörg Richter");
             //
             // Fulltext HTML indexing

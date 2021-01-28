@@ -1,4 +1,4 @@
-DMX is a platform for knowledge management and collaboration.
+DMX is a knowledge building platform.
 
 Copyright (C) 2000-2018 Jörg Richter <jri@dmx.berlin> et al.
 Copyright (C) 2019-2020 DMX Systems <https://dmx.systems>
