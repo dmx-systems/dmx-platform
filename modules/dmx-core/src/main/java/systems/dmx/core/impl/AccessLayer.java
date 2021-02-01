@@ -135,7 +135,7 @@ public final class AccessLayer {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             model.preCreate();
-            return updateValues(model, null);
+            return integrateValues(model);
         } catch (Exception e) {
             throw new RuntimeException("Creating topic failed, model=" + model, e);
         }
@@ -344,7 +344,7 @@ public final class AccessLayer {
             //
             // store in DB
             db.storeAssoc(model);
-            AssocModelImpl _model = updateValues(model, null);
+            AssocModelImpl _model = integrateValues(model);
             createAssocInstantiation(_model.getId(), _model.getTypeUri());
             //
             // Note: the postCreate() hook is invoked on the update model, *not* on the value integration result
@@ -1027,8 +1027,8 @@ public final class AccessLayer {
 
     // ---
 
-    private <M extends DMXObjectModelImpl> M updateValues(M updateModel, M targetObject) {
-        M value = new ValueIntegrator(this).integrate(updateModel, targetObject, null).value;
+    private <M extends DMXObjectModelImpl> M integrateValues(M newValues) {
+        M value = new ValueIntegrator(this).integrate(newValues, null, null).value;   // targetObject=null, compDef=null
         // sanity check
         if (value == null) {
             throw new RuntimeException("ValueIntegrator yields no result");
