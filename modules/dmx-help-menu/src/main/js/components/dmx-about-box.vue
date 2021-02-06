@@ -9,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Feb 1, 2021
+        Feb 6, 2021
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -19,7 +19,7 @@
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2020&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
+        2021&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
           DMX Systems
         </el-link>
       </div>
