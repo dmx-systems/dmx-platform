@@ -108,9 +108,7 @@ class ValueIntegrator {
                 em.fireEvent(CoreEvent.POST_CREATE_TOPIC, _value.instantiate());
             }
             // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
-            UnifiedValue value = new UnifiedValue(_value);
-            idTransfer(_value);
-            return value;
+            return new UnifiedValue(_value);
         } catch (Exception e) {
             throw new RuntimeException("Value integration failed, newValues=" + newValues + ", targetObject=" +
                 targetObject + ", compDef=" + compDef, e);
@@ -127,26 +125,6 @@ class ValueIntegrator {
             return new UnifiedValue(object, ref.originalId);
         } else {
             return new UnifiedValue(null);
-        }
-    }
-
-    // Sets the ID of the value integration result into the update model.
-    //
-    // Note: this is a side effect, but we keep it for pragmatic reasons.
-    //
-    // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
-    // In DMX the update model is not passed directly to the storage layer, but a new model object is created (see
-    // createSimpleTopic()). The ID transfer is here to emulate the DM4 behavior.
-    //
-    // Without this side effect e.g. managing view configs would be more hard. When creating a type through a migration
-    // (e.g. while bootstrap) the read type model is put in the type cache as is. Without the side effect the view
-    // config topic models would have no ID. Updating view config values later on would fail.
-    private void idTransfer(DMXObjectModelImpl value) {
-        if (value != null) {
-            if (value.id == -1) {
-                throw new RuntimeException("ID of unification result is not initialized: " + value);
-            }
-            newValues.id = value.id;
         }
     }
 
@@ -852,11 +830,20 @@ class ValueIntegrator {
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
+    /**
+     * Wrapper for a value integration result.
+     */
     class UnifiedValue<M extends DMXObjectModelImpl> implements JSONEnabled {
 
-        M value;                            // the resulting unified value; may be null
-        DMXObjectModelImpl _newValues;      // the original new values
-        long originalId;                    // the original ID, saved here cause it is overwritten (see integrate())
+        M value;                            // the wrapped value; may be null
+
+        DMXObjectModelImpl _newValues;      // The original "update model" (`newValues`) that resulted in this value.
+                                            // Needed to update the assoc value once the parent assignment for this
+                                            // value is created (updateAssignmentsMany()).
+
+        long originalId;                    // The ID of the value this value is about to replace.
+                                            // Needed to update a multi-value (updateAssignmentsMany()).
+                                            // Saved here cause it is overwritten (integrate()).
 
         /**
          * @param   value   may be null
@@ -865,12 +852,34 @@ class ValueIntegrator {
             this.value = value;
             this._newValues = newValues;
             this.originalId = newValues.id;
+            idTransfer();
         }
 
         private UnifiedValue(M value, long originalId) {
             this.value = value;
             this._newValues = newValues;
             this.originalId = originalId;
+            idTransfer();
+        }
+
+        // Sets the ID of the value integration result into the update model.
+        //
+        // Note: this is a side effect, but we keep it for pragmatic reasons.
+        //
+        // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
+        // In DMX the update model is not passed directly to the storage layer, but a new model object is created (see
+        // createSimpleTopic()). The ID transfer is here to emulate the DM4 behavior.
+        //
+        // Without this side effect e.g. managing view configs would be more hard. When creating a type through a
+        // migration (e.g. while bootstrap) the read type model is put in the type cache as is. Without the side effect
+        // the view config topic models would have no ID. Updating view config values later on would fail.
+        private void idTransfer() {
+            if (value != null) {
+                if (value.id == -1) {
+                    throw new RuntimeException("ID of unification result is not initialized: " + value);
+                }
+                newValues.id = value.id;
+            }
         }
 
         @Override
