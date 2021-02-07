@@ -78,18 +78,13 @@ class ValueIntegrator {
             this.isType  = newValues instanceof TypeModel;
             this.isFacetUpdate = compDef != null;
             //
-            // process refs
-            if (newValues instanceof TopicReferenceModel) {
-                return unifyRef();
-            }
-            if (newValues instanceof TopicDeletionModel) {
-                return new UnifiedValue(null);
+            if (newValues instanceof TopicReferenceModel || newValues instanceof TopicDeletionModel) {
+                return resolveRef();
             }
             // convenience: take newValues's typeUri from target object (if available)
             if (newValues.typeUri == null && targetObject != null) {
                 newValues.typeUri = targetObject.typeUri;
             }
-            // argument check
             if (newValues.typeUri == null) {
                 throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
                     newValues + ", targetObject=" + targetObject);
@@ -117,7 +112,11 @@ class ValueIntegrator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private UnifiedValue unifyRef() {
+    private UnifiedValue resolveRef() {
+        // TODO: drop TopicDeletionModel? Technically same as empty reference, see below.
+        if (newValues instanceof TopicDeletionModel) {
+            return new UnifiedValue(null);
+        }
         TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
@@ -864,7 +863,7 @@ class ValueIntegrator {
 
         // Sets the ID of the value integration result into the update model.
         //
-        // Note: this is a side effect, but we keep it for pragmatic reasons.
+        // Note: this is an ugly side effect, but we keep it for pragmatic reasons.
         //
         // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
         // In DMX the update model is not passed directly to the storage layer, but a new model object is created (see
