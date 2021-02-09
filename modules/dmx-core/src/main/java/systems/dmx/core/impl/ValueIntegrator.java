@@ -439,14 +439,14 @@ class ValueIntegrator {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             TopicModel childTopic = childValue.value;
-            boolean newValueIsEmpty = childTopic == null;
             long newId = !newValueIsEmpty ? childTopic.getId() : -1;
+            boolean newValueIsEmpty = newId == -1;
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;
-            if (oldValueExists && newValueIsEmpty || valueChanged) {
+            if (valueChanged) {
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
@@ -493,7 +493,7 @@ class ValueIntegrator {
             TopicModel childTopic = (TopicModel) childValue.value;
             long originalId = childValue.originalId;
             long newId = childTopic != null ? childTopic.getId() : -1;
-            boolean valueEmptied = newId == -1;
+            boolean newValueIsEmpty = newId == -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
                 if (oldValues == null) {
@@ -501,7 +501,7 @@ class ValueIntegrator {
                         " when there are no old topics (null)");
                 }
                 oldValue = findTopic(oldValues, originalId);
-            } else if (!valueEmptied && oldValues != null) {
+            } else if (!newValueIsEmpty && oldValues != null) {
                 oldValue = findTopicOrNull(oldValues, newId);
             }
             boolean oldValueExists = oldValue != null;
@@ -511,7 +511,7 @@ class ValueIntegrator {
             //
             boolean deleted = false;
             if (valueChanged) {
-                if (valueEmptied) {
+                if (newValueIsEmpty) {
                     logger.fine("### Deleting assignment (compDefUri=\"" + compDefUri + "\") from composite " +
                         parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
@@ -525,7 +525,7 @@ class ValueIntegrator {
             // a new value must be present
             //
             AssocModelImpl assoc = null;
-            if (!valueEmptied && (!oldValueExists || valueChanged)) {
+            if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
                 assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
