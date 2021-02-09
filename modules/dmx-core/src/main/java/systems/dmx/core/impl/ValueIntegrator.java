@@ -439,7 +439,7 @@ class ValueIntegrator {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             TopicModel childTopic = childValue.value;
-            long newId = !newValueIsEmpty ? childTopic.getId() : -1;
+            long newId = childTopic != null ? childTopic.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             //
