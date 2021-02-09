@@ -331,7 +331,6 @@ class ValueIntegrator {
      * @return  Result value: the parent object, or null if there is no parent
      */
     private UnifiedValue identifyParent(Map<String, Object> childValues) {
-        // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return new UnifiedValue(targetObject);
         } else if (isAssoc) {
@@ -435,16 +434,19 @@ class ValueIntegrator {
         try {
             ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
             RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(compDefUri);     // may be null
-            if (oldValue != null && oldValue.id == -1) {
+            boolean oldValueExists = oldValue != null;
+            if (oldValueExists && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             TopicModel childTopic = childValue.value;
             boolean newValueIsEmpty = childTopic == null;
+            long newId = !newValueIsEmpty ? childTopic.getId() : -1;
+            boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;
-            if (oldValue != null && (newValueIsEmpty || childTopic != null && !oldValue.equals(childTopic))) {
+            if (oldValueExists && newValueIsEmpty || valueChanged) {
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
@@ -459,7 +461,7 @@ class ValueIntegrator {
             // a new value must be present
             //
             AssocModelImpl assoc = null;
-            if (childTopic != null && (oldValue == null || !oldValue.equals(childTopic))) {
+            if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
                 assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
                 // update memory
@@ -468,7 +470,7 @@ class ValueIntegrator {
             // 3) update relating assoc
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
-            if (assoc == null && oldValue != null && !deleted) {
+            if (assoc == null && oldValueExists && !deleted) {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
