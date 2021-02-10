@@ -438,15 +438,18 @@ class ValueIntegrator {
             if (oldValueExists && oldValue.id == -1) {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
+            // new value
             TopicModel childTopic = childValue.value;
             long newId = childTopic != null ? childTopic.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
+            //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;
             if (valueChanged) {
+                deleted = true;
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
@@ -455,7 +458,6 @@ class ValueIntegrator {
                         parent.id + " (typeUri=\"" + type.uri + "\")");
                     oldChildTopics.remove(compDefUri);
                 }
-                deleted = true;
             }
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
@@ -474,8 +476,8 @@ class ValueIntegrator {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = newValues.getChildTopics().getTopicOrNull(compDefUri);
-                updateRelatingAssoc(assoc, compDefUri, newChildValue);
+                RelatedTopicModelImpl _newValues = newValues.getChildTopics().getTopicOrNull(compDefUri);
+                updateRelatingAssoc(assoc, compDefUri, _newValues);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childValue=" + childValue +
@@ -488,13 +490,15 @@ class ValueIntegrator {
      */
     private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String compDefUri) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
-        List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);   // may be null
+        List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);     // may be null
         for (UnifiedValue childValue : childValues) {
+            // new value
             TopicModel childTopic = (TopicModel) childValue.value;
-            long originalId = childValue.originalId;
             long newId = childTopic != null ? childTopic.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
+            // old value
             RelatedTopicModelImpl oldValue = null;
+            long originalId = childValue.originalId;
             if (originalId != -1) {
                 if (oldValues == null) {
                     throw new RuntimeException("Tried to replace original topic " + originalId +
@@ -505,6 +509,7 @@ class ValueIntegrator {
                 oldValue = findTopicOrNull(oldValues, newId);
             }
             boolean oldValueExists = oldValue != null;
+            //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             //
             // 1) delete assignment if exists AND value has changed or emptied
