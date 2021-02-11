@@ -606,7 +606,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic, ChangeReport report) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
             // encode password
             RelatedTopic passwordTopic = topic.getChildTopics().getTopic(PASSWORD);
@@ -622,7 +622,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc, ChangeReport report) {
+    public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         setModifier(assoc);
     }
 

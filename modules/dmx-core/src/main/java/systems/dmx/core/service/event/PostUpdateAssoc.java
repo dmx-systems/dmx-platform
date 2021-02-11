@@ -9,5 +9,5 @@ import systems.dmx.core.service.EventListener;
 
 public interface PostUpdateAssoc extends EventListener {
 
-    void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc, ChangeReport report);
+    void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel);
 }

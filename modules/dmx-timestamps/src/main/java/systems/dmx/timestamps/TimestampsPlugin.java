@@ -169,12 +169,12 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic, ChangeReport report) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         storeTimestamp(topic);
     }
 
     @Override
-    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc, ChangeReport report) {
+    public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         storeTimestamp(assoc);
     }
 

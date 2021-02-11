@@ -107,7 +107,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Once a view config topic is updated we must update the cached view config and inform the webclient.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic, ChangeReport report) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(VIEW_CONFIG)) {
             setDefaultConfigTopicLabel(topic);
             updateTypeCacheAndAddDirective(topic);

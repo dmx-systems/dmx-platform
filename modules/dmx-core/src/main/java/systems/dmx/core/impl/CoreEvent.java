@@ -152,7 +152,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateTopic) listener).postUpdateTopic(
-                (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2], (ChangeReport) params[3]
+                (Topic) params[0], (ChangeReport) params[1], (TopicModel) params[2]
             );
         }
     };
@@ -161,7 +161,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateAssoc) listener).postUpdateAssoc(
-                (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2], (ChangeReport) params[3]
+                (Assoc) params[0], (ChangeReport) params[1], (AssocModel) params[2]
             );
         }
     };
