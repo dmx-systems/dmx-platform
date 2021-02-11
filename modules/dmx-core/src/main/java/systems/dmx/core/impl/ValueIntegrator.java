@@ -447,7 +447,10 @@ class ValueIntegrator {
             boolean newValueIsEmpty = newId == -1;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
-            report.add(compDefUri, newValue, oldValue);
+            boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
+            if (changed) {
+                report.add(compDefUri, newValue, oldValue);
+            }
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
@@ -516,7 +519,10 @@ class ValueIntegrator {
             boolean oldValueExists = oldValue != null;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
-            report.add(compDefUri, newValue, oldValue);
+            boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
+            if (changed) {
+                report.add(compDefUri, newValue, oldValue);
+            }
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //

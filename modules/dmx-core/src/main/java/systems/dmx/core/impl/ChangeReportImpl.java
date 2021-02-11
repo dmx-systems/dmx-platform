@@ -13,7 +13,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-class ChangeReportImpl implements ChangeReport, JSONEnabled {
+class ChangeReportImpl implements ChangeReport {
 
     Map<String, List<Change>> changes = new HashMap();
 
