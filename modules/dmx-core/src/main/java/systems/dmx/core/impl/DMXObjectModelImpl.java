@@ -419,7 +419,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
-            new ValueIntegrator(al).integrate(updateModel, this, null);   // TODO: handle return value
+            ChangeReportImpl report = new ValueIntegrator(al).integrate(updateModel, this, null).report;
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face of
             // DMX update logic (= "value integration"). Note that update() is not called recursively anymore.
             //
