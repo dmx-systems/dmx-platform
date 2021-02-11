@@ -439,8 +439,8 @@ class ValueIntegrator {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             // new value
-            TopicModel childTopic = childValue.value;
-            long newId = childTopic != null ? childTopic.getId() : -1;
+            TopicModel newValue = childValue.value;
+            long newId = newValue != null ? newValue.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
@@ -465,9 +465,9 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
+                assoc = createChildAssoc(parent, newValue, compDefUri, deleted);
                 // update memory
-                oldChildTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+                oldChildTopics.set(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
             // 3) update relating assoc
             //
@@ -493,8 +493,8 @@ class ValueIntegrator {
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);     // may be null
         for (UnifiedValue childValue : childValues) {
             // new value
-            TopicModel childTopic = (TopicModel) childValue.value;
-            long newId = childTopic != null ? childTopic.getId() : -1;
+            TopicModel newValue = (TopicModel) childValue.value;
+            long newId = newValue != null ? newValue.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             // old value
             RelatedTopicModelImpl oldValue = null;
@@ -532,9 +532,9 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(parent, childTopic, compDefUri, deleted);
+                assoc = createChildAssoc(parent, newValue, compDefUri, deleted);
                 // update memory
-                oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+                oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
             // 3) update relating assoc
             //
