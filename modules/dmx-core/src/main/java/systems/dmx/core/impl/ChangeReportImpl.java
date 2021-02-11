@@ -15,16 +15,11 @@ import org.codehaus.jettison.json.JSONObject;
 
 class ChangeReportImpl implements ChangeReport {
 
-    Map<String, List<Change>> changes = new HashMap();
+    private Map<String, List<Change>> changes = new HashMap();
 
-    // TODO: both RelatedTopicModelImpl
-    void add(String compDefUri, TopicModelImpl newValue, RelatedTopicModelImpl oldValue) {
-        List<Change> l = changes.get(compDefUri);
-        if (l == null) {
-            l = new ArrayList();
-            changes.put(compDefUri, l);
-        }
-        l.add(new Change(newValue, oldValue));
+    @Override
+    public List<Change> getChanges(String compDefUri) {
+        return changes.get(compDefUri);
     }
 
     @Override
@@ -51,25 +46,15 @@ class ChangeReportImpl implements ChangeReport {
         }
     }
 
-    class Change implements JSONEnabled {
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
-        TopicModelImpl newValue;
-        RelatedTopicModelImpl oldValue;
-
-        Change(TopicModelImpl newValue, RelatedTopicModelImpl oldValue) {
-            this.newValue = newValue;
-            this.oldValue = oldValue;
+    // TODO: both RelatedTopicModelImpl
+    void add(String compDefUri, TopicModelImpl newValue, RelatedTopicModelImpl oldValue) {
+        List<Change> l = changes.get(compDefUri);
+        if (l == null) {
+            l = new ArrayList();
+            changes.put(compDefUri, l);
         }
-
-        @Override
-        public JSONObject toJSON() {
-            try {
-                return new JSONObject()
-                    .put("newValue", newValue != null ? newValue.toJSON() : JSONObject.NULL)
-                    .put("oldValue", oldValue != null ? oldValue.toJSON() : JSONObject.NULL);
-            } catch (Exception e) {
-                throw new RuntimeException("Serialization failed", e);
-            }
-        }
+        l.add(new Change(newValue, oldValue));
     }
 }
