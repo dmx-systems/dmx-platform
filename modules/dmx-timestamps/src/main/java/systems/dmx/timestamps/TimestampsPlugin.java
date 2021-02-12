@@ -8,6 +8,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
+import systems.dmx.core.service.ChangeReport;
 import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
 import systems.dmx.core.service.event.PostUpdateAssoc;
@@ -168,12 +169,12 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         storeTimestamp(topic);
     }
 
     @Override
-    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
+    public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         storeTimestamp(assoc);
     }
 

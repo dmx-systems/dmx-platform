@@ -313,7 +313,8 @@ class ValueIntegrator {
             UnifiedValue value = identifyParent(childValues);
             DMXObjectModelImpl parent = value.value;
             if (parent != null) {
-                updateAssignments(parent, childValues);
+                ChangeReportImpl report = updateAssignments(parent, childValues);
+                value.report = report;
             }
             return value;
         }
@@ -407,7 +408,8 @@ class ValueIntegrator {
      * @param   childValues     key: compDefUri
      *                          value: UnifiedValue or List<UnifiedValue>
      */
-    private void updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
+    private ChangeReportImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
+        ChangeReportImpl report = new ChangeReportImpl();
         for (String compDefUri : compDefUris()) {
             // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
@@ -418,19 +420,20 @@ class ValueIntegrator {
             // Note: for partial create/update requests childValue might be null
             if (childValue != null) {
                 if (isOne(compDefUri)) {
-                    updateAssignmentsOne(parent, (UnifiedValue) childValue, compDefUri);
+                    updateAssignmentsOne(parent, (UnifiedValue) childValue, compDefUri, report);
                 } else {
-                    updateAssignmentsMany(parent, (List<UnifiedValue>) childValue, compDefUri);
+                    updateAssignmentsMany(parent, (List<UnifiedValue>) childValue, compDefUri, report);
                 }
             }
         }
+        return report;
     }
 
     /**
      * @param   childValue      never null; a UnifiedValue's "value" field may be null
      */
     private void updateAssignmentsOne(DMXObjectModelImpl parent, UnifiedValue<TopicModelImpl> childValue,
-                                                                 String compDefUri) {
+                                      String compDefUri, ChangeReportImpl report) {
         try {
             ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
             RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(compDefUri);     // may be null
@@ -439,11 +442,15 @@ class ValueIntegrator {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             // new value
-            TopicModel newValue = childValue.value;
+            TopicModelImpl newValue = childValue.value;
             long newId = newValue != null ? newValue.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
+            boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
+            if (changed) {
+                report.add(compDefUri, newValue, oldValue);
+            }
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
@@ -488,12 +495,13 @@ class ValueIntegrator {
     /**
      * @param   childValues   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String compDefUri) {
+    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String compDefUri,
+                                       ChangeReportImpl report) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);     // may be null
         for (UnifiedValue childValue : childValues) {
             // new value
-            TopicModel newValue = (TopicModel) childValue.value;
+            TopicModelImpl newValue = (TopicModelImpl) childValue.value;
             long newId = newValue != null ? newValue.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             // old value
@@ -511,6 +519,10 @@ class ValueIntegrator {
             boolean oldValueExists = oldValue != null;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
+            boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
+            if (changed) {
+                report.add(compDefUri, newValue, oldValue);
+            }
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
@@ -871,6 +883,8 @@ class ValueIntegrator {
         long originalId;                    // The ID of the value this value is about to replace.
                                             // Needed to update a multi-value (updateAssignmentsMany()).
                                             // Saved here cause it is overwritten (integrate()).
+
+        ChangeReportImpl report;
 
         private UnifiedValue() {
             this(null);

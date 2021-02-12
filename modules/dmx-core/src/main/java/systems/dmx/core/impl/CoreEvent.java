@@ -8,6 +8,7 @@ import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
+import systems.dmx.core.service.ChangeReport;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
 import systems.dmx.core.service.event.*;
@@ -151,7 +152,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateTopic) listener).postUpdateTopic(
-                (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2]
+                (Topic) params[0], (ChangeReport) params[1], (TopicModel) params[2]
             );
         }
     };
@@ -160,7 +161,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateAssoc) listener).postUpdateAssoc(
-                (Assoc) params[0], (AssocModel) params[1], (AssocModel) params[2]
+                (Assoc) params[0], (ChangeReport) params[1], (AssocModel) params[2]
             );
         }
     };

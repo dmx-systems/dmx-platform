@@ -419,7 +419,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
-            new ValueIntegrator(al).integrate(updateModel, this, null);   // TODO: handle return value
+            ChangeReportImpl report = new ValueIntegrator(al).integrate(updateModel, this, null).report;
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face of
             // DMX update logic (= "value integration"). Note that update() is not called recursively anymore.
             //
@@ -429,7 +429,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
             // that doesn't reflect the update. Here we instantiate the now updated model.
             DMXObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
-            em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject);
+            em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject, report);
         } catch (Exception e) {
             throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }

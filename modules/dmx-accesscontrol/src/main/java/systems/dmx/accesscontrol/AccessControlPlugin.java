@@ -21,6 +21,7 @@ import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
+import systems.dmx.core.service.ChangeReport;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
 import systems.dmx.core.service.Inject;
@@ -605,7 +606,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
             // encode password
             RelatedTopic passwordTopic = topic.getChildTopics().getTopic(PASSWORD);
@@ -621,7 +622,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssoc(Assoc assoc, AssocModel updateModel, AssocModel oldAssoc) {
+    public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         setModifier(assoc);
     }
 

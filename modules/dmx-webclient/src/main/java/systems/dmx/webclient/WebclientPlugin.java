@@ -15,6 +15,7 @@ import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigModel;
 import systems.dmx.core.osgi.PluginActivator;
+import systems.dmx.core.service.ChangeReport;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.event.AllPluginsActive;
@@ -106,7 +107,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Once a view config topic is updated we must update the cached view config and inform the webclient.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
+    public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(VIEW_CONFIG)) {
             setDefaultConfigTopicLabel(topic);
             updateTypeCacheAndAddDirective(topic);
