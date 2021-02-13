@@ -429,7 +429,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
             // that doesn't reflect the update. Here we instantiate the now updated model.
             DMXObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
-            em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject, report);
+            em.fireEvent(getPostUpdateEvent(), object, report, updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
