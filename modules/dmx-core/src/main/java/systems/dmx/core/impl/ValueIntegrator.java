@@ -937,14 +937,9 @@ class ValueIntegrator {
             return ((Long) id).hashCode();
         } */
 
-        // TODO: copy in DMXObjectModelImpl
         @Override
         public String toString() {
-            try {
-                return getClass().getSimpleName() + " " + toJSON().toString(4);
-            } catch (Exception e) {
-                throw new RuntimeException("Prettyprinting failed", e);
-            }
+            return dump();
         }
     }
 }

@@ -69,15 +69,9 @@ abstract class PlayerModelImpl implements PlayerModel {
         }
     }
 
-    // TODO: copy in DMXObjectModelImpl
-    // Can we use Java 8 and put this in the JSONEnabled interface?
     @Override
     public String toString() {
-        try {
-            return getClass().getSimpleName() + " " + toJSON().toString(4);
-        } catch (Exception e) {
-            throw new RuntimeException("Prettyprinting failed", e);
-        }
+        return dump();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
