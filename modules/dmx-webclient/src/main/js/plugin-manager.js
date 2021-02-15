@@ -22,6 +22,7 @@ export default extraElementUI => {
   initPlugin(require('modules/dmx-help-menu/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-files/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
