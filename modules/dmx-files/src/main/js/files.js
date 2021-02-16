@@ -1,13 +1,16 @@
-const state = {
-}
+import FilesRPC from './files-rpc'
 
-const actions = {
-  // TODO
-  revealFileBrowser () {
+export default ({dmx, axios: http}) => {
+
+  const filesRPC = new FilesRPC(dmx, http)
+
+  return {
+    actions: {
+      revealFileBrowser ({dispatch}) {
+        filesRPC.getFolderTopic('/').then(folder => {
+          dispatch('revealTopic', {topic: folder})
+        })
+      }
+    }
   }
-}
-
-export default {
-  state,
-  actions
 }
