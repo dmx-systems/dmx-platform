@@ -616,7 +616,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         }
         // by default the directory name is used as Folder Name
         if (folderName == null) {
-            folderName = repoPathFile.getName();    // Note: getName() of "/" returns ""
+            folderName = repoPath.equals("/") ? repoPath : repoPathFile.getName();  // Note: getName() of "/" returns ""
         }
         //
         return createFileOrFolderTopic(mf.newTopicModel("dmx.files.folder", mf.newChildTopicsModel()
