@@ -622,7 +622,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         return createFileOrFolderTopic(mf.newTopicModel("dmx.files.folder", mf.newChildTopicsModel()
             .set("dmx.files.path", repoPath)
             .set("dmx.files.folder_name", folderName)
-            .set("dmx.files.folder_content", "<p></p>")
         ));     // throws Exception
     }
 

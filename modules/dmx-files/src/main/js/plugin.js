@@ -12,7 +12,7 @@ export default {
     }
   ],
 
-  valueRenderers: {
-    'dmx.files.folder_content': require('./components/dmx-folder-content').default
+  objectRenderers: {
+    'dmx.files.folder': require('./components/dmx-folder-renderer').default
   }
 }

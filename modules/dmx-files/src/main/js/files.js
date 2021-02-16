@@ -6,10 +6,15 @@ export default ({dmx, axios: http}) => {
 
   return {
     actions: {
+
       revealFileBrowser ({dispatch}) {
         filesRPC.getFolderTopic('/').then(folder => {
           dispatch('revealTopic', {topic: folder})
         })
+      },
+
+      getDirectoryListing ({dispatch}, repoPath) {
+        return filesRPC.getDirectoryListing(repoPath)
       }
     }
   }
