@@ -10,5 +10,9 @@ export default {
       comp: require('./components/dmx-filebrowser-reveal').default,
       mount: 'toolbar-left'
     }
-  ]
+  ],
+
+  valueRenderers: {
+    'dmx.files.folder_content': require('./components/dmx-folder-content').default
+  }
 }
