@@ -26,7 +26,8 @@ export default {
     },
 
     mediaType () {
-      return this.object.children['dmx.files.media_type'].value
+      const mediaType = this.object.children['dmx.files.media_type']
+      return mediaType && mediaType.value
     },
 
     fileUrl () {
@@ -34,7 +35,7 @@ export default {
     },
 
     isImage () {
-      return this.mediaType.startsWith('image/')
+      return this.mediaType && this.mediaType.startsWith('image/')
     },
 
     isPDF () {
