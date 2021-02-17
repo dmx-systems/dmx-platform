@@ -12,6 +12,16 @@ export default class FilesRPC {
       .then(response => new this.dmx.Topic(response.data))
   }
 
+  getChildFileTopic (folderId, repoPath) {
+    return this.http.get(`/files/parent/${folderId}/file/${encodeURIComponent(repoPath)}`)
+      .then(response => new this.dmx.Topic(response.data))
+  }
+
+  getChildFolderTopic (folderId, repoPath) {
+    return this.http.get(`/files/parent/${folderId}/folder/${encodeURIComponent(repoPath)}`)
+      .then(response => new this.dmx.Topic(response.data))
+  }
+
   // === File Repository ===
 
   getDirectoryListing (repoPath) {

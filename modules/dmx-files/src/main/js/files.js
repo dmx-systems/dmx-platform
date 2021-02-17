@@ -13,7 +13,15 @@ export default ({dmx, axios: http}) => {
         })
       },
 
-      getDirectoryListing ({dispatch}, repoPath) {
+      getChildFileTopic (_, {folderId, repoPath}) {
+        return filesRPC.getChildFileTopic(folderId, repoPath)
+      },
+
+      getChildFolderTopic (_, {folderId, repoPath}) {
+        return filesRPC.getChildFolderTopic(folderId, repoPath)
+      },
+
+      getDirectoryListing (_, repoPath) {
         return filesRPC.getDirectoryListing(repoPath)
       }
     }

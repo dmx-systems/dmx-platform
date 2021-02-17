@@ -13,16 +13,22 @@
 </template>
 
 <script>
-const ICONS = {
-  file: 'fa-file-o',
-  directory: 'fa-folder-o'
+const TAB = {
+  file: {
+    icon: 'fa-file-o',
+    action: 'getChildFileTopic'
+  },
+  directory: {
+    icon: 'fa-folder-o',
+    action: 'getChildFolderTopic'
+  }
 }
 
 export default {
 
   created () {
     console.log('dmx-folder-renderer created', this.object)
-    this.initListing()
+    this.initItems()
   },
 
   mixins: [
@@ -43,22 +49,30 @@ export default {
     },
 
     icons () {
-      return this.items.map(item => ICONS[item.kind])
+      return this.items.map(item => TAB[item.kind].icon)
+    }
+  },
+
+  watch: {
+    object () {
+      this.initItems()
     }
   },
 
   methods: {
 
-    initListing () {
+    initItems () {
       this.$store.dispatch('getDirectoryListing', this.path)
         .then(listing => {
-          console.log(listing)
           this.items = listing.items
         })
     },
 
     reveal (item) {
-      console.log(item)
+      this.$store.dispatch(TAB[item.kind].action, {folderId: this.object.id, repoPath: item.path})
+        .then(childTopic => {
+          this.$store.dispatch('revealTopic', {topic: childTopic})
+        })
     }
   }
 }

@@ -17,6 +17,6 @@ export default {
 .dmx-filebrowser-reveal {
   padding-left:  2px !important;
   padding-right: 2px !important;
-  margin-right: 18px;
+  margin-right: 18px !important;
 }
 </style>
