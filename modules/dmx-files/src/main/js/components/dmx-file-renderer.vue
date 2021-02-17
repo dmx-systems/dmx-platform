@@ -1,6 +1,7 @@
 <template>
   <div class="dmx-file-renderer">
-    <embed v-if="isPDF" :src="fileUrl" :type="mediaType" width="100%" height="450"></embed>
+    <img v-if="isImage" :src="fileUrl">
+    <embed v-if="isPDF" class="pdf" :src="fileUrl" :type="mediaType"></embed>
     <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context" :no-heading="true">
     </dmx-value-renderer>
   </div>
@@ -32,6 +33,10 @@ export default {
       return '/filerepo/' + encodeURIComponent(this.path)
     },
 
+    isImage () {
+      return this.mediaType.startsWith('image/')
+    },
+
     isPDF () {
       return this.mediaType === 'application/pdf'
     }
@@ -40,4 +45,16 @@ export default {
 </script>
 
 <style>
+.dmx-file-renderer > img {
+  max-width: 100%;
+}
+
+.dmx-file-renderer > .pdf {
+  width: 100%;
+  height: 100vh;
+}
+
+.dmx-file-renderer > .dmx-value-renderer {
+  margin-top: var(--field-spacing);
+}
 </style>
