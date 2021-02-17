@@ -13,6 +13,7 @@ export default {
   ],
 
   objectRenderers: {
+    'dmx.files.file':   require('./components/dmx-file-renderer').default,
     'dmx.files.folder': require('./components/dmx-folder-renderer').default
   }
 }

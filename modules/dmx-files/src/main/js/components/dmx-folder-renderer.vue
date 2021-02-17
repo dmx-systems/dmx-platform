@@ -27,7 +27,7 @@ const TAB = {
 export default {
 
   created () {
-    console.log('dmx-folder-renderer created', this.object)
+    // console.log('dmx-folder-renderer created', this.object)
     this.initItems()
   },
 
@@ -62,17 +62,18 @@ export default {
   methods: {
 
     initItems () {
-      this.$store.dispatch('getDirectoryListing', this.path)
-        .then(listing => {
-          this.items = listing.items
-        })
+      this.$store.dispatch('getDirectoryListing', this.path).then(listing => {
+        this.items = listing.items
+      })
     },
 
     reveal (item) {
-      this.$store.dispatch(TAB[item.kind].action, {folderId: this.object.id, repoPath: item.path})
-        .then(childTopic => {
-          this.$store.dispatch('revealTopic', {topic: childTopic})
-        })
+      this.$store.dispatch(TAB[item.kind].action, {
+        folderId: this.object.id,
+        repoPath: item.path
+      }).then(childTopic => {
+        this.$store.dispatch('revealTopic', {topic: childTopic})
+      })
     }
   }
 }
