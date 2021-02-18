@@ -1,7 +1,8 @@
 <template>
   <div class="dmx-file-renderer">
     <img v-if="isImage" :src="fileUrl">
-    <embed v-if="isPDF" class="pdf" :src="fileUrl" :type="mediaType"></embed>
+    <audio v-if="isAudio" :src="fileUrl" controls></audio>
+    <embed v-if="isPDF" :src="fileUrl" :type="mediaType" class="pdf"></embed>
     <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context" :no-heading="true">
     </dmx-value-renderer>
   </div>
@@ -36,6 +37,10 @@ export default {
 
     isImage () {
       return this.mediaType && this.mediaType.startsWith('image/')
+    },
+
+    isAudio () {
+      return this.mediaType && this.mediaType.startsWith('audio/')
     },
 
     isPDF () {
