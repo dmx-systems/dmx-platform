@@ -23,6 +23,10 @@ export default ({dmx, axios: http}) => {
 
       getDirectoryListing (_, repoPath) {
         return filesRPC.getDirectoryListing(repoPath)
+      },
+
+      getFileContent (_, repoPath) {
+        return filesRPC.getFileContent(repoPath)
       }
     }
   }

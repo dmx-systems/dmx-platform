@@ -1,5 +1,6 @@
 <template>
   <div class="dmx-file-renderer">
+    <pre v-if="isText">{{text}}</pre>
     <img v-if="isImage" :src="fileUrl">
     <audio v-if="isAudio" :src="fileUrl" controls></audio>
     <video v-if="isVideo" :src="fileUrl" controls></video>
@@ -14,12 +15,19 @@ export default {
 
   created () {
     // console.log('dmx-file-renderer created', this.object)
+    this.initText()
   },
 
   mixins: [
     require('./mixins/object').default,
     require('./mixins/context').default
   ],
+
+  data () {
+    return {
+      text: ''
+    }
+  },
 
   computed: {
 
@@ -34,6 +42,10 @@ export default {
 
     fileUrl () {
       return '/filerepo/' + encodeURIComponent(this.path)
+    },
+
+    isText () {
+      return this.mediaType && this.mediaType.startsWith('text/')
     },
 
     isImage () {
@@ -51,11 +63,32 @@ export default {
     isPDF () {
       return this.mediaType === 'application/pdf'
     }
+  },
+
+  watch: {
+    object () {
+      this.initText()
+    }
+  },
+
+  methods: {
+    initText () {
+      if (this.isText) {
+        this.$store.dispatch('getFileContent', this.path).then(content => {
+          this.text = content
+        })
+      }
+    }
   }
 }
 </script>
 
 <style>
+.dmx-file-renderer > pre {
+  line-height: 1.4em;
+  white-space: pre-wrap;
+}
+
 .dmx-file-renderer > img {
   max-width: 100%;
 }
