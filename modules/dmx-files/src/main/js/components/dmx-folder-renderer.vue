@@ -63,7 +63,7 @@ export default {
 
     initItems () {
       this.$store.dispatch('getDirectoryListing', this.path).then(listing => {
-        this.items = listing.items
+        this.items = listing.items.sort((item1, item2) => item1.name.localeCompare(item2.name))
       })
     },
 
