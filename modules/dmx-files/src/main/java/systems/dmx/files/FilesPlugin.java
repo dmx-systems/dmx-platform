@@ -9,6 +9,7 @@ import systems.dmx.config.ConfigTarget;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.SimpleValue;
@@ -45,6 +46,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -170,20 +172,18 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Path("/parent/{id}/file/{path}")
     @Transactional
     @Override
-    public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
+    public RelatedTopic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFileTopic(repoPath);
-        createFolderAssoc(folderTopicId, topic);
-        return topic;
+        return createFolderAssoc(folderTopicId, topic);
     }
 
     @GET
     @Path("/parent/{id}/folder/{path}")
     @Transactional
     @Override
-    public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
+    public RelatedTopic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFolderTopic(repoPath);
-        createFolderAssoc(folderTopicId, topic);
-        return topic;
+        return createFolderAssoc(folderTopicId, topic);
     }
 
 
@@ -644,14 +644,17 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     /**
      * @param   topic   a File topic, or a Folder topic.
      */
-    private void createFolderAssoc(final long folderTopicId, Topic topic) {
+    private RelatedTopic createFolderAssoc(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
-            boolean exists = dmx.getAssocs(folderTopicId, topicId, COMPOSITION).size() > 0;
-            if (!exists) {
+            List<Assoc> assocs = dmx.getAssocs(folderTopicId, topicId, COMPOSITION);
+            Assoc assoc;
+            if (assocs.size() > 0) {
+                assoc = assocs.get(0);
+            } else {
                 // We suppress standard workspace assignment as the folder association requires a special assignment.
                 // (We can't set the actual workspace here as privileged "assignToWorkspace" calls are required.)
-                Assoc assoc = dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () ->
+                assoc = dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () ->
                     dmx.createAssoc(mf.newAssocModel(COMPOSITION,
                         mf.newTopicPlayerModel(folderTopicId, PARENT),
                         mf.newTopicPlayerModel(topicId,       CHILD)
@@ -659,6 +662,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                 );
                 createWorkspaceAssignment(assoc, repoPath(topic));
             }
+            return assoc.getDMXObjectByRole(CHILD);
         } catch (Exception e) {
             throw new RuntimeException("Creating association to Folder topic " + folderTopicId + " failed", e);
         }

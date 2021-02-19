@@ -1,5 +1,6 @@
 package systems.dmx.files;
 
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 
 import java.io.File;
@@ -82,7 +83,7 @@ public interface FilesService {
      *
      * @return  The File topic. Its child topics ("File Name", "Path", "Media Type", "Size") are included.
      */
-    Topic getChildFileTopic(long folderTopicId, String repoPath);
+    RelatedTopic getChildFileTopic(long folderTopicId, String repoPath);
 
     /**
      * Returns the Folder topic representing the folder at a given repository path.
@@ -108,7 +109,7 @@ public interface FilesService {
      *
      * @return  The Folder topic. Its child topics ("Folder Name", "Path") are included.
      */
-    Topic getChildFolderTopic(long folderTopicId, String repoPath);
+    RelatedTopic getChildFolderTopic(long folderTopicId, String repoPath);
 
 
 

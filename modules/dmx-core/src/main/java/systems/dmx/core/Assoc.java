@@ -22,10 +22,12 @@ public interface Assoc extends DMXObject {
 
     // --- Convenience Methods ---
 
-    // TODO: rename to "getPlayerObject"
+    // TODO: rename to "getPlayerObject1"
+    // TODO: return <O extends RelatedObject>
     DMXObject getDMXObject1();
 
-    // TODO: rename to "getPlayerObject"
+    // TODO: rename to "getPlayerObject2"
+    // TODO: return <O extends RelatedObject>
     DMXObject getDMXObject2();
 
     // ---
