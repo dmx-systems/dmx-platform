@@ -1,5 +1,5 @@
 <template>
-  <el-button type="text" class="dmx-filebrowser-reveal fa fa-file-o" title="Reveal File Browser" @click="reveal">
+  <el-button type="text" class="dmx-filebrowser-reveal fa fa-folder-o" title="Reveal File Browser" @click="reveal">
   </el-button>
 </template>
 
