@@ -22,25 +22,30 @@ public interface Assoc extends DMXObject {
 
     // --- Convenience Methods ---
 
+    // TODO: rename to "getPlayerObject"
     DMXObject getDMXObject1();
 
+    // TODO: rename to "getPlayerObject"
     DMXObject getDMXObject2();
 
     // ---
 
     /**
+     * TODO: rename method to "getPlayerObjectByRole"
+     *
      * @return  this association's player which plays the given role.
-     *          If there is no such player, null is returned.
+     *          If there is no such player, null is returned.   ### FIXDOC
      *          <p>
      *          If there are 2 such players an exception is thrown.
      */
-    RelatedObject getDMXObjectByRole(String roleTypeUri);
+    <O extends RelatedObject> O getDMXObjectByRole(String roleTypeUri);
 
     /**
-     * TODO: return RelatedObject
+     * TODO: rename method to "getPlayerObjectByType"
+     * TODO: return <O extends RelatedObject>
      *
      * @return  this association's topic which has the given type.
-     *          If there is no such topic, null is returned.
+     *          If there is no such topic, null is returned.    ### FIXDOC
      *          <p>
      *          If there are 2 such topics an exception is thrown.
      */
