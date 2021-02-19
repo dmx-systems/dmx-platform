@@ -14,12 +14,12 @@ export default class FilesRPC {
 
   getChildFileTopic (folderId, repoPath) {
     return this.http.get(`/files/parent/${folderId}/file/${encodeURIComponent(repoPath)}`)
-      .then(response => new this.dmx.Topic(response.data))
+      .then(response => new this.dmx.RelatedTopic(response.data))
   }
 
   getChildFolderTopic (folderId, repoPath) {
     return this.http.get(`/files/parent/${folderId}/folder/${encodeURIComponent(repoPath)}`)
-      .then(response => new this.dmx.Topic(response.data))
+      .then(response => new this.dmx.RelatedTopic(response.data))
   }
 
   // File Repository

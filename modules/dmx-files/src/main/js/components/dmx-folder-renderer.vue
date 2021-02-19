@@ -73,7 +73,7 @@ export default {
         folderId: this.object.id,
         repoPath: item.path
       }).then(childTopic => {
-        this.$store.dispatch('revealTopic', {topic: childTopic})
+        this.$store.dispatch('revealRelatedTopic', {relTopic: childTopic})
       })
     }
   }
