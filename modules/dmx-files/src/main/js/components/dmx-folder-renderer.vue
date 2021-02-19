@@ -88,6 +88,7 @@ export default {
 .dmx-folder-renderer ul.listing {
   list-style-type: none;
   margin-top: 0;
+  margin-bottom: 0;
   padding-left: 0;
 }
 

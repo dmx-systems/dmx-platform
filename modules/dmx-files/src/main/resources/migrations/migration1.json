@@ -5,11 +5,6 @@
   "topic_types": [
     // File
     {
-      "value":       "File Content",
-      "uri":         "dmx.files.file_content",
-      "dataTypeUri": "dmx.core.html"
-    },
-    {
       "value":       "File Name",
       "uri":         "dmx.files.file_name",
       "dataTypeUri": "dmx.core.text"
@@ -34,10 +29,6 @@
       "uri":         "dmx.files.file",
       "dataTypeUri": "dmx.core.entity",
       "compDefs": [
-        {
-          "childTypeUri":        "dmx.files.file_content",
-          "childCardinalityUri": "dmx.core.one"
-        },
         {
           "childTypeUri":        "dmx.files.file_name",
           "childCardinalityUri": "dmx.core.one",
@@ -72,11 +63,6 @@
       "dataTypeUri": "dmx.core.text"
     },
     {
-      "value":       "Folder Content",
-      "uri":         "dmx.files.folder_content",
-      "dataTypeUri": "dmx.core.html"
-    },
-    {
       "value":       "Folder",
       "uri":         "dmx.files.folder",
       "dataTypeUri": "dmx.core.entity",
@@ -87,10 +73,6 @@
         },
         {
           "childTypeUri":        "dmx.files.path",
-          "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.files.folder_content",
           "childCardinalityUri": "dmx.core.one"
         }
       ],
