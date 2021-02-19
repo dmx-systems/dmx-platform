@@ -2,6 +2,7 @@
   <div class="dmx-folder-renderer">
     <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context" :no-heading="true">
     </dmx-value-renderer>
+    <div class="field-label">Folder Content</div>
     <ul class="listing">
       <li v-for="(item, i) in items">
         <el-button type="text" @click="reveal(item)">
@@ -80,8 +81,13 @@ export default {
 </script>
 
 <style>
+.dmx-folder-renderer > .field-label {
+  margin-top: var(--field-spacing);
+}
+
 .dmx-folder-renderer ul.listing {
   list-style-type: none;
+  margin-top: 0;
   padding-left: 0;
 }
 
