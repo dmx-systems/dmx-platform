@@ -26,8 +26,8 @@ export default ({store}) => ({
       if (topic.typeUri === 'dmx.files.folder') {
         return [{
           label: 'Upload File',
-          handler: id => {
-            store.dispatch('openUploadDialog')
+          handler: folderId => {
+            store.dispatch('openUploadDialog', folderId)
           }
         }]
       }

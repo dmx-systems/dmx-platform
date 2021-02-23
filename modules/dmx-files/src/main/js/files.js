@@ -5,7 +5,9 @@ export default ({dmx, axios: http}) => {
   const filesRPC = new FilesRPC(dmx, http)
 
   const state = {
-    visible: false      // Upload dialog visibility
+    visible: false,     // Upload dialog visibility
+    folderName: '',     // Folder to upload to
+    path: ''            // Repo path to upload to
   }
 
   const actions = {
@@ -16,8 +18,12 @@ export default ({dmx, axios: http}) => {
       })
     },
 
-    openUploadDialog () {
+    openUploadDialog (_, folderId) {
       state.visible = true
+      dmx.rpc.getTopic(folderId, true).then(folder => {
+        state.folderName = folder.children['dmx.files.folder_name'].value
+        state.path = folder.children['dmx.files.path'].value
+      })
     },
 
     closeUploadDialog () {
