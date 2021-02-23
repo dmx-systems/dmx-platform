@@ -35,17 +35,10 @@ const state = {
                               //     }
                               //   }
 
-  topicmapCommands: {},       // Registered topicmap commands:
+  topicmapCommands: {}        // Registered topicmap commands:
                               //   {
                               //      topicmapTypeUri: [comp]
                               //   }
-
-  contextCommands: {
-    topic: [],
-    topic_danger: [],
-    assoc: [],
-    assoc_danger: []
-  }
 }
 
 const actions = {
@@ -457,14 +450,6 @@ const actions = {
     const uri = command.topicmapTypeUri
     const commands = c[uri] || (c[uri] = [])
     commands.push(command.comp)
-  },
-
-  registerContextCommands (_, commands) {
-    ['topic', 'topic_danger', 'assoc', 'assoc_danger'].forEach(prop => {
-      if (commands[prop]) {
-        state.contextCommands[prop] = state.contextCommands[prop].concat(commands[prop])
-      }
-    })
   },
 
   //

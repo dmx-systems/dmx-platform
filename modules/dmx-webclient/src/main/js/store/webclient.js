@@ -25,6 +25,12 @@ const state = {
   },                        //   {
                             //     typeUri: function (topic) => icon
                             //   }
+  contextCommands: {
+    topic: [],
+    topic_danger: [],
+    assoc: [],
+    assoc_danger: []
+  },
 
   compDefs: {},             // Registered webclient components:
                             // {
@@ -45,7 +51,7 @@ const state = {
         }
       }
     },
-    // TODO: allow DMX webclient plugins to provide Quill extensions
+    // TODO: allow DMX plugins to provide Quill extensions
     extensions: [
       require('../quill-extensions/topic-link').default,
       require('../quill-extensions/video').default
@@ -105,6 +111,14 @@ const actions = {
 
   registerIconRenderer (_, {typeUri, iconFunc}) {
     state.iconRenderers[typeUri] = iconFunc
+  },
+
+  registerContextCommands (_, commands) {
+    ['topic', 'topic_danger', 'assoc', 'assoc_danger'].forEach(prop => {
+      if (commands[prop]) {
+        state.contextCommands[prop] = state.contextCommands[prop].concat(commands[prop])
+      }
+    })
   },
 
   registerComponent (_, compDef) {
