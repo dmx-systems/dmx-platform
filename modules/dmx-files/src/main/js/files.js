@@ -4,30 +4,47 @@ export default ({dmx, axios: http}) => {
 
   const filesRPC = new FilesRPC(dmx, http)
 
-  return {
-    actions: {
+  const state = {
+    visible: false      // Upload dialog visibility
+  }
 
-      revealFileBrowser ({dispatch}) {
-        filesRPC.getFolderTopic('/').then(folder => {
-          dispatch('revealTopic', {topic: folder})
-        })
-      },
+  const actions = {
 
-      getChildFileTopic (_, {folderId, repoPath}) {
-        return filesRPC.getChildFileTopic(folderId, repoPath)
-      },
+    revealFileBrowser ({dispatch}) {
+      filesRPC.getFolderTopic('/').then(folder => {
+        dispatch('revealTopic', {topic: folder})
+      })
+    },
 
-      getChildFolderTopic (_, {folderId, repoPath}) {
-        return filesRPC.getChildFolderTopic(folderId, repoPath)
-      },
+    openUploadDialog () {
+      state.visible = true
+    },
 
-      getDirectoryListing (_, repoPath) {
-        return filesRPC.getDirectoryListing(repoPath)
-      },
+    closeUploadDialog () {
+      state.visible = false
+    },
 
-      getFileContent (_, repoPath) {
-        return filesRPC.getFileContent(repoPath)
-      }
+    // RPC delegates
+
+    getChildFileTopic (_, {folderId, repoPath}) {
+      return filesRPC.getChildFileTopic(folderId, repoPath)
+    },
+
+    getChildFolderTopic (_, {folderId, repoPath}) {
+      return filesRPC.getChildFolderTopic(folderId, repoPath)
+    },
+
+    getDirectoryListing (_, repoPath) {
+      return filesRPC.getDirectoryListing(repoPath)
+    },
+
+    getFileContent (_, repoPath) {
+      return filesRPC.getFileContent(repoPath)
     }
+  }
+
+  return {
+    state,
+    actions
   }
 }
