@@ -1,8 +1,8 @@
 package systems.dmx.core.service;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.RelatedTopicModel;
+import systems.dmx.core.Topic;
+import systems.dmx.core.RelatedTopic;
 
 import java.util.List;
 
@@ -16,12 +16,12 @@ public interface ChangeReport extends JSONEnabled {
 
     class Change implements JSONEnabled {
 
-        // TODO: type newValue RelatedTopicModel.
-        // At the moment in case of a facet update we have just a TopicModel though.
-        public TopicModel newValue;
-        public RelatedTopicModel oldValue;
+        // TODO: type newValue RelatedTopic.
+        // At the moment in case of a facet update we have just a Topic though.
+        public Topic newValue;
+        public RelatedTopic oldValue;
 
-        public Change(TopicModel newValue, RelatedTopicModel oldValue) {
+        public Change(Topic newValue, RelatedTopic oldValue) {
             this.newValue = newValue;
             this.oldValue = oldValue;
         }

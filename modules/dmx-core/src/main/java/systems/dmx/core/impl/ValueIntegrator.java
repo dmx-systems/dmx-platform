@@ -442,14 +442,16 @@ class ValueIntegrator {
                 throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
             }
             // new value
-            TopicModelImpl newValue = childValue.value;
+            TopicModelImpl newValue = childValue.value;                                     // may be null
             long newId = newValue != null ? newValue.getId() : -1;
             boolean newValueIsEmpty = newId == -1;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
             if (changed) {
-                report.add(compDefUri, newValue, oldValue);
+                report.add(compDefUri, !newValueIsEmpty ? newValue.instantiate() : null,
+                                        oldValueExists ? oldValue.instantiate() : null
+                );
             }
             //
             // 1) delete assignment if exists AND value has changed or emptied
@@ -521,7 +523,9 @@ class ValueIntegrator {
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
             boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
             if (changed) {
-                report.add(compDefUri, newValue, oldValue);
+                report.add(compDefUri, !newValueIsEmpty ? newValue.instantiate() : null,
+                                        oldValueExists ? oldValue.instantiate() : null
+                );
             }
             //
             // 1) delete assignment if exists AND value has changed or emptied

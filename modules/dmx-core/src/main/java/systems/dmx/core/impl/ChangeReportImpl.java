@@ -42,8 +42,8 @@ class ChangeReportImpl implements ChangeReport {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    // TODO: both RelatedTopicModelImpl
-    void add(String compDefUri, TopicModelImpl newValue, RelatedTopicModelImpl oldValue) {
+    // TODO: both RelatedTopicImpl
+    void add(String compDefUri, TopicImpl newValue, RelatedTopicImpl oldValue) {
         List<Change> l = changes.get(compDefUri);
         if (l == null) {
             l = new ArrayList();
