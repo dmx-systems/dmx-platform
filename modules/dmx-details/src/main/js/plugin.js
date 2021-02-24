@@ -30,6 +30,7 @@ export default ({store}) => {
           mode:            state => state.details.mode,
           markerTopicIds:  (_, getters) => getters && getters.visibleTopicIds,
           detailRenderers: state => state.detailRenderers,
+          extraButtons:    state => state.detailPanelButtons,
           types:           state => ({
                              assocTypes: state.typeCache.assocTypes,
                              roleTypes:  state.typeCache.roleTypes
