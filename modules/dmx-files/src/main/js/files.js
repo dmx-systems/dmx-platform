@@ -18,12 +18,11 @@ export default ({dmx, axios: http}) => {
       })
     },
 
-    openUploadDialog (_, folderId) {
+    openUploadDialog ({rootState}) {
       state.visible = true
-      dmx.rpc.getTopic(folderId, true).then(folder => {
-        state.folderName = folder.children['dmx.files.folder_name'].value
-        state.path = folder.children['dmx.files.path'].value
-      })
+      const folder = rootState.object
+      state.folderName = folder.children['dmx.files.folder_name'].value
+      state.path = folder.children['dmx.files.path'].value
     },
 
     closeUploadDialog () {

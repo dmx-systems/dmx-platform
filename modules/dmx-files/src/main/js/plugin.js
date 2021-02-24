@@ -21,15 +21,11 @@ export default ({store}) => ({
     'dmx.files.folder': require('./components/dmx-folder-renderer').default
   },
 
-  contextCommands: {
-    topic: topic => {
-      if (topic.typeUri === 'dmx.files.folder') {
-        return [{
-          label: 'Upload File',
-          handler: folderId => {
-            store.dispatch('openUploadDialog', folderId)
-          }
-        }]
+  detailPanelButtons: {
+    'dmx.files.folder': {
+      label: 'Upload File',
+      handler: _ => {
+        store.dispatch('openUploadDialog')
       }
     }
   }
