@@ -22,11 +22,11 @@ export default ({store}) => ({
   },
 
   detailPanelButtons: {
-    'dmx.files.folder': {
-      label: 'Upload File',
-      handler: _ => {
-        store.dispatch('openUploadDialog')
+    'dmx.files.folder': [
+      {
+        label: 'Upload File',
+        handler: _ => store.dispatch('openUploadDialog')
       }
-    }
+    ]
   }
 })

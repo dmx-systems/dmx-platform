@@ -127,8 +127,8 @@ function registerToolbarCommands (commands, action) {
 }
 
 function registerDetailPanelButtons (buttons) {
-  buttons && Object.entries(buttons).forEach(([typeUri, button]) => {
-    store.dispatch('registerDetailPanelButton', {typeUri, button})
+  buttons && Object.entries(buttons).forEach(([typeUri, buttons]) => {
+    store.dispatch('registerDetailPanelButtons', {typeUri, buttons})
   })
 }
 

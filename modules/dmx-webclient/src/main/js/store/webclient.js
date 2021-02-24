@@ -26,8 +26,8 @@ const state = {
     value: {}               //   typeUri: component
   },                        // }
 
-  iconRenderers: {          // Registered icon renderers:
-  },                        // {
+  iconRenderers: {},        // Registered icon renderers:
+                            // {
                             //   typeUri: function (topic) => icon
                             // }
 
@@ -38,12 +38,14 @@ const state = {
     assoc_danger: []
   },
 
-  detailPanelButtons: {     // Registered detail panel buttons:
-  },                        // {
-                            //   typeUri: {
-                            //     label: button label (string)
-                            //     handler: function
-                            //   }
+  detailPanelButtons: {},   // Registered extra buttons being displayed in the detail panel:
+                            // {
+                            //   typeUri: [
+                            //     {
+                            //       label: button label (string)
+                            //       handler: function
+                            //     }
+                            //   ]
                             // }
 
   quillConfig: {
@@ -137,8 +139,9 @@ const actions = {
     })
   },
 
-  registerDetailPanelButton (_, {typeUri, button}) {
-    state.detailPanelButtons[typeUri] = button
+  registerDetailPanelButtons (_, {typeUri, buttons}) {
+    state.detailPanelButtons[typeUri] || (state.detailPanelButtons[typeUri] = [])
+    state.detailPanelButtons[typeUri] = state.detailPanelButtons[typeUri].concat(buttons)
   },
 
   /**
