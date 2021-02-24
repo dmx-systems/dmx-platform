@@ -16,15 +16,21 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
+  compDefs: {},             // Registered webclient components:
+                            // {
+                            //    mount: [compDef]
+                            // }
+
   detailRenderers: {        // Registered detail renderers; comprises object renderers and value renderers:
-    object: {},             //   {
-    value: {}               //     typeUri: component
-  },                        //   }
+    object: {},             // {
+    value: {}               //   typeUri: component
+  },                        // }
 
   iconRenderers: {          // Registered icon renderers:
-  },                        //   {
-                            //     typeUri: function (topic) => icon
-                            //   }
+  },                        // {
+                            //   typeUri: function (topic) => icon
+                            // }
+
   contextCommands: {
     topic: [],
     topic_danger: [],
@@ -32,10 +38,14 @@ const state = {
     assoc_danger: []
   },
 
-  compDefs: {},             // Registered webclient components:
-                            // {
-                            //    mount: [compDef]
+  detailPanelButtons: {     // Registered detail panel buttons:
+  },                        // {
+                            //   typeUri: {
+                            //     label: button label (string)
+                            //     handler: function
+                            //   }
                             // }
+
   quillConfig: {
     options: {
       theme: 'bubble',
@@ -102,6 +112,12 @@ const actions = {
 
   // ---
 
+  registerComponent (_, compDef) {
+    const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
+    compDef.id = compCount++
+    compDefs.push(compDef)
+  },
+
   /**
    * @param   renderer    "object" or "value"
    */
@@ -121,10 +137,8 @@ const actions = {
     })
   },
 
-  registerComponent (_, compDef) {
-    const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
-    compDef.id = compCount++
-    compDefs.push(compDef)
+  registerDetailPanelButton (_, {typeUri, button}) {
+    state.detailPanelButtons[typeUri] = button
   },
 
   /**

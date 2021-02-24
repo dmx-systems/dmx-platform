@@ -97,6 +97,8 @@ function initPlugin (pluginConfig) {
   // context commands
   const contextCommands = _pluginConfig.contextCommands
   contextCommands && store.dispatch('registerContextCommands', contextCommands)
+  // detail panel buttons
+  registerDetailPanelButtons(_pluginConfig.detailPanelButtons)
   // login extensions
   const loginExtensions = _pluginConfig.loginExtensions
   loginExtensions && loginExtensions.forEach(ext => store.dispatch('registerLoginExtension', ext))
@@ -121,6 +123,12 @@ function registerToolbarCommands (commands, action) {
     comps.forEach(comp => {
       store.dispatch(action, {topicmapTypeUri, comp})
     })
+  })
+}
+
+function registerDetailPanelButtons (buttons) {
+  buttons && Object.entries(buttons).forEach(([typeUri, button]) => {
+    store.dispatch('registerDetailPanelButton', {typeUri, button})
   })
 }
 

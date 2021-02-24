@@ -6,7 +6,7 @@ export default ({dmx, axios: http}) => {
 
   const state = {
     visible: false,     // Upload dialog visibility
-    folderName: '',     // Folder to upload to
+    folderName: '',     // Name of folder to upload to
     path: ''            // Repo path to upload to
   }
 

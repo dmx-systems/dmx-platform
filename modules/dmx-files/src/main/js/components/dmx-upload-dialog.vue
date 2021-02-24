@@ -1,6 +1,6 @@
 <template>
   <el-dialog :visible="visible" :title="title" :modal="false" v-draggable @close="close">
-    <el-upload :action="action" :on-success="onSucess" ref="upload">
+    <el-upload :action="action" :on-success="onSuccess" ref="upload">
       <el-button slot="trigger" type="primary">Select File</el-button>
     </el-upload>
   </el-dialog>
@@ -38,7 +38,7 @@ export default {
       this.$store.dispatch('closeUploadDialog')
     },
 
-    onSucess (response, file, fileList) {
+    onSuccess (response, file, fileList) {
       this.$refs.upload.clearFiles()
       this.close()
     }
