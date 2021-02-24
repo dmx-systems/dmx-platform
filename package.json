@@ -17,7 +17,7 @@
     "axios": "0.18.1",
     "dmx-api": "2.0.0",
     "dmx-cytoscape-renderer": "2.0.0",
-    "dmx-detail-panel": "2.0.0",
+    "dmx-detail-panel": "https://github.com/dmx-systems/dmx-detail-panel.git",
     "dmx-login-dialog": "2.0.0",
     "dmx-object-renderer": "2.0.0",
     "dmx-search-widget": "2.0.0",
