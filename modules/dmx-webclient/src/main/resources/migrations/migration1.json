@@ -1,4 +1,4 @@
-// Part of DMX 5.0-beta-4
+// Part of DMX 5.2
 // Runs ALWAYS
 
 [
@@ -33,6 +33,11 @@
       {
         "value":       "Customizable",
         "uri":         "dmx.webclient.customizable",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      {
+        "value":       "Noneditable",
+        "uri":         "dmx.webclient.noneditable",
         "dataTypeUri": "dmx.core.boolean"
       }
     ],
@@ -76,6 +81,10 @@
           },
           {
             "childTypeUri":        "dmx.webclient.add_to_create_menu",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.noneditable",
             "childCardinalityUri": "dmx.core.one"
           },
           {
