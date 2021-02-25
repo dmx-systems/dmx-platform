@@ -45,13 +45,14 @@
         {
           "childTypeUri":        "dmx.files.size",
           "childCardinalityUri": "dmx.core.one"
-        },
+        }
       ],
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
           "children": {
-            "dmx.webclient.icon": "\uf15b"
+            "dmx.webclient.icon": "\uf15b",
+            "dmx.webclient.noneditable": true
           }
         }
       ]
@@ -80,7 +81,8 @@
         {
           "typeUri": "dmx.webclient.view_config",
           "children": {
-            "dmx.webclient.icon": "\uf07b"
+            "dmx.webclient.icon": "\uf07b",
+            "dmx.webclient.noneditable": true
           }
         }
       ]
