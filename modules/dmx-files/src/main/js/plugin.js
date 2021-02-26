@@ -13,6 +13,10 @@ export default ({store}) => ({
     {
       comp: require('./components/dmx-upload-dialog').default,
       mount: 'webclient'
+    },
+    {
+      comp: require('./components/dmx-download-iframe').default,
+      mount: 'webclient'
     }
   ],
 
@@ -22,6 +26,12 @@ export default ({store}) => ({
   },
 
   detailPanelButtons: {
+    'dmx.files.file': [
+      {
+        label: 'Download File',
+        handler: _ => store.dispatch('downloadFile')
+      }
+    ],
     'dmx.files.folder': [
       {
         label: 'Upload File',

@@ -5,7 +5,11 @@ export default ({dmx, axios: http}) => {
   const filesRPC = new FilesRPC(dmx, http)
 
   const state = {
+    // dialog
     visible: false,     // Upload dialog visibility
+    // download
+    url: undefined,     // URL of file to download
+    // upload
     folderName: '',     // Name of folder to upload to
     path: ''            // Repo path to upload to
   }
@@ -16,6 +20,11 @@ export default ({dmx, axios: http}) => {
       filesRPC.getFolderTopic('/').then(folder => {
         dispatch('revealTopic', {topic: folder})
       })
+    },
+
+    downloadFile ({rootState}) {
+      const repoPath = rootState.object.children['dmx.files.path'].value
+      state.url = filesRPC.filerepoURL(repoPath) + '?download'
     },
 
     openUploadDialog ({rootState}) {

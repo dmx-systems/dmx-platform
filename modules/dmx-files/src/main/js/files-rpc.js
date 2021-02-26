@@ -32,7 +32,11 @@ export default class FilesRPC {
   // File Content
 
   getFileContent (repoPath) {
-    return this.http.get(`/filerepo/${encodeURIComponent(repoPath)}`)
+    return this.http.get(this.filerepoURL(repoPath))
       .then(response => response.data)
+  }
+
+  filerepoURL (repoPath) {
+    return '/filerepo/' + encodeURIComponent(repoPath)
   }
 }
