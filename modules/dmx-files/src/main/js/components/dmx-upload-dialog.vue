@@ -9,6 +9,8 @@
 <script>
 export default {
 
+  inject: ["dmx"],
+
   computed: {
 
     visible () {
@@ -39,6 +41,7 @@ export default {
     },
 
     onSuccess (response, file, fileList) {
+      this.$store.dispatch('revealRelatedTopic', {relTopic: new this.dmx.RelatedTopic(response.topic)})
       this.$refs.upload.clearFiles()
       this.close()
     }
