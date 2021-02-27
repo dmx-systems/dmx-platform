@@ -207,9 +207,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             File repoFile = unusedPath(directory, file);
             file.write(repoFile);
             //
-            // 3) create topic
+            // 3) create topic (and folder assoc)
             Topic fileTopic = createFileTopic(repoFile);
-            return new StoredFile(repoFile.getName(), repoPath(fileTopic), fileTopic.getId());
+            Topic folderTopic = fetchFolderTopic(repoPath);
+            RelatedTopic topic = createFolderAssoc(folderTopic.getId(), fileTopic);
+            return new StoredFile(repoFile.getName(), repoPath(fileTopic), fileTopic.getId(), topic);
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -671,10 +673,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     // ---
 
     /**
-     * Creates a workspace assignment for a File topic, a Folder topic, or a folder association (type "Aggregation").
+     * Creates a workspace assignment for a File topic, a Folder topic, or a folder association (type "Composition").
      * The workspce is calculated from both, the "dmx.filerepo.per_workspace" flag and the given repository path.
      *
-     * @param   object  a File topic, a Folder topic, or a folder association (type "Aggregation").
+     * @param   object  a File topic, a Folder topic, or a folder association (type "Composition").
      */
     private void createWorkspaceAssignment(DMXObject object, String repoPath) {
         try {

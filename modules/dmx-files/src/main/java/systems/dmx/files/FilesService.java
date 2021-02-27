@@ -63,7 +63,7 @@ public interface FilesService {
      * Returns the File topic representing the file at a given repository path.
      * If no such File topic exists it is created.
      * <p>
-     * Creates an association (type "Aggregation") between the File topic (role type "Child")
+     * Creates an association (type "Composition") between the File topic (role type "Child")
      * and its parent Folder topic (role type "Parent"), if not exists already.
      *
      * @param   repoPath        A repository path. Relative to the repository base path.
@@ -89,7 +89,7 @@ public interface FilesService {
      * Returns the Folder topic representing the folder at a given repository path.
      * If no such Folder topic exists it is created.
      * <p>
-     * Creates an association (type "Aggregation") between the Folder topic (role type "Child")
+     * Creates an association (type "Composition") between the Folder topic (role type "Child")
      * and its parent Folder topic (role type "Parent"), if not exists already.
      *
      * @param   repoPath        A repository path. Relative to the repository base path.

@@ -1,6 +1,7 @@
 package systems.dmx.files;
 
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.RelatedTopic;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -13,13 +14,15 @@ public class StoredFile implements JSONEnabled {
     private final String fileName;
     private final String repoPath;
     private final long fileTopicId;
+    private final RelatedTopic fileTopic;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    StoredFile(String fileName, String repoPath, long fileTopicId) {
+    StoredFile(String fileName, String repoPath, long fileTopicId, RelatedTopic fileTopic) {
         this.fileName = fileName;
         this.repoPath = repoPath;
         this.fileTopicId = fileTopicId;
+        this.fileTopic = fileTopic;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -36,6 +39,10 @@ public class StoredFile implements JSONEnabled {
         return fileTopicId;
     }
 
+    public RelatedTopic getFileTopic() {
+        return fileTopic;
+    }
+
     // ---
 
     @Override
@@ -44,7 +51,8 @@ public class StoredFile implements JSONEnabled {
             return new JSONObject()
                 .put("fileName", fileName)
                 .put("repoPath", repoPath)
-                .put("topicId", fileTopicId);
+                .put("topicId", fileTopicId)
+                .put("topic", fileTopic.toJSON());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }
