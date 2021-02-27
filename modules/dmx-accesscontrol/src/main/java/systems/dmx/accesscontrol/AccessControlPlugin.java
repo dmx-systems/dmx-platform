@@ -657,8 +657,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             " bytes, disk quota: " + diskQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {
-            throw new RuntimeException("Disk quota of " + userInfo(username) + " exceeded. Disk quota: " +
-                diskQuota + " bytes. Currently occupied: " + occupiedSpace + " bytes.");
+            throw new RuntimeException("Disk quota of " + userInfo(username) + " exceeded, diskQuota=" + diskQuota +
+                " bytes, occupiedSpace=" + occupiedSpace + " bytes, fileSize=" + fileSize + " bytes");
         }
     }
 
@@ -686,7 +686,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         for (Topic fileTopic : dmx.getTopicsByType("dmx.files.file")) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
-                occupiedSpace += fs.getFile(fileTopicId).length();
+                try {
+                    occupiedSpace += fs.getFile(fileTopicId).length();
+                } catch (Exception e) {
+                    // Note: file might be deleted meanwhile
+                }
             }
         }
         return occupiedSpace;
