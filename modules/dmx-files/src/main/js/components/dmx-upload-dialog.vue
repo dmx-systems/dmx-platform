@@ -1,8 +1,10 @@
 <template>
-  <el-dialog :visible="visible" :title="title" :modal="false" v-draggable @close="close">
-    <el-upload :action="action" :on-success="onSuccess" ref="upload">
-      <el-button slot="trigger" type="primary">Select File</el-button>
+  <el-dialog custom-class="dmx-upload-dialog" :visible="visible" :title="title" :modal="false" v-draggable
+      @open="clearError" @close="close">
+    <el-upload :action="action" :on-success="onSuccess" :on-error="onError" ref="upload">
+      <el-button slot="trigger" type="primary" @click="clearError">Select File</el-button>
     </el-upload>
+    <div class="error">{{error}}</div>
   </el-dialog>
 </template>
 
@@ -10,6 +12,12 @@
 export default {
 
   inject: ["dmx"],
+
+  data () {
+    return {
+      error: ''
+    }
+  },
 
   computed: {
 
@@ -44,7 +52,22 @@ export default {
       this.$store.dispatch('revealRelatedTopic', {relTopic: new this.dmx.RelatedTopic(response.topic)})
       this.$refs.upload.clearFiles()
       this.close()
+    },
+
+    onError (error, file, fileList) {
+      this.error = `${error.name}: ${error.message}`
+    },
+
+    clearError () {
+      this.error = ''
     }
   }
 }
 </script>
+
+<style>
+.dmx-upload-dialog .error {
+  color: var(--color-danger);
+  margin-top: var(--field-spacing);
+}
+</style>
