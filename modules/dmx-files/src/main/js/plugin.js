@@ -25,6 +25,10 @@ export default ({store}) => ({
     'dmx.files.folder': require('./components/dmx-folder-renderer').default
   },
 
+  valueRenderers: {
+    'dmx.files.size': require('./components/dmx-file-size').default,
+  },
+
   detailPanelButtons: {
     'dmx.files.file': [
       {
