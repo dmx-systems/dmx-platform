@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "axios": "0.18.1",
-    "dmx-api": "2.0.0",
+    "dmx-api": "https://github.com/dmx-systems/dmx-api.git",
     "dmx-cytoscape-renderer": "2.0.0",
     "dmx-detail-panel": "https://github.com/dmx-systems/dmx-detail-panel.git",
     "dmx-login-dialog": "2.0.0",
