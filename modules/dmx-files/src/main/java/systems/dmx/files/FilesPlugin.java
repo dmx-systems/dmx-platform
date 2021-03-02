@@ -2,10 +2,6 @@ package systems.dmx.files;
 
 import static systems.dmx.core.Constants.*;
 import systems.dmx.files.event.CheckDiskQuota;
-import systems.dmx.config.ConfigDefinition;
-import systems.dmx.config.ConfigModificationRole;
-import systems.dmx.config.ConfigService;
-import systems.dmx.config.ConfigTarget;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
@@ -18,7 +14,6 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
-import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
@@ -63,7 +58,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static final String FILE_REPO_PATH = System.getProperty("dmx.filerepo.path", "/");
     private static final String FILE_REPOSITORY_PATH = canonizePath(FILE_REPO_PATH);
     private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
-    private static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
@@ -79,8 +73,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         logger.info("File repository config:" +
             "\n  dmx.filerepo.path = \"" + FILE_REPO_PATH + "\" (canonized = \"" + FILE_REPOSITORY_PATH +
                 "\", root_dir = " + IS_ROOT_DIR + ")" +
-            "\n  dmx.filerepo.per_workspace = " + FILE_REPOSITORY_PER_WORKSPACE +
-            "\n  dmx.filerepo.disk_quota = " + DISK_QUOTA_MB);
+            "\n  dmx.filerepo.per_workspace = " + FILE_REPOSITORY_PER_WORKSPACE);
     }
 
     // Events
@@ -92,11 +85,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             );
         }
     };
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Inject
-    private ConfigService configService;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -190,10 +178,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // === File Repository ===
 
-    @POST
-    @Path("/{path}")
-    @Consumes("multipart/form-data")
-    @Transactional
+    // Note: this is not a resource method.
+    // So we don't throw a WebApplicationException here. ### TODO: polish
     @Override
     public StoredFile storeFile(UploadedFile file, @PathParam("path") String repoPath) {
         String operation = "Storing " + file + " at repository path \"" + repoPath + "\"";
@@ -438,30 +424,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
 
     @Override
-    public void preInstall() {
-        configService.registerConfigDefinition(new ConfigDefinition(
-            // TODO: can't use AC constants -> cyclic dependency
-            // TODO: move registration to AC module?
-            ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
-            mf.newTopicModel("dmx.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
-            ConfigModificationRole.ADMIN
-        ));
-    }
-
-    @Override
     public void init() {
         publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
-    }
-
-    @Override
-    public void shutdown() {
-        // Note 1: unregistering is crucial e.g. for redeploying the Files plugin. The next register call
-        // (at preInstall() time) would fail as the Config service already holds such a registration.
-        // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
-        // Files plugin is stopped/started as well but at shutdown() time the Config service is already gone.
-        if (configService != null) {
-            configService.unregisterConfigDefinition("dmx.files.disk_quota");
-        }
     }
 
 

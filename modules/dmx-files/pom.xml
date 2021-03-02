@@ -19,11 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>systems.dmx</groupId>
-            <artifactId>dmx-config</artifactId>
-            <version>5.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>
