@@ -135,7 +135,7 @@ public interface FilesService {
      *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  a StoredFile object which holds 2 information: the name of the uploaded file, and the ID
-     *          of the created File topic.
+     *          of the created File topic. ### FIXDOC
      */
     StoredFile storeFile(UploadedFile file, String repoPath);
 

@@ -58,6 +58,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static final String FILE_REPO_PATH = System.getProperty("dmx.filerepo.path", "/");
     private static final String FILE_REPOSITORY_PATH = canonizePath(FILE_REPO_PATH);
     private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
+    private static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
@@ -73,7 +74,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         logger.info("File repository config:" +
             "\n  dmx.filerepo.path = \"" + FILE_REPO_PATH + "\" (canonized = \"" + FILE_REPOSITORY_PATH +
                 "\", root_dir = " + IS_ROOT_DIR + ")" +
-            "\n  dmx.filerepo.per_workspace = " + FILE_REPOSITORY_PER_WORKSPACE);
+            "\n  dmx.filerepo.per_workspace = " + FILE_REPOSITORY_PER_WORKSPACE +
+            "\n  dmx.filerepo.disk_quota = " + DISK_QUOTA_MB);
     }
 
     // Events
@@ -181,7 +183,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     // Note: this is not a resource method.
     // So we don't throw a WebApplicationException here. ### TODO: polish
     @Override
-    public StoredFile storeFile(UploadedFile file, @PathParam("path") String repoPath) {
+    public StoredFile storeFile(UploadedFile file, String repoPath) {
         String operation = "Storing " + file + " at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
@@ -229,10 +231,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         }
     }
 
-    @POST
-    @Path("/{path}/folder/{folder_name}")
+    // Note: this is not a resource method.
+    // So we don't throw a WebApplicationException here. ### TODO: polish
     @Override
-    public void createFolder(@PathParam("folder_name") String folderName, @PathParam("path") String repoPath) {
+    public void createFolder(String folderName, String repoPath) {
         String operation = "Creating folder \"" + folderName + "\" at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
