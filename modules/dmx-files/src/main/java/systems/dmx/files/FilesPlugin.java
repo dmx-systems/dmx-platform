@@ -27,7 +27,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
@@ -180,10 +179,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // === File Repository ===
 
-    // Note: this is not a resource method.
-    // So we don't throw a WebApplicationException here. ### TODO: polish
+    // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     @Override
-    public StoredFile storeFile(UploadedFile file, String repoPath) {
+    public StoredFile storeFile(UploadedFile file, String repoPath) throws FileRepositoryException {
         String operation = "Storing " + file + " at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
@@ -200,8 +198,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             Topic folderTopic = fetchFolderTopic(repoPath);
             RelatedTopic topic = createFolderAssoc(folderTopic.getId(), fileTopic);
             return new StoredFile(repoFile.getName(), repoPath(fileTopic), fileTopic.getId(), topic);
-        } catch (FileRepositoryException e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -231,10 +227,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         }
     }
 
-    // Note: this is not a resource method.
-    // So we don't throw a WebApplicationException here. ### TODO: polish
+    // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     @Override
-    public void createFolder(String folderName, String repoPath) {
+    public void createFolder(String folderName, String repoPath) throws FileRepositoryException {
         String operation = "Creating folder \"" + folderName + "\" at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
@@ -253,8 +248,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             if (!success) {
                 throw new RuntimeException("File.mkdir() failed (file=\"" + repoFile + "\")");
             }
-        } catch (FileRepositoryException e) {
-            throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
