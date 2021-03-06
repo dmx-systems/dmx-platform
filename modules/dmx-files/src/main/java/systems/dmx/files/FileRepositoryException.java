@@ -4,20 +4,26 @@ import javax.ws.rs.core.Response.Status;
 
 
 
-class FileRepositoryException extends Exception {
+public class FileRepositoryException extends Exception {
 
-    Status status;
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private Status status;
+
+    // ---------------------------------------------------------------------------------------------------- Constructors
 
     FileRepositoryException(String message, Status status) {
         super(message);
         this.status = status;
     }
 
-    Status getStatus() {
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public Status getStatus() {
         return status;
     }
 
-    int getStatusCode() {
+    public int getStatusCode() {
         return status.getStatusCode();
     }
 }
