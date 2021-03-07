@@ -35,10 +35,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.File;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -213,7 +214,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             File file = absolutePath(repoPath);         // throws FileRepositoryException
             //
             // 2) store file
-            FileOutputStream out = new FileOutputStream(file);
+            // FIXME: check disk quota; compare to UploadedFile.write()
+            OutputStream out = new FileOutputStream(file);
             IOUtils.copy(in, out);
             in.close();
             out.close();
