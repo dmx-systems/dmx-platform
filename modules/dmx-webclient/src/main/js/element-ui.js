@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import {
   Button, Input, Select, Option, OptionGroup, Checkbox, Radio, RadioGroup, Dropdown, DropdownMenu, DropdownItem, Link,
-  Dialog, Upload, MessageBox, Collapse, CollapseItem, Tabs, TabPane, Autocomplete, ColorPicker, Loading, Notification
+  Dialog, MessageBox, Collapse, CollapseItem, Tabs, TabPane, Autocomplete, ColorPicker, Loading, Notification
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 import DialogDraggable from 'vue-element-dialog-draggable'
@@ -30,7 +30,6 @@ Vue.use(DropdownMenu)
 Vue.use(DropdownItem)
 Vue.use(Link)
 Vue.use(Dialog)
-Vue.use(Upload)
 Vue.use(Collapse)
 Vue.use(CollapseItem)
 Vue.use(Tabs)
