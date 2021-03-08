@@ -59,9 +59,7 @@ export default ({store}) => {
 
   function createTopic ({topicType, value}) {
     const topicModel = topicType.newTopicModel(value)
-    // console.log('createTopic', topicModel)
     dmx.rpc.createTopic(topicModel).then(topic => {
-      // console.log('Created', topic)
       revealTopic(topic)
       store.dispatch('_processDirectives', topic.directives)
     })
