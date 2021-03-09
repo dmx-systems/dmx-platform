@@ -182,7 +182,7 @@ public interface FilesService {
      *                      <p>
      *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      */
-    void createFolder(String folderName, String repoPath) throws FileRepositoryException;
+    RelatedTopic createFolder(String folderName, String repoPath) throws FileRepositoryException;
 
     // ---
 

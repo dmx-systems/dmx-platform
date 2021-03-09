@@ -231,7 +231,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     @Override
-    public void createFolder(String folderName, String repoPath) throws FileRepositoryException {
+    public RelatedTopic createFolder(String folderName, String repoPath) throws FileRepositoryException {
         String operation = "Creating folder \"" + folderName + "\" at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
@@ -244,12 +244,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             if (repoFile.exists()) {
                 throw new RuntimeException("File or directory \"" + repoFile + "\" already exists");
             }
-            //
             boolean success = repoFile.mkdir();
-            //
             if (!success) {
-                throw new RuntimeException("File.mkdir() failed (file=\"" + repoFile + "\")");
+                throw new RuntimeException("File.mkdir() failed, repoFile=\"" + repoFile + "\"");
             }
+            // 3) create folder topic (and parent assoc)
+            Topic folder = createFolderTopic(repoFile);
+            Topic parentFolder = fetchFolderTopic(repoPath);
+            return createFolderAssoc(parentFolder.getId(), folder);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
