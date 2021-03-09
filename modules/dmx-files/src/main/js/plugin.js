@@ -25,6 +25,11 @@ export default ({store}) => ({
     'dmx.files.size': require('./components/dmx-file-size').default,
   },
 
+  doubleClickHandlers: {
+    'dmx.files.file':   topic => store.dispatch('openFile', topic.id),
+    'dmx.files.folder': topic => store.dispatch('openFile', topic.id)
+  },
+
   detailPanelButtons: {
     'dmx.files.file': [
       {

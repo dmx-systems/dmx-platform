@@ -29,6 +29,10 @@ export default class FilesRPC {
       .then(response => response.data)
   }
 
+  openFile(fileTopicId) {
+    this.http.get(`/files/open/${fileTopicId}`)
+  }
+
   // File Content
 
   getFileContent (repoPath) {

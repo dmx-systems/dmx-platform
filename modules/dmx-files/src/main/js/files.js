@@ -37,6 +37,10 @@ export default ({dmx, axios: http}) => {
 
     getFileContent (_, repoPath) {
       return filesRPC.getFileContent(repoPath)
+    },
+
+    openFile (_, fileTopicId) {
+      filesRPC.openFile(fileTopicId)
     }
   }
 
