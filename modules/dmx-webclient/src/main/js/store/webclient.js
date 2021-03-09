@@ -38,6 +38,11 @@ const state = {
     assoc_danger: []
   },
 
+  doubleClickHandlers: {},  // Max one handler per type:
+                            // {
+                            //   typeUri: function
+                            // }
+
   detailPanelButtons: {},   // Registered extra buttons being displayed in the detail panel:
                             // {
                             //   typeUri: [
@@ -136,6 +141,16 @@ const actions = {
       if (commands[prop]) {
         state.contextCommands[prop] = state.contextCommands[prop].concat(commands[prop])
       }
+    })
+  },
+
+  registerDoubleClickHandlers (_, handlers) {
+    Object.entries(handlers).forEach(([typeUri, handler]) => {
+      const _handler = state.doubleClickHandlers[typeUri]
+      if (_handler) {
+        throw Error(`For type "${typeUri}" a double click handler is already registered`)
+      }
+      state.doubleClickHandlers[typeUri] = handler
     })
   },
 

@@ -97,6 +97,9 @@ function initPlugin (pluginConfig) {
   // context commands
   const contextCommands = _pluginConfig.contextCommands
   contextCommands && store.dispatch('registerContextCommands', contextCommands)
+  // double-click handlers
+  const doubleClickHandlers = _pluginConfig.doubleClickHandlers
+  doubleClickHandlers && store.dispatch('registerDoubleClickHandlers', doubleClickHandlers)
   // detail panel buttons
   registerDetailPanelButtons(_pluginConfig.detailPanelButtons)
   // login extensions

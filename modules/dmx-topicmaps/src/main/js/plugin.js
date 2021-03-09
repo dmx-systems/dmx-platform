@@ -25,7 +25,7 @@ export default ({store, dmx}) => {
         listeners: {
           'topic-select':         id             => store.dispatch('selectTopic', id),
           'topic-unselect':       id             => store.dispatch('unselectTopic', id),
-          'topic-double-click':   topic          => selectTopicmapIf(topic),
+          'topic-double-click':   topic          => invokeDoubleClickHandler(topic),
           'topic-drag':           ({id, pos})    => store.dispatch('setTopicPosition', {id, pos}),
           'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {
                                                                                         topicId: id,
@@ -106,13 +106,16 @@ export default ({store, dmx}) => {
         const mapTypeUri = topic.children['dmx.topicmaps.topicmap_type_uri'].value
         return dmx.typeCache.getTopicType(mapTypeUri).getViewConfig('dmx.webclient.icon')
       }
+    },
+
+    doubleClickHandlers: {
+      'dmx.topicmaps.topicmap': topicmap => store.dispatch('selectTopicmap', topicmap.id)
     }
   }
 
-  function selectTopicmapIf (topic) {
-    if (topic.typeUri === 'dmx.topicmaps.topicmap') {
-      store.dispatch('selectTopicmap', topic.id)
-    }
+  function invokeDoubleClickHandler (topic) {
+    const handler = store.state.doubleClickHandlers[topic.typeUri]
+    handler && handler(topic)
   }
 
   function showDetails () {
