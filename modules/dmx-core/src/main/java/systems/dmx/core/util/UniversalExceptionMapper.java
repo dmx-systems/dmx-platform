@@ -97,7 +97,7 @@ public class UniversalExceptionMapper {
     }
 
     private Response errorResponse(ResponseBuilder builder, Throwable e) {
-        return builder.type(MediaType.APPLICATION_JSON).entity(new ExceptionInfo(e)).build();
+        return builder.type(MediaType.APPLICATION_JSON).entity(new ErrorReport(e)).build();
     }
 
     private boolean hasNestedAccessControlException(Throwable e) {
@@ -145,30 +145,28 @@ public class UniversalExceptionMapper {
 
     // --------------------------------------------------------------------------------------------------- Private Class
 
-    private static class ExceptionInfo implements JSONEnabled {
+    private static class ErrorReport implements JSONEnabled {
 
         private JSONObject json;
 
-        private ExceptionInfo(Throwable e) {
+        private ErrorReport(Throwable e) {
             try {
-                json = createJSONObject(e);
+                String problem = e.getMessage();                // may be null
+                String cause = getRootCause(e).getMessage();    // may be null
+                json = new JSONObject()
+                    .put("problem", problem != null ? problem : "")
+                    .put("cause",   cause   != null ? cause   : "");
             } catch (JSONException je) {
-                throw new RuntimeException("Generating exception info failed", je);
+                throw new RuntimeException("Generating error report failed", je);
             }
         }
 
-        private JSONObject createJSONObject(Throwable e) throws JSONException {
-            String message = e.getMessage();    // may be null
-            JSONObject json = new JSONObject()
-                .put("exception", e.getClass().getName())
-                .put("message", message != null ? message : "");
-            //
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                json.put("cause", createJSONObject(cause));
+        private Throwable getRootCause(Throwable e) {
+            Throwable cause;
+            while ((cause = e.getCause()) != null) {
+                e = cause;
             }
-            //
-            return json;
+            return e;
         }
 
         @Override
