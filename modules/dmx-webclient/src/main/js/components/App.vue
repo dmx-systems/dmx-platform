@@ -145,6 +145,15 @@ button {
   margin-right: var(--icon-spacing);
 }
 
+.el-notification__content {
+  line-height: unset !important;
+  text-align: unset !important;
+}
+
+.el-notification__content .field {
+  margin-top: var(--field-spacing);
+}
+
 /* Quill editor */
 
 button.ql-topic-link {
