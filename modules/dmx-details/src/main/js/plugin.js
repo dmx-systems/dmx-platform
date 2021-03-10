@@ -73,9 +73,9 @@ export default ({store}) => {
 
   function url (object) {
     if (object.typeUri === 'dmx.core.topic_type') {
-      return `/core/topictype/${object.uri}`
+      return `/core/topic-type/${object.uri}`
     } else if (object.typeUri === 'dmx.core.assoc_type') {
-      return `/core/assoctype/${object.uri}`
+      return `/core/assoc-type/${object.uri}`
     } else if (object.isTopic) {
       return `/core/topic/${object.id}?children=true&assocChildren=true`
     } else if (object.isAssoc) {

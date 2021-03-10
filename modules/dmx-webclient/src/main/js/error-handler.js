@@ -3,7 +3,7 @@ import {Notification} from 'element-ui'
 export default function onHttpError (error) {
   const report = error.response.data
   Notification.error({
-    title: 'Sorry',
+    title: 'Error',
     message: `
       <div class="field">
         <div class="field-label">Problem</div>
