@@ -151,11 +151,11 @@ public class UniversalExceptionMapper {
 
         private ErrorReport(Throwable e) {
             try {
-                String problem = e.getMessage();                // may be null
+                String error = e.getMessage();                  // may be null
                 String cause = getRootCause(e).getMessage();    // may be null
                 json = new JSONObject()
-                    .put("problem", problem != null ? problem : "")
-                    .put("cause",   cause   != null ? cause   : "");
+                    .put("error", error != null ? error : "")
+                    .put("cause", cause != null ? cause : "");
             } catch (JSONException je) {
                 throw new RuntimeException("Generating error report failed", je);
             }
