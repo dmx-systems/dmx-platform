@@ -146,12 +146,11 @@ button {
 }
 
 .el-notification__content {
-  line-height: unset !important;
   text-align: unset !important;
 }
 
-.el-notification__content .field {
-  margin-top: var(--field-spacing);
+.el-notification__content p {
+  margin-top: 1em !important;
 }
 
 /* Quill editor */

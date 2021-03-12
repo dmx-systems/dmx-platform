@@ -5,11 +5,8 @@ export default function onHttpError (error) {
   Notification.error({
     title: 'Error',
     message: `
-      <div>${report.error}</div>
-      <div class="field">
-        <div class="field-label">Cause</div>
-        <div>${report.cause}</div>
-      </div>`,
+      <p>${report.error}</p>
+      <p>Cause: ${report.cause}</p>`,
     dangerouslyUseHTMLString: true,
     duration: 0
   })
