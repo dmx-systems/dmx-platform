@@ -5,5 +5,12 @@
       "uri":         "dmx.base.url",
       "dataTypeUri": "dmx.core.text"
     }
+  ],
+  "assoc_types": [
+    {
+      "value":       "User Mailbox",
+      "uri":         "dmx.base.user_mailbox",
+      "dataTypeUri": "dmx.core.text"
+    }
   ]
 }
