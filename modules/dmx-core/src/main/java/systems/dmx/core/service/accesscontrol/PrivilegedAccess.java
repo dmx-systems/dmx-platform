@@ -251,7 +251,7 @@ public interface PrivilegedAccess {
      * Returns the username for the given email address.
      * <p>
      * The username is determined by traversing from the Email Address topic along a
-     * <code>org.deepamehta.signup.user_mailbox</code> association.
+     * <code>dmx.base.user_mailbox</code> association.
      * <p>
      * Access control is bypassed.
      *
@@ -265,7 +265,7 @@ public interface PrivilegedAccess {
      * Returns the email address for the given username.
      * <p>
      * The email address is determined by traversing from the Username topic along a
-     * <code>org.deepamehta.signup.user_mailbox</code> association.
+     * <code>dmx.base.user_mailbox</code> association.
      * <p>
      * Access control is bypassed.
      *

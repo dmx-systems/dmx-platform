@@ -45,7 +45,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private static final String WORKSPACE_ASSIGNMENT = "dmx.workspaces.workspace_assignment";
     private static final String TOPICMAP_CONTEXT     = "dmx.topicmaps.topicmap_context";
     private static final String CONFIGURATION        = "dmx.config.configuration";
-    private static final String USER_MAILBOX         = "org.deepamehta.signup.user_mailbox";
+    private static final String USER_MAILBOX         = "dmx.base.user_mailbox";
 
     // Role Types
     private static final String CONFIGURABLE         = "dmx.config.configurable";
