@@ -1,6 +1,7 @@
 package systems.dmx.files.migrations;
 
 import systems.dmx.core.service.Migration;
+import static systems.dmx.files.Constants.*;
 
 
 
@@ -16,10 +17,10 @@ public class Migration4 extends Migration {
 
     @Override
     public void run() {
-        dmx.getTopicType("dmx.files.file").getViewConfig().setConfigValue(
+        dmx.getTopicType(FILE).getViewConfig().setConfigValue(
             "dmx.webclient.view_config", "dmx.webclient.noneditable", true
         );
-        dmx.getTopicType("dmx.files.folder").getViewConfig().setConfigValue(
+        dmx.getTopicType(FOLDER).getViewConfig().setConfigValue(
             "dmx.webclient.view_config", "dmx.webclient.noneditable", true
         );
     }

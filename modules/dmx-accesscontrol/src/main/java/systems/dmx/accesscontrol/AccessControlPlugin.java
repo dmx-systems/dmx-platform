@@ -1,6 +1,7 @@
 package systems.dmx.accesscontrol;
 
 import static systems.dmx.accesscontrol.Constants.*;
+import static systems.dmx.files.Constants.*;
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
@@ -683,7 +684,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
-        for (Topic fileTopic : dmx.getTopicsByType("dmx.files.file")) {
+        for (Topic fileTopic : dmx.getTopicsByType(FILE)) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
                 try {

@@ -1,6 +1,7 @@
 package systems.dmx.files;
 
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.files.Constants.*;
 import systems.dmx.files.event.CheckDiskQuota;
 
 import systems.dmx.core.Assoc;
@@ -30,7 +31,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -502,7 +502,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFileTopic(String repoPath) {
-        return fetchFileOrFolderTopic(repoPath, "dmx.files.file");
+        return fetchFileOrFolderTopic(repoPath, FILE);
     }
 
     /**
@@ -512,7 +512,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        return fetchFileOrFolderTopic(repoPath, "dmx.files.folder");
+        return fetchFileOrFolderTopic(repoPath, FOLDER);
     }
 
     // ---
@@ -536,7 +536,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchPathTopic(String repoPath) {
-        return dmx.getTopicByValue("dmx.files.path", new SimpleValue(repoPath));
+        return dmx.getTopicByValue(PATH, new SimpleValue(repoPath));
     }
 
     // ---
@@ -550,16 +550,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
-            .set("dmx.files.file_name", path.getName())
-            .set("dmx.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
-            .set("dmx.files.size", path.length());
+            .set(FILE_NAME, path.getName())
+            .set(PATH, repoPath(path))  // TODO: is repo path already known by caller? Pass it?
+            .set(SIZE, path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
         if (mediaType != null) {
-            childTopics.set("dmx.files.media_type", mediaType);
+            childTopics.set(MEDIA_TYPE, mediaType);
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dmx.files.file", childTopics));      // throws Exception
+        return createFileOrFolderTopic(mf.newTopicModel(FILE, childTopics));      // throws Exception
     }
 
     /**
@@ -584,9 +584,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             folderName = repoPath.equals("/") ? repoPath : repoPathFile.getName();  // Note: getName() of "/" returns ""
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dmx.files.folder", mf.newChildTopicsModel()
-            .set("dmx.files.path", repoPath)
-            .set("dmx.files.folder_name", folderName)
+        return createFileOrFolderTopic(mf.newTopicModel(FOLDER, mf.newChildTopicsModel()
+            .set(PATH, repoPath)
+            .set(FOLDER_NAME, folderName)
         ));     // throws Exception
     }
 
@@ -822,7 +822,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @return  The repository path, is canonic.
      */
     private String repoPath(Topic topic) {
-        return topic.getChildTopics().getString("dmx.files.path");
+        return topic.getChildTopics().getString(PATH);
     }
 
     /**
