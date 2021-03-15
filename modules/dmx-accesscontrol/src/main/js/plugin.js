@@ -14,7 +14,9 @@ export default ({store}) => ({
         extensions: state => state.accesscontrol.extensions
       },
       listeners: {
-        'logged-in': username => store.dispatch('loggedIn', username),
+        'logged-in': username => store.dispatch('initTypeCache').then(() => {
+                                   store.dispatch('loggedIn', username)
+                                 }),
         close:       _        => store.dispatch('closeLoginDialog')
       }
     },
