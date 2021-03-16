@@ -14,7 +14,7 @@ const actions = {
 
   loggedIn (_, username) {
     console.log('Login', username)
-    setUsername(username)
+    state.username = username
   },
 
   logout ({dispatch}) {
@@ -22,9 +22,7 @@ const actions = {
     // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
     dmx.rpc.logout().then(() => {
-      setUsername()
-      return dispatch('initTypeCache')
-    }).then(() => {
+      state.username = undefined
       dispatch('loggedOut')
     })
   },
@@ -59,10 +57,6 @@ dmx.rpc.getUsername().then(username => {
 })
 
 // helper
-
-function setUsername (username) {
-  state.username = username
-}
 
 function encodePassword (password) {
   return ENCODED_PASSWORD_PREFIX + SHA256(password)
