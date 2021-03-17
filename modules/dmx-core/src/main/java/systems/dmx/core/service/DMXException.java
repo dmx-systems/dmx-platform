@@ -10,4 +10,8 @@ public class DMXException extends RuntimeException {
         super(message);
         this.level = level;
     }
+
+    public CriticalityLevel getLevel() {
+        return level;
+    }
 }

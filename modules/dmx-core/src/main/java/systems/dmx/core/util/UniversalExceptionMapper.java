@@ -1,6 +1,8 @@
 package systems.dmx.core.util;
 
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.service.CriticalityLevel;
+import systems.dmx.core.service.DMXException;
 import systems.dmx.core.service.accesscontrol.AccessControlException;
 
 import org.codehaus.jettison.json.JSONException;
@@ -151,11 +153,16 @@ public class UniversalExceptionMapper {
 
         private ErrorReport(Throwable e) {
             try {
-                String error = e.getMessage();                  // may be null
-                String cause = getRootCause(e).getMessage();    // may be null
+                Throwable _cause = getRootCause(e);
+                String error = e.getMessage();          // may be null
+                String cause = _cause.getMessage();     // may be null
                 json = new JSONObject()
                     .put("error", error != null ? error : "")
                     .put("cause", cause != null ? cause : "");
+                if (_cause instanceof DMXException) {
+                    CriticalityLevel level = ((DMXException) _cause).getLevel();
+                    json.put("level", level);
+                }
             } catch (JSONException je) {
                 throw new RuntimeException("Generating error report failed", je);
             }
