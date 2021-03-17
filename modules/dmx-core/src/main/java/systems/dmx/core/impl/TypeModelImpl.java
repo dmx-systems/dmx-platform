@@ -7,8 +7,10 @@ import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigModel;
+import systems.dmx.core.service.CriticalityLevel;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
+import systems.dmx.core.service.DMXException;
 import systems.dmx.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -257,7 +259,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         // 1) check pre-condition
         int size = getAllInstances().size();
         if (size > 0) {
-            throw new RuntimeException(size + " \"" + value + "\" instances still exist");
+            throw new DMXException(size + " \"" + value + "\" instances still exist", CriticalityLevel.WARNING);
         }
         // 2) delete all comp defs
         //
