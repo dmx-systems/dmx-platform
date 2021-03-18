@@ -5,6 +5,8 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
+import systems.dmx.core.service.CriticalityLevel;
+import systems.dmx.core.service.DMXException;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.util.DMXUtils;
 
@@ -137,7 +139,8 @@ public final class AccessLayer {
             model.preCreate();
             return integrateValues(model);
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic failed, model=" + model, e);
+            // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
+            throw new RuntimeException("Creating topic of type \"" + model.getTypeUri() + "\" failed", e);
         }
     }
 
@@ -198,6 +201,7 @@ public final class AccessLayer {
                 updateModel
             );
         } catch (Exception e) {
+            // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
             throw new RuntimeException("Fetching and updating topic " + updateModel.getId() + " failed", e);
         }
     }
@@ -354,7 +358,8 @@ public final class AccessLayer {
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, _model.instantiate());
             return _model;
         } catch (Exception e) {
-            throw new RuntimeException("Creating association failed, model=" + model, e);
+            // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
+            throw new RuntimeException("Creating assoc of type \"" + model.getTypeUri() + "\" failed", e);
         }
     }
 
@@ -369,6 +374,7 @@ public final class AccessLayer {
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
             // Its children are always topics (never associations).
         } catch (Exception e) {
+            // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
             throw new RuntimeException("Fetching and updating association " + updateModel.getId() + " failed", e);
         }
     }
@@ -1028,12 +1034,16 @@ public final class AccessLayer {
     // ---
 
     private <M extends DMXObjectModelImpl> M integrateValues(M newValues) {
-        M value = new ValueIntegrator(this).integrate(newValues, null, null).value;   // targetObject=null, compDef=null
-        // sanity check
-        if (value == null) {
-            throw new RuntimeException("ValueIntegrator yields no result");
+        try {
+            M value = new ValueIntegrator(this).integrate(newValues, null, null).value;   // targetObject=compDef=null
+            // sanity check
+            if (value == null) {
+                throw new DMXException("ValueIntegrator yields no result", CriticalityLevel.WARNING);
+            }
+            //
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException("Integrating new values failed, newValues=" + newValues, e);
         }
-        //
-        return value;
     }
 }
