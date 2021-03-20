@@ -357,10 +357,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspaceId") long workspaceId) {
         try {
-            dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
-                mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
-                mf.newTopicPlayerModel(workspaceId, DEFAULT)
-            ));
+            dmx.getPrivilegedAccess().runInWorkspaceContext(workspaceId, () ->
+                dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
+                    mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
+                    mf.newTopicPlayerModel(workspaceId, DEFAULT)
+                ))
+            );
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -570,9 +572,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 try {
                     // creating a Membership requires WRITE permission for the involved workspace
                     PlayerModel wp = players[1];
-                    if (!wp.getTypeUri().equals(WORKSPACE)) {
-                        throw new RuntimeException("Unexpected players: " + players);
-                    }
                     checkWriteAccess(wp.getId());
                     return true;
                 } catch (AccessControlException e) {
@@ -580,8 +579,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 }
             }
         );
+        // custom workspace assignment
         if (p != null) {
-            // custom workspace assignment
             long workspaceId = p[1].getId();
             assoc.getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
         }
