@@ -178,9 +178,10 @@ public interface PrivilegedAccess {
      * <p>
      * If the object is already assigned to the given workspace nothing is performed.
      * <p>
-     * Note: this method can't be used to reassign an object to another workspace; use the `WorkspacesService` instead.
-     * Typically this method is used for objects created in a migration or objects created inside a
-     * <code>runInWorkspaceContext -1</code> context, and when the `WorkspacesService` is not available for some reason.
+     * Note: this method can't be used to reassign an object to another workspace; use the
+     * <code>WorkspacesService</code> instead. Typically this method is used for objects created in a migration or
+     * objects created inside a <code>runInWorkspaceContext -1</code> context, or when the
+     * <code>WorkspacesService</code> is not available for some reason.
      *
      * @throws  RuntimeException    if the object is already assigned to another workspace than the given workspace.
      */
@@ -195,10 +196,20 @@ public interface PrivilegedAccess {
     /**
      * Executes a code block and assigns all topics/associations created while that execution to the given workspace.
      * <p>
-     * <code>runInWorkspaceContext()</code> calls can be nested.
+     * Use this method to override the standard workspace assignment (which is based on <code>dmx_workspace_id</code>
+     * cookie or Workspace facet).
      * <p>
-     * Use this method to override the standard workspace assignment (which is based on `dmx_workspace_id` cookie or
-     * Workspace facet).
+     * <code>runInWorkspaceContext()</code> calls can be nested.
+     *
+     * @param   workspaceId     the ID of the workspace the created topics/associations will be assigned to.
+     *                          <p>
+     *                          Pass <code>-1</code> to do no workspace assignments. In this case the topics/
+     *                          associations are created without any workspace assignment. Consider using privileged
+     *                          {@link #assignToWorkspace} to do the initial workspace assignments later on.
+     *
+     * @param   callable        the code block to execute.
+     *
+     * @return  The value returned by your <code>callable</code>.
      *
      * @throws  AccessControlException      if the current user has no WRITE permission for the given workspace.
      * @throws  IllegalArgumentException    if <code>workspaceId</code> does not refer to a Workspace.
@@ -206,9 +217,9 @@ public interface PrivilegedAccess {
     <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
 
     /**
-     * Executes a code block and suppresses the standard workspace assignment (which is based on `dmx_workspace_id`
-     * cookie or Workspace facet) for all topics/associations created while that execution. The created topics/
-     * associations will have no workspace assignment.
+     * Executes a code block and suppresses the standard workspace assignment (which is based on
+     * <code>dmx_workspace_id</code> cookie or Workspace facet) for all topics/associations created while that
+     * execution. The created topics/associations will have no workspace assignment.
      * <p>
      * Use this method if you want do workspace assignment manually after creation.
      *
