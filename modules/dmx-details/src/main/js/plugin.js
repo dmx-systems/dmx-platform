@@ -3,6 +3,10 @@ import Vue from 'vue'
 export default ({store}) => {
   return {
 
+    init () {
+      store.dispatch('initConfigDefs')
+    },
+
     storeModule: {
       name: 'details',
       module: require('./details').default
@@ -28,6 +32,7 @@ export default ({store}) => {
           pinned:          state => state.details.pinned,
           tab:             state => state.details.tab,
           mode:            state => state.details.mode,
+          configDefs:      state => state.details.configDefs,
           markerTopicIds:  (_, getters) => getters && getters.visibleTopicIds,
           detailRenderers: state => state.detailRenderers,
           extraButtons:    state => state.detailPanelButtons,
