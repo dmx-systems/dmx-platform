@@ -5,7 +5,7 @@ export default ({dmx}) => {
     visible: false,     // Detail panel visibility
     pinned: false,      // Pin toggle state
 
-    tab: 'info',        // Selected tab: 'info', 'related', 'meta', 'view'.
+    tab: 'info',        // Selected tab: 'info', 'related', 'meta', 'config'.
                         // Note: form edit takes place in "info" tab, while 'mode' is set to 'form'.
 
     mode: 'info',       // Mode of the "info" tab: 'info' or 'form'.
@@ -37,7 +37,7 @@ export default ({dmx}) => {
 
     selectDetail (_, detail) {
       // console.log('selectDetail', detail)
-      if (!['info', 'edit', 'related', 'meta', 'view'].includes(detail)) {
+      if (!['info', 'edit', 'related', 'meta', 'config'].includes(detail)) {
         throw Error(`"${detail}" is not an expected detail name`)
       }
       if (detail === 'info') {

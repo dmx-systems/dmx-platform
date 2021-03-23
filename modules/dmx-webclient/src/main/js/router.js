@@ -135,7 +135,7 @@ store.registerModule('routerModule', {
      *
      * Prerequisite: a single selection
      *
-     * @param   detail    "info", "related", "meta", "view" or "edit"
+     * @param   detail    "info", "related", "meta", "config" or "edit"
      */
     callDetailRoute ({rootState}, detail) {
       const object = rootState.object
@@ -152,7 +152,7 @@ store.registerModule('routerModule', {
      * Redirects to "topicDetail" route.
      *
      * @param   id        a topic ID
-     * @param   detail    "info", "related", "meta", "view" or "edit"
+     * @param   detail    "info", "related", "meta", "config" or "edit"
      */
     callTopicDetailRoute (_, {id, detail}) {
       router.push({
@@ -165,7 +165,7 @@ store.registerModule('routerModule', {
      * Redirects to "assocDetail" route.
      *
      * @param   id        an assoc ID
-     * @param   detail    "info", "related", "meta", "view" or "edit"
+     * @param   detail    "info", "related", "meta", "config" or "edit"
      */
     callAssocDetailRoute (_, {id, detail}) {
       router.push({
