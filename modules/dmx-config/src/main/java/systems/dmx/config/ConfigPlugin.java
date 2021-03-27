@@ -3,7 +3,7 @@ package systems.dmx.config;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.SimpleValue;
+import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
@@ -18,6 +18,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.Context;
 
 import java.util.ArrayList;
@@ -60,6 +61,14 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     public RelatedTopic getConfigTopic(@PathParam("configTypeUri") String configTypeUri,
                                        @PathParam("topicId") long topicId) {
         return _getConfigTopic(configTypeUri, topicId);
+    }
+
+    @PUT
+    @Path("/topic/{topicId}")
+    @Override
+    public void updateConfigTopic(@PathParam("topicId") long topicId, TopicModel updateModel) {
+        logger.info("### topicId=" + topicId + ", updateModel=" + updateModel);
+        // TODO
     }
 
     @Override
