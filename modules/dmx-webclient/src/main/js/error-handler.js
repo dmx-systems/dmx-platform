@@ -8,9 +8,8 @@ export default function onHttpError (error) {
   Notification({
     title: report.level,
     type: report.level.toLowerCase(),
-    message: `
-      <p>${report.error}</p>
-      <p>Cause: ${report.cause}</p>`,
+    message: '<p>' + report.error + '</p>' +
+      (report.cause ? '<p>Cause: ' + report.cause + '</p>' : ''),
     dangerouslyUseHTMLString: true,
     duration: 0
   })
