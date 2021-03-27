@@ -153,22 +153,31 @@ public class UniversalExceptionMapper {
 
         private ErrorReport(Throwable e) {
             try {
-                Throwable _cause = getRootCause(e);
-                String error = e.getMessage();          // may be null
-                String cause = _cause.getMessage();     // may be null
-                json = new JSONObject()
-                    .put("error", error != null ? error : "")
-                    .put("cause", cause != null ? cause : "");
-                if (_cause instanceof DMXException) {
-                    CriticalityLevel level = ((DMXException) _cause).getLevel();
-                    json.put("level", level);
+                String error = e.getMessage();              // may be null
+                json = new JSONObject().put("error", error != null ? error : "");
+                Throwable cause = getRootCause(e);
+                if (cause != null) {
+                    String message = cause.getMessage();    // may be null
+                    if (message != null) {
+                        json.put("cause", message);
+                    }
+                    if (cause instanceof DMXException) {
+                        CriticalityLevel level = ((DMXException) cause).getLevel();
+                        json.put("level", level);
+                    }
                 }
             } catch (JSONException je) {
                 throw new RuntimeException("Generating error report failed", je);
             }
         }
 
+        /**
+         * @return  the final root cause of the given exception, or <code>null</code> if there is no root cause.
+         */
         private Throwable getRootCause(Throwable e) {
+            if (e.getCause() == null) {
+                return null;
+            }
             Throwable cause;
             while ((cause = e.getCause()) != null) {
                 e = cause;
