@@ -65,10 +65,29 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @PUT
     @Path("/topic/{topicId}")
+    @Transactional
     @Override
     public void updateConfigTopic(@PathParam("topicId") long topicId, TopicModel updateModel) {
-        logger.info("### topicId=" + topicId + ", updateModel=" + updateModel);
-        // TODO
+        try {
+            Topic topic = dmx.getTopic(topicId);
+            String configTypeUri = updateModel.getTypeUri();
+            RelatedTopic oldConfigTopic = getConfigTopic(configTypeUri, topicId);
+            ConfigDefinition configDef = getApplicableConfigDefinition(topic, configTypeUri);
+            long workspaceId = workspaceId(configDef.getConfigModificationRole());
+            dmx.getPrivilegedAccess().runInWorkspaceContext(workspaceId, () -> {
+                Topic newConfigTopic = dmx.createTopic(updateModel);
+                if (!oldConfigTopic.equals(newConfigTopic)) {
+                    logger.info("change " + oldConfigTopic.getId() + " -> " + newConfigTopic.getId());
+                    oldConfigTopic.getRelatingAssoc().delete();
+                    createConfigAssoc(topic, newConfigTopic);
+                } else {
+                    logger.info("no change");
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Updating config for topic " + topicId + " failed", e);
+        }
     }
 
     @Override
@@ -177,6 +196,13 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " +
                 topic.getId() + " failed", e);
         }
+    }
+
+    private void createConfigAssoc(Topic topic, Topic configTopic) {
+        dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
+            mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
+            mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
+        ));
     }
 
     private long workspaceId(ConfigModificationRole role) {

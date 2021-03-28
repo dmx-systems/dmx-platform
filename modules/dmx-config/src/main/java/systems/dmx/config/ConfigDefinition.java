@@ -17,11 +17,17 @@ public class ConfigDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   configurableUri     either a topic URI or a topic type URI, depending on "target".
+     */
     public ConfigDefinition(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic,
                                                                          ConfigModificationRole role) {
         this(target, configurableUri, defaultConfigTopic, role, null);
     }
 
+    /**
+     * @param   configurableUri     either a topic URI or a topic type URI, depending on "target".
+     */
     public ConfigDefinition(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic,
                                                  ConfigModificationRole role, ConfigCustomizer customizer) {
         this.target = target;
