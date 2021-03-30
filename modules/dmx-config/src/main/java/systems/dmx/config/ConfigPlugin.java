@@ -179,16 +179,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             final PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            // Note: a config topic requires a special workspace assignment. So we suppress standard workspace
-            // assignment. (We can't set the actual workspace here as privileged "assignToWorkspace" calls are
-            // required.)
-            return pa.runInWorkspaceContext(-1, () -> {
+            // Note: a config topic requires a special workspace assignment.
+            long workspaceId = workspaceId(configDef.getConfigModificationRole());
+            return pa.runInWorkspaceContext(workspaceId, () -> {
                 Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
-                dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
-                    mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
-                    mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
-                ));
-                pa.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
+                createConfigAssoc(topic, configTopic);
                 // ### TODO: extend Core API to avoid re-retrieval
                 return _getConfigTopic(configTypeUri, topic.getId());
             });
