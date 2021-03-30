@@ -157,8 +157,7 @@ public class UniversalExceptionMapper {
                 json = new JSONObject().put("error", error != null ? error : "");
                 Throwable cause = getRootCause(e);
                 if (cause != null) {
-                    String message = cause.getMessage();    // may be null
-                    json.put("cause", message != null ? message : cause);
+                    json.put("cause", cause);
                     if (cause instanceof DMXException) {
                         CriticalityLevel level = ((DMXException) cause).getLevel();
                         json.put("level", level);
