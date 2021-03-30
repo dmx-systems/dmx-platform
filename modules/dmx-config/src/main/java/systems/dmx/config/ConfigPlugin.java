@@ -75,11 +75,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             ConfigDefinition configDef = getApplicableConfigDefinition(topic, configTypeUri);
             long workspaceId = workspaceId(configDef.getConfigModificationRole());
             dmx.getPrivilegedAccess().runInWorkspaceContext(workspaceId, () -> {
-                Topic newConfigTopic = dmx.createTopic(updateModel);
-                if (!oldConfigTopic.equals(newConfigTopic)) {
-                    logger.info("change " + oldConfigTopic.getId() + " -> " + newConfigTopic.getId());
+                Topic configTopic = dmx.createTopic(updateModel);
+                if (!configTopic.equals(oldConfigTopic)) {
+                    logger.info("change " + oldConfigTopic.getId() + " -> " + configTopic.getId());
                     oldConfigTopic.getRelatingAssoc().delete();
-                    createConfigAssoc(topic, newConfigTopic);
+                    createConfigAssoc(topic, configTopic);
                 } else {
                     logger.info("no change");
                 }
