@@ -54,8 +54,12 @@ export default ({dmx}) => {
     initConfigDefs () {
       dmx.rpc.getConfigDefs().then(configDefs => {
         state.configDefs = configDefs
-        console.log(state.configDefs)
+        // console.log(state.configDefs)
       })
+    },
+
+    updateConfigTopic ({rootState}, configTopic) {
+      dmx.rpc.updateConfigTopic(rootState.object.id, configTopic)
     }
   }
 

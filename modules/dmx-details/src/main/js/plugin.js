@@ -51,6 +51,7 @@ export default ({store}) => {
                                                     },
           'submit-inline':       object          => store.dispatch('submit', object),
           'submit-view-config':  viewConfigTopic => store.dispatch('submit', viewConfigTopic),
+          'submit-config-topic': configTopic     => store.dispatch('updateConfigTopic', configTopic),
           'child-topic-reveal':  relTopic        => store.dispatch('revealRelatedTopic', {relTopic}),
           'related-topic-click': relTopic        => store.dispatch('revealRelatedTopic', {relTopic}),
           'related-icon-click':  relTopic        => store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
