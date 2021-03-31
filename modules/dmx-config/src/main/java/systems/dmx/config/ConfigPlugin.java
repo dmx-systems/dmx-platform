@@ -5,6 +5,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
+import systems.dmx.core.service.DirectivesResponse;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.event.PostCreateTopic;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -67,7 +67,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     @Path("/topic/{topicId}")
     @Transactional
     @Override
-    public void updateConfigTopic(@PathParam("topicId") long topicId, TopicModel updateModel) {
+    public DirectivesResponse updateConfigTopic(@PathParam("topicId") long topicId, TopicModel updateModel) {
         try {
             Topic topic = dmx.getTopic(topicId);
             String configTypeUri = updateModel.getTypeUri();
@@ -85,6 +85,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                 }
                 return null;
             });
+            return new DirectivesResponse();
         } catch (Exception e) {
             throw new RuntimeException("Updating config for topic " + topicId + " failed", e);
         }

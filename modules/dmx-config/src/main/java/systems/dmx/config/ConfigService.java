@@ -3,6 +3,7 @@ package systems.dmx.config;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.service.DirectivesResponse;
 
 
 
@@ -10,7 +11,7 @@ public interface ConfigService {
 
     RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
-    void updateConfigTopic(long topicId, TopicModel updateModel);
+    DirectivesResponse updateConfigTopic(long topicId, TopicModel updateModel);
 
     void createConfigTopic(String configTypeUri, Topic topic);
 

@@ -7,10 +7,10 @@ import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 
 
 /**
- * Creates workspace assignments for existing "Configuration" assocs.
+ * Creates missing workspace assignments for existing "Configuration" assocs.
  * <p>
  * Part of DMX 5.2
- * Runs ALWAYS
+ * Runs only in UPDATE mode.
  */
 public class Migration2 extends Migration {
 

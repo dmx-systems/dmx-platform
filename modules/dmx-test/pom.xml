@@ -24,12 +24,13 @@
             <version>5.2-SNAPSHOT</version>
         </dependency>
         <!--
-            Note: we depend on the following plugins just for their constants.
-            IMPORTANT: we must not depend on any plugin which comes with a `migrationX.properties` file.
-            While testing no OSGi container is in place. When the surefire tests run only 1 class loader is in place,
-            causing the resources of all plugins being "merged".
-            The solution is to not depend on dmx-workspaces here, as Workspaces depends on dmx-config, and Config comes
-            with `migration2.properties`. It would accidentally be read while running the Core migrations.
+            IMPORTANT: we depend on the following plugins just for their constants. However, we can't depend on any
+            plugin which comes with a `migrationX.properties` file. While testing no OSGi container is in place.
+            When the surefire tests run only 1 class loader is in place, causing the resources of all plugins being
+            "merged". In particular the dmx-workspaces plugin depends on dmx-config plugin, and Config comes with
+            `migration2.properties`. The migration manager would accidentally pick up this file while running the
+            Core migrations.
+            The solution is to not depend on dmx-workspaces and hardcode the Workspaces constants in the tests.
         -->
         <dependency>
             <groupId>systems.dmx</groupId>
