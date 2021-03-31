@@ -62,6 +62,14 @@ export default ({dmx}) => {
       dmx.rpc.updateConfigTopic(rootState.object.id, configTopic).then(directives => {
         dispatch('_processDirectives', directives)
       })
+    },
+
+    loggedIn ({dispatch}) {
+      dispatch('initConfigDefs')
+    },
+
+    loggedOut ({dispatch}) {
+      dispatch('initConfigDefs')
     }
   }
 
