@@ -58,8 +58,10 @@ export default ({dmx}) => {
       })
     },
 
-    updateConfigTopic ({rootState}, configTopic) {
-      dmx.rpc.updateConfigTopic(rootState.object.id, configTopic)
+    updateConfigTopic ({rootState, dispatch}, configTopic) {
+      dmx.rpc.updateConfigTopic(rootState.object.id, configTopic).then(directives => {
+        dispatch('_processDirectives', directives)
+      })
     }
   }
 
