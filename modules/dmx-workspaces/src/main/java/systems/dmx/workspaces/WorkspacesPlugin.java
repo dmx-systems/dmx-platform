@@ -72,8 +72,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
-    private static final String ENABLED_SHARING_MODES_LABEL = "Enabled Sharing Modes";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject

@@ -4,6 +4,8 @@ package systems.dmx.workspaces;
 
 public class Constants {
 
+    public static final String ENABLED_SHARING_MODES_LABEL = "Enabled Sharing Modes";
+
     // Topic Types
     public static final String WORKSPACE             = "dmx.workspaces.workspace";
     public static final String WORKSPACE_NAME        = "dmx.workspaces.workspace_name";
