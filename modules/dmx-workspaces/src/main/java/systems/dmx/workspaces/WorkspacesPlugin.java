@@ -72,6 +72,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
+    private static final String ENABLED_SHARING_MODES_LABEL = "Enabled Sharing Modes";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
@@ -363,6 +365,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note: for an object's initial workspace assignment checking the object's WRITE permission would fail
         // as that permission is granted only by the very workspace assignment we're about to create.
         _assignToWorkspace(topic, workspaceId);
+        //
+        setEnabledSharingModesLabel(topic);
     }
 
     /**
@@ -562,6 +566,12 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             if (getAssignedWorkspaceId(object.getId()) != workspaceId) {
                 objects.remove();
             }
+        }
+    }
+
+    private void setEnabledSharingModesLabel(Topic topic) {
+        if (topic.getTypeUri().equals(ENABLED_SHARING_MODES)) {
+            topic.setSimpleValue(ENABLED_SHARING_MODES_LABEL);
         }
     }
 
