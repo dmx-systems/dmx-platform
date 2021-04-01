@@ -1,5 +1,6 @@
 package systems.dmx.config;
 
+import static systems.dmx.config.Constants.*;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -33,11 +34,6 @@ import java.util.logging.Logger;
 @Path("/config")
 @Produces("application/json")
 public class ConfigPlugin extends PluginActivator implements ConfigService, PostCreateTopic {
-
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static String ASSOC_TYPE_CONFIGURATION = "dmx.config.configuration";
-    private static String ROLE_TYPE_CONFIGURABLE = "dmx.config.configurable";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -195,8 +191,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     }
 
     private void createConfigAssoc(Topic topic, Topic configTopic) {
-        dmx.createAssoc(mf.newAssocModel(ASSOC_TYPE_CONFIGURATION,
-            mf.newTopicPlayerModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
+        dmx.createAssoc(mf.newAssocModel(CONFIGURATION,
+            mf.newTopicPlayerModel(topic.getId(), CONFIGURABLE),
             mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
         ));
     }
