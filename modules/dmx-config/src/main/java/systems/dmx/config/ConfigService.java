@@ -9,6 +9,8 @@ import systems.dmx.core.service.DirectivesResponse;
 
 public interface ConfigService {
 
+    ConfigDefinitions getConfigDefs();
+
     RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
     DirectivesResponse updateConfigTopic(long topicId, TopicModel updateModel);

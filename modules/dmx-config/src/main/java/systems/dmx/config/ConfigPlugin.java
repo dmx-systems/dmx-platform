@@ -52,6 +52,29 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // --- ConfigService ---
 
     @GET
+    @Override
+    public ConfigDefinitions getConfigDefs() {
+        try {
+            JSONObject json = new JSONObject();
+            PrivilegedAccess pa = dmx.getPrivilegedAccess();
+            for (String configurableUri: registry.keySet()) {
+                JSONArray array = new JSONArray();
+                for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
+                    String username = pa.getUsername(request);
+                    long workspaceId = workspaceId(configDef.getConfigModificationRole());
+                    if (pa.hasReadPermission(username, workspaceId)) {
+                        array.put(configDef.getConfigTypeUri());
+                    }
+                }
+                json.put(configurableUri, array);
+            }
+            return new ConfigDefinitions(json);
+        } catch (Exception e) {
+            throw new RuntimeException("Retrieving the registered config definitions failed", e);
+        }
+    }
+
+    @GET
     @Path("/{configTypeUri}/topic/{topicId}")
     @Override
     public RelatedTopic getConfigTopic(@PathParam("configTypeUri") String configTypeUri,
@@ -129,30 +152,6 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             throw new RuntimeException("No such config definition registered");
         } catch (Exception e) {
             throw new RuntimeException("Unregistering definition for config type \"" + configTypeUri + "\" failed", e);
-        }
-    }
-
-    // --- not part of OSGi service ---
-
-    @GET
-    public ConfigDefinitions getConfigDefinitions() {
-        try {
-            JSONObject json = new JSONObject();
-            PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            for (String configurableUri: registry.keySet()) {
-                JSONArray array = new JSONArray();
-                for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
-                    String username = pa.getUsername(request);
-                    long workspaceId = workspaceId(configDef.getConfigModificationRole());
-                    if (pa.hasReadPermission(username, workspaceId)) {
-                        array.put(configDef.getConfigTypeUri());
-                    }
-                }
-                json.put(configurableUri, array);
-            }
-            return new ConfigDefinitions(json);
-        } catch (Exception e) {
-            throw new RuntimeException("Retrieving the registered config definitions failed", e);
         }
     }
 
