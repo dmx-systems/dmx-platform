@@ -5,8 +5,8 @@ import static systems.dmx.files.Constants.*;
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
-import systems.dmx.config.ConfigDefinition;
-import systems.dmx.config.ConfigModificationRole;
+import systems.dmx.config.ConfigDef;
+import systems.dmx.config.ConfigModRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
 import static systems.dmx.core.Constants.*;
@@ -481,10 +481,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preInstall() {
-        cs.registerConfigDef(new ConfigDefinition(
+        cs.registerConfigDef(new ConfigDef(
             ConfigTarget.TYPE_INSTANCES, USERNAME,
             mf.newTopicModel(LOGIN_ENABLED, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
-            ConfigModificationRole.ADMIN, this
+            ConfigModRole.ADMIN, this
         ));
     }
 

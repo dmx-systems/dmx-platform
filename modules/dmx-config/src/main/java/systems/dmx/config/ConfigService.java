@@ -9,7 +9,7 @@ import systems.dmx.core.service.DirectivesResponse;
 
 public interface ConfigService {
 
-    ConfigDefinitions getConfigDefs();
+    ConfigDefs getConfigDefs();
 
     RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
@@ -19,7 +19,7 @@ public interface ConfigService {
 
     // ---
 
-    void registerConfigDef(ConfigDefinition configDef);
+    void registerConfigDef(ConfigDef configDef);
 
     void unregisterConfigDef(String configTypeUri);
 }

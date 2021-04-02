@@ -2,7 +2,7 @@ package systems.dmx.config;
 
 
 
-public enum ConfigModificationRole {
+public enum ConfigModRole {
     ADMIN,
     SYSTEM,
     CREATOR,

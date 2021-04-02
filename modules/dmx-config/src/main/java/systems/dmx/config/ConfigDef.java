@@ -5,14 +5,14 @@ import systems.dmx.core.model.TopicModel;
 
 
 
-public class ConfigDefinition {
+public class ConfigDef {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private ConfigTarget target;
     private String configurableUri;
     private TopicModel defaultConfigTopic;
-    private ConfigModificationRole role;
+    private ConfigModRole role;
     private ConfigCustomizer customizer;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -20,16 +20,15 @@ public class ConfigDefinition {
     /**
      * @param   configurableUri     either a topic URI or a topic type URI, depending on "target".
      */
-    public ConfigDefinition(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic,
-                                                                         ConfigModificationRole role) {
+    public ConfigDef(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic, ConfigModRole role) {
         this(target, configurableUri, defaultConfigTopic, role, null);
     }
 
     /**
      * @param   configurableUri     either a topic URI or a topic type URI, depending on "target".
      */
-    public ConfigDefinition(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic,
-                                                 ConfigModificationRole role, ConfigCustomizer customizer) {
+    public ConfigDef(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic, ConfigModRole role,
+                                                                  ConfigCustomizer customizer) {
         this.target = target;
         this.configurableUri = configurableUri;
         this.defaultConfigTopic = defaultConfigTopic;
@@ -41,7 +40,7 @@ public class ConfigDefinition {
 
     @Override
     public boolean equals(Object o) {
-        return getConfigTypeUri().equals(((ConfigDefinition) o).getConfigTypeUri());
+        return getConfigTypeUri().equals(((ConfigDef) o).getConfigTypeUri());
     }
 
     @Override
@@ -69,7 +68,7 @@ public class ConfigDefinition {
         return defaultConfigTopic;
     }
 
-    ConfigModificationRole getConfigModificationRole() {
+    ConfigModRole getConfigModRole() {
         return role;
     }
 }

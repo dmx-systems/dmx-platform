@@ -40,7 +40,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     /**
      * Key: the "configurable URI" as a config target's hash key, that is either "topicUri:{uri}" or "typeUri:{uri}".
      */
-    private Map<String, List<ConfigDefinition>> registry = new HashMap();
+    private Map<String, List<ConfigDef>> registry = new HashMap();
 
     @Context
     private HttpServletRequest request;
@@ -53,22 +53,22 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @GET
     @Override
-    public ConfigDefinitions getConfigDefs() {
+    public ConfigDefs getConfigDefs() {
         try {
             JSONObject json = new JSONObject();
             PrivilegedAccess pa = dmx.getPrivilegedAccess();
             for (String configurableUri: registry.keySet()) {
                 JSONArray array = new JSONArray();
-                for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
+                for (ConfigDef configDef : lookupConfigDefs(configurableUri)) {
                     String username = pa.getUsername(request);
-                    long workspaceId = workspaceId(configDef.getConfigModificationRole());
+                    long workspaceId = workspaceId(configDef.getConfigModRole());
                     if (pa.hasReadPermission(username, workspaceId)) {
                         array.put(configDef.getConfigTypeUri());
                     }
                 }
                 json.put(configurableUri, array);
             }
-            return new ConfigDefinitions(json);
+            return new ConfigDefs(json);
         } catch (Exception e) {
             throw new RuntimeException("Retrieving the registered config definitions failed", e);
         }
@@ -91,8 +91,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             Topic topic = dmx.getTopic(topicId);
             String configTypeUri = updateModel.getTypeUri();
             RelatedTopic oldConfigTopic = getConfigTopic(configTypeUri, topicId);
-            ConfigDefinition configDef = getApplicableConfigDefinition(topic, configTypeUri);
-            long workspaceId = workspaceId(configDef.getConfigModificationRole());
+            ConfigDef configDef = getApplicableConfigDef(topic, configTypeUri);
+            long workspaceId = workspaceId(configDef.getConfigModRole());
             dmx.getPrivilegedAccess().runInWorkspaceContext(workspaceId, () -> {
                 Topic configTopic = dmx.createTopic(updateModel);
                 if (!configTopic.equals(oldConfigTopic)) {
@@ -112,13 +112,13 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @Override
     public void createConfigTopic(String configTypeUri, Topic topic) {
-        _createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic);
+        _createConfigTopic(getApplicableConfigDef(topic, configTypeUri), topic);
     }
 
     // ---
 
     @Override
-    public void registerConfigDef(ConfigDefinition configDef) {
+    public void registerConfigDef(ConfigDef configDef) {
         try {
             if (isRegistered(configDef)) {
                 throw new RuntimeException("A definition for config type \"" + configDef.getConfigTypeUri() +
@@ -126,7 +126,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             }
             //
             String hashKey = configDef.getHashKey();
-            List<ConfigDefinition> configDefs = lookupConfigDefinitions(hashKey);
+            List<ConfigDef> configDefs = lookupConfigDefs(hashKey);
             if (configDefs == null) {
                 configDefs = new ArrayList();
                 registry.put(hashKey, configDefs);
@@ -140,8 +140,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     @Override
     public void unregisterConfigDef(String configTypeUri) {
         try {
-            for (List<ConfigDefinition> configDefs : registry.values()) {
-                ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
+            for (List<ConfigDef> configDefs : registry.values()) {
+                ConfigDef configDef = findByConfigTypeUri(configDefs, configTypeUri);
                 if (configDef != null) {
                     if (!configDefs.remove(configDef)) {
                         throw new RuntimeException("Config definition could not be removed from registry");
@@ -159,7 +159,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @Override
     public void postCreateTopic(Topic topic) {
-        for (ConfigDefinition configDef : getApplicableConfigDefinitions(topic)) {
+        for (ConfigDef configDef : getApplicableConfigDefs(topic)) {
             _createConfigTopic(configDef, topic);
         }
     }
@@ -170,13 +170,13 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return dmx.getPrivilegedAccess().getConfigTopic(configTypeUri, topicId);
     }
 
-    private RelatedTopic _createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
+    private RelatedTopic _createConfigTopic(final ConfigDef configDef, final Topic topic) {
         final String configTypeUri = configDef.getConfigTypeUri();
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             final PrivilegedAccess pa = dmx.getPrivilegedAccess();
             // Note: a config topic requires a special workspace assignment.
-            long workspaceId = workspaceId(configDef.getConfigModificationRole());
+            long workspaceId = workspaceId(configDef.getConfigModRole());
             return pa.runInWorkspaceContext(workspaceId, () -> {
                 Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
                 createConfigAssoc(topic, configTopic);
@@ -196,7 +196,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         ));
     }
 
-    private long workspaceId(ConfigModificationRole role) {
+    private long workspaceId(ConfigModRole role) {
         PrivilegedAccess pa = dmx.getPrivilegedAccess();
         switch (role) {
         case ADMIN:
@@ -215,11 +215,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
      *
      * @return  a list of config definitions, possibly empty.
      */
-    private List<ConfigDefinition> getApplicableConfigDefinitions(Topic topic) {
-        List<ConfigDefinition> configDefs1 = lookupConfigDefinitions(ConfigTarget.SINGLETON.hashKey(topic));
-        List<ConfigDefinition> configDefs2 = lookupConfigDefinitions(ConfigTarget.TYPE_INSTANCES.hashKey(topic));
+    private List<ConfigDef> getApplicableConfigDefs(Topic topic) {
+        List<ConfigDef> configDefs1 = lookupConfigDefs(ConfigTarget.SINGLETON.hashKey(topic));
+        List<ConfigDef> configDefs2 = lookupConfigDefs(ConfigTarget.TYPE_INSTANCES.hashKey(topic));
         if (configDefs1 != null && configDefs2 != null) {
-            List<ConfigDefinition> configDefs = new ArrayList();
+            List<ConfigDef> configDefs = new ArrayList();
             configDefs.addAll(configDefs1);
             configDefs.addAll(configDefs2);
             return configDefs;
@@ -232,12 +232,12 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
      *
      * @throws RuntimeException     if no such config definition is registered.
      */
-    private ConfigDefinition getApplicableConfigDefinition(Topic topic, String configTypeUri) {
-        List<ConfigDefinition> configDefs = getApplicableConfigDefinitions(topic);
+    private ConfigDef getApplicableConfigDef(Topic topic, String configTypeUri) {
+        List<ConfigDef> configDefs = getApplicableConfigDefs(topic);
         if (configDefs.size() == 0) {
             throw new RuntimeException("None of the registered config definitions are applicable to " + info(topic));
         }
-        ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
+        ConfigDef configDef = findByConfigTypeUri(configDefs, configTypeUri);
         if (configDef == null) {
             throw new RuntimeException("For " + info(topic) + " no config definition for type \"" + configTypeUri +
                 "\" registered");
@@ -247,8 +247,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     // ---
 
-    private boolean isRegistered(ConfigDefinition configDef) {
-        for (List<ConfigDefinition> configDefs : registry.values()) {
+    private boolean isRegistered(ConfigDef configDef) {
+        for (List<ConfigDef> configDefs : registry.values()) {
             if (configDefs.contains(configDef)) {
                 return true;
             }
@@ -256,8 +256,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return false;
     }
 
-    private ConfigDefinition findByConfigTypeUri(List<ConfigDefinition> configDefs, String configTypeUri) {
-        for (ConfigDefinition configDef : configDefs) {
+    private ConfigDef findByConfigTypeUri(List<ConfigDef> configDefs, String configTypeUri) {
+        for (ConfigDef configDef : configDefs) {
             if (configDef.getConfigTypeUri().equals(configTypeUri)) {
                 return configDef;
             }
@@ -265,7 +265,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return null;
     }
 
-    private List<ConfigDefinition> lookupConfigDefinitions(String hashKey) {
+    private List<ConfigDef> lookupConfigDefs(String hashKey) {
         return registry.get(hashKey);
     }
 

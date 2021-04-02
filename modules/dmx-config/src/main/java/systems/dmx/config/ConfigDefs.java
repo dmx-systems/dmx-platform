@@ -6,7 +6,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-class ConfigDefinitions implements JSONEnabled {
+class ConfigDefs implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -14,7 +14,7 @@ class ConfigDefinitions implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ConfigDefinitions(JSONObject json) {
+    ConfigDefs(JSONObject json) {
         this.json = json;
     }
 

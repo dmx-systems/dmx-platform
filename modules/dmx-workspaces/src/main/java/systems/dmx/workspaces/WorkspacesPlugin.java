@@ -1,8 +1,8 @@
 package systems.dmx.workspaces;
 
 import static systems.dmx.workspaces.Constants.*;
-import systems.dmx.config.ConfigDefinition;
-import systems.dmx.config.ConfigModificationRole;
+import systems.dmx.config.ConfigDef;
+import systems.dmx.config.ConfigModRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
 import systems.dmx.facets.FacetsService;
@@ -261,7 +261,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Override
     public void preInstall() {
-        configService.registerConfigDef(new ConfigDefinition(
+        configService.registerConfigDef(new ConfigDef(
             // TODO: can't use AC constants -> cyclic dependency
             // TODO: move registration to AC module?
             ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
@@ -272,7 +272,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 .set("dmx.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
                 .set("dmx.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
             ),
-            ConfigModificationRole.ADMIN
+            ConfigModRole.ADMIN
         ));
     }
 
