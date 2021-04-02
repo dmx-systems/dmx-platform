@@ -86,8 +86,8 @@ class ValueIntegrator {
                 newValues.typeUri = targetObject.typeUri;
             }
             if (newValues.typeUri == null) {
-                throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
-                    newValues + ", targetObject=" + targetObject);
+                throw new IllegalArgumentException("Tried to integrate values whose \"typeUri\" is not set, " +
+                    "newValues=" + newValues + ", targetObject=" + targetObject);
             }
             // Note: we must get type *after* processing refs. Refs might have no type set.
             this.type = newValues.getType();
@@ -258,7 +258,8 @@ class ValueIntegrator {
         UnifiedValue value = unifyComposite(childValues);
         //
         // label calculation
-        if (!isFacetUpdate) {
+        boolean updated = value.report != null ? value.report.hasChanges() : false;
+        if (!isFacetUpdate && (value.created || updated)) {
             DMXObjectModelImpl _value = value.value;
             if (_value != null) {
                 new LabelCalculation(_value).calculate();
@@ -878,7 +879,7 @@ class ValueIntegrator {
     class UnifiedValue<M extends DMXObjectModelImpl> implements JSONEnabled {
 
         M value;                            // the wrapped value; may be null
-        boolean created;                    // indicates whether the value has been retrieved (false) or created (true)
+        boolean created;                    // indicates whether "value" has been retrieved (false) or created (true)
 
         DMXObjectModelImpl _newValues;      // The original "update model" (`newValues`) that resulted in this value.
                                             // Needed to update the assoc value once the parent assignment for this

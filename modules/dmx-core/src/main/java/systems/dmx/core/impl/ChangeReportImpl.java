@@ -18,6 +18,11 @@ class ChangeReportImpl implements ChangeReport {
     private Map<String, List<Change>> changes = new HashMap();
 
     @Override
+    public boolean hasChanges() {
+        return !changes.isEmpty();
+    }
+
+    @Override
     public List<Change> getChanges(String compDefUri) {
         return changes.get(compDefUri);
     }

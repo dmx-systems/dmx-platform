@@ -12,6 +12,8 @@ import org.codehaus.jettison.json.JSONObject;
 
 public interface ChangeReport extends JSONEnabled {
 
+    boolean hasChanges();
+
     List<Change> getChanges(String compDefUri);
 
     class Change implements JSONEnabled {
