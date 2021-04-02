@@ -19,7 +19,7 @@ public interface ConfigService {
 
     // ---
 
-    void registerConfigDefinition(ConfigDefinition configDef);
+    void registerConfigDef(ConfigDefinition configDef);
 
-    void unregisterConfigDefinition(String configTypeUri);
+    void unregisterConfigDef(String configTypeUri);
 }

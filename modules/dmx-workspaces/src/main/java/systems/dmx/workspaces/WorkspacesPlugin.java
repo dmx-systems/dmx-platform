@@ -261,7 +261,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Override
     public void preInstall() {
-        configService.registerConfigDefinition(new ConfigDefinition(
+        configService.registerConfigDef(new ConfigDefinition(
             // TODO: can't use AC constants -> cyclic dependency
             // TODO: move registration to AC module?
             ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
@@ -283,7 +283,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Workspaces plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
-            configService.unregisterConfigDefinition("dmx.workspaces.enabled_sharing_modes");
+            configService.unregisterConfigDef("dmx.workspaces.enabled_sharing_modes");
         }
     }
 

@@ -481,7 +481,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preInstall() {
-        cs.registerConfigDefinition(new ConfigDefinition(
+        cs.registerConfigDef(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, USERNAME,
             mf.newTopicModel(LOGIN_ENABLED, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
             ConfigModificationRole.ADMIN, this
@@ -495,7 +495,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Access Control plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (cs != null) {
-            cs.unregisterConfigDefinition(LOGIN_ENABLED);
+            cs.unregisterConfigDef(LOGIN_ENABLED);
         }
     }
 

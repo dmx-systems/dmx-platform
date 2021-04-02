@@ -118,7 +118,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ---
 
     @Override
-    public void registerConfigDefinition(ConfigDefinition configDef) {
+    public void registerConfigDef(ConfigDefinition configDef) {
         try {
             if (isRegistered(configDef)) {
                 throw new RuntimeException("A definition for config type \"" + configDef.getConfigTypeUri() +
@@ -138,7 +138,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     }
 
     @Override
-    public void unregisterConfigDefinition(String configTypeUri) {
+    public void unregisterConfigDef(String configTypeUri) {
         try {
             for (List<ConfigDefinition> configDefs : registry.values()) {
                 ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
