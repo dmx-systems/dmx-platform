@@ -66,7 +66,9 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                         array.put(configDef.getConfigTypeUri());
                     }
                 }
-                json.put(configurableUri, array);
+                if (array.length() > 0) {
+                    json.put(configurableUri, array);
+                }
             }
             return new ConfigDefs(json);
         } catch (Exception e) {
