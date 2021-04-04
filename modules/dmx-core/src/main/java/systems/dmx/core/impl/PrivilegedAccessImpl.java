@@ -63,7 +63,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ---
 
     private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
-    private static final long NO_WORKSPACE_TOKEN = -1;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -352,11 +351,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception {
         return contextTracker.run(workspaceId, callable);
-    }
-
-    @Override
-    public <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception {
-        return runInWorkspaceContext(NO_WORKSPACE_TOKEN, callable);
     }
 
     @Override

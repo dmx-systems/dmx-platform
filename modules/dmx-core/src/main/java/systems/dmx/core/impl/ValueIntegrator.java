@@ -259,10 +259,10 @@ class ValueIntegrator {
         //
         // label calculation
         boolean updated = value.report != null ? value.report.hasChanges() : false;
+        logger.fine("### typeUri=" + type.getUri() + ", created=" + value.created + ", updated=" + updated);
         if (!isFacetUpdate && (value.created || updated)) {
-            DMXObjectModelImpl _value = value.value;
-            if (_value != null) {
-                new LabelCalculation(_value).calculate();
+            if (value.value != null) {
+                new LabelCalculation(value.value).calculate();
             } else if (isAssoc) {
                 storeAssocSimpleValue();
             }

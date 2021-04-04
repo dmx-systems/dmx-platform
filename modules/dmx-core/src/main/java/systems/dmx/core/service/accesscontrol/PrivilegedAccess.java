@@ -217,19 +217,6 @@ public interface PrivilegedAccess {
     <V> V runInWorkspaceContext(long workspaceId, Callable<V> callable) throws Exception;
 
     /**
-     * Executes a code block and suppresses the standard workspace assignment (which is based on
-     * <code>dmx_workspace_id</code> cookie or Workspace facet) for all topics/associations created while that
-     * execution. The created topics/associations will have no workspace assignment.
-     * <p>
-     * Use this method if you want do workspace assignment manually after creation.
-     *
-     * @deprecated      Use {@link #runInWorkspaceContext} with workspaceID <code>-1</code> instead.
-     *                  This method will be dropped from DMX 5.1.
-     */
-    @Deprecated
-    <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception;
-
-    /**
      * Returns the workspace ID of the most recent {@link #runInWorkspaceContext} call in the current thread, or
      * <code>null</code> if there was no {@link #runInWorkspaceContext} call.
      */
