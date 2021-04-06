@@ -1,5 +1,7 @@
 <template>
-  <div class="dmx-webclient"></div>
+  <div class="dmx-webclient">
+    <dmx-sizer></dmx-sizer>
+  </div>
 </template>
 
 <script>
@@ -25,8 +27,13 @@ Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components
 Vue.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 
 export default {
+
   provide: {
     dmx, axios, Vue
+  },
+
+  components: {
+    'dmx-sizer': require('./dmx-sizer').default
   }
 }
 </script>

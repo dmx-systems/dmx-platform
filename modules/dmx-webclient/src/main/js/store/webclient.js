@@ -51,6 +51,8 @@ const state = {
                             //   ]
                             // }
 
+  topicmapPanelWidth: 0,    // in pixel
+
   quillConfig: {
     options: {
       theme: 'bubble',
@@ -171,7 +173,7 @@ const actions = {
       // The default value must not be overridden by an undefined init value.
       const propsData = {}
       for (const prop in compDef.props) {
-        propsData[prop] = compDef.props[prop](store.state)    // call getter function
+        propsData[prop] = compDef.props[prop](state)    // call getter function
       }
       // 2) instantiate & mount
       // Note: to manually mounted components the store must be passed explicitly resp. "parent" must be set.
@@ -188,6 +190,10 @@ const actions = {
       }
       // TODO: unregister listeners?
     })
+  },
+
+  initSizer () {
+    state.topicmapPanelWidth = document.querySelector('.dmx-topicmap-panel').clientWidth
   },
 
   //

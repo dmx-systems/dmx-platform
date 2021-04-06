@@ -309,6 +309,7 @@ function initialNavigation (route) {
     store.dispatch('selectDetail', detail)
   }
   // console.log('### Initial navigation complete!')
+  Vue.nextTick(() => store.dispatch('initSizer'))
 }
 
 /**
