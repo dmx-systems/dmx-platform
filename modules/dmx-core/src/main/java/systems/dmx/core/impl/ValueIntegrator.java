@@ -260,11 +260,13 @@ class ValueIntegrator {
         // label calculation
         boolean updated = value.report != null ? value.report.hasChanges() : false;
         logger.fine("### typeUri=" + type.getUri() + ", created=" + value.created + ", updated=" + updated);
-        if (!isFacetUpdate && (value.created || updated)) {
-            if (value.value != null) {
-                new LabelCalculation(value.value).calculate();
-            } else if (isAssoc) {
-                storeAssocSimpleValue();
+        if (!isFacetUpdate) {
+            if (value.value != null) {          // TODO: are these conditions correct/concise?
+                if (value.created || updated) {
+                    new LabelCalculation(value.value).calculate();
+                } else if (isAssoc) {
+                    storeAssocSimpleValue();
+                }
             }
         }
         //
