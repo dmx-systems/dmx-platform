@@ -1,7 +1,5 @@
 <template>
-  <div class="dmx-webclient">
-    <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
-  </div>
+  <div class="dmx-webclient"></div>
 </template>
 
 <script>
@@ -27,21 +25,8 @@ Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components
 Vue.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 
 export default {
-
   provide: {
     dmx, axios, Vue
-  },
-
-  computed: {
-    compDefs () {
-      return this.$store.state.compDefs.webclient
-    }
-  },
-
-  methods: {
-    mountId (compDef) {
-      return `mount-${compDef.id}`
-    }
   }
 }
 </script>

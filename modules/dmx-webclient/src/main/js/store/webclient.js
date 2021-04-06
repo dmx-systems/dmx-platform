@@ -5,8 +5,6 @@ import dmx from 'dmx-api'
 
 Vue.use(Vuex)
 
-let compCount = 0
-
 const state = {
 
   object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
@@ -121,7 +119,6 @@ const actions = {
 
   registerComponent (_, compDef) {
     const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
-    compDef.id = compCount++
     compDefs.push(compDef)
   },
 
@@ -179,7 +176,8 @@ const actions = {
       // 2) instantiate & mount
       // Note: to manually mounted components the store must be passed explicitly resp. "parent" must be set.
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
-      const comp = new Vue({parent, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
+      const comp = new Vue({parent, propsData, ...compDef.comp}).$mount()
+      parent.$el.appendChild(comp.$el)
       // 3) make props reactive
       for (const prop in compDef.props) {
         watchProp(comp, prop, compDef.props[prop])
