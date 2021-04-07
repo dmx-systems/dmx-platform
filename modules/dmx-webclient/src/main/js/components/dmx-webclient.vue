@@ -68,12 +68,14 @@ export default {
 }
 
 .dmx-webclient .dmx-topicmap-panel {
+  flex-grow: 1;
   width: 70%;
   overflow: hidden;     /* leave place for the detail panel */
   position: relative;
 }
 
 .dmx-webclient .dmx-detail-panel {
+  flex-grow: 1;
   width: 30%;
   box-sizing: border-box;
   background-color: var(--background-color);

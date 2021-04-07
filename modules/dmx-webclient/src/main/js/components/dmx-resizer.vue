@@ -18,40 +18,38 @@ export default {
   },
 
   methods: {
-    onMouseDown({target: resizer, pageX: initialPageX, pageY: initialPageY}) {
-      if (resizer.className.match('dmx-resizer')) {
-        const self = this
-        const container = document.querySelector('.dmx-webclient')
-        const panelL    = document.querySelector('.dmx-topicmap-panel')
-        const panelR    = document.querySelector('.dmx-detail-panel')
-        const initialPaneWidth = panelR.offsetWidth
-        const {addEventListener, removeEventListener} = window
+    onMouseDown({pageX: initialPageX}) {
+      const self = this
+      const container = document.querySelector('.dmx-webclient')
+      const panelL    = document.querySelector('.dmx-topicmap-panel')
+      const panelR    = document.querySelector('.dmx-detail-panel')
+      const initialPaneWidth = panelR.offsetWidth
+      const {addEventListener, removeEventListener} = window
 
-        this.$emit('resizeStart')
+      this.$emit('resizeStart')
 
-        const onMouseMove = function ({pageX, pageY}) {
-          resize(pageX - initialPageX)
-          self.$emit('resize')
-        }
-
-        const onMouseUp = function () {
-          removeEventListener('mousemove', onMouseMove)
-          removeEventListener('mouseup',   onMouseUp)
-          self.$emit('resizeStop')
-        }
-
-        const resize = function (offset) {
-          const containerWidth = container.clientWidth
-          // console.log('resize', containerWidth, initialPaneWidth, offset)
-          const paneWidth = initialPaneWidth - offset
-          self.$store.dispatch('setDetailPanelWidth', paneWidth)
-          panelL.style.width = `${containerWidth - paneWidth}px`
-          panelR.style.width = `${paneWidth}px`
-        }
-
-        addEventListener('mousemove', onMouseMove)
-        addEventListener('mouseup', onMouseUp)
+      const onMouseMove = function ({pageX}) {
+        resize(pageX - initialPageX)
+        self.$emit('resize')
       }
+
+      const onMouseUp = function () {
+        removeEventListener('mousemove', onMouseMove)
+        removeEventListener('mouseup',   onMouseUp)
+        self.$emit('resizeStop')
+      }
+
+      const resize = function (offset) {
+        const containerWidth = container.clientWidth
+        // console.log('resize', containerWidth, initialPaneWidth, offset)
+        const paneWidth = initialPaneWidth - offset
+        self.$store.dispatch('setDetailPanelWidth', paneWidth)
+        panelL.style.width = `${containerWidth - paneWidth}px`
+        panelR.style.width = `${paneWidth}px`
+      }
+
+      addEventListener('mousemove', onMouseMove)
+      addEventListener('mouseup', onMouseUp)
     }
   }
 }
@@ -59,10 +57,12 @@ export default {
 
 <style>
 .dmx-resizer {
+  z-index: 1;
   position: absolute;
-  width: 5px;
+  width: 10px;
   height: 100%;
-  background-color: rgba(255, 0, 0, .3);  /* var(--background-color-darker); */
-  cursor: col-resize
+  margin-left: -5px;
+  background-color: rgba(255, 0, 0, .2);
+  cursor: col-resize;
 }
 </style>
