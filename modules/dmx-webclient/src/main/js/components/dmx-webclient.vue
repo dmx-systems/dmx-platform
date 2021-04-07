@@ -1,6 +1,6 @@
 <template>
-  <div class="dmx-webclient">
-    <dmx-sizer></dmx-sizer>
+  <div class="dmx-webclient" :style="{userSelect}">
+    <dmx-resizer @resizeStart="resizeStart" @resizeStop="resizeStop"></dmx-resizer>
   </div>
 </template>
 
@@ -32,8 +32,31 @@ export default {
     dmx, axios, Vue
   },
 
+  data() {
+    return {
+      isResizing: false
+    }
+  },
+
+  computed: {
+    userSelect() {
+      return this.isResizing ? 'none' : ''
+    }
+  },
+
+  methods: {
+
+    resizeStart () {
+      this.isResizing = true
+    },
+
+    resizeStop () {
+      this.isResizing = false
+    }
+  },
+
   components: {
-    'dmx-sizer': require('./dmx-sizer').default
+    'dmx-resizer': require('./dmx-resizer').default
   }
 }
 </script>
