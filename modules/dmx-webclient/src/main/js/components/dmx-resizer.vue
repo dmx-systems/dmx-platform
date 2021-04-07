@@ -12,17 +12,18 @@ export default {
     },
 
     left () {
-      return this.$store.state.topicmapPanelWidth + 'px'
+      const width = document.querySelector('.dmx-webclient').clientWidth
+      return `${width - this.$store.state.detailPanelWidth}px`
     }
   },
 
   methods: {
     onMouseDown({target: resizer, pageX: initialPageX, pageY: initialPageY}) {
       if (resizer.className.match('dmx-resizer')) {
-        let self = this
-        let container = document.querySelector('.dmx-webclient')
-        let pane      = document.querySelector('.dmx-detail-panel')
-        let {
+        const self = this
+        const container = document.querySelector('.dmx-webclient')
+        const pane      = document.querySelector('.dmx-detail-panel')
+        const {
           offsetWidth: initialPaneWidth,
           offsetHeight: initialPaneHeight,
         } = pane
@@ -30,9 +31,10 @@ export default {
         const {addEventListener, removeEventListener} = window
 
         const resize = (initialSize, offset = 0) => {
-          let containerWidth = container.clientWidth
+          const containerWidth = container.clientWidth
           // console.log('resize', containerWidth, initialSize, offset)
-          let paneWidth = initialSize - offset
+          const paneWidth = initialSize - offset
+          this.$store.dispatch('setDetailPanelWidth', paneWidth)
           return pane.style['flex-basis'] = paneWidth + 'px'
         }
 
@@ -40,7 +42,7 @@ export default {
         let size = resize()
 
         // Trigger paneResizeStart event
-        self.$emit('resizeStart', pane, resizer, size)
+        this.$emit('resizeStart', pane, resizer, size)
 
         const onMouseMove = function({pageX, pageY}) {
           size = resize(initialPaneWidth, pageX - initialPageX)
@@ -67,7 +69,7 @@ export default {
   position: absolute;
   width: 5px;
   height: 100%;
-  background-color: var(--background-color-darker);
+  background-color: rgba(255, 0, 0, .3);  /* var(--background-color-darker); */
   cursor: col-resize
 }
 </style>

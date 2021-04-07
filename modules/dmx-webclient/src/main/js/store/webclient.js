@@ -51,7 +51,7 @@ const state = {
                             //   ]
                             // }
 
-  topicmapPanelWidth: 0,    // in pixel
+  detailPanelWidth: 0,      // in pixel
 
   quillConfig: {
     options: {
@@ -192,8 +192,8 @@ const actions = {
     })
   },
 
-  initSizer () {
-    state.topicmapPanelWidth = document.querySelector('.dmx-topicmap-panel').clientWidth
+  setDetailPanelWidth (_, width) {
+    state.detailPanelWidth = width
   },
 
   //
