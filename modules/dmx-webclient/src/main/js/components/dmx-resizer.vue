@@ -22,40 +22,33 @@ export default {
       if (resizer.className.match('dmx-resizer')) {
         const self = this
         const container = document.querySelector('.dmx-webclient')
-        const pane      = document.querySelector('.dmx-detail-panel')
-        const {
-          offsetWidth: initialPaneWidth,
-          offsetHeight: initialPaneHeight,
-        } = pane
-
+        const panelL    = document.querySelector('.dmx-topicmap-panel')
+        const panelR    = document.querySelector('.dmx-detail-panel')
+        const initialPaneWidth = panelR.offsetWidth
         const {addEventListener, removeEventListener} = window
 
-        const resize = (initialSize, offset = 0) => {
-          const containerWidth = container.clientWidth
-          // console.log('resize', containerWidth, initialSize, offset)
-          const paneWidth = initialSize - offset
-          this.$store.dispatch('setDetailPanelWidth', paneWidth)
-          return pane.style['flex-basis'] = paneWidth + 'px'
+        this.$emit('resizeStart')
+
+        const onMouseMove = function ({pageX, pageY}) {
+          resize(pageX - initialPageX)
+          self.$emit('resize')
         }
 
-        // Resize once to get current computed size
-        let size = resize()
-
-        // Trigger paneResizeStart event
-        this.$emit('resizeStart', pane, resizer, size)
-
-        const onMouseMove = function({pageX, pageY}) {
-          size = resize(initialPaneWidth, pageX - initialPageX)
-          self.$emit('resize', pane, resizer, size)
-        }
-
-        const onMouseUp = function() {
-          // Run resize one more time to set computed width/height.
-          size = resize(pane.clientWidth)
+        const onMouseUp = function () {
           removeEventListener('mousemove', onMouseMove)
-          removeEventListener('mouseup', onMouseUp)
-          self.$emit('resizeStop', pane, resizer, size)
+          removeEventListener('mouseup',   onMouseUp)
+          self.$emit('resizeStop')
         }
+
+        const resize = function (offset) {
+          const containerWidth = container.clientWidth
+          // console.log('resize', containerWidth, initialPaneWidth, offset)
+          const paneWidth = initialPaneWidth - offset
+          self.$store.dispatch('setDetailPanelWidth', paneWidth)
+          panelL.style.width = `${containerWidth - paneWidth}px`
+          panelR.style.width = `${paneWidth}px`
+        }
+
         addEventListener('mousemove', onMouseMove)
         addEventListener('mouseup', onMouseUp)
       }
