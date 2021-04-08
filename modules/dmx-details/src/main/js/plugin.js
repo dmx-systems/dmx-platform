@@ -14,9 +14,12 @@ export default ({store}) => {
 
     storeWatcher: [{
       getter: state => state.details.visible,
-      callback: () => {
+      callback: (visible) => {
         Vue.nextTick(() => {
           store.dispatch('resizeTopicmapRenderer')
+          if (visible) {
+            store.dispatch('repositionResizer')
+          }
         })
       }
     }],

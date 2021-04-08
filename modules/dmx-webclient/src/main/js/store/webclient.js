@@ -5,6 +5,10 @@ import dmx from 'dmx-api'
 
 Vue.use(Vuex)
 
+window.addEventListener('resize', e => {
+  store.dispatch('repositionResizer')
+})
+
 const state = {
 
   object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
@@ -50,6 +54,8 @@ const state = {
                             //     }
                             //   ]
                             // }
+
+  resizerPos: 0,            // x coordinate in pixel
 
   quillConfig: {
     options: {
@@ -171,7 +177,7 @@ const actions = {
       // The default value must not be overridden by an undefined init value.
       const propsData = {}
       for (const prop in compDef.props) {
-        propsData[prop] = compDef.props[prop](store.state)    // call getter function
+        propsData[prop] = compDef.props[prop](state)    // call getter function
       }
       // 2) instantiate & mount
       // Note: to manually mounted components the store must be passed explicitly resp. "parent" must be set.
@@ -188,6 +194,16 @@ const actions = {
       }
       // TODO: unregister listeners?
     })
+  },
+
+  // Resizer
+
+  positionResizer (_, pos) {
+    state.resizerPos = pos
+  },
+
+  repositionResizer ({dispatch}) {
+    dispatch('positionResizer', document.querySelector('.dmx-topicmap-panel').clientWidth)
   },
 
   //

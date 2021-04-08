@@ -1,5 +1,7 @@
 <template>
-  <div class="dmx-webclient"></div>
+  <div class="dmx-webclient" :style="{userSelect}">
+    <dmx-resizer @resizeStart="resizeStart" @resizeStop="resizeStop"></dmx-resizer>
+  </div>
 </template>
 
 <script>
@@ -25,8 +27,36 @@ Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components
 Vue.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 
 export default {
+
   provide: {
     dmx, axios, Vue
+  },
+
+  data() {
+    return {
+      isResizing: false
+    }
+  },
+
+  computed: {
+    userSelect() {
+      return this.isResizing ? 'none' : ''
+    }
+  },
+
+  methods: {
+
+    resizeStart () {
+      this.isResizing = true
+    },
+
+    resizeStop () {
+      this.isResizing = false
+    }
+  },
+
+  components: {
+    'dmx-resizer': require('./dmx-resizer').default
   }
 }
 </script>
@@ -39,14 +69,14 @@ export default {
 
 .dmx-webclient .dmx-topicmap-panel {
   flex-grow: 1;
-  flex-basis: 70%;
+  width: 70%;
   overflow: hidden;     /* leave place for the detail panel */
   position: relative;
 }
 
 .dmx-webclient .dmx-detail-panel {
   flex-grow: 1;
-  flex-basis: 30%;
+  width: 30%;
   box-sizing: border-box;
   background-color: var(--background-color);
   border-left: 1px solid var(--border-color);
