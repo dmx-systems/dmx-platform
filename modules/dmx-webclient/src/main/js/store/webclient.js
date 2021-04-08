@@ -51,7 +51,7 @@ const state = {
                             //   ]
                             // }
 
-  detailPanelWidth: 0,      // in pixel
+  resizerPos: 0,            // x coordinate in pixel
 
   quillConfig: {
     options: {
@@ -192,15 +192,13 @@ const actions = {
     })
   },
 
-  setDetailPanelWidth (_, width) {
-    state.detailPanelWidth = width
+  positionResizer (_, pos) {
+    state.resizerPos = pos
   },
 
-  syncDetailPanelWidth ({dispatch}) {
-    Vue.nextTick(() => {
-      const panel = document.querySelector('.dmx-detail-panel')
-      panel && dispatch('setDetailPanelWidth', panel.clientWidth)
-    })
+  repositionResizer ({dispatch}) {
+    const panel = document.querySelector('.dmx-topicmap-panel')
+    panel && dispatch('positionResizer', panel.clientWidth)
   },
 
   //

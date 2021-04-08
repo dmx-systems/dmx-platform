@@ -18,7 +18,7 @@ export default ({store}) => {
         Vue.nextTick(() => {
           store.dispatch('resizeTopicmapRenderer')
           if (visible) {
-            store.dispatch('syncDetailPanelWidth')
+            store.dispatch('repositionResizer')
           }
         })
       }
