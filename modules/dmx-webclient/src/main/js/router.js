@@ -309,10 +309,6 @@ function initialNavigation (route) {
     store.dispatch('selectDetail', detail)
   }
   // console.log('### Initial navigation complete!')
-  Vue.nextTick(() => {
-    const panel = document.querySelector('.dmx-detail-panel')
-    panel && store.dispatch('setDetailPanelWidth', panel.clientWidth)
-  })
 }
 
 /**

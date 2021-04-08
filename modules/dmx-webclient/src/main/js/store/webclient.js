@@ -196,6 +196,13 @@ const actions = {
     state.detailPanelWidth = width
   },
 
+  syncDetailPanelWidth ({dispatch}) {
+    Vue.nextTick(() => {
+      const panel = document.querySelector('.dmx-detail-panel')
+      panel && dispatch('setDetailPanelWidth', panel.clientWidth)
+    })
+  },
+
   //
 
   loggedIn () {
