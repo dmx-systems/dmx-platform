@@ -5,6 +5,10 @@ import dmx from 'dmx-api'
 
 Vue.use(Vuex)
 
+window.addEventListener('resize', e => {
+  store.dispatch('repositionResizer')
+})
+
 const state = {
 
   object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
@@ -192,13 +196,14 @@ const actions = {
     })
   },
 
+  // Resizer
+
   positionResizer (_, pos) {
     state.resizerPos = pos
   },
 
   repositionResizer ({dispatch}) {
-    const panel = document.querySelector('.dmx-topicmap-panel')
-    panel && dispatch('positionResizer', panel.clientWidth)
+    dispatch('positionResizer', document.querySelector('.dmx-topicmap-panel').clientWidth)
   },
 
   //

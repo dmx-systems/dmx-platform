@@ -57,10 +57,9 @@ export default {
 .dmx-resizer {
   z-index: 1;
   position: absolute;
-  width: 10px;
+  width: 16px;
   height: 100%;
-  margin-left: -5px;
-  background-color: rgba(255, 0, 0, .2);
+  margin-left: -8px;
   cursor: col-resize;
 }
 </style>
