@@ -44,6 +44,10 @@ export default {
 </script>
 
 <style>
+.dmx-workspace-commands .el-select {
+  margin-right: 4px;
+}
+
 .dmx-workspace-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;

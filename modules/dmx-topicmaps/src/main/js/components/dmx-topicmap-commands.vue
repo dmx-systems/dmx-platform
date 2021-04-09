@@ -52,6 +52,10 @@ export default {
   margin-left: 18px;
 }
 
+.dmx-topicmap-commands .el-select {
+  margin-right: 4px;
+}
+
 .dmx-topicmap-commands .el-button {
   padding-left:  2px !important;
   padding-right: 2px !important;
