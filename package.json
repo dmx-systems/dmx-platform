@@ -20,7 +20,7 @@
     "dmx-detail-panel": "https://github.com/dmx-systems/dmx-detail-panel.git",
     "dmx-login-dialog": "2.0.0",
     "dmx-object-renderer": "https://github.com/dmx-systems/dmx-object-renderer.git",
-    "dmx-search-widget": "2.0.0",
+    "dmx-search-widget": "https://github.com/dmx-systems/dmx-search-widget.git",
     "dmx-topicmap-panel": "https://github.com/dmx-systems/dmx-topicmap-panel.git",
     "dmx-websocket": "2.0.0",
     "element-ui": "2.13.2",
