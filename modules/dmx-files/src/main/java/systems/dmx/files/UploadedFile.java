@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import org.apache.commons.io.IOUtils;
 
 
@@ -51,6 +53,39 @@ public class UploadedFile {
 
 
 
+    // === File Content ===
+
+    /**
+     * Returns the contents of the uploaded file as a String, using the default character encoding.
+     */
+    public String getString() {
+        return getString(Charset.defaultCharset().name());
+    }
+
+    /**
+     * Returns the contents of the uploaded file as a String, using the given encoding.
+     */
+    public String getString(String encoding) {
+        try {
+            StringWriter out = new StringWriter();
+            IOUtils.copy(in, out, encoding);
+            in.close();
+            out.close();
+            return out.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Getting contents of uploaded file failed (" + this + ")", e);
+        }
+    }
+
+    /**
+     * Returns the contents of the uploaded file as an array of bytes.
+     * TODO
+    public byte[] getBytes() {
+        return fileItem.get();
+    }*/
+
+
+
     // === Java API ===
 
     @Override
@@ -61,7 +96,7 @@ public class UploadedFile {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * A convenience method to write the uploaded file to disk.
+     * Performs a disk quota check for the current user, and if it succeeds, writes this uploaded file to disk.
      */
     void write(File file) {
         try {
