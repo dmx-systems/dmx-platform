@@ -52,6 +52,11 @@ store.dispatch('registerDetailRenderer', {
   typeUri: 'dmx.webclient.color',
   component: require('./components/dmx-color-picker').default
 })
+store.dispatch('registerDetailRenderer', {
+  renderer: 'value',
+  typeUri: 'dmx.webclient.arrow_shape',
+  component: require('./components/dmx-arrow-select').default
+})
 
 // 5) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
