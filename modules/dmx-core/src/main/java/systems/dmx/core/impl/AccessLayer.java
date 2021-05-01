@@ -506,6 +506,18 @@ public final class AccessLayer {
         }
     }
 
+    List<RoleTypeModelImpl> getAllRoleTypes() {
+        try {
+            List<RoleTypeModelImpl> roleTypes = new ArrayList();
+            for (TopicModelImpl roleTypeTopic : getTopicsByType(ROLE_TYPE)) {
+                roleTypes.add(typeStorage.fetchRoleType(roleTypeTopic));
+            }
+            return roleTypes;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching all role types failed", e);
+        }
+    }
+
     // ---
 
     TopicTypeModelImpl createTopicType(TopicTypeModelImpl model) {

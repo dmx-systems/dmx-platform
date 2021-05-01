@@ -231,6 +231,20 @@ class TypeStorage {
 
 
 
+    // === Role Types ===
+
+    // --- Fetch ---
+
+    RoleTypeModelImpl fetchRoleType(TopicModelImpl roleTypeTopic) {
+        try {
+            return mf.newRoleTypeModel(roleTypeTopic, fetchViewConfigOfType(roleTypeTopic));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching role type \"" + roleTypeTopic.getUri() + "\" failed", e);
+        }
+    }
+
+
+
     // === Composition Definitions ===
 
     // --- Fetch ---
@@ -651,8 +665,8 @@ class TypeStorage {
 
     private ViewConfigModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), COMPOSITION,
-                PARENT, CHILD, "dmx.webclient.view_config"));
+            return viewConfigModel(al.db.fetchTopicRelatedTopics(typeTopic.getId(), COMPOSITION, PARENT, CHILD,
+                "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
         }
@@ -660,8 +674,8 @@ class TypeStorage {
 
     private ViewConfigModel fetchViewConfigOfCompDef(AssocModel compDef) {
         try {
-            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), COMPOSITION,
-                PARENT, CHILD, "dmx.webclient.view_config"));
+            return viewConfigModel(al.db.fetchAssocRelatedTopics(compDef.getId(), COMPOSITION, PARENT, CHILD,
+                "dmx.webclient.view_config"));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view config of comp def " + compDef.getId() + " failed", e);
         }

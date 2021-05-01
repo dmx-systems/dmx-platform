@@ -3,6 +3,8 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.ViewConfigModel;
 
+import org.codehaus.jettison.json.JSONObject;
+
 
 
 class RoleTypeModelImpl extends TopicModelImpl implements RoleTypeModel {
@@ -35,6 +37,18 @@ class RoleTypeModelImpl extends TopicModelImpl implements RoleTypeModel {
     @Override
     public void setViewConfig(ViewConfigModel viewConfig) {
         this.viewConfig = (ViewConfigModelImpl) viewConfig;
+    }
+
+    // TopicModel Overrides
+
+    @Override
+    public JSONObject toJSON() {
+        try {
+            return super.toJSON()
+                .put("viewConfigTopics", viewConfig.toJSONArray());
+        } catch (Exception e) {
+            throw new RuntimeException("Serialization failed", e);
+        }
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
