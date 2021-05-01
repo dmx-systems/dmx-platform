@@ -457,6 +457,15 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
+    // === RoleTypeModel ===
+
+    @Override
+    public RoleTypeModelImpl newRoleTypeModel(TopicModel roleTypeTopic, ViewConfigModel viewConfig) {
+        return new RoleTypeModelImpl((TopicModelImpl) roleTypeTopic, (ViewConfigModelImpl) viewConfig);
+    }
+
+
+
     // === RelatedTopicModel ===
 
     @Override

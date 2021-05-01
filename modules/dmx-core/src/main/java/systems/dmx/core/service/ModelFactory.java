@@ -9,6 +9,7 @@ import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedAssocModel;
 import systems.dmx.core.model.RelatedTopicModel;
+import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicDeletionModel;
 import systems.dmx.core.model.TopicModel;
@@ -121,6 +122,12 @@ public interface ModelFactory {
     AssocPlayerModel newAssocPlayerModel(long assocId, String roleTypeUri);
 
     AssocPlayerModel newAssocPlayerModel(JSONObject assocPlayerModel);
+
+
+
+    // === RoleTypeModel ===
+
+    RoleTypeModel newRoleTypeModel(TopicModel roleTypeTopic, ViewConfigModel viewConfig);
 
 
 

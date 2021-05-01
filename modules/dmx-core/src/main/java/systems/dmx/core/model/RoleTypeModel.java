@@ -15,5 +15,6 @@ public interface RoleTypeModel extends TopicModel {
 
     Object getViewConfigValue(String configTypeUri, String childTypeUri);
 
+    // needed?
     void setViewConfig(ViewConfigModel viewConfig);
 }
