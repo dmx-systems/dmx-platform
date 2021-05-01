@@ -8,6 +8,7 @@ import systems.dmx.core.DMXType;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -321,8 +322,14 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Role Types ===
 
+    @GET
+    @Path("/role-types")
+    public List<RoleType> getAllRoleTypes() {
+        return dmx.getAllRoleTypes();
+    }
+
     @POST
-    @Path("/roletype")
+    @Path("/roletype")      // TODO: make it "/role-type"
     @Transactional
     public Topic createRoleType(TopicModel model) {
         Topic roleType = dmx.createRoleType(model);
