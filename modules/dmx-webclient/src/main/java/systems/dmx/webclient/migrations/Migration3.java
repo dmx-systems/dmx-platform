@@ -33,13 +33,13 @@ public class Migration3 extends Migration {
     public void run() {
         initDMXWorkspaceId();
         //
-        logger.info("########## Repairing types with missing \"View Config\" topic (" +
+        logger.info("##### Repairing types with missing \"View Config\" topic (" +
             (dmxWorkspaceId == -1 ? "clean install" : "update") + " detected)");
         //
         repair(dmx.getAllTopicTypes(), 0);
         repair(dmx.getAllAssocTypes(), 1);
         //
-        logger.info("########## Repairing types with missing \"View Config\" topic complete\n    " +
+        logger.info("##### Repairing types with missing \"View Config\" topic complete\n    " +
             "Topic types repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +
             "Assoc types repaired: " + count[1][1] + "/" + count[1][0]);
     }
