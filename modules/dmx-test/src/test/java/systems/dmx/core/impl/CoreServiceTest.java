@@ -558,7 +558,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dmx.my.uri", topic.getUri());
             //
             dmx.createTopic(mf.newTopicModel("dmx.my.uri", PLUGIN));
-            fail("\"URI not unique\" exception not thrown");
+            fail("\"URI already taken\" exception not thrown");
             //
             tx.success();
         } catch (Exception e) {
@@ -569,7 +569,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             cause = cause.getCause();
             assertTrue(cause.getMessage().startsWith("Creating single topic failed"));
             cause = cause.getCause();
-            assertEquals("URI \"dmx.my.uri\" is not unique", cause.getMessage());
+            assertEquals("URI \"dmx.my.uri\" is already taken", cause.getMessage());
         } finally {
             tx.finish();
         }
@@ -586,11 +586,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("", topic2.getUri());
             //
             topic2.setUri("dmx.my.uri");
-            fail("\"URI not unique\" exception not thrown");
+            fail("\"URI already taken\" exception not thrown");
             //
             tx.success();
         } catch (Exception e) {
-            assertEquals("URI \"dmx.my.uri\" is not unique", e.getMessage());
+            assertEquals("URI \"dmx.my.uri\" is already taken", e.getMessage());
         } finally {
             tx.finish();
         }
@@ -609,13 +609,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("", topic2.getUri());
             //
             topic2.update(mf.newTopicModel("dmx.my.uri", PLUGIN));
-            fail("\"URI not unique\" exception not thrown");
+            fail("\"URI already taken\" exception not thrown");
             //
             tx.success();
         } catch (Exception e) {
             // logger.log(Level.WARNING, "Exception thrown:", e);
             assertEquals("Updating topic " + topic2Id + " failed", e.getMessage());
-            assertEquals("URI \"dmx.my.uri\" is not unique", e.getCause().getCause().getMessage());
+            assertEquals("URI \"dmx.my.uri\" is already taken", e.getCause().getCause().getMessage());
         } finally {
             tx.finish();
         }
