@@ -556,6 +556,25 @@ public final class AccessLayer {
         }
     }
 
+    TopicModelImpl createRoleType(TopicModelImpl model) {
+        // check type URI argument
+        String typeUri = model.getTypeUri();
+        if (typeUri == null) {
+            model.setTypeUri(ROLE_TYPE);
+        } else {
+            if (!typeUri.equals(ROLE_TYPE)) {
+                throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
+                    "(found: \"" + typeUri + "\")");
+            }
+        }
+        // store in DB
+        createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
+        //
+        em.fireEvent(CoreEvent.INTRODUCE_ROLE_TYPE, model.instantiate());
+        //
+        return model;
+    }
+
     // ---
 
     void updateTopicType(TopicTypeModelImpl updateModel) {
@@ -602,23 +621,6 @@ public final class AccessLayer {
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }
-    }
-
-    // ---
-
-    TopicModelImpl createRoleType(TopicModelImpl model) {
-        // check type URI argument
-        String typeUri = model.getTypeUri();
-        if (typeUri == null) {
-            model.setTypeUri(ROLE_TYPE);
-        } else {
-            if (!typeUri.equals(ROLE_TYPE)) {
-                throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
-                    "(found: \"" + typeUri + "\")");
-            }
-        }
-        //
-        return createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---
