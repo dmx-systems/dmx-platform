@@ -47,6 +47,17 @@ public class Migration6 extends Migration {
             }
             count++;
         }
+        //
+        dmx.getRoleType(PARENT_TYPE).getViewConfig().setConfigValue(
+            VIEW_CONFIG, "dmx.webclient.arrow_shape", "triangle"
+        );
+        dmx.getRoleType(CHILD).getViewConfig().setConfigValue(
+            VIEW_CONFIG, "dmx.webclient.arrow_shape", "triangle"
+        );
+        dmx.getRoleType(TYPE).getViewConfig().setConfigValue(
+            VIEW_CONFIG, "dmx.webclient.arrow_shape", "triangle"
+        );
+        //
         logger.info("##### Adding view configs to role types complete\n    " +
             "View configs added: " + count + "\n    " +
             "Assigned to DMX workspace: " + assigned);
