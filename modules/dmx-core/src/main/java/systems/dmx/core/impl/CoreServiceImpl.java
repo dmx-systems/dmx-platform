@@ -301,6 +301,11 @@ public class CoreServiceImpl implements CoreService {
     // === Role Types ===
 
     @Override
+    public RoleType getRoleType(String roleTypeUri) {
+        return al.getRoleType(roleTypeUri).instantiate();
+    }
+
+    @Override
     public List<RoleType> getAllRoleTypes() {
         return al.instantiate(al.getAllRoleTypes());
     }

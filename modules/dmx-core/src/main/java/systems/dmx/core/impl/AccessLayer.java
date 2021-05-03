@@ -482,6 +482,12 @@ public final class AccessLayer {
 
     // ---
 
+    RoleTypeModelImpl getRoleType(String roleTypeUri) {
+        return typeStorage.fetchRoleType(getTopicByUri(roleTypeUri));
+    }
+
+    // ---
+
     List<TopicTypeModelImpl> getAllTopicTypes() {
         try {
             List<TopicTypeModelImpl> topicTypes = new ArrayList();

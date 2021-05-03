@@ -281,6 +281,8 @@ public interface CoreService {
 
     // === Role Types ===
 
+    RoleType getRoleType(String roleTypeUri);
+
     List<RoleType> getAllRoleTypes();
 
     Topic createRoleType(TopicModel model);
