@@ -48,7 +48,7 @@ public class Migration6 extends Migration {
             count++;
         }
         //
-        dmx.getRoleType(PARENT_TYPE).getViewConfig().setConfigValue(
+        dmx.getRoleType(CHILD_TYPE).getViewConfig().setConfigValue(
             VIEW_CONFIG, "dmx.webclient.arrow_shape", "triangle"
         );
         dmx.getRoleType(CHILD).getViewConfig().setConfigValue(
