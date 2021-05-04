@@ -171,6 +171,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 dmx.getAssocType(type.getUri()),
                 compDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
             );
+        } else if (typeUri.equals(ROLE_TYPE)) {
+            Directives.get().add(Directive.UPDATE_ROLE_TYPE, dmx.getRoleType(type.getUri()));
         } else {
             throw new RuntimeException("View config " + viewConfigTopic.getId() + " is associated unexpectedly, type=" +
                 type + ", compDefId=" + compDefId + ", viewConfigTopic=" + viewConfigTopic);
@@ -180,7 +182,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void _updateTypeCacheAndAddDirective(DMXType type, long compDefId, Topic viewConfigTopic, Directive dir) {
         logger.info("### Updating view config of type \"" + type.getUri() + "\", compDefId=" + compDefId);
         updateTypeCache(type.getModel(), compDefId, viewConfigTopic.getModel());
-        Directives.get().add(dir, type);        // ### TODO: should be implicit
+        Directives.get().add(dir, type);
     }
 
     /**
