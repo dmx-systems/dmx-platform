@@ -484,7 +484,6 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     // ---
 
-    // ### TODO: remove this workaround
     private boolean permissionIfNoWorkspaceIsAssigned(Operation operation, long objectId, String typeUri) {
         switch (operation) {
         case READ:

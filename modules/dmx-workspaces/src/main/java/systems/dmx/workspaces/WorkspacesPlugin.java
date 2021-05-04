@@ -14,6 +14,7 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.TopicModel;
@@ -205,6 +206,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             }
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(type) + " to workspace " + workspaceId + " failed", e);
+        }
+    }
+
+    @Override
+    public void assignRoleTypeToWorkspace(RoleType roleType, long workspaceId) {
+        try {
+            checkAssignmentArgs(roleType, workspaceId);
+            __assignToWorkspace(roleType, workspaceId);
+            // view config topics
+            for (Topic configTopic : roleType.getViewConfig().getConfigTopics()) {
+                __assignToWorkspace(configTopic, workspaceId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(roleType) + " to workspace " + workspaceId + " failed", e);
         }
     }
 
@@ -582,6 +597,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof AssocType) {
             return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof RoleType) {
+            return "role type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
                 "\")";

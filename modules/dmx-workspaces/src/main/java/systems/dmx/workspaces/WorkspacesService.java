@@ -3,6 +3,7 @@ package systems.dmx.workspaces;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 
@@ -73,6 +74,15 @@ public interface WorkspacesService {
      * </ul>
      */
     void assignTypeToWorkspace(DMXType type, long workspaceId);
+
+    /**
+     * Assigns a role type as well as its "parts" to a workspace. In particular:
+     * <ul>
+     * <li>the role type</li>
+     * <li>the role type's view config</li>
+     * </ul>
+     */
+    void assignRoleTypeToWorkspace(RoleType roleType, long workspaceId);
 
     // ---
 
