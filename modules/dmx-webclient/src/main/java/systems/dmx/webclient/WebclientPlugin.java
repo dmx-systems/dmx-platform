@@ -5,6 +5,7 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfig;
@@ -19,8 +20,9 @@ import systems.dmx.core.service.ChangeReport;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
 import systems.dmx.core.service.event.AllPluginsActive;
-import systems.dmx.core.service.event.IntroduceTopicType;
 import systems.dmx.core.service.event.IntroduceAssocType;
+import systems.dmx.core.service.event.IntroduceRoleType;
+import systems.dmx.core.service.event.IntroduceTopicType;
 import systems.dmx.core.service.event.PostUpdateTopic;
 import systems.dmx.core.service.event.PreCreateTopicType;
 import systems.dmx.core.service.event.PreCreateAssocType;
@@ -34,6 +36,7 @@ import java.util.logging.Logger;
 public class WebclientPlugin extends PluginActivator implements AllPluginsActive,
                                                                 IntroduceTopicType,
                                                                 IntroduceAssocType,
+                                                                IntroduceRoleType,
                                                                 PreCreateTopicType,
                                                                 PreCreateAssocType,
                                                                 PostUpdateTopic {
@@ -126,6 +129,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         setViewConfigLabel(assocType);
     }
 
+    @Override
+    public void introduceRoleType(RoleType roleType) {
+        setViewConfigLabel(roleType);
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
@@ -197,6 +205,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         for (String compDefUri : type) {
             setViewConfigLabel(type.getCompDef(compDefUri).getViewConfig());
         }
+    }
+
+    private void setViewConfigLabel(RoleType roleType) {
+        setViewConfigLabel(roleType.getViewConfig());
     }
 
     private void setViewConfigLabel(ViewConfig viewConfig) {
