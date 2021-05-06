@@ -482,6 +482,12 @@ public final class AccessLayer {
 
     // ---
 
+    RoleTypeModelImpl getRoleType(String roleTypeUri) {
+        return typeStorage.fetchRoleType(getTopicByUri(roleTypeUri));
+    }
+
+    // ---
+
     List<TopicTypeModelImpl> getAllTopicTypes() {
         try {
             List<TopicTypeModelImpl> topicTypes = new ArrayList();
@@ -503,6 +509,18 @@ public final class AccessLayer {
             return assocTypes;
         } catch (Exception e) {
             throw new RuntimeException("Fetching all association types failed", e);
+        }
+    }
+
+    List<RoleTypeModelImpl> getAllRoleTypes() {
+        try {
+            List<RoleTypeModelImpl> roleTypes = new ArrayList();
+            for (TopicModelImpl roleTypeTopic : getTopicsByType(ROLE_TYPE)) {
+                roleTypes.add(typeStorage.fetchRoleType(roleTypeTopic));
+            }
+            return roleTypes;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching all role types failed", e);
         }
     }
 
@@ -536,6 +554,25 @@ public final class AccessLayer {
         } catch (Exception e) {
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed", e);
         }
+    }
+
+    TopicModelImpl createRoleType(TopicModelImpl model) {
+        // check type URI argument
+        String typeUri = model.getTypeUri();
+        if (typeUri == null) {
+            model.setTypeUri(ROLE_TYPE);
+        } else {
+            if (!typeUri.equals(ROLE_TYPE)) {
+                throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
+                    "(found: \"" + typeUri + "\")");
+            }
+        }
+        // store in DB
+        createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
+        //
+        em.fireEvent(CoreEvent.INTRODUCE_ROLE_TYPE, model.instantiate());
+        //
+        return model;
     }
 
     // ---
@@ -584,23 +621,6 @@ public final class AccessLayer {
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }
-    }
-
-    // ---
-
-    TopicModelImpl createRoleType(TopicModelImpl model) {
-        // check type URI argument
-        String typeUri = model.getTypeUri();
-        if (typeUri == null) {
-            model.setTypeUri(ROLE_TYPE);
-        } else {
-            if (!typeUri.equals(ROLE_TYPE)) {
-                throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
-                    "(found: \"" + typeUri + "\")");
-            }
-        }
-        //
-        return createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---

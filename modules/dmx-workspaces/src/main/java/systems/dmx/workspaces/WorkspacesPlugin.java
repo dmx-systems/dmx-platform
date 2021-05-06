@@ -14,6 +14,7 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.TopicModel;
@@ -24,6 +25,7 @@ import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.IntroduceAssocType;
+import systems.dmx.core.service.event.IntroduceRoleType;
 import systems.dmx.core.service.event.IntroduceTopicType;
 import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
@@ -53,6 +55,7 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicType,
                                                                                     IntroduceAssocType,
+                                                                                    IntroduceRoleType,
                                                                                     PostCreateTopic,
                                                                                     PostCreateAssoc,
                                                                                     PreDeleteTopic {
@@ -208,6 +211,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
     }
 
+    @Override
+    public void assignRoleTypeToWorkspace(RoleType roleType, long workspaceId) {
+        try {
+            checkAssignmentArgs(roleType, workspaceId);
+            __assignToWorkspace(roleType, workspaceId);
+            // view config topics
+            for (Topic configTopic : roleType.getViewConfig().getConfigTopics()) {
+                __assignToWorkspace(configTopic, workspaceId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(roleType) + " to workspace " + workspaceId + " failed", e);
+        }
+    }
+
     // ---
 
     // Note: the "children" query parameter is handled by core's JerseyResponseFilter
@@ -337,6 +354,27 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         assignTypeToWorkspace(assocType, workspaceId);
     }
 
+    /**
+     * Takes care the DMX standard types (and their parts) get an assignment to the DMX workspace.
+     * This is important in conjunction with access control.
+     * Note: type introduction is aborted if at least one of these conditions apply:
+     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this
+     *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
+     *     - The type is not a DMX standard type. In this case the 3rd-party plugin developer is responsible
+     *       for doing the workspace assignment (in case the type is created programmatically while a migration).
+     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DMX standard
+     *       type if its URI begins with "dmx."
+     */
+    @Override
+    public void introduceRoleType(RoleType roleType) {
+        long workspaceId = workspaceIdForType(roleType);
+        if (workspaceId == -1) {
+            return;
+        }
+        //
+        assignRoleTypeToWorkspace(roleType, workspaceId);
+    }
+
     // ---
 
     /**
@@ -437,8 +475,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Returns the ID of the DMX workspace or -1 to signal abortion of type introduction.
      */
-    private long workspaceIdForType(DMXType type) {
-        return workspaceId(type) == -1 && isDMXStandardType(type) ? getDMXWorkspaceId() : -1;
+    private long workspaceIdForType(DMXObject object) {
+        return workspaceId(object) == -1 && isDMXStandardType(object) ? getDMXWorkspaceId() : -1;
     }
 
     // ---
@@ -535,8 +573,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // --- Helper ---
 
-    private boolean isDMXStandardType(DMXType type) {
-        return type.getUri().startsWith("dmx.");
+    private boolean isDMXStandardType(DMXObject object) {
+        return object.getUri().startsWith("dmx.");
     }
 
     private boolean isWorkspacePart(Topic topic) {
@@ -582,6 +620,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof AssocType) {
             return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof RoleType) {
+            return "role type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
                 "\")";

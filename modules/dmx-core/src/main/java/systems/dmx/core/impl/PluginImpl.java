@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.AssocType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.osgi.PluginContext;
@@ -535,7 +536,8 @@ public class PluginImpl implements Plugin, EventHandler {
      *   1) create "Plugin" topic
      *   2) run migrations
      *   3) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
-     *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
+     *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} and
+     *                                   {@link CoreEvent.INTRODUCE_ROLE_TYPE} events)
      */
     private void installPluginInDB() {
         DMXTransaction tx = dmx.beginTx();
@@ -548,6 +550,7 @@ public class PluginImpl implements Plugin, EventHandler {
             if (isCleanInstall) {
                 introduceTopicTypesToPlugin();
                 introduceAssocTypesToPlugin();
+                introduceRoleTypesToPlugin();
             }
             //
             tx.success();
@@ -591,7 +594,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    // ### TODO: move to AccessLayer?
     private void introduceTopicTypesToPlugin() {
         try {
             for (TopicType topicType : dmx.getAllTopicTypes()) {
@@ -602,7 +604,6 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-    // ### TODO: move to AccessLayer?
     private void introduceAssocTypesToPlugin() {
         try {
             for (AssocType assocType : dmx.getAllAssocTypes()) {
@@ -610,6 +611,16 @@ public class PluginImpl implements Plugin, EventHandler {
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);
+        }
+    }
+
+    private void introduceRoleTypesToPlugin() {
+        try {
+            for (RoleType roleType : dmx.getAllRoleTypes()) {
+                dispatchEvent(CoreEvent.INTRODUCE_ROLE_TYPE, roleType);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Introducing role types to " + this + " failed", e);
         }
     }
 
@@ -689,7 +700,8 @@ public class PluginImpl implements Plugin, EventHandler {
      * Checks whether this plugin is a listener for the given event, and if so, dispatches the event to this plugin.
      * Otherwise nothing is performed.
      * <p>
-     * Called internally to dispatch the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
+     * Called internally to dispatch the INTRODUCE_TOPIC_TYPE, INTRODUCE_ASSOCIATION_TYPE and INTRODUCE_ROLE_TYPE
+     * events.
      */
     private void dispatchEvent(DMXEvent event, Object... params) {
         dmx.em.dispatchEvent(this, event, params);

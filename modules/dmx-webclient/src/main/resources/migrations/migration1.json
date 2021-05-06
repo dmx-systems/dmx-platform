@@ -21,6 +21,11 @@
         "dataTypeUri": "dmx.core.boolean"
       },
       {
+        "value":       "Noneditable",
+        "uri":         "dmx.webclient.noneditable",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      {
         "value":       "Widget",
         "uri":         "dmx.webclient.widget",
         "dataTypeUri": "dmx.core.text"
@@ -36,8 +41,13 @@
         "dataTypeUri": "dmx.core.boolean"
       },
       {
-        "value":       "Noneditable",
-        "uri":         "dmx.webclient.noneditable",
+        "value":       "Arrow Shape",
+        "uri":         "dmx.webclient.arrow_shape",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Hollow",
+        "uri":         "dmx.webclient.hollow",
         "dataTypeUri": "dmx.core.boolean"
       }
     ],
@@ -106,6 +116,14 @@
           },
           {
             "childTypeUri":        "dmx.webclient.customizable",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.arrow_shape",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.webclient.hollow",
             "childCardinalityUri": "dmx.core.one"
           }
         ]

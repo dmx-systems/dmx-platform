@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -218,7 +219,7 @@ class CoreEvent {
     // ---
 
     // This event has a double nature:
-    //   a) it is fired regularily (see CoreServiceImpl.createTopicType()).
+    //   a) it is fired regularily (see AccessLayer.createTopicType()).
     //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
     static DMXEvent INTRODUCE_TOPIC_TYPE = new DMXEvent(IntroduceTopicType.class) {
         @Override
@@ -230,13 +231,25 @@ class CoreEvent {
     };
 
     // This event has a double nature:
-    //   a) it is fired regularily (see CoreServiceImpl.createAssocType()).
+    //   a) it is fired regularily (see AccessLayer.createAssocType()).
     //   b) it is fired locally (see PluginImpl.introduceAssocTypesToPlugin()).
     static DMXEvent INTRODUCE_ASSOCIATION_TYPE = new DMXEvent(IntroduceAssocType.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((IntroduceAssocType) listener).introduceAssocType(
                 (AssocType) params[0]
+            );
+        }
+    };
+
+    // This event has a double nature:
+    //   a) it is fired regularily (see AccessLayer.createRoleType()).
+    //   b) it is fired locally (see PluginImpl.introduceRoleTypesToPlugin()).
+    static DMXEvent INTRODUCE_ROLE_TYPE = new DMXEvent(IntroduceRoleType.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((IntroduceRoleType) listener).introduceRoleType(
+                (RoleType) params[0]
             );
         }
     };

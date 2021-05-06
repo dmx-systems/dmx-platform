@@ -612,12 +612,12 @@ public class Neo4jStorage implements DMXStorage {
     // === Value Storage ===
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
-        checkUriUniqueness(uri);
+        checkUri(uri);
         storeAndIndexExactValue(topicNode, KEY_URI, uri, topicIndex);
     }
 
     private void storeAndIndexAssocUri(Node assocNode, String uri) {
-        checkUriUniqueness(uri);
+        checkUri(uri);
         storeAndIndexExactValue(assocNode, KEY_URI, uri, assocIndex);
     }
 
@@ -1205,14 +1205,14 @@ public class Neo4jStorage implements DMXStorage {
      *
      * @param   uri     The URI to check. Must not be null.
      */
-    private void checkUriUniqueness(String uri) {
+    private void checkUri(String uri) {
         if (uri.equals("")) {
             return;
         }
         Node n1 = topicIndex.get(KEY_URI, uri).getSingle();
         Node n2 = assocIndex.get(KEY_URI, uri).getSingle();
         if (n1 != null || n2 != null) {
-            throw new RuntimeException("URI \"" + uri + "\" is not unique");
+            throw new RuntimeException("URI \"" + uri + "\" is already taken");
         }
     }
 }

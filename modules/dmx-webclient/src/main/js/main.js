@@ -8,7 +8,7 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './websocket'
 
-console.log('[DMX] 2021/04/28')
+console.log('[DMX] 2021/05/06')
 
 // 1) Init dmx library
 // The dmx library must be inited *before* the dmx-webclient component is instantiated.
@@ -51,6 +51,11 @@ store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.color',
   component: require('./components/dmx-color-picker').default
+})
+store.dispatch('registerDetailRenderer', {
+  renderer: 'value',
+  typeUri: 'dmx.webclient.arrow_shape',
+  component: require('./components/dmx-arrow-select').default
 })
 
 // 5) Initial navigation

@@ -4,6 +4,7 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
@@ -298,6 +299,16 @@ public class CoreServiceImpl implements CoreService {
 
 
     // === Role Types ===
+
+    @Override
+    public RoleType getRoleType(String roleTypeUri) {
+        return al.getRoleType(roleTypeUri).instantiate();
+    }
+
+    @Override
+    public List<RoleType> getAllRoleTypes() {
+        return al.instantiate(al.getAllRoleTypes());
+    }
 
     @Override
     public Topic createRoleType(TopicModel model) {
