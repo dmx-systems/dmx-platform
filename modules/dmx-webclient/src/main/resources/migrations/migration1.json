@@ -46,11 +46,6 @@
         "dataTypeUri": "dmx.core.text"
       },
       {
-        "value":       "Arrow Scale",
-        "uri":         "dmx.webclient.arrow_scale",
-        "dataTypeUri": "dmx.core.number"
-      },
-      {
         "value":       "Hollow",
         "uri":         "dmx.webclient.hollow",
         "dataTypeUri": "dmx.core.boolean"
@@ -125,10 +120,6 @@
           },
           {
             "childTypeUri":        "dmx.webclient.arrow_shape",
-            "childCardinalityUri": "dmx.core.one"
-          },
-          {
-            "childTypeUri":        "dmx.webclient.arrow_scale",
             "childCardinalityUri": "dmx.core.one"
           },
           {

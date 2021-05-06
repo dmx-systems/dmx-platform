@@ -8,7 +8,7 @@ import systems.dmx.core.service.Migration;
 
 
 /**
- * Adds 3 "Arrow" props to "View Configuration".
+ * Adds 2 "Arrow" props to "View Configuration".
  * <p>
  * Part of DMX 5.2
  * Runs only in UPDATE mode.
@@ -18,11 +18,9 @@ public class Migration5 extends Migration {
     @Override
     public void run() {
         dmx.createTopicType(mf.newTopicTypeModel("dmx.webclient.arrow_shape", "Arrow Shape", TEXT));
-        dmx.createTopicType(mf.newTopicTypeModel("dmx.webclient.arrow_scale", "Arrow Scale", NUMBER));
         dmx.createTopicType(mf.newTopicTypeModel("dmx.webclient.hollow", "Hollow", BOOLEAN));
         TopicType viewConfig = dmx.getTopicType(VIEW_CONFIG);
         viewConfig.addCompDef(mf.newCompDefModel(VIEW_CONFIG, "dmx.webclient.arrow_shape", ONE));
-        viewConfig.addCompDef(mf.newCompDefModel(VIEW_CONFIG, "dmx.webclient.arrow_scale", ONE));
         viewConfig.addCompDef(mf.newCompDefModel(VIEW_CONFIG, "dmx.webclient.hollow", ONE));
     }
 }
