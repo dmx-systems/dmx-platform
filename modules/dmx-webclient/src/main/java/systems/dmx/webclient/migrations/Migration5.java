@@ -8,7 +8,7 @@ import systems.dmx.core.service.Migration;
 
 
 /**
- * Adds 2 "Arrow" props to "View Configuration".
+ * Adds "Arrow Shape" and "Hollow" props to "View Configuration".
  * <p>
  * Part of DMX 5.2
  * Runs only in UPDATE mode.

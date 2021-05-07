@@ -113,7 +113,7 @@ public interface ModelFactory {
 
     TopicPlayerModel newTopicPlayerModel(long topicId, String topicUri, String roleTypeUri);
 
-    TopicPlayerModel newTopicPlayerModel(JSONObject topicPlayerModel);
+    TopicPlayerModel newTopicPlayerModel(JSONObject topicPlayer);
 
 
 
@@ -121,13 +121,15 @@ public interface ModelFactory {
 
     AssocPlayerModel newAssocPlayerModel(long assocId, String roleTypeUri);
 
-    AssocPlayerModel newAssocPlayerModel(JSONObject assocPlayerModel);
+    AssocPlayerModel newAssocPlayerModel(JSONObject assocPlayer);
 
 
 
     // === RoleTypeModel ===
 
     RoleTypeModel newRoleTypeModel(TopicModel roleTypeTopic, ViewConfigModel viewConfig);
+
+    RoleTypeModel newRoleTypeModel(JSONObject roleType);
 
 
 

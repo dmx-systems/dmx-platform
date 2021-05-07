@@ -420,18 +420,18 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public TopicPlayerModelImpl newTopicPlayerModel(JSONObject topicPlayerModel) {
+    public TopicPlayerModelImpl newTopicPlayerModel(JSONObject topicPlayer) {
         try {
-            long topicId       = topicPlayerModel.optLong("topicId", -1);
-            String topicUri    = topicPlayerModel.optString("topicUri", null);
-            String roleTypeUri = topicPlayerModel.getString("roleTypeUri");
+            long topicId       = topicPlayer.optLong("topicId", -1);
+            String topicUri    = topicPlayer.optString("topicUri", null);
+            String roleTypeUri = topicPlayer.getString("roleTypeUri");
             //
             if (topicId == -1 && topicUri == null) {
                 throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
             return newTopicPlayerModel(topicId, topicUri, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(topicPlayerModel, e, "TopicPlayerModelImpl");
+            throw parsingFailed(topicPlayer, e, "TopicPlayerModelImpl");
         }
     }
 
@@ -445,13 +445,13 @@ public class ModelFactoryImpl implements ModelFactory {
     }    
 
     @Override
-    public AssocPlayerModelImpl newAssocPlayerModel(JSONObject assocPlayerModel) {
+    public AssocPlayerModelImpl newAssocPlayerModel(JSONObject assocPlayer) {
         try {
-            long assocId       = assocPlayerModel.getLong("assocId");
-            String roleTypeUri = assocPlayerModel.getString("roleTypeUri");
+            long assocId       = assocPlayer.getLong("assocId");
+            String roleTypeUri = assocPlayer.getString("roleTypeUri");
             return newAssocPlayerModel(assocId, roleTypeUri);
         } catch (Exception e) {
-            throw parsingFailed(assocPlayerModel, e, "AssocPlayerModelImpl");
+            throw parsingFailed(assocPlayer, e, "AssocPlayerModelImpl");
         }
     }    
 
@@ -462,6 +462,18 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public RoleTypeModelImpl newRoleTypeModel(TopicModel roleTypeTopic, ViewConfigModel viewConfig) {
         return new RoleTypeModelImpl((TopicModelImpl) roleTypeTopic, (ViewConfigModelImpl) viewConfig);
+    }
+
+    @Override
+    public RoleTypeModelImpl newRoleTypeModel(JSONObject roleType) {
+        try {
+            return newRoleTypeModel(
+                newTopicModel(roleType),
+                newViewConfigModel(roleType.optJSONArray("viewConfigTopics"))      // optJSONArray may return null
+            );
+        } catch (Exception e) {
+            throw parsingFailed(roleType, e, "RoleTypeModelImpl");
+        }
     }
 
 
