@@ -10,6 +10,7 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -311,8 +312,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Topic createRoleType(TopicModel model) {
-        return al.createRoleType((TopicModelImpl) model).instantiate();
+    public RoleType createRoleType(RoleTypeModel model) {
+        return al.createRoleType((RoleTypeModelImpl) model).instantiate();
     }
 
 

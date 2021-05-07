@@ -556,7 +556,7 @@ public final class AccessLayer {
         }
     }
 
-    TopicModelImpl createRoleType(TopicModelImpl model) {
+    RoleTypeModelImpl createRoleType(RoleTypeModelImpl model) {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {

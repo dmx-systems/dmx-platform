@@ -9,6 +9,7 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -285,7 +286,7 @@ public interface CoreService {
 
     List<RoleType> getAllRoleTypes();
 
-    Topic createRoleType(TopicModel model);
+    RoleType createRoleType(RoleTypeModel model);
 
 
 
