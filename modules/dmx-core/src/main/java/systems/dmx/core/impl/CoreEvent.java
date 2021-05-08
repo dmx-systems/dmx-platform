@@ -7,6 +7,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocTypeModel;
+import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.ChangeReport;
@@ -103,6 +104,15 @@ class CoreEvent {
         public void dispatch(EventListener listener, Object... params) {
             ((PreCreateAssocType) listener).preCreateAssocType(
                 (AssocTypeModel) params[0]
+            );
+        }
+    };
+
+    static DMXEvent PRE_CREATE_ROLE_TYPE = new DMXEvent(PreCreateRoleType.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((PreCreateRoleType) listener).preCreateRoleType(
+                (RoleTypeModel) params[0]
             );
         }
     };

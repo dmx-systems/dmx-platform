@@ -538,6 +538,9 @@ public final class AccessLayer {
                     "(found: \"" + typeUri + "\")");
             }
         }
+        //
+        em.fireEvent(CoreEvent.PRE_CREATE_ROLE_TYPE, model);
+        //
         // store in DB
         createRoleType(model, URI_PREFIX_ROLE_TYPE);
         //
