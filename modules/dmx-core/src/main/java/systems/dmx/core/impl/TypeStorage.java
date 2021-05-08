@@ -714,6 +714,10 @@ class TypeStorage {
         }
     }
 
+    void storeViewConfig(RoleTypeModelImpl roleType) {
+        _storeViewConfig(newTypePlayer(roleType.id), roleType.viewConfig);
+    }
+
     /**
      * @return      may be null
      */

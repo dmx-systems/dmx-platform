@@ -144,8 +144,6 @@ public final class AccessLayer {
         }
     }
 
-    // ---
-
     /**
      * Creates a single topic in the DB.
      * No child topics are created.
@@ -162,33 +160,6 @@ public final class AccessLayer {
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model, e);
-        }
-    }
-
-    /**
-     * Creates a sole type topic in the DB, auto-generates a default type URI if due, and fires POST_CREATE_TOPIC.
-     * No type-specific parts are created.
-     * <p>
-     * Used to create topic types, assoc types, and role types.
-     */
-    private TopicModelImpl createTypeTopic(TopicModelImpl model, String uriPrefix) {
-        try {
-            createSingleTopic(model);
-            // set default URI
-            // If no URI is given the topic gets a default URI based on its ID, if requested.
-            // Note: this must be done *after* the topic is stored. The ID is not known before.
-            // Note: in case no URI was given: once stored a topic's URI is empty (not null).
-            if (model.getUri().equals("")) {
-                model.updateUri(uriPrefix + model.getId());     // update memory + DB
-            }
-            // Note: creating a type does not involve value integration, so POST_CREATE_TOPIC is fired from here.
-            model.postCreate();
-            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
-            //
-            return model;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating type topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
-                "\"", e);
         }
     }
 
@@ -568,7 +539,7 @@ public final class AccessLayer {
             }
         }
         // store in DB
-        createTypeTopic(model, URI_PREFIX_ROLE_TYPE);
+        createRoleType(model, URI_PREFIX_ROLE_TYPE);
         //
         em.fireEvent(CoreEvent.INTRODUCE_ROLE_TYPE, model.instantiate());
         //
@@ -1040,6 +1011,40 @@ public final class AccessLayer {
         //
         typeStorage.storeType(model);                   // store type-specific parts
     }
+
+    private void createRoleType(RoleTypeModelImpl model, String uriPrefix) {
+        createTypeTopic(model, uriPrefix);
+        typeStorage.storeViewConfig(model);
+    }
+
+    /**
+     * Creates a sole type topic in the DB, auto-generates a default type URI if due, and fires POST_CREATE_TOPIC.
+     * No type-specific parts are created.
+     * <p>
+     * Used to create topic types, assoc types, and role types.
+     */
+    private TopicModelImpl createTypeTopic(TopicModelImpl model, String uriPrefix) {
+        try {
+            createSingleTopic(model);
+            // set default URI
+            // If no URI is given the topic gets a default URI based on its ID, if requested.
+            // Note: this must be done *after* the topic is stored. The ID is not known before.
+            // Note: in case no URI was given: once stored a topic's URI is empty (not null).
+            if (model.getUri().equals("")) {
+                model.updateUri(uriPrefix + model.getId());     // update memory + DB
+            }
+            // Note: creating a type does not involve value integration, so POST_CREATE_TOPIC is fired from here.
+            model.postCreate();
+            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model.instantiate());
+            //
+            return model;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating type topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
+                "\"", e);
+        }
+    }
+
+    // ---
 
     private String typeUri(long objectId) {
         return (String) db.fetchProperty(objectId, "typeUri");
