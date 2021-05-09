@@ -11,6 +11,7 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfig;
 import systems.dmx.core.model.AssocTypeModel;
 import systems.dmx.core.model.CompDefModel;
+import systems.dmx.core.model.RoleTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
@@ -24,8 +25,9 @@ import systems.dmx.core.service.event.IntroduceAssocType;
 import systems.dmx.core.service.event.IntroduceRoleType;
 import systems.dmx.core.service.event.IntroduceTopicType;
 import systems.dmx.core.service.event.PostUpdateTopic;
-import systems.dmx.core.service.event.PreCreateTopicType;
 import systems.dmx.core.service.event.PreCreateAssocType;
+import systems.dmx.core.service.event.PreCreateRoleType;
+import systems.dmx.core.service.event.PreCreateTopicType;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -39,6 +41,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                                                                 IntroduceRoleType,
                                                                 PreCreateTopicType,
                                                                 PreCreateAssocType,
+                                                                PreCreateRoleType,
                                                                 PostUpdateTopic {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -102,6 +105,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Override
     public void preCreateAssocType(AssocTypeModel model) {
         addDefaultViewConfig(model);
+    }
+
+    /**
+     * Add a default view config to the role type in case no one is set.
+     * <p>
+     * Note: the default view config needs a workspace assignment. The default view config must be added *before* the
+     * assignment can take place. Workspace assignment for a role type (including its view config) is performed by the
+     * type-introduction hook of the Workspaces module. Here we use the pre-create-role-type hook (instead of type-
+     * introduction too) as the pre-create-role-type hook is guaranteed to be invoked *before* type-introduction.
+     * On the other hand the order of type-introduction invocations is not deterministic accross plugins.
+     */
+    @Override
+    public void preCreateRoleType(RoleTypeModel model) {
+        addDefaultViewConfigTopic(model.getViewConfig());
     }
 
     // ---
