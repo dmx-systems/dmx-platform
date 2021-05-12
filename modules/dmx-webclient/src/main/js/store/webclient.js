@@ -228,10 +228,10 @@ const actions = {
       case 'DELETE_TOPIC':
         dispatch('unselectIf', dir.arg.id)
         break
-      case 'UPDATE_ASSOCIATION':
+      case 'UPDATE_ASSOC':
         displayObjectIf(new dmx.Assoc(dir.arg))
         break
-      case 'DELETE_ASSOCIATION':
+      case 'DELETE_ASSOC':
         dispatch('unselectIf', dir.arg.id)
         break
       }

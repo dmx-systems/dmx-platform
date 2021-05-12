@@ -517,7 +517,7 @@ const actions = {
         //
         removeFromAllSelections(dir.arg.id)
         break
-      case 'DELETE_ASSOCIATION':
+      case 'DELETE_ASSOC':
         removeFromAllSelections(dir.arg.id)
         break
       }

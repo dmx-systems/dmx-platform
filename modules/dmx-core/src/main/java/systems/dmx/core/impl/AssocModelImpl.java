@@ -284,12 +284,12 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final Directive getUpdateDirective() {
-        return Directive.UPDATE_ASSOCIATION;
+        return Directive.UPDATE_ASSOC;
     }
 
     @Override
     final Directive getDeleteDirective() {
-        return Directive.DELETE_ASSOCIATION;
+        return Directive.DELETE_ASSOC;
     }
 
 

@@ -195,9 +195,9 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         for (Directives.Entry entry : directives) {
             switch (entry.dir) {
             case UPDATE_TOPIC:
-            case UPDATE_ASSOCIATION:
+            case UPDATE_ASSOC:
             case UPDATE_TOPIC_TYPE:
-            case UPDATE_ASSOCIATION_TYPE:
+            case UPDATE_ASSOC_TYPE:
                 firePreSend((DMXObject) entry.arg);
                 break;
             }
