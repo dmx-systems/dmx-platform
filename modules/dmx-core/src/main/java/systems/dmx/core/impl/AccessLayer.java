@@ -26,9 +26,9 @@ public final class AccessLayer {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String URI_PREFIX_TOPIC_TYPE       = "domain.project.topic_type_";
-    private static final String URI_PREFIX_ASSOCIATION_TYPE = "domain.project.assoc_type_";
-    private static final String URI_PREFIX_ROLE_TYPE        = "domain.project.role_type_";
+    private static final String URI_PREFIX_TOPIC_TYPE = "domain.project.topic_type_";
+    private static final String URI_PREFIX_ASSOC_TYPE = "domain.project.assoc_type_";
+    private static final String URI_PREFIX_ROLE_TYPE  = "domain.project.role_type_";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -314,7 +314,7 @@ public final class AccessLayer {
      */
     AssocModelImpl createAssoc(AssocModelImpl model) {
         try {
-            em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
+            em.fireEvent(CoreEvent.PRE_CREATE_ASSOC, model);
             model.preCreate();
             //
             // store in DB
@@ -326,7 +326,7 @@ public final class AccessLayer {
             // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
             // at CompDefModelImpl). "model" might be an CompDefModel while "_model" is always an AssocModel.
             model.postCreate();
-            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, _model.instantiate());
+            em.fireEvent(CoreEvent.POST_CREATE_ASSOC, _model.instantiate());
             return _model;
         } catch (Exception e) {
             // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
@@ -341,8 +341,8 @@ public final class AccessLayer {
             AssocModelImpl model = db.fetchAssoc(updateModel.getId());
             updateAssoc(model, updateModel);
             //
-            // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
-            // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
+            // Note: there is no possible POST_UPDATE_ASSOC_REQUEST event to fire here (compare to updateTopic()).
+            // It would be equivalent to POST_UPDATE_ASSOC. Per request exactly one association is updated.
             // Its children are always topics (never associations).
         } catch (Exception e) {
             // Note: do not put model in an exception thrown at web layer. The Webclient would present it to the user.
@@ -514,12 +514,12 @@ public final class AccessLayer {
 
     AssocTypeModelImpl createAssocType(AssocTypeModelImpl model) {
         try {
-            em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
+            em.fireEvent(CoreEvent.PRE_CREATE_ASSOC_TYPE, model);
             //
             // store in DB
-            createType(model, URI_PREFIX_ASSOCIATION_TYPE);
+            createType(model, URI_PREFIX_ASSOC_TYPE);
             //
-            em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, model.instantiate());
+            em.fireEvent(CoreEvent.INTRODUCE_ASSOC_TYPE, model.instantiate());
             //
             return model;
         } catch (Exception e) {
@@ -784,7 +784,7 @@ public final class AccessLayer {
      * @throws  AccessControlException  if the current user has no permission.
      */
     void checkAssocReadAccess(long assocId) {
-        em.fireEvent(CoreEvent.CHECK_ASSOCIATION_READ_ACCESS, assocId);
+        em.fireEvent(CoreEvent.CHECK_ASSOC_READ_ACCESS, assocId);
     }
 
     // ---
@@ -800,7 +800,7 @@ public final class AccessLayer {
      * @throws  AccessControlException  if the current user has no permission.
      */
     void checkAssocWriteAccess(long assocId) {
-        em.fireEvent(CoreEvent.CHECK_ASSOCIATION_WRITE_ACCESS, assocId);
+        em.fireEvent(CoreEvent.CHECK_ASSOC_WRITE_ACCESS, assocId);
     }
 
 

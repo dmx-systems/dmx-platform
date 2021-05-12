@@ -262,22 +262,22 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
 
     @Override
     final DMXEvent getPreUpdateEvent() {
-        return CoreEvent.PRE_UPDATE_ASSOCIATION;
+        return CoreEvent.PRE_UPDATE_ASSOC;
     }
 
     @Override
     final DMXEvent getPostUpdateEvent() {
-        return CoreEvent.POST_UPDATE_ASSOCIATION;
+        return CoreEvent.POST_UPDATE_ASSOC;
     }
 
     @Override
     final DMXEvent getPreDeleteEvent() {
-        return CoreEvent.PRE_DELETE_ASSOCIATION;
+        return CoreEvent.PRE_DELETE_ASSOC;
     }
 
     @Override
     final DMXEvent getPostDeleteEvent() {
-        return CoreEvent.POST_DELETE_ASSOCIATION;
+        return CoreEvent.POST_DELETE_ASSOC;
     }
 
     // ---

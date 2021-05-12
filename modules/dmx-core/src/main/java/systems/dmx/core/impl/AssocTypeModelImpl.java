@@ -70,11 +70,11 @@ public class AssocTypeModelImpl extends TypeModelImpl implements AssocTypeModel 
 
     @Override
     Directive getUpdateTypeDirective() {
-        return Directive.UPDATE_ASSOCIATION_TYPE;
+        return Directive.UPDATE_ASSOC_TYPE;
     }
 
     @Override
     Directive getDeleteTypeDirective() {
-        return Directive.DELETE_ASSOCIATION_TYPE;
+        return Directive.DELETE_ASSOC_TYPE;
     }
 }

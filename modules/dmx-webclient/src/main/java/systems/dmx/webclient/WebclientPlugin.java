@@ -186,7 +186,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         } else if (typeUri.equals(ASSOC_TYPE)) {
             _updateTypeCacheAndAddDirective(
                 dmx.getAssocType(type.getUri()),
-                compDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
+                compDefId, viewConfigTopic, Directive.UPDATE_ASSOC_TYPE
             );
         } else if (typeUri.equals(ROLE_TYPE)) {
             Directives.get().add(Directive.UPDATE_ROLE_TYPE, dmx.getRoleType(type.getUri()));

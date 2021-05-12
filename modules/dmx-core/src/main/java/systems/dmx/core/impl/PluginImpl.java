@@ -536,7 +536,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *   1) create "Plugin" topic
      *   2) run migrations
      *   3) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
-     *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} and
+     *                                   {@link CoreEvent.INTRODUCE_ASSOC_TYPE} and
      *                                   {@link CoreEvent.INTRODUCE_ROLE_TYPE} events)
      */
     private void installPluginInDB() {
@@ -607,7 +607,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void introduceAssocTypesToPlugin() {
         try {
             for (AssocType assocType : dmx.getAllAssocTypes()) {
-                dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+                dispatchEvent(CoreEvent.INTRODUCE_ASSOC_TYPE, assocType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);
@@ -700,7 +700,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Checks whether this plugin is a listener for the given event, and if so, dispatches the event to this plugin.
      * Otherwise nothing is performed.
      * <p>
-     * Called internally to dispatch the INTRODUCE_TOPIC_TYPE, INTRODUCE_ASSOCIATION_TYPE and INTRODUCE_ROLE_TYPE
+     * Called internally to dispatch the INTRODUCE_TOPIC_TYPE, INTRODUCE_ASSOC_TYPE and INTRODUCE_ROLE_TYPE
      * events.
      */
     private void dispatchEvent(DMXEvent event, Object... params) {
