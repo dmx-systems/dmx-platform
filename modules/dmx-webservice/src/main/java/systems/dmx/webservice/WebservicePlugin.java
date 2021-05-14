@@ -330,7 +330,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @POST
-    @Path("/roletype")      // TODO: make it "/role-type"
+    @Path("/role-type")
     @Transactional
     public RoleType createRoleType(RoleTypeModel model) {
         RoleType roleType = dmx.createRoleType(model);
