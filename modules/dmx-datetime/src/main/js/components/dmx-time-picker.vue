@@ -17,6 +17,7 @@ export default {
     require('./mixins/object').default,       // object to render
     require('./mixins/info-mode').default,
     require('./mixins/comp-def').default,     // undefined for top-level object
+    require('./mixins/path').default,
     require('./mixins/context').default
   ],
 
@@ -26,10 +27,13 @@ export default {
       return this.object.type
     },
 
-    // TODO: copy in dmx-value-renderer.vue
+    // Custom label rule (compare to dmx-value-renderer.vue)
     fieldLabel () {
-      const customAssocType = this.compDef && this.compDef.customAssocType
-      return customAssocType && customAssocType.isSimple ? customAssocType.value : this.type.value
+      let label = this.type.value
+      if (this.path.length) {
+        label += ` (${this.path.join(' / ')})`
+      }
+      return label
     },
 
     mode () {
