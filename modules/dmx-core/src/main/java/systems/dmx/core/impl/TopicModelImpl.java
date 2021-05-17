@@ -6,7 +6,9 @@ import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.PlayerModel;
 import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.service.CriticalityLevel;
 import systems.dmx.core.service.DMXEvent;
+import systems.dmx.core.service.DMXException;
 import systems.dmx.core.service.Directive;
 
 import java.util.List;
@@ -185,7 +187,13 @@ public class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     void preDelete() {
         if (typeUri.equals(TOPIC_TYPE) || typeUri.equals(ASSOC_TYPE)) {
             throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
-                "Use a delete-type call instead.");
+                "Use a delete-type call instead.");     // TODO
+        } else if (typeUri.equals(ROLE_TYPE)) {
+            int size = al.db.queryAssocsByRoleType(uri).size();
+            if (size > 0) {
+                throw new DMXException("Role type \"" + value + "\" is still used in " + size + " associations",
+                    CriticalityLevel.WARNING);
+            }
         }
     }
 
