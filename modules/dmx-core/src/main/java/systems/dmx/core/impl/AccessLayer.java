@@ -224,6 +224,10 @@ public final class AccessLayer {
         return filterReadables(_getAssocsByType(assocTypeUri));
     }
 
+    List<AssocModelImpl> getAssocsByRoleType(String roleTypeUri) {
+        return filterReadables(db.queryAssocsByRoleType(roleTypeUri));
+    }
+
     AssocModelImpl getAssocByValue(String key, SimpleValue value) {
         try {
             AssocModelImpl assoc = sd.fetchAssoc(key, value.value());

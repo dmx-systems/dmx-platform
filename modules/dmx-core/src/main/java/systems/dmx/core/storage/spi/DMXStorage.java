@@ -107,6 +107,8 @@ public interface DMXStorage {
      */
     List<AssocModelImpl> queryAssocsFulltext(String key, Object value);
 
+    List<AssocModelImpl> queryAssocsByRoleType(String roleTypeUri);
+
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *

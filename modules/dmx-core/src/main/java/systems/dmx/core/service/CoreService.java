@@ -157,6 +157,8 @@ public interface CoreService {
 
     List<Assoc> getAssocsByType(String assocTypeUri);
 
+    List<Assoc> getAssocsByRoleType(String roleTypeUri);
+
     /**
      * Returns all associations between two topics. If no such association exists an empty list is returned.
      */

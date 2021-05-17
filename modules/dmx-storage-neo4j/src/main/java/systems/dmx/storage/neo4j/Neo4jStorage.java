@@ -247,6 +247,14 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
+    public List<AssocModelImpl> queryAssocsByRoleType(String roleTypeUri) {
+        return queryAssocIndex(null,
+            roleTypeUri, null, -1, null,
+            null, null, -1, null
+        );
+    }
+
+    @Override
     public List<AssocModelImpl> fetchAssocs(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                                String roleTypeUri2) {
         return queryAssocIndex(assocTypeUri,

@@ -165,6 +165,11 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public List<Assoc> getAssocsByRoleType(String roleTypeUri) {
+        return al.instantiate(al.getAssocsByRoleType(roleTypeUri));
+    }
+
+    @Override
     public List<Assoc> getAssocs(long topic1Id, long topic2Id) {
         return al.instantiate(al.getAssocs(topic1Id, topic2Id));
     }
