@@ -23,6 +23,7 @@ const actions = {
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
     dmx.rpc.logout().then(() => {
       state.username = undefined
+      dispatch('initTypeCache')
       dispatch('loggedOut')
     })
   },
