@@ -247,7 +247,7 @@ class MigrationManager {
 
     private void createRoleTypes(JSONArray roleTypes) throws JSONException {
         for (int i = 0; i < roleTypes.length(); i++) {
-            dmx.createTopic(mf.newRoleTypeModel(roleTypes.getJSONObject(i)));
+            dmx.createRoleType(mf.newRoleTypeModel(roleTypes.getJSONObject(i)));
         }
     }
 
