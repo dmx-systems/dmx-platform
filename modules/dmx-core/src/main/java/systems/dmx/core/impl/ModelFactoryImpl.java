@@ -467,8 +467,10 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public RoleTypeModelImpl newRoleTypeModel(JSONObject roleType) {
         try {
+            String uri = roleType.getString("uri");
+            SimpleValue value = new SimpleValue(roleType.getString("value"));
             return newRoleTypeModel(
-                newTopicModel(roleType),
+                newTopicModel(uri, ROLE_TYPE, value),
                 newViewConfigModel(roleType.optJSONArray("viewConfigTopics"))      // optJSONArray may return null
             );
         } catch (Exception e) {
