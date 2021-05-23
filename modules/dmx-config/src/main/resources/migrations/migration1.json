@@ -18,12 +18,10 @@
       ]
     }
   ],
-  "topics": [
-    // Role Types
+  "role_types": [
     {
-      "value":   "Configurable",
-      "uri":     "dmx.config.configurable",
-      "typeUri": "dmx.core.role_type"
+      "value": "Configurable",
+      "uri":   "dmx.config.configurable"
     }
   ]
 }
