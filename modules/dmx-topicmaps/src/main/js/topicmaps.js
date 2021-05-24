@@ -375,13 +375,14 @@ const actions = {
     _selectTopicmap(topicmapId, dispatch)
   },
 
-  reloadTopicmap ({getters, rootState, dispatch}) {
+  reloadTopicmap ({getters, dispatch}) {
     const topicmapId = _topicmapId(getters)
     // console.log('reloadTopicmap', topicmapId)
     // update state
     dispatch('clearTopicmapCache', topicmapId)
     // update view
     _displayTopicmap(getters, dispatch).then(() => {
+      // restore selection
       const selection = getters.selection
       if (selection.isSingle()) {
         const id = selection.getObjectId()

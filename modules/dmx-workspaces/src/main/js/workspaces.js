@@ -98,6 +98,7 @@ const actions = {
         dispatch('clearTopicmapCache')
         selectFirstWorkspace(dispatch)
       }
+      dispatch('initTypeCache')
     })
   },
 
