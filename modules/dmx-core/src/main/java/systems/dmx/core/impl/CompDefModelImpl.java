@@ -178,16 +178,16 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
         try {
             // 1) check comp def
             if (!super.isReadable()) {
-                logger.info("### Comp def \"" + getCompDefUri() + "\" not READable");
+                logger.fine("### Comp def \"" + getCompDefUri() + "\" not READable");
                 return false;
             }
-            // Note: there is no need to explicitly check READability for the comp def's child type.
+            // Note: there is no need to check READability for the comp def's child type.
             // If the child type is not READable the entire comp def is not READable as well.
             //
             // 2) check custom assoc type, if set
             TopicModelImpl assocType = getCustomAssocType();
             if (assocType != null && !assocType.isReadable()) {
-                logger.info("### Comp def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
+                logger.fine("### Comp def \"" + getCompDefUri() + "\" not READable (custom assoc type not READable)");
                 return false;
             }
             //

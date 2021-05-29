@@ -467,7 +467,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public RoleTypeModelImpl newRoleTypeModel(JSONObject roleType) {
         try {
-            String uri = roleType.getString("uri");
+            String uri = roleType.optString("uri", null);
             SimpleValue value = new SimpleValue(roleType.getString("value"));
             return newRoleTypeModel(
                 newTopicModel(uri, ROLE_TYPE, value),

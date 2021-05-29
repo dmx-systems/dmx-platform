@@ -11,7 +11,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Adds view configs to all role types.
+ * Adds default view configs to all role types.
+ * Adds custom view configs (arrow heads) to certain role types.
  * <p>
  * Part of DMX 5.2
  * Runs ALWAYS
