@@ -61,7 +61,7 @@ const actions = {
 
   /**
    * Sets the topicmap state ("selectedTopicmapId" and cookie), and displays the given topicmap.
-   * The topicmap is retrieved either from cache or from server (asynchronously).
+   * The topicmap is retrieved either from cache or from server.
    *
    * Preconditions:
    * - the route is set.

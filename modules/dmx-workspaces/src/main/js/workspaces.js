@@ -90,7 +90,7 @@ const actions = {
   },
 
   loggedOut ({dispatch}) {
-    fetchWorkspaceTopics().then(() => {
+    fetchWorkspaceTopics().then(() => dispatch('initTypeCache')).then(() => {
       if (isWorkspaceReadable()) {
         // Note: 'clearTopicmapCache' is dispatched inside 'reloadTopicmap'
         dispatch('reloadTopicmap')
@@ -98,7 +98,6 @@ const actions = {
         dispatch('clearTopicmapCache')
         selectFirstWorkspace(dispatch)
       }
-      dispatch('initTypeCache')
     })
   },
 
