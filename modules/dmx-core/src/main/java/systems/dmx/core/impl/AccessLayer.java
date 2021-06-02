@@ -461,6 +461,15 @@ public final class AccessLayer {
         return typeStorage.fetchRoleType(getTopicByUri(roleTypeUri));
     }
 
+    RoleTypeModelImpl getRoleTypeImplicitly(long assocId, String roleTypeUri) {
+        AssocModelImpl assoc = getAssoc(assocId);       // includes READ check
+        if (assoc.playerCount(roleTypeUri) == 0) {
+            throw new IllegalArgumentException("Role type \"" + roleTypeUri + "\" not used by assoc " + assocId + ": " +
+                assoc);
+        }
+        return _getRoleType(roleTypeUri);
+    }
+
     // ---
 
     List<TopicTypeModelImpl> getAllTopicTypes() {
@@ -615,6 +624,13 @@ public final class AccessLayer {
      */
     AssocTypeModelImpl _getAssocType(String uri) {
         return typeStorage.getAssocType(uri);
+    }
+
+    /**
+     * DB direct access. No permission check.
+     */
+    RoleTypeModelImpl _getRoleType(String uri) {
+        return typeStorage.fetchRoleType(uri);
     }
 
 

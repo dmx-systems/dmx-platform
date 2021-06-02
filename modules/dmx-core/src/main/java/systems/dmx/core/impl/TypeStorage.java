@@ -235,6 +235,10 @@ class TypeStorage {
 
     // --- Fetch ---
 
+    RoleTypeModelImpl fetchRoleType(String roleTypeUri) {
+        return fetchRoleType(al.sd.fetchTopic("uri", roleTypeUri));
+    }
+
     RoleTypeModelImpl fetchRoleType(TopicModelImpl roleTypeTopic) {
         try {
             return mf.newRoleTypeModel(roleTypeTopic, fetchViewConfigOfType(roleTypeTopic));

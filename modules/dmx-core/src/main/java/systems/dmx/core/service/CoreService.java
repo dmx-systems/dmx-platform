@@ -286,6 +286,8 @@ public interface CoreService {
 
     RoleType getRoleType(String roleTypeUri);
 
+    RoleType getRoleTypeImplicitly(long assocId, String roleTypeUri);
+
     List<RoleType> getAllRoleTypes();
 
     RoleType createRoleType(RoleTypeModel model);

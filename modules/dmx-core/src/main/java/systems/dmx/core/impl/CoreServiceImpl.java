@@ -312,6 +312,11 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public RoleType getRoleTypeImplicitly(long assocId, String roleTypeUri) {
+        return al.getRoleTypeImplicitly(assocId, roleTypeUri).instantiate();
+    }
+
+    @Override
     public List<RoleType> getAllRoleTypes() {
         return al.instantiate(al.getAllRoleTypes());
     }
