@@ -19,7 +19,7 @@ import java.util.List;
 
 
 /**
- * Collection of the data that makes up an {@link Assoc}.
+ * Data that underly an {@link Assoc}.
  *
  * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
@@ -79,6 +79,13 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                 "\" (" + this + ")");
         }
         return rm1 ? player1 : rm2 ? player2 : null;
+    }
+
+    @Override
+    public int playerCount(String roleTypeUri) {
+        boolean rm1 = player1.getRoleTypeUri().equals(roleTypeUri);
+        boolean rm2 = player2.getRoleTypeUri().equals(roleTypeUri);
+        return (rm1 ? 1 : 0) + (rm2 ? 1 : 0);
     }
 
     @Override

@@ -62,6 +62,8 @@ public interface Assoc extends DMXObject {
      */
     Player getPlayerByRole(String roleTypeUri);
 
+    int playerCount(String roleTypeUri);
+
     boolean hasSameRoleTypeUris();
 
     /**

@@ -31,6 +31,8 @@ public interface AssocModel extends DMXObjectModel {
      */
     PlayerModel getPlayerByRole(String roleTypeUri);
 
+    int playerCount(String roleTypeUri);
+
     boolean hasSameRoleTypeUris();
 
     /**

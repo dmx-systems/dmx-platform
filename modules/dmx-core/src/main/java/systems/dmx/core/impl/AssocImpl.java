@@ -88,6 +88,11 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     }
 
     @Override
+    public final int playerCount(String roleTypeUri) {
+        return getModel().playerCount(roleTypeUri);
+    }
+
+    @Override
     public final boolean hasSameRoleTypeUris() {
         return getModel().hasSameRoleTypeUris();
     }
