@@ -324,6 +324,12 @@ public class WebservicePlugin extends PluginActivator {
     // === Role Types ===
 
     @GET
+    @Path("/role-type/{uri}/assoc/{id}")
+    public RoleType getRoleTypeImplicitly(@PathParam("id") long assocId, @PathParam("uri") String roleTypeUri) {
+        return dmx.getRoleTypeImplicitly(assocId, roleTypeUri);
+    }
+
+    @GET
     @Path("/role-types")
     public List<RoleType> getAllRoleTypes() {
         return dmx.getAllRoleTypes();
