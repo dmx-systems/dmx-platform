@@ -90,15 +90,18 @@ const actions = {
   },
 
   loggedOut ({dispatch}) {
-    fetchWorkspaceTopics().then(() => dispatch('initTypeCache')).then(() => {
-      if (isWorkspaceReadable()) {
-        // Note: 'clearTopicmapCache' is dispatched inside 'reloadTopicmap'
-        dispatch('reloadTopicmap')
-      } else {
-        dispatch('clearTopicmapCache')
-        selectFirstWorkspace(dispatch)
-      }
-    })
+    fetchWorkspaceTopics()
+      .then(() => dispatch('clearTopicmap'))
+      .then(() => dispatch('initTypeCache'))
+      .then(() => {
+        if (isWorkspaceReadable()) {
+          // Note: 'clearTopicmapCache' is dispatched inside 'reloadTopicmap'
+          dispatch('reloadTopicmap')
+        } else {
+          dispatch('clearTopicmapCache')
+          selectFirstWorkspace(dispatch)
+        }
+      })
   },
 
   // WebSocket messages
