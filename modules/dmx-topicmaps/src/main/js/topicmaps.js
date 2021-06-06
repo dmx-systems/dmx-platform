@@ -737,11 +737,8 @@ function emptyAllSelectionsExcept (topicmapId) {
 }
 
 function adjustSelection (selection) {
-  selection.forEachId(id => {
-    if (!state.topicmap.hasObject(id)) {
-      selection.remove(id)    // FIXME: remove while iterate
-    }
-  })
+  selection.topicIds = selection.topicIds.filter(id => state.topicmap.hasTopic(id))
+  selection.assocIds = selection.assocIds.filter(id => state.topicmap.hasAssoc(id))
 }
 
 // ---
