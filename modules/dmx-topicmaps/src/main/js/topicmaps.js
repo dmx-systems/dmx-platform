@@ -84,7 +84,9 @@ const actions = {
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
     dmx.utils.setCookie('dmx_topicmap_id', id)
     // update state + update view
-    return _displayTopicmap(getters, dispatch)
+    return _displayTopicmap(getters, dispatch).then(() => {
+      _syncSelectMulti(getters.selection, dispatch)
+    })
   },
 
   /**
@@ -296,7 +298,6 @@ const actions = {
       player1: {roleTypeUri: 'dmx.core.default', ...playerId1},
       player2: {roleTypeUri: 'dmx.core.default', ...playerId2}
     }
-    // console.log('createAssoc', assocModel)
     dmx.rpc.createAssoc(assocModel).then(assoc => {
       // console.log('Created', assoc)
       dispatch('revealAssoc', {assoc})
@@ -378,19 +379,23 @@ const actions = {
   reloadTopicmap ({getters, dispatch}) {
     const topicmapId = _topicmapId(getters)
     // console.log('reloadTopicmap', topicmapId)
-    // update state
+    // 1) update state
     dispatch('clearTopicmapCache')
     // Note: when the topicmap cache is cleared (see dmx-topicmap-panel module) here we remove all topicmap selection
     // states as we can't know if the selected topic/assoc is still contained in the topicmap when loaded with changed
     // authorization.
     emptyAllSelectionsExcept(topicmapId)
-    // update view
+    // 2) update view
     _displayTopicmap(getters, dispatch).then(() => {
-      // restore selection
       const selection = getters.selection
+      const wasMulti = selection.isMulti()
+      adjustSelection(selection)
+      // restore selection
       if (selection.isSingle()) {
         const id = selection.getObjectId()
-        if (state.topicmap.hasVisibleObject(id)) {
+        if (wasMulti) {
+          dispatch(selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute', id)
+        } else if (state.topicmap.hasVisibleObject(id)) {
           dispatch('renderAsSelected', {
             id,
             showDetails: getters.showInmapDetails
@@ -399,7 +404,7 @@ const actions = {
           dispatch('stripSelectionFromRoute')
         }
       } else {
-        // Note: a multi selection is visually restored by _displayTopicmap() already
+        _syncSelectMulti(selection, dispatch)
       }
     })
   },
@@ -533,7 +538,6 @@ const getters = {
   topicmapId: (state, getters, rootState) => {
     const workspaceId = __workspaceId(rootState)
     const topicmapId = workspaceId && state.selectedTopicmapId[workspaceId]
-    // console.log('# topicmapId getter', workspaceId, topicmapId)
     return topicmapId
   },
 
@@ -567,18 +571,15 @@ const getters = {
    */
   selection: (state, getters) => {
     const topicmapId = getters.topicmapId     // FIXME: undefined?
-    // console.log('# selection getter', topicmapId, state.selections[topicmapId])
     return state.selections[topicmapId]
   },
 
   visibleTopicIds (state) {
     // Note: at startup state.topicmap is undefined
-    // console.log('visibleTopicIds getter', state.topicmap)
     return state.topicmap && state.topicmap.topics.filter(topic => topic.isVisible()).map(topic => topic.id)
   },
 
   visibleAssocIds (state) {
-    // console.log('visibleAssocIds getter', state.topicmap)
     return state.topicmap && state.topicmap.assocs.filter(assoc => assoc.isVisible()).map(assoc => assoc.id)
   }
 }
@@ -654,7 +655,6 @@ function _displayTopicmap (getters, dispatch) {
     .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))    // dispatch into topicmap-panel
     .then(topicmap => {
       state.topicmap = topicmap
-      _syncSelectMulti(selection, dispatch)
     })
 }
 
@@ -673,7 +673,7 @@ function _syncUnselectMulti (selection, dispatch) {
   // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
   if (selection.isMulti()) {
     selection.forEachId(id => {
-      dispatch('_renderAsUnselected', id)     // TODO: pinned multi selection?
+      dispatch('_renderAsUnselected', id)
     })
   }
 }
@@ -732,6 +732,14 @@ function emptyAllSelectionsExcept (topicmapId) {
     // Note: Object.keys() returns string keys. So we use non-strict equality here.
     if (_topicmapId != topicmapId) {    /* eslint eqeqeq: "off" */
       state.selections[_topicmapId].empty()
+    }
+  })
+}
+
+function adjustSelection (selection) {
+  selection.forEachId(id => {
+    if (!state.topicmap.hasObject(id)) {
+      selection.remove(id)    // FIXME: remove while iterate
     }
   })
 }
