@@ -3,7 +3,7 @@
     <pre v-if="isText">{{text}}</pre>
     <img v-if="isImage" :src="fileUrl" @load="update">
     <audio v-if="isAudio" :src="fileUrl" controls></audio>
-    <video v-if="isVideo" :src="fileUrl" controls></video>
+    <video v-if="isVideo" :src="fileUrl" controls @loadeddata="update"></video>
     <embed v-if="isPDF" :src="fileUrl" :type="mediaType" class="pdf" @load="update"></embed>
     <dmx-value-renderer :object="object" :level="0" :path="[]" :context="context" :no-heading="true">
     </dmx-value-renderer>
