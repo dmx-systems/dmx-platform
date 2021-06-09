@@ -1,6 +1,8 @@
 package systems.dmx.files;
 
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.service.CriticalityLevel;
+import systems.dmx.core.service.DMXException;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
 
@@ -25,7 +27,11 @@ public class DirectoryListing implements JSONEnabled {
     public DirectoryListing(File directory, PathMapper pathMapper) {
         this.pathMapper = pathMapper;
         this.dirInfo = new FileItem(directory);
-        for (File file : directory.listFiles()) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            throw new DMXException("An OS-level error occurred while accessing the directory", CriticalityLevel.WARNING);
+        }
+        for (File file : files) {
             fileItems.add(new FileItem(file));
         }
     }
