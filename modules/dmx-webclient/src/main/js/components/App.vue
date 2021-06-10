@@ -140,6 +140,11 @@ button {
 }
 
 /* Note: this is a global rule as el-selects are <body> mounted */
+.el-select-dropdown__wrap {
+  max-height: 100vh !important;
+}
+
+/* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__item .icon {
   color: var(--color-topic-icon);
   margin-right: var(--icon-spacing);
