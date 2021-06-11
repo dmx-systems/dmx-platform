@@ -141,7 +141,7 @@ button {
 
 /* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__wrap {
-  max-height: 100vh !important;
+  max-height: 100vh !important;                   /* was 274px */
 }
 
 /* Note: this is a global rule as el-selects are <body> mounted */
