@@ -13,12 +13,12 @@ const state = {
 const actions = {
 
   loggedIn (_, username) {
-    console.log('Login', username)
+    DEV && console.log('Login', username)
     state.username = username
   },
 
   logout ({dispatch}) {
-    console.log('Logout', state.username)
+    DEV && console.log('Logout', state.username)
     // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
     dmx.rpc.logout().then(() => {

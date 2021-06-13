@@ -22,9 +22,9 @@ const state = {
 const actions = {
 
   createWorkspace ({dispatch}, {name, sharingModeUri}) {
-    console.log('createWorkspace', name, sharingModeUri)
+    // console.log('createWorkspace', name, sharingModeUri)
     dmx.rpc.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
-      console.log('Workspace', topic)
+      // console.log('Workspace', topic)
       state.workspaceTopics.push(topic)
       selectWorkspace(topic.id, dispatch)
     })

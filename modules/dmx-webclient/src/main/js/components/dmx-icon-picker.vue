@@ -36,7 +36,7 @@ export default {
     },
 
     select (icon) {
-      console.log('select icon', icon.id, icon.unicode)
+      // console.log('select icon', icon.id, icon.unicode)
       this.object.value = String.fromCharCode(parseInt(icon.unicode, 16))
       this.close()
     }

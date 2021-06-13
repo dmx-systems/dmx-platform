@@ -39,7 +39,7 @@ export default {
   toolbarHandler (value) {
     // "value" is the button of/off state
     // "this" refers to the Quill toolbar instance
-    console.log('topicLinkHandler', value)
+    // console.log('topicLinkHandler', value)
     store.dispatch('openSearchWidget', {
       pos: {
         model:  {x: 100, y: 100},   // TODO
@@ -48,7 +48,7 @@ export default {
       options: {
         noSelect: true,
         topicHandler: topic => {
-          console.log('createTopicLink', topic)
+          // console.log('createTopicLink', topic)
           this.quill.format('topic-link', {
             topicId: topic.id,
             linkId: undefined   // TODO
@@ -72,7 +72,7 @@ export default {
         e.preventDefault()    // suppress browser's default link click behavior
         e.stopPropagation()   // prevent activating inline edit
         const topicId = Number(e.target.dataset.topicId)
-        console.log('topic link clicked', topicId)
+        // console.log('topic link clicked', topicId)
         store.dispatch('revealTopicById', topicId)
       })
     })

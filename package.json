@@ -22,7 +22,7 @@
     "dmx-object-renderer": "https://github.com/dmx-systems/dmx-object-renderer.git",
     "dmx-search-widget": "https://github.com/dmx-systems/dmx-search-widget.git",
     "dmx-topicmap-panel": "https://github.com/dmx-systems/dmx-topicmap-panel.git",
-    "dmx-websocket": "2.0.0",
+    "dmx-websocket": "https://github.com/dmx-systems/dmx-websocket.git",
     "element-ui": "2.13.2",
     "vue": "2.6.11",
     "vue-element-dialog-draggable": "1.0.3",

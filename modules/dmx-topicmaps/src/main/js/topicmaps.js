@@ -472,11 +472,11 @@ const actions = {
     }
     const topics = state.topicmapTopics[workspace.id]
     if (topics) {
-      console.log('Adding topicmap topic', _topicmapTopic, 'to workspace', workspace.id)
+      // console.log('Adding topicmap topic', _topicmapTopic, 'to workspace', workspace.id)
       topics.push(_topicmapTopic)
       initSelection(_topicmapTopic.id, dispatch)
     } else {
-      console.log('Ignoring topicmap topic', _topicmapTopic, 'for workspace', workspace.id)
+      // console.log('Ignoring topicmap topic', _topicmapTopic, 'for workspace', workspace.id)
     }
   },
 
@@ -610,7 +610,7 @@ function deleteTopicmap (topic, getters, rootState, dispatch) {
   findTopicmapTopic(topic.id, (topics, i) => topics.splice(i, 1))
   delete state.selections[topic.id]
   // redirect
-  console.log('deleteTopicmap', topic.id, _topicmapId(getters))
+  // console.log('deleteTopicmap', topic.id, _topicmapId(getters))
   if (topic.id === _topicmapId(getters)) {
     _selectTopicmap(firstTopicmapTopic(rootState).id, dispatch)
   }

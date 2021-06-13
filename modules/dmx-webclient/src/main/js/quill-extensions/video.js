@@ -21,11 +21,11 @@ export default {
         node.setAttribute('src', Link.sanitize(value))
         if (tag === 'video') {
           node.setAttribute('controls', '')
-          console.log('Video direct-link', node)
+          // console.log('Video direct-link', node)
         } else {
           node.setAttribute('frameborder', '0')
           node.setAttribute('allowfullscreen', true)
-          console.log('Video embed-link', node)
+          // console.log('Video embed-link', node)
         }
         return node
       }
