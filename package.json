@@ -18,7 +18,7 @@
     "dmx-api": "https://github.com/dmx-systems/dmx-api.git",
     "dmx-cytoscape-renderer": "https://github.com/dmx-systems/dmx-cytoscape-renderer.git",
     "dmx-detail-panel": "https://github.com/dmx-systems/dmx-detail-panel.git",
-    "dmx-login-dialog": "2.0.0",
+    "dmx-login-dialog": "https://github.com/dmx-systems/dmx-login-dialog.git",
     "dmx-object-renderer": "https://github.com/dmx-systems/dmx-object-renderer.git",
     "dmx-search-widget": "https://github.com/dmx-systems/dmx-search-widget.git",
     "dmx-topicmap-panel": "https://github.com/dmx-systems/dmx-topicmap-panel.git",
