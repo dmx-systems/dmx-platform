@@ -47,6 +47,9 @@ copy-release:
 deploy-to-central:
   stage: deploy
   script:
+    - whoami
+    - ls -la ~/.m2
+    - more ~/.m2/settings.xml
     - mvn deploy -P release
   only:
-    - tags
+    - master
