@@ -43,3 +43,10 @@ copy-release:
     - cp ${ZIPFILE} /var/www/download.dmx.systems/dmx-${CI_COMMIT_TAG}.zip
   only:
     - tags
+
+deploy-to-central:
+  stage: deploy
+  script:
+    - mvn deploy -P release
+  only:
+    - tags
