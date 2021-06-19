@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -406,6 +407,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             Desktop.getDesktop().open(file);
             //
             // Note: a HTTP GET method MUST return a non-void type
+            return 0;
+        } catch (HeadlessException e) {
+            // fail silently
+            logger.info("### File opening ABORTED -- this is a headless installation");
             return 0;
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
