@@ -2,6 +2,7 @@ package systems.dmx.config;
 
 import static systems.dmx.config.Constants.*;
 import static systems.dmx.core.Constants.*;
+import systems.dmx.core.Assoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.TopicModel;
@@ -172,27 +173,32 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return dmx.getPrivilegedAccess().getConfigTopic(configTypeUri, topicId);
     }
 
-    private RelatedTopic _createConfigTopic(final ConfigDef configDef, final Topic topic) {
+    private void _createConfigTopic(final ConfigDef configDef, final Topic topic) {
         final String configTypeUri = configDef.getConfigTypeUri();
         try {
-            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
+            logger.info("Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             final PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            // Note: a config topic requires a special workspace assignment.
-            long workspaceId = workspaceId(configDef.getConfigModRole());
-            return pa.runInWorkspaceContext(workspaceId, () -> {
-                Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
-                createConfigAssoc(topic, configTopic);
-                // ### TODO: extend Core API to avoid re-retrieval
-                return _getConfigTopic(configTypeUri, topic.getId());
+            // Note: a config topic (and its assoc) require special workspace assignments.
+            // Creating the assignments requires priviledged access. Consider e.g. the Username topic created while
+            // 1st LDAP login: its config topics are bound to the "Administration" workspace, but at this time the new
+            // user is not logged in yet.
+            RelatedTopic configTopic = pa.runInWorkspaceContext(-1, () -> {
+                return createConfigAssoc(
+                    topic,
+                    dmx.createTopic(configDef.getConfigValue(topic))
+                ).getDMXObjectByRole(DEFAULT);
             });
+            long workspaceId = workspaceId(configDef.getConfigModRole());
+            pa.assignToWorkspace(configTopic, workspaceId);
+            pa.assignToWorkspace(configTopic.getRelatingAssoc(), workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " +
                 topic.getId() + " failed", e);
         }
     }
 
-    private void createConfigAssoc(Topic topic, Topic configTopic) {
-        dmx.createAssoc(mf.newAssocModel(CONFIGURATION,
+    private Assoc createConfigAssoc(Topic topic, Topic configTopic) {
+        return dmx.createAssoc(mf.newAssocModel(CONFIGURATION,
             mf.newTopicPlayerModel(topic.getId(), CONFIGURABLE),
             mf.newTopicPlayerModel(configTopic.getId(), DEFAULT)
         ));
