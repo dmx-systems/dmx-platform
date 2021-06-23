@@ -180,8 +180,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             final PrivilegedAccess pa = dmx.getPrivilegedAccess();
             // Note: a config topic (and its assoc) require special workspace assignments.
             // Creating the assignments requires priviledged access. Consider e.g. the Username topic created while
-            // 1st LDAP login: its config topics are bound to the "Administration" workspace, but at this time the new
-            // user is not logged in yet.
+            // 1st LDAP login: assigning the user's config topics to the "Administration" workspace would fail.
+            // Only admins can do the assignments, but at this moment no user is logged in.
             RelatedTopic configTopic = pa.runInWorkspaceContext(-1, () -> {
                 return createConfigAssoc(
                     topic,

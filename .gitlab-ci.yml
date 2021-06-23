@@ -50,6 +50,6 @@ deploy-to-central:
     - whoami
     - ls -la ~/.m2
     - more ~/.m2/settings.xml
-    - mvn deploy -P release
+    - mvn clean deploy -P release
   only:
-    - tags
+    - master
