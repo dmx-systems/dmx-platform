@@ -9,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Jun 23, 2021
+        Jun 25, 2021
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -47,13 +47,12 @@ export default {
 <style>
 .dmx-about-box .el-dialog__body {
   display: flex;
-  align-items: center;
-  padding: 10px 20px 30px 20px !important;    /* Element UI default is 30px 20px (was overrideen in App.vue) */
+  padding: 20px !important;   /* Element UI default is 30px 20px (was overrideen in App.vue) */
 }
 
 .dmx-about-box img {
   width: 50%;
-  margin-right: 10%;
+  margin-right: 16%;
 }
 
 .dmx-about-box .el-link {
