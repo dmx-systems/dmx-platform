@@ -7,13 +7,13 @@
     <name>DMX Tags</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-tags</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 </project>

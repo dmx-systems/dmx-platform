@@ -52,4 +52,4 @@ deploy-to-central:
     - more ~/.m2/settings.xml
     - mvn clean deploy -P release
   only:
-    - master
+    - tags

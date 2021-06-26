@@ -50,5 +50,5 @@ DMX is available freely under the GNU Affero General Public License, version 3.
 All third party components incorporated into the DMX Software are licensed under the original license provided by the owner of the applicable component.
 
 
------------
-Feb 6, 2021
+------------
+Jun 26, 2021
