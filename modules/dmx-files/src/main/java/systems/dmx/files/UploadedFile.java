@@ -84,6 +84,13 @@ public class UploadedFile {
         return fileItem.get();
     }*/
 
+    /**
+     * Returns an InputStream that can be used to retrieve the contents of the uploaded file.
+     */
+    public InputStream getInputStream() {
+        return in;
+    }
+
 
 
     // === Java API ===
