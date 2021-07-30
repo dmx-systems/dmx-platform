@@ -100,6 +100,9 @@ function initPlugin (pluginConfig) {
   // double-click handlers
   const doubleClickHandlers = _pluginConfig.doubleClickHandlers
   doubleClickHandlers && store.dispatch('registerDoubleClickHandlers', doubleClickHandlers)
+  // drop handler
+  const dropHandler = _pluginConfig.dropHandler
+  dropHandler && store.dispatch('registerDropHandler', dropHandler)
   // detail panel buttons
   registerDetailPanelButtons(_pluginConfig.detailPanelButtons)
   // login extensions

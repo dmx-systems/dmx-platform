@@ -20,6 +20,7 @@ export default ({store, dmx}) => {
             right: state.compDefs['toolbar-right']
           }),
           contextCommands: state => state.contextCommands,
+          dropHandler:     state => state.dropHandler,
           quillConfig:     state => state.quillConfig
         },
         listeners: {
@@ -28,6 +29,7 @@ export default ({store, dmx}) => {
           'topic-double-click':   topic          => invokeDoubleClickHandler(topic),
           'topic-dragged':        ({id, pos})    => store.dispatch('setTopicPosition', {id, pos}),
           'topics-dragged':       topicCoords    => store.dispatch('setTopicPositions', topicCoords),
+          'topic-dropped':        ids            => store.dispatch('handleTopicDrop', ids),
           'topic-pin':            ({id, pinned}) => store.dispatch('setTopicPinned', {
                                                                                         topicId: id,
                                                                                         pinned,

@@ -45,6 +45,8 @@ const state = {
                             //   typeUri: function
                             // }
 
+  dropHandler: [],          // Array of predicate functions: viewTopic1, viewTopic2 -> boolean
+
   detailPanelButtons: {},   // Registered extra buttons being displayed in the detail panel:
                             // {
                             //   typeUri: [
@@ -155,6 +157,10 @@ const actions = {
       }
       state.doubleClickHandlers[typeUri] = handler
     })
+  },
+
+  registerDropHandler (_, handler) {
+    state.dropHandler.push(handler)
   },
 
   registerDetailPanelButtons (_, {typeUri, buttons}) {
