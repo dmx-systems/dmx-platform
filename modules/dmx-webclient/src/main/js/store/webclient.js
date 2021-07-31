@@ -45,7 +45,11 @@ const state = {
                             //   typeUri: function
                             // }
 
-  dropHandler: [],          // Array of predicate functions: viewTopic1, viewTopic2 -> boolean
+  dropHandler: [],          // Array of drop handler objects:
+                            // {
+                            //   isDroppable (topic1, topic2) predicate returns boolean, called often while drag
+                            //   handleDrop (topic1, topic2) handler for "topic 1 is dropped onto topic 2"
+                            // }
 
   detailPanelButtons: {},   // Registered extra buttons being displayed in the detail panel:
                             // {
