@@ -65,24 +65,23 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     /**
-     * @param   predChildTopic    may be null.
+     * @param   beforeChildTopic    may be null.
      */
-    public Topic insert(Topic childTopic, Topic predChildTopic) {
+    public Topic add(Topic childTopic, Topic beforeChildTopic) {
         long childTopicId = childTopic.getId();
-        if (predChildTopic != null) {
-            checkParent(predChildTopic);
+        if (beforeChildTopic != null) {
+            checkParent(beforeChildTopic);
             //
-            long predChildTopicId = predChildTopic.getId();
-            RelatedTopic succ = getSuccessor(predChildTopic);
-            if (succ != null) {
-                insertInBetween(childTopicId, predChildTopicId, succ);
+            RelatedTopic pred = getPredecessor(beforeChildTopic);
+            if (pred != null) {
+                insertInBetween(childTopicId, pred, beforeChildTopic.getId());
             } else {
-                createSequenceSegment(predChildTopicId, childTopicId);
+                insertAtBegin(childTopicId, getFirst());
             }
         } else {
-            RelatedTopic first = getFirst();
-            if (first != null) {
-                insertAtBegin(childTopicId, first);
+            RelatedTopic last = getLast();
+            if (last != null) {
+                createSequenceSegment(last.getId(), childTopicId);
             } else {
                 createSequenceStart(childTopicId);
             }
@@ -126,10 +125,10 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
         createSequenceSegment(childTopicId, firstChildTopic.getId());
     }
 
-    private void insertInBetween(long childTopicId, long predChildTopicId, RelatedTopic succChildTopic) {
-        succChildTopic.getRelatingAssoc().delete();
-        createSequenceSegment(predChildTopicId, childTopicId);
-        createSequenceSegment(childTopicId, succChildTopic.getId());
+    private void insertInBetween(long childTopicId, RelatedTopic predChildTopic, long succChildTopicId) {
+        predChildTopic.getRelatingAssoc().delete();
+        createSequenceSegment(predChildTopic.getId(), childTopicId);
+        createSequenceSegment(childTopicId, succChildTopicId);
     }
 
     // ---
@@ -163,6 +162,15 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
     private RelatedTopic getFirst() {
         return parentTopic.getRelatedTopic(ASSOCIATION, PARENT, SEQUENCE_START, childTypeUri);
+    }
+
+    private RelatedTopic getLast() {
+        RelatedTopic childTopic = null;
+        Iterator<RelatedTopic> i = iterator();
+        while (i.hasNext()) {
+            childTopic = i.next();
+        }
+        return childTopic;
     }
 
     // ---
