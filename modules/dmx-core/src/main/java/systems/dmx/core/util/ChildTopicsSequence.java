@@ -70,7 +70,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     public Topic add(Topic childTopic, Topic beforeChildTopic) {
         long childTopicId = childTopic.getId();
         if (beforeChildTopic != null) {
-            checkParent(beforeChildTopic);
+            checkChildTopic(beforeChildTopic);
             //
             RelatedTopic pred = getPredecessor(beforeChildTopic);
             if (pred != null) {
@@ -97,7 +97,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
      * @param   childTopic      not null.
      */
     public void remove(Topic childTopic) {
-        checkParent(childTopic);
+        checkChildTopic(childTopic);
         //
         RelatedTopic pred = getPredecessor(childTopic);
         RelatedTopic succ = getSuccessor(childTopic);
@@ -134,8 +134,8 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     private void createSequenceStart(long childTopicId) {
-        dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
-            mf.newTopicPlayerModel(parentTopic.getId(), PARENT),
+        dmx.createAssoc(mf.newAssocModel(SEQUENCE,
+            mf.newTopicPlayerModel(parentTopic.getId(), DEFAULT),
             mf.newTopicPlayerModel(childTopicId, SEQUENCE_START)
         ));
     }
@@ -161,7 +161,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     private RelatedTopic getFirst() {
-        return parentTopic.getRelatedTopic(ASSOCIATION, PARENT, SEQUENCE_START, childTypeUri);
+        return parentTopic.getRelatedTopic(SEQUENCE, DEFAULT, SEQUENCE_START, childTypeUri);
     }
 
     private RelatedTopic getLast() {
@@ -175,22 +175,22 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
     // ---
 
-    private void checkParent(Topic node) {
-        if (!getParentNode(node).equals(parentTopic)) {
-            throw new RuntimeException("Node " + node.getId() + " is not a child of node " + parentTopic.getId());
+    private void checkChildTopic(Topic topic) {
+        if (!getParentTopic(topic).equals(parentTopic)) {
+            throw new RuntimeException("Topic " + topic.getId() + " is not a child of topic " + parentTopic.getId());
         }
     }
 
-    private RelatedTopic getParentNode(Topic node) {
-        RelatedTopic parentNode = getParentNodeIfExists(node);
-        if (parentNode == null) {
-            throw new RuntimeException("Node " + node.getId() + " has no parent node");
+    private RelatedTopic getParentTopic(Topic topic) {
+        RelatedTopic parentTopic = getParentTopicIfExists(topic);
+        if (parentTopic == null) {
+            throw new RuntimeException("Topic " + topic.getId() + " has no parent topic");
         }
-        return parentNode;
+        return parentTopic;
     }
 
     // ### FIXME: ambiguity
-    private RelatedTopic getParentNodeIfExists(Topic node) {
-        return node.getRelatedTopic(assocTypeUri, CHILD, PARENT, parentTopic.getTypeUri());
+    private RelatedTopic getParentTopicIfExists(Topic topic) {
+        return topic.getRelatedTopic(assocTypeUri, CHILD, PARENT, parentTopic.getTypeUri());
     }
 }
