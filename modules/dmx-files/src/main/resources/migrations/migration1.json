@@ -36,7 +36,8 @@
         },
         {
           "childTypeUri":        "dmx.files.path",
-          "childCardinalityUri": "dmx.core.one"
+          "childCardinalityUri": "dmx.core.one",
+          "isIdentityAttr":      true
         },
         {
           "childTypeUri":        "dmx.files.media_type",
@@ -74,7 +75,8 @@
         },
         {
           "childTypeUri":        "dmx.files.path",
-          "childCardinalityUri": "dmx.core.one"
+          "childCardinalityUri": "dmx.core.one",
+          "isIdentityAttr":      true
         }
       ],
       "viewConfigTopics": [
