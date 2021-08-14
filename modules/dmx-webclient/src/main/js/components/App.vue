@@ -43,8 +43,8 @@
   --heading-spacing: 17px;                    /* vertical spacing before/after heading */
   --color-topic-icon:  hsl(210, 50%, 53%);    /* matches dmx-color-picker blue */
   --color-topic-hover: hsl(210, 50%, 53%);    /* matches dmx-color-picker blue */
-  --line-height: 1.6em;
-  --paragraph-spacing: 0.6em;
+  --line-height: 1.5;
+  --paragraph-spacing: 0.5em;
   --field-spacing: 1.2em;                     /* vertical spacing between data fields */
   --object-item-padding: 8px;                 /* padding for topic/assoc items e.g. in a topic list */
   --icon-spacing: 7px;                        /* horizontal spacing between icon and label */
