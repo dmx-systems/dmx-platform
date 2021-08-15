@@ -198,8 +198,8 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     private void createSequenceStart(long assocId) {
-        dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
-            mf.newTopicPlayerModel(parentTopic.getId(), PARENT),
+        dmx.createAssoc(mf.newAssocModel(SEQUENCE,
+            mf.newTopicPlayerModel(parentTopic.getId(), DEFAULT),
             mf.newAssocPlayerModel(assocId, SEQUENCE_START)
         ));
     }
@@ -221,8 +221,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
      * @return      possibly null
      */
     private RelatedAssoc getPredecessorAssoc(Assoc assoc) {
-        RelatedAssoc predAssoc = assoc.getRelatedAssoc(SEQUENCE, SUCCESSOR, PREDECESSOR,
-            null);    // othersAssocTypeUri=null
+        RelatedAssoc predAssoc = assoc.getRelatedAssoc(SEQUENCE, SUCCESSOR, PREDECESSOR, assocTypeUri);
         if (predAssoc != null) {
             checkAssoc(predAssoc);
         }
@@ -245,8 +244,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
      *          The returned association's "relating association" is of type "Sequence".
      */
     private RelatedAssoc getSuccessorAssoc(Assoc assoc) {
-        List<RelatedAssoc> succAssocs = assoc.getRelatedAssocs(SEQUENCE, PREDECESSOR, SUCCESSOR,
-            null);    // othersAssocTypeUri=null
+        List<RelatedAssoc> succAssocs = assoc.getRelatedAssocs(SEQUENCE, PREDECESSOR, SUCCESSOR, assocTypeUri);
         RelatedAssoc succAssoc = null;
         int size = succAssocs.size();
         if (size >= 1) {
@@ -270,8 +268,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
      *          connects the returned association (role type is "Sequence Start") with the parent topic.
      */
     private RelatedAssoc getFirstAssoc() {
-        RelatedAssoc assoc = parentTopic.getRelatedAssoc(ASSOCIATION, PARENT, SEQUENCE_START,
-            null);  // othersAssocTypeUri=null
+        RelatedAssoc assoc = parentTopic.getRelatedAssoc(SEQUENCE, DEFAULT, SEQUENCE_START, assocTypeUri);
         if (assoc != null) {
             checkAssoc(assoc);
         }
