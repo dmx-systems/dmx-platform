@@ -9,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Aug 14, 2021
+        Aug 15, 2021
       </div>
       <div class="field">
         <div class="field-label">License</div>

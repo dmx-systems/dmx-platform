@@ -1,12 +1,17 @@
 package systems.dmx.core.util;
 
 import static systems.dmx.core.Constants.*;
+import systems.dmx.core.Assoc;
+import systems.dmx.core.RelatedAssoc;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Logger;
 
 
 
@@ -23,6 +28,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
     private CoreService dmx;
     private ModelFactory mf;
+    private CycleDetection detection;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -32,16 +38,21 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
         this.assocTypeUri = assocTypeUri;
         this.dmx = dmx;
         this.mf = dmx.getModelFactory();
+        // this.detection = detection;      // TODO
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    /**
+     * @return  an iterator of the parent topic's child topics (<code>RelatedTopic</code>s).
+     *          Their "relating association" is the respective parent connection.
+     */
     @Override
     public Iterator<RelatedTopic> iterator() {
 
         return new Iterator() {
 
-            private RelatedTopic topic = getFirst();
+            private RelatedTopic topic = getFirstTopic();
 
             @Override
             public boolean hasNext() {
@@ -51,7 +62,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
             @Override
             public RelatedTopic next() {
                 RelatedTopic _topic = topic;
-                topic = getSuccessor(topic);
+                topic = getSuccessorTopic(topic);
                 return _topic;
             }
 
@@ -65,42 +76,91 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     /**
-     * @param   beforeChildTopic    may be null.
+     * Convenience.
+     *
+     * @param   predTopicId     may be -1
      */
-    public Topic add(Topic childTopic, Topic beforeChildTopic) {
-        long childTopicId = childTopic.getId();
-        if (beforeChildTopic != null) {
-            checkChildTopic(beforeChildTopic);
-            //
-            RelatedTopic pred = getPredecessor(beforeChildTopic);
-            if (pred != null) {
-                insertInBetween(childTopicId, pred, beforeChildTopic.getId());
-            } else {
-                insertAtBegin(childTopicId, getFirst());
-            }
-        } else {
-            RelatedTopic last = getLast();
-            if (last != null) {
-                createSequenceSegment(last.getId(), childTopicId);
-            } else {
-                createSequenceStart(childTopicId);
-            }
+    public Topic insert(long childTopicId, long predTopicId) {
+        try {
+            RelatedTopic childTopic = getChildTopic(childTopicId);
+            _insert(childTopic.getRelatingAssoc(), predTopicId);
+            return childTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Inserting topic " + childTopicId + " into sequence of parent topic " +
+                parentTopic.getId() + " failed (predTopicId=" + predTopicId + ")", e);
         }
-        return childTopic;
     }
 
+    public void insert(Assoc assoc, long predTopicId) {
+        try {
+            _insert(assoc, predTopicId);
+        } catch (Exception e) {
+            throw new RuntimeException("Inserting association " + assoc.getId() + " into sequence of parent topic " +
+                parentTopic.getId() + " failed (predTopicId=" + predTopicId + ")", e);
+        }
+    }
+
+    // ---
+
     /**
-     * Removes the given child topic from the sequence.
+     * Convenience.
      * <p>
-     * Must be called <i>before</i> <code>childTopic</code> is removed from DB (if at all).
+     * Removes the given child topic (actually the association that connects it to parent) from this sequence.
+     * The child topic itself is not deleted, nor the association that connects it to parent.
+     * <p>
+     * Must be called <i>before</i> the child topic (or the association that connects it to parent) is deleted
+     * (if at all).
      *
-     * @param   childTopic      not null.
+     * @param   childTopicId    the child topic to remove
+     *
+     * @return  the <code>RelatedTopic</code> representation of the child topic.
      */
-    public void remove(Topic childTopic) {
-        checkChildTopic(childTopic);
-        //
-        RelatedTopic pred = getPredecessor(childTopic);
-        RelatedTopic succ = getSuccessor(childTopic);
+    public RelatedTopic remove(long childTopicId) {
+        try {
+            RelatedTopic childTopic = getChildTopic(childTopicId);
+            _remove(childTopic.getRelatingAssoc());
+            return childTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Removing topic " + childTopicId + " from sequence of parent topic " +
+                parentTopic.getId() + " failed", e);
+        }
+    }
+
+    public RelatedTopic remove(Assoc assoc) {
+        try {
+            _remove(assoc);
+            return childTopic(assoc);
+        } catch (Exception e) {
+            throw new RuntimeException("Removing association " + assoc.getId() + " from sequence of parent topic " +
+                parentTopic.getId() + " failed", e);
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void _insert(Assoc assoc, long predTopicId) {
+        long assocId = assoc.getId();
+        if (predTopicId != -1) {
+            Assoc predAssoc = getChildTopic(predTopicId).getRelatingAssoc();
+            RelatedAssoc succAssoc = getSuccessorAssoc(predAssoc);
+            if (succAssoc != null) {
+                insertInBetween(assocId, predAssoc, succAssoc);
+            } else {
+                createSequenceSegment(predAssoc.getId(), assocId);
+            }
+        } else {
+            RelatedAssoc first = getFirstAssoc();
+            if (first != null) {
+                insertAtBegin(assocId, first);
+            } else {
+                createSequenceStart(assocId);
+            }
+        }
+    }
+
+    private void _remove(Assoc assoc) {
+        RelatedAssoc pred = getPredecessorAssoc(assoc);
+        RelatedAssoc succ = getSuccessorAssoc(assoc);
         if (succ != null) {
             succ.getRelatingAssoc().delete();
         }
@@ -110,87 +170,227 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
                 createSequenceSegment(pred.getId(), succ.getId());
             }
         } else {
-            getFirst().getRelatingAssoc().delete();
+            getFirstAssoc().getRelatingAssoc().delete();
             if (succ != null) {
                 createSequenceStart(succ.getId());
             }
         }
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
-    private void insertAtBegin(long childTopicId, RelatedTopic firstChildTopic) {
-        firstChildTopic.getRelatingAssoc().delete();
-        createSequenceStart(childTopicId);
-        createSequenceSegment(childTopicId, firstChildTopic.getId());
+    /**
+     * @param   firstChildAssoc     the association that connects the parent topic with its first child topic.
+     *                              This association's "relating association" is its parent connection.
+     */
+    private void insertAtBegin(long assocId, RelatedAssoc firstChildAssoc) {
+        firstChildAssoc.getRelatingAssoc().delete();
+        createSequenceStart(assocId);
+        createSequenceSegment(assocId, firstChildAssoc.getId());
     }
 
-    private void insertInBetween(long childTopicId, RelatedTopic predChildTopic, long succChildTopicId) {
-        predChildTopic.getRelatingAssoc().delete();
-        createSequenceSegment(predChildTopic.getId(), childTopicId);
-        createSequenceSegment(childTopicId, succChildTopicId);
+    private void insertInBetween(long assocId, Assoc predAssoc, RelatedAssoc succAssoc) {
+        succAssoc.getRelatingAssoc().delete();
+        createSequenceSegment(predAssoc.getId(), assocId);
+        createSequenceSegment(assocId, succAssoc.getId());
     }
 
     // ---
 
-    private void createSequenceStart(long childTopicId) {
-        dmx.createAssoc(mf.newAssocModel(SEQUENCE,
-            mf.newTopicPlayerModel(parentTopic.getId(), DEFAULT),
-            mf.newTopicPlayerModel(childTopicId, SEQUENCE_START)
+    private void createSequenceStart(long assocId) {
+        dmx.createAssoc(mf.newAssocModel(ASSOCIATION,
+            mf.newTopicPlayerModel(parentTopic.getId(), PARENT),
+            mf.newAssocPlayerModel(assocId, SEQUENCE_START)
         ));
     }
 
-
-    private void createSequenceSegment(long predTopicId, long succTopicId) {
+    private void createSequenceSegment(long predAssocId, long succAssocId) {
         dmx.createAssoc(mf.newAssocModel(SEQUENCE,
-            mf.newTopicPlayerModel(predTopicId, PREDECESSOR),
-            mf.newTopicPlayerModel(succTopicId, SUCCESSOR)
+            mf.newAssocPlayerModel(predAssocId, PREDECESSOR),
+            mf.newAssocPlayerModel(succAssocId, SUCCESSOR)
         ));
     }
 
     // ---
 
-    private RelatedTopic getPredecessor(Topic childTopic) {
-        return childTopic.getRelatedTopic(SEQUENCE, SUCCESSOR, PREDECESSOR, childTypeUri);
+    private RelatedAssoc getPredecessorAssoc(RelatedTopic childTopic) {
+        return getPredecessorAssoc(childTopic.getRelatingAssoc());
     }
 
-    private RelatedTopic getSuccessor(Topic childTopic) {
-        return childTopic.getRelatedTopic(SEQUENCE, PREDECESSOR, SUCCESSOR, childTypeUri);
-    }
-
-    // ---
-
-    private RelatedTopic getFirst() {
-        return parentTopic.getRelatedTopic(SEQUENCE, DEFAULT, SEQUENCE_START, childTypeUri);
-    }
-
-    private RelatedTopic getLast() {
-        RelatedTopic childTopic = null;
-        Iterator<RelatedTopic> i = iterator();
-        while (i.hasNext()) {
-            childTopic = i.next();
+    /**
+     * @return      possibly null
+     */
+    private RelatedAssoc getPredecessorAssoc(Assoc assoc) {
+        RelatedAssoc predAssoc = assoc.getRelatedAssoc(SEQUENCE, SUCCESSOR, PREDECESSOR,
+            null);    // othersAssocTypeUri=null
+        if (predAssoc != null) {
+            checkAssoc(predAssoc);
         }
+        return predAssoc;
+    }
+
+    // ---
+
+    /**
+     * Convenience.
+     */
+    private RelatedAssoc getSuccessorAssoc(RelatedTopic childTopic) {
+        return getSuccessorAssoc(childTopic.getRelatingAssoc());
+    }
+
+    /**
+     * @param   assoc   expected to connect the parent topic with a child topic.
+     *
+     * @return  the given association's successor association, or <code>null</code> if there is no successor.
+     *          The returned association's "relating association" is of type "Sequence".
+     */
+    private RelatedAssoc getSuccessorAssoc(Assoc assoc) {
+        List<RelatedAssoc> succAssocs = assoc.getRelatedAssocs(SEQUENCE, PREDECESSOR, SUCCESSOR,
+            null);    // othersAssocTypeUri=null
+        RelatedAssoc succAssoc = null;
+        int size = succAssocs.size();
+        if (size >= 1) {
+            succAssoc = succAssocs.get(0);
+            // ambiguity detection
+            if (size > 1) {
+                detection.reportAmbiguity(parentTopic, assoc, succAssocs);
+            }
+        }
+        if (succAssoc != null) {
+            checkAssoc(succAssoc);
+        }
+        return succAssoc;
+    }
+
+    // ---
+
+    /**
+     * @return  the association that connects the parent topic with its first child topic, or <code>null</code> if there
+     *          is no child topic. The returned association's "relating association" is of type "Assoc" and
+     *          connects the returned association (role type is "Sequence Start") with the parent topic.
+     */
+    private RelatedAssoc getFirstAssoc() {
+        RelatedAssoc assoc = parentTopic.getRelatedAssoc(ASSOCIATION, PARENT, SEQUENCE_START,
+            null);  // othersAssocTypeUri=null
+        if (assoc != null) {
+            checkAssoc(assoc);
+        }
+        return assoc;
+    }
+
+    /**
+     * @return  the parent topic's first child topic, or <code>null</code> if there is no child topic.
+     *          The returned topic's "relating association" is its parent connection.
+     */
+    private RelatedTopic getFirstTopic() {
+        Assoc assoc = getFirstAssoc();
+        return assoc != null ? childTopic(assoc) : null;
+    }
+
+    /**
+     * @param   childTopic      its "relating association" is expected to be its parent connection.
+     *
+     * @return  the given child topic's successor child topic, or <code>null</code> if there is no successor.
+     *          The returned topic's "relating association" is its parent connection.
+     */
+    private RelatedTopic getSuccessorTopic(RelatedTopic childTopic) {
+        Assoc assoc = getSuccessorAssoc(childTopic);
+        return assoc != null ? childTopic(assoc) : null;
+    }
+
+    // ---
+
+    /**
+     * Returns the <code>RelatedTopic</code> representation of the specified child topic.
+     *
+     * @param   childTopicId    ID of the child topic to return.
+     *
+     * @return  a <code>RelatedTopic</code> that represents the specified child topic.
+     *          Its "relating association" is the one that connects this sequence's parent topic with the child topic.
+     *
+     * @throws  RuntimeException    if the specified ID is not one of this sequence's child topics.
+     */
+    private RelatedTopic getChildTopic(long childTopicId) {
+        Assoc assoc = dmx.getAssocBetweenTopicAndTopic(assocTypeUri, parentTopic.getId(), childTopicId, PARENT, CHILD);
+        if (assoc == null) {
+            throw new RuntimeException("Node " + childTopicId + " is not a child of node " + parentTopic.getId());
+        }
+        checkAssoc(assoc);
+        RelatedTopic childTopic = childTopic(assoc);
+        checkTopic(childTopic);
         return childTopic;
     }
 
-    // ---
+    private RelatedTopic childTopic(Assoc assoc) {
+        return assoc.getDMXObjectByRole(CHILD);
+    }
 
-    private void checkChildTopic(Topic topic) {
-        if (!getParentTopic(topic).equals(parentTopic)) {
-            throw new RuntimeException("Topic " + topic.getId() + " is not a child of topic " + parentTopic.getId());
+    private long assocId(RelatedTopic childTopic) {
+        return childTopic.getRelatingAssoc().getId();
+    }
+
+    private void checkTopic(Topic topic) {
+        String typeUri = topic.getTypeUri();
+        if (!typeUri.equals(childTypeUri)) {
+            throw new RuntimeException("Topic " + topic.getId() + " is of type \"" + typeUri +
+                "\" but expected is \"" + childTypeUri + "\"");
         }
     }
 
-    private RelatedTopic getParentTopic(Topic topic) {
-        RelatedTopic parentTopic = getParentTopicIfExists(topic);
-        if (parentTopic == null) {
-            throw new RuntimeException("Topic " + topic.getId() + " has no parent topic");
+    private void checkAssoc(Assoc assoc) {
+        String typeUri = assoc.getTypeUri();
+        if (!assocTypeUri.equals(typeUri)) {
+            throw new RuntimeException("Assoc " + assoc.getId() + " is of type \"" + typeUri +
+                "\" but expected is \"" + assocTypeUri + "\"");
         }
-        return parentTopic;
     }
 
-    // ### FIXME: ambiguity
-    private RelatedTopic getParentTopicIfExists(Topic topic) {
-        return topic.getRelatedTopic(assocTypeUri, CHILD, PARENT, parentTopic.getTypeUri());
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private static class CycleDetection {
+
+        // child node sequence cycle detection
+        Topic parentNode;
+        List<Long> childNodeIds;
+        int sequenceCycles = 0;
+
+        // child node sequence ambiguity detection
+        int sequenceAmbiguities = 0;
+
+        private Logger logger = Logger.getLogger(getClass().getName());
+
+        // ------------------------------------------------------------------------------------------------ Constructors
+
+        private CycleDetection() {
+        }
+
+        // ------------------------------------------------------------------------------------- Package Private Methods
+
+        // child node sequence cycle detection
+
+        void startSequence(Topic parentNode) {
+            this.parentNode = parentNode;
+            this.childNodeIds = new ArrayList();
+        }
+
+        boolean checkSequence(long nodeId) {
+            boolean cycle = childNodeIds.contains(nodeId);
+            if (!cycle) {
+                childNodeIds.add(nodeId);
+            } else {
+                logger.warning("### Cycle detected in child node sequence of parent node " + parentNode.getId() +
+                    ". Offending node ID: " + nodeId + ". Nodes in sequence so far: " + childNodeIds.size());
+                sequenceCycles++;
+            }
+            return !cycle;
+        }
+
+        // child node sequence ambiguity detection
+
+        void reportAmbiguity(Topic parentTopic, Assoc assoc, List<RelatedAssoc> succAssocs) {
+            logger.warning("### Ambiguity detected in child node sequence of parent node " + parentNode.getId() +
+                ". Assoc " + assoc.getId() + " has " + succAssocs.size() + " successors: " + succAssocs);
+            sequenceAmbiguities++;
+        }
     }
 }
