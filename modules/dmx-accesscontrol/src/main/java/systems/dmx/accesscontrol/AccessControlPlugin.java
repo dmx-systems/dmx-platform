@@ -357,12 +357,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspaceId") long workspaceId) {
         try {
-            dmx.getPrivilegedAccess().runInWorkspaceContext(workspaceId, () ->
-                dmx.createAssoc(mf.newAssocModel(MEMBERSHIP,
-                    mf.newTopicPlayerModel(getUsernameTopicOrThrow(username).getId(), DEFAULT),
-                    mf.newTopicPlayerModel(workspaceId, DEFAULT)
-                ))
-            );
+            checkWorkspaceArg(workspaceId);
+            dmx.getPrivilegedAccess().createMembership(username, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -672,6 +668,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("Unknown user \"" + username + "\"");
         }
         return usernameTopic;
+    }
+
+    /**
+     * Checks a "workspaceId" argument. 2 checks are performed:
+     *   - the workspace ID refers actually to a workspace
+     *   - the workspace is writable by the current user
+     *
+     * If any check fails an exception is thrown.
+     *
+     * @param   workspaceId     the workspace ID to check
+     */
+    private void checkWorkspaceArg(long workspaceId) {
+        // ### Basically copied from WorkspacesPlugin.checkAssignmentArgs()
+        Topic workspace = dmx.getTopic(workspaceId);
+        String typeUri = workspace.getTypeUri();
+        if (!typeUri.equals(WORKSPACE)) {
+            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
+                "\")");
+        }
+        //
+        workspace.checkWriteAccess();       // throws AccessControlException
     }
 
     // ### TODO: copy in Credentials.java
