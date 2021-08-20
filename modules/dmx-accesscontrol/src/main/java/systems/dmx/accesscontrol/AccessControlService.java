@@ -166,6 +166,9 @@ public interface AccessControlService {
 
     // ---
 
+    /**
+     * Makes the given user a member of the given workspace.
+     */
     void createMembership(String username, long workspaceId);
 
     /**

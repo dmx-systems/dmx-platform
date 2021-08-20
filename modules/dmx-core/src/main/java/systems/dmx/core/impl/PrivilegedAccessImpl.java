@@ -220,6 +220,27 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     }
 
     @Override
+    public void createMembership(String username, long workspaceId) {
+        try {
+            // 1) create membership
+            Assoc membership = runInWorkspaceContext(-1, () ->
+                al.createAssoc(mf.newAssocModel(MEMBERSHIP,
+                    mf.newTopicPlayerModel(_getUsernameTopicOrThrow(username).getId(), DEFAULT),
+                    mf.newTopicPlayerModel(workspaceId, DEFAULT)
+                )).instantiate()
+            );
+            // 2) assign membership to the involved workspace
+            // Note: the current user has not necessarily WRITE access to the involved workspace.
+            // Privileged assignToWorkspace() is required (instead of using WorkspacesService).
+            // This is to support the "DMX Tendu" 3rd-party plugin.
+            assignToWorkspace(membership, workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
+    }
+
+    @Override
     public boolean isMember(String username, long workspaceId) {
         try {
             if (username == null) {

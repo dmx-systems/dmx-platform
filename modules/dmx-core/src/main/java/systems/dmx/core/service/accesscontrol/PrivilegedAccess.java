@@ -86,6 +86,14 @@ public interface PrivilegedAccess {
     Topic getPrivateWorkspace(String username);
 
     /**
+     * Makes the given user a member of the given workspace.
+     * <p>
+     * This is a privileged method: the current user is <i>not</i> required to have WRITE permission for the given
+     * workspace.
+     */
+    void createMembership(String username, long workspaceId);
+
+    /**
      * Checks if a user is a member of a given workspace.
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
