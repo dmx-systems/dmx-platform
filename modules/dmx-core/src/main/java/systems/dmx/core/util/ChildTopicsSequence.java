@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 
 /**
  * Maintains the sequence of a parent topic's child topics.
+ * <p>
+ * ### Status: experimental. Partly functional. API will change.
  */
 public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
@@ -310,7 +312,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     private RelatedTopic getChildTopic(long childTopicId) {
         Assoc assoc = dmx.getAssocBetweenTopicAndTopic(assocTypeUri, parentTopic.getId(), childTopicId, PARENT, CHILD);
         if (assoc == null) {
-            throw new RuntimeException("Node " + childTopicId + " is not a child of node " + parentTopic.getId());
+            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + parentTopic.getId());
         }
         checkAssoc(assoc);
         RelatedTopic childTopic = childTopic(assoc);
