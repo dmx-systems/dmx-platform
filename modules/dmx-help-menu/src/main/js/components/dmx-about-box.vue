@@ -5,7 +5,7 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.3-SNAPSHOT
+        5.2.1
       </div>
       <div class="field">
         <div class="field-label">Released</div>
