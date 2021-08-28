@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * <p>
  * ### Status: experimental. Partly functional. API will change.
  */
-public class ChildTopicsSequence implements Iterable<RelatedTopic> {
+public class ChildTopicsSequence implements Iterable<RelatedAssoc> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -47,25 +47,25 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
     /**
      * @return  an iterator of the parent topic's child topics (<code>RelatedTopic</code>s).
-     *          Their "relating association" is the respective parent connection.
+     *          Their "relating association" is the respective parent connection. ### FIXDOC
      */
     @Override
-    public Iterator<RelatedTopic> iterator() {
+    public Iterator<RelatedAssoc> iterator() {
 
         return new Iterator() {
 
-            private RelatedTopic topic = getFirstTopic();
+            private RelatedAssoc assoc = getFirstAssoc();
 
             @Override
             public boolean hasNext() {
-                return topic != null;
+                return assoc != null;
             }
 
             @Override
-            public RelatedTopic next() {
-                RelatedTopic _topic = topic;
-                topic = getSuccessorTopic(topic);
-                return _topic;
+            public RelatedAssoc next() {
+                RelatedAssoc _assoc = assoc;
+                assoc = getSuccessorAssoc(assoc);
+                return _assoc;
             }
 
             @Override
@@ -233,38 +233,6 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     // ---
 
     /**
-     * Convenience.
-     */
-    private RelatedAssoc getSuccessorAssoc(RelatedTopic childTopic) {
-        return getSuccessorAssoc(childTopic.getRelatingAssoc());
-    }
-
-    /**
-     * @param   assoc   expected to connect the parent topic with a child topic.
-     *
-     * @return  the given association's successor association, or <code>null</code> if there is no successor.
-     *          The returned association's "relating association" is of type "Sequence".
-     */
-    private RelatedAssoc getSuccessorAssoc(Assoc assoc) {
-        List<RelatedAssoc> succAssocs = assoc.getRelatedAssocs(SEQUENCE, PREDECESSOR, SUCCESSOR, assocTypeUri);
-        RelatedAssoc succAssoc = null;
-        int size = succAssocs.size();
-        if (size >= 1) {
-            succAssoc = succAssocs.get(0);
-            // ambiguity detection
-            if (size > 1) {
-                detection.reportAmbiguity(parentTopic, assoc, succAssocs);
-            }
-        }
-        if (succAssoc != null) {
-            checkAssoc(succAssoc);
-        }
-        return succAssoc;
-    }
-
-    // ---
-
-    /**
      * @return  the association that connects the parent topic with its first child topic, or <code>null</code> if there
      *          is no child topic. The returned association's "relating association" is of type "Assoc" and
      *          connects the returned association (role type is "Sequence Start") with the parent topic.
@@ -295,6 +263,38 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
     private RelatedTopic getSuccessorTopic(RelatedTopic childTopic) {
         Assoc assoc = getSuccessorAssoc(childTopic);
         return assoc != null ? childTopic(assoc) : null;
+    }
+
+    // ---
+
+    /**
+     * Convenience.
+     */
+    private RelatedAssoc getSuccessorAssoc(RelatedTopic childTopic) {
+        return getSuccessorAssoc(childTopic.getRelatingAssoc());
+    }
+
+    /**
+     * @param   assoc   expected to connect the parent topic with a child topic.
+     *
+     * @return  the given association's successor association, or <code>null</code> if there is no successor.
+     *          The returned association's "relating association" is of type "Sequence".
+     */
+    private RelatedAssoc getSuccessorAssoc(Assoc assoc) {
+        List<RelatedAssoc> succAssocs = assoc.getRelatedAssocs(SEQUENCE, PREDECESSOR, SUCCESSOR, assocTypeUri);
+        RelatedAssoc succAssoc = null;
+        int size = succAssocs.size();
+        if (size >= 1) {
+            succAssoc = succAssocs.get(0);
+            // ambiguity detection
+            if (size > 1) {
+                detection.reportAmbiguity(parentTopic, assoc, succAssocs);
+            }
+        }
+        if (succAssoc != null) {
+            checkAssoc(succAssoc);
+        }
+        return succAssoc;
     }
 
     // ---
@@ -338,7 +338,7 @@ public class ChildTopicsSequence implements Iterable<RelatedTopic> {
 
     private void checkAssoc(Assoc assoc) {
         String typeUri = assoc.getTypeUri();
-        if (!assocTypeUri.equals(typeUri)) {
+        if (!typeUri.equals(assocTypeUri)) {
             throw new RuntimeException("Assoc " + assoc.getId() + " is of type \"" + typeUri +
                 "\" but expected is \"" + assocTypeUri + "\"");
         }
