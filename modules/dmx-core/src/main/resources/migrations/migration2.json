@@ -1,6 +1,11 @@
 {
   "topic_types": [
     {
+      "value":       "Ordered",
+      "uri":         "dmx.core.ordered",
+      "dataTypeUri": "dmx.core.boolean"
+    },
+    {
       "value":       "Identity Attribute",
       "uri":         "dmx.core.identity_attr",
       "dataTypeUri": "dmx.core.boolean"
@@ -26,6 +31,10 @@
           "childTypeUri":        "dmx.core.cardinality",
           "childCardinalityUri": "dmx.core.one",
           "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.core.ordered",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
           "childTypeUri":        "dmx.core.assoc_type",

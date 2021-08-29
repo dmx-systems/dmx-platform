@@ -15,6 +15,7 @@ public class Constants {
     public static final String DATA_TYPE            = "dmx.core.data_type";
     public static final String ROLE_TYPE            = "dmx.core.role_type";
     public static final String CARDINALITY          = "dmx.core.cardinality";
+    public static final String ORDERED              = "dmx.core.ordered";
     public static final String IDENTITY_ATTR        = "dmx.core.identity_attr";
     public static final String INCLUDE_IN_LABEL     = "dmx.core.include_in_label";
     //
