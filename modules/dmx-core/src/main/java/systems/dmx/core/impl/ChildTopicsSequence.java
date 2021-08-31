@@ -18,7 +18,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private TopicModelImpl parentTopic;
+    private long parentTopicId;
     private String childTypeUri;
     private String assocTypeUri;
 
@@ -28,8 +28,8 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsSequence(TopicModelImpl parentTopic, String childTypeUri, String assocTypeUri, AccessLayer al) {
-        this.parentTopic = parentTopic;
+    ChildTopicsSequence(long parentTopicId, String childTypeUri, String assocTypeUri, AccessLayer al) {
+        this.parentTopicId = parentTopicId;
         this.childTypeUri = childTypeUri;
         this.assocTypeUri = assocTypeUri;
         this.al = al;
@@ -83,7 +83,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             return childTopic;
         } catch (Exception e) {
             throw new RuntimeException("Inserting topic " + childTopicId + " into sequence of parent topic " +
-                parentTopic.getId() + " failed (predTopicId=" + predTopicId + ")", e);
+                parentTopicId + " failed (predTopicId=" + predTopicId + ")", e);
         }
     }
 
@@ -92,7 +92,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             _insert(assoc, predTopicId);
         } catch (Exception e) {
             throw new RuntimeException("Inserting association " + assoc.getId() + " into sequence of parent topic " +
-                parentTopic.getId() + " failed (predTopicId=" + predTopicId + ")", e);
+                parentTopicId + " failed (predTopicId=" + predTopicId + ")", e);
         }
     }
 
@@ -118,7 +118,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             return childTopic;
         } catch (Exception e) {
             throw new RuntimeException("Removing topic " + childTopicId + " from sequence of parent topic " +
-                parentTopic.getId() + " failed", e);
+                parentTopicId + " failed", e);
         }
     }
 
@@ -128,7 +128,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             return childTopic(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assoc.getId() + " from sequence of parent topic " +
-                parentTopic.getId() + " failed", e);
+                parentTopicId + " failed", e);
         }
     }
 
@@ -195,7 +195,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     private void createSequenceStart(long assocId) {
         al.createAssoc(mf.newAssocModel(SEQUENCE,
-            mf.newTopicPlayerModel(parentTopic.getId(), DEFAULT),
+            mf.newTopicPlayerModel(parentTopicId, DEFAULT),
             mf.newAssocPlayerModel(assocId, SEQUENCE_START)
         ));
     }
@@ -233,7 +233,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
      *          connects the returned association (role type is "Sequence Start") with the parent topic.
      */
     private RelatedAssocModelImpl getFirstAssoc() {
-        RelatedAssocModelImpl assoc = al.getTopicRelatedAssoc(parentTopic.getId(), SEQUENCE, DEFAULT, SEQUENCE_START,
+        RelatedAssocModelImpl assoc = al.getTopicRelatedAssoc(parentTopicId, SEQUENCE, DEFAULT, SEQUENCE_START,
             assocTypeUri);
         if (assoc != null) {
             checkAssoc(assoc);
@@ -285,7 +285,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             succAssoc = succAssocs.get(0);
             // ambiguity detection
             if (size > 1) {
-                detection.reportAmbiguity(parentTopic, assoc, succAssocs);
+                detection.reportAmbiguity(parentTopicId, assoc, succAssocs);
             }
         }
         if (succAssoc != null) {
@@ -307,10 +307,10 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
      * @throws  RuntimeException    if the specified ID is not one of this sequence's child topics.
      */
     private RelatedTopicModelImpl getChildTopic(long childTopicId) {
-        AssocModelImpl assoc = al.getAssocBetweenTopicAndTopic(assocTypeUri, parentTopic.getId(), childTopicId, PARENT,
+        AssocModelImpl assoc = al.getAssocBetweenTopicAndTopic(assocTypeUri, parentTopicId, childTopicId, PARENT,
             CHILD);
         if (assoc == null) {
-            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + parentTopic.getId());
+            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + parentTopicId);
         }
         checkAssoc(assoc);
         RelatedTopicModelImpl childTopic = childTopic(assoc);
@@ -384,7 +384,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
         // child node sequence ambiguity detection
 
-        void reportAmbiguity(TopicModelImpl parentTopic, AssocModelImpl assoc, List<RelatedAssocModelImpl> succAssocs) {
+        void reportAmbiguity(long parentTopicId, AssocModelImpl assoc, List<RelatedAssocModelImpl> succAssocs) {
             logger.warning("### Ambiguity detected in child node sequence of parent node " + parentNode.getId() +
                 ". Assoc " + assoc.getId() + " has " + succAssocs.size() + " successors: " + succAssocs);
             sequenceAmbiguities++;
