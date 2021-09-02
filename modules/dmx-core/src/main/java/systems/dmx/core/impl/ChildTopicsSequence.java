@@ -24,7 +24,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     private AccessLayer al;
     private ModelFactoryImpl mf;
-    private CycleDetection detection;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -34,7 +33,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
         this.assocTypeUri = assocTypeUri;
         this.al = al;
         this.mf = al.mf;
-        // this.detection = detection;      // TODO
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -50,6 +48,8 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
             private RelatedAssocModelImpl assoc = getFirstAssoc();
 
+            private List assocIds = new ArrayList();
+
             @Override
             public boolean hasNext() {
                 return assoc != null;
@@ -59,6 +59,12 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             public RelatedAssocModelImpl next() {
                 RelatedAssocModelImpl _assoc = assoc;
                 assoc = getSuccessorAssoc(assoc);
+                //
+                if (assocIds.contains(_assoc.id)) {
+                    throw new RuntimeException("Cycle detected: assoc " + _assoc.id + " already in " + assocIds);
+                }
+                assocIds.add(_assoc.id);
+                //
                 return _assoc;
             }
 
@@ -155,7 +161,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
     }
 
     private void _remove(AssocModelImpl assoc) {
-        RelatedAssocModelImpl pred = getPredecessorAssoc(assoc);
+        RelatedAssocModelImpl pred = getPredecessorAssoc(assoc.id);
         RelatedAssocModelImpl succ = getSuccessorAssoc(assoc);
         if (succ != null) {
             succ.getRelatingAssoc().delete();
@@ -209,20 +215,15 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     // ---
 
-    private RelatedAssocModelImpl getPredecessorAssoc(RelatedTopicModelImpl childTopic) {
+    /* private RelatedAssocModelImpl getPredecessorAssoc(RelatedTopicModelImpl childTopic) {
         return getPredecessorAssoc(childTopic.getRelatingAssoc());
-    }
+    } */
 
     /**
      * @return      possibly null
      */
-    private RelatedAssocModelImpl getPredecessorAssoc(AssocModelImpl assoc) {
-        RelatedAssocModelImpl predAssoc = al.getAssocRelatedAssoc(assoc.getId(), SEQUENCE, SUCCESSOR, PREDECESSOR,
-            assocTypeUri);
-        if (predAssoc != null) {
-            checkAssoc(predAssoc);
-        }
-        return predAssoc;
+    private RelatedAssocModelImpl getPredecessorAssoc(long assocId) {
+        return al.getAssocRelatedAssoc(assocId, SEQUENCE, SUCCESSOR, PREDECESSOR, assocTypeUri);
     }
 
     // ---
@@ -233,12 +234,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
      *          connects the returned association (role type is "Sequence Start") with the parent topic.
      */
     private RelatedAssocModelImpl getFirstAssoc() {
-        RelatedAssocModelImpl assoc = al.getTopicRelatedAssoc(parentTopicId, SEQUENCE, DEFAULT, SEQUENCE_START,
-            assocTypeUri);
-        if (assoc != null) {
-            checkAssoc(assoc);
-        }
-        return assoc;
+        return al.getTopicRelatedAssoc(parentTopicId, SEQUENCE, DEFAULT, SEQUENCE_START, assocTypeUri);
     }
 
     /**
@@ -285,11 +281,9 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
             succAssoc = succAssocs.get(0);
             // ambiguity detection
             if (size > 1) {
-                detection.reportAmbiguity(parentTopicId, assoc, succAssocs);
+                throw new RuntimeException("Ambiguity detected: assoc " + assoc.id + " has " + size + " successors: " +
+                    succAssocs);
             }
-        }
-        if (succAssoc != null) {
-            checkAssoc(succAssoc);
         }
         return succAssoc;
     }
@@ -312,7 +306,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
         if (assoc == null) {
             throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + parentTopicId);
         }
-        checkAssoc(assoc);
         RelatedTopicModelImpl childTopic = childTopic(assoc);
         checkTopic(childTopic);
         return childTopic;
@@ -331,63 +324,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
         if (!typeUri.equals(childTypeUri)) {
             throw new RuntimeException("Topic " + topic.getId() + " is of type \"" + typeUri +
                 "\" but expected is \"" + childTypeUri + "\"");
-        }
-    }
-
-    private void checkAssoc(AssocModelImpl assoc) {
-        String typeUri = assoc.getTypeUri();
-        if (!typeUri.equals(assocTypeUri)) {
-            throw new RuntimeException("Assoc " + assoc.getId() + " is of type \"" + typeUri +
-                "\" but expected is \"" + assocTypeUri + "\"");
-        }
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private static class CycleDetection {
-
-        // child node sequence cycle detection
-        TopicModelImpl parentNode;
-        List<Long> childNodeIds;
-        int sequenceCycles = 0;
-
-        // child node sequence ambiguity detection
-        int sequenceAmbiguities = 0;
-
-        private Logger logger = Logger.getLogger(getClass().getName());
-
-        // ------------------------------------------------------------------------------------------------ Constructors
-
-        private CycleDetection() {
-        }
-
-        // ------------------------------------------------------------------------------------- Package Private Methods
-
-        // child node sequence cycle detection
-
-        void startSequence(TopicModelImpl parentNode) {
-            this.parentNode = parentNode;
-            this.childNodeIds = new ArrayList();
-        }
-
-        boolean checkSequence(long nodeId) {
-            boolean cycle = childNodeIds.contains(nodeId);
-            if (!cycle) {
-                childNodeIds.add(nodeId);
-            } else {
-                logger.warning("### Cycle detected in child node sequence of parent node " + parentNode.getId() +
-                    ". Offending node ID: " + nodeId + ". Nodes in sequence so far: " + childNodeIds.size());
-                sequenceCycles++;
-            }
-            return !cycle;
-        }
-
-        // child node sequence ambiguity detection
-
-        void reportAmbiguity(long parentTopicId, AssocModelImpl assoc, List<RelatedAssocModelImpl> succAssocs) {
-            logger.warning("### Ambiguity detected in child node sequence of parent node " + parentNode.getId() +
-                ". Assoc " + assoc.getId() + " has " + succAssocs.size() + " successors: " + succAssocs);
-            sequenceAmbiguities++;
         }
     }
 }
