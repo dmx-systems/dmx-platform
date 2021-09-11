@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 /**
  * Maintains the sequence of a parent topic's child topics.
- * <p>
- * ### Status: experimental. Partly functional. API will change.
  */
 class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
@@ -67,70 +65,64 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
                 //
                 return _assoc;
             }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
         };
     }
 
     // ---
 
-    /**
-     * Convenience.
-     *
-     * @param   predTopicId     may be -1
-     */
-    RelatedTopicModelImpl insert(long childTopicId, long predTopicId) {
+    AssocModelImpl insert(AssocModelImpl assoc, AssocModelImpl predAssoc) {
         try {
-            RelatedTopicModelImpl childTopic = getChildTopic(childTopicId);
-            _insert(childTopic.getRelatingAssoc(), predTopicId);
-            return childTopic;
+            if (predAssoc != null) {
+                RelatedAssocModelImpl succAssoc = getSuccessorAssoc(predAssoc);
+                if (succAssoc != null) {
+                    insertInBetween(assoc.id, predAssoc, succAssoc);
+                } else {
+                    createSequenceSegment(predAssoc.id, assoc.id);
+                }
+            } else {
+                RelatedAssocModelImpl first = getFirstAssoc();
+                if (first != null) {
+                    insertAtBegin(assoc.id, first);
+                } else {
+                    createSequenceStart(assoc.id);
+                }
+            }
+            return assoc;
         } catch (Exception e) {
-            throw new RuntimeException("Inserting topic " + childTopicId + " into sequence of parent topic " +
-                parentTopicId + " failed (predTopicId=" + predTopicId + ")", e);
+            throw new RuntimeException("Inserting association " + assoc.id + " into sequence of parent topic " +
+                parentTopicId + " failed, predAssoc=" + predAssoc, e);
         }
     }
 
-    void insert(AssocModelImpl assoc, long predTopicId) {
-        try {
-            _insert(assoc, predTopicId);
-        } catch (Exception e) {
-            throw new RuntimeException("Inserting association " + assoc.getId() + " into sequence of parent topic " +
-                parentTopicId + " failed (predTopicId=" + predTopicId + ")", e);
-        }
-    }
-
-    // ---
-
     /**
-     * Convenience.
-     * <p>
      * Removes the given child topic (actually the association that connects it to parent) from this sequence.
      * The child topic itself is not deleted, nor the association that connects it to parent.
      * <p>
      * Must be called <i>before</i> the child topic (or the association that connects it to parent) is deleted
      * (if at all).
      *
-     * @param   childTopicId    the child topic to remove
+     * @param   childTopicId    the child topic to remove ### FIXDOC
      *
      * @return  the <code>RelatedTopic</code> representation of the child topic.
      */
-    RelatedTopicModelImpl remove(long childTopicId) {
-        try {
-            RelatedTopicModelImpl childTopic = getChildTopic(childTopicId);
-            _remove(childTopic.getRelatingAssoc());
-            return childTopic;
-        } catch (Exception e) {
-            throw new RuntimeException("Removing topic " + childTopicId + " from sequence of parent topic " +
-                parentTopicId + " failed", e);
-        }
-    }
-
     RelatedTopicModelImpl remove(AssocModelImpl assoc) {
         try {
-            _remove(assoc);
+            RelatedAssocModelImpl pred = getPredecessorAssoc(assoc.id);
+            RelatedAssocModelImpl succ = getSuccessorAssoc(assoc);
+            if (succ != null) {
+                succ.getRelatingAssoc().delete();
+            }
+            if (pred != null) {
+                pred.getRelatingAssoc().delete();
+                if (succ != null) {
+                    createSequenceSegment(pred.getId(), succ.getId());
+                }
+            } else {
+                getFirstAssoc().getRelatingAssoc().delete();
+                if (succ != null) {
+                    createSequenceStart(succ.getId());
+                }
+            }
             return childTopic(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assoc.getId() + " from sequence of parent topic " +
@@ -139,47 +131,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void _insert(AssocModelImpl assoc, long predTopicId) {
-        long assocId = assoc.getId();
-        if (predTopicId != -1) {
-            AssocModelImpl predAssoc = getChildTopic(predTopicId).getRelatingAssoc();
-            RelatedAssocModelImpl succAssoc = getSuccessorAssoc(predAssoc);
-            if (succAssoc != null) {
-                insertInBetween(assocId, predAssoc, succAssoc);
-            } else {
-                createSequenceSegment(predAssoc.getId(), assocId);
-            }
-        } else {
-            RelatedAssocModelImpl first = getFirstAssoc();
-            if (first != null) {
-                insertAtBegin(assocId, first);
-            } else {
-                createSequenceStart(assocId);
-            }
-        }
-    }
-
-    private void _remove(AssocModelImpl assoc) {
-        RelatedAssocModelImpl pred = getPredecessorAssoc(assoc.id);
-        RelatedAssocModelImpl succ = getSuccessorAssoc(assoc);
-        if (succ != null) {
-            succ.getRelatingAssoc().delete();
-        }
-        if (pred != null) {
-            pred.getRelatingAssoc().delete();
-            if (succ != null) {
-                createSequenceSegment(pred.getId(), succ.getId());
-            }
-        } else {
-            getFirstAssoc().getRelatingAssoc().delete();
-            if (succ != null) {
-                createSequenceStart(succ.getId());
-            }
-        }
-    }
-
-    // ---
 
     /**
      * @param   firstChildAssoc     the association that connects the parent topic with its first child topic.
@@ -238,28 +189,6 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
     }
 
     /**
-     * @return  the parent topic's first child topic, or <code>null</code> if there is no child topic.
-     *          The returned topic's "relating association" is its parent connection.
-     */
-    private RelatedTopicModelImpl getFirstTopic() {
-        AssocModelImpl assoc = getFirstAssoc();
-        return assoc != null ? childTopic(assoc) : null;
-    }
-
-    /**
-     * @param   childTopic      its "relating association" is expected to be its parent connection.
-     *
-     * @return  the given child topic's successor child topic, or <code>null</code> if there is no successor.
-     *          The returned topic's "relating association" is its parent connection.
-     */
-    private RelatedTopicModelImpl getSuccessorTopic(RelatedTopicModelImpl childTopic) {
-        AssocModelImpl assoc = getSuccessorAssoc(childTopic);
-        return assoc != null ? childTopic(assoc) : null;
-    }
-
-    // ---
-
-    /**
      * Convenience.
      */
     private RelatedAssocModelImpl getSuccessorAssoc(RelatedTopicModelImpl childTopic) {
@@ -291,7 +220,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
     // ---
 
     /**
-     * Returns the <code>RelatedTopic</code> representation of the specified child topic.
+     * Returns the <code>RelatedTopic</code> representation of the specified child topic. ### TODO: drop it
      *
      * @param   childTopicId    ID of the child topic to return.
      *
