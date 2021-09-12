@@ -504,6 +504,8 @@ class ValueIntegrator {
                                        ChangeReportImpl report) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);     // may be null
+        CompDefModel compDef = compDef(compDefUri);
+        boolean sequenceHasChanges = false;
         for (UnifiedValue childValue : childValues) {
             // new value
             TopicModelImpl newValue = (TopicModelImpl) childValue.value;
@@ -524,13 +526,19 @@ class ValueIntegrator {
             boolean oldValueExists = oldValue != null;
             //
             boolean valueChanged = oldValueExists && oldValue.id != newId;      // true if changed or emptied
-            boolean changed = valueChanged || !oldValueExists && !newValueIsEmpty;
-            if (changed) {
+            boolean valueAdded = !oldValueExists && !newValueIsEmpty;           // true if added
+            //
+            if (valueChanged || valueAdded) {
+                // update change report
                 report.add(compDefUri, !newValueIsEmpty ? newValue.instantiate() : null,
                                         oldValueExists ? oldValue.instantiate() : null
                 );
+                // update sequence
+                if (!sequenceHasChanges) {
+                    sequenceHasChanges = true;
+                    deleteSequence(parent.id, compDef);
+                }
             }
-            //
             // 1) delete assignment if exists AND value has changed or emptied
             //
             boolean deleted = false;
@@ -566,6 +574,9 @@ class ValueIntegrator {
                 updateRelatingAssoc(assoc, compDefUri, newValues);
             }
         }
+        if (sequenceHasChanges) {
+            createSequence(parent.id, compDef, oldChildTopics.getTopicsOrNull(compDefUri));
+        }
     }
 
     private void updateRelatingAssoc(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
@@ -592,6 +603,37 @@ class ValueIntegrator {
             throw new RuntimeException("Updating relating assoc " + assoc.id + " failed, compDefUri=\"" + compDefUri +
                 "\", assoc=" + assoc, e);
         }
+    }
+
+    // --- Sequence ---
+
+    private void createSequence(long parentTopicId, CompDefModel compDef, List<RelatedTopicModelImpl> values) {
+        ChildTopicsSequence s = newChildTopicsSequence(parentTopicId, compDef);
+        AssocModelImpl predAssoc = null;
+        int n = 0;
+        for (RelatedTopicModelImpl value : values) {
+            predAssoc = s.insert(value.getRelatingAssoc(), predAssoc);
+            n++;
+        }
+        logger.info("### " + n + " sequence segments created");
+    }
+
+    private void deleteSequence(long parentTopicId, CompDefModel compDef) {
+        int n = 0;
+        for (RelatedAssocModelImpl assoc : newChildTopicsSequence(parentTopicId, compDef)) {
+            assoc.getRelatingAssoc().delete();
+            n++;
+        }
+        logger.info("### " + n + " sequence segments deleted");
+    }
+
+    private ChildTopicsSequence newChildTopicsSequence(long parentTopicId, CompDefModel compDef) {
+        return new ChildTopicsSequence(
+            parentTopicId,
+            compDef.getChildTypeUri(),
+            compDef.getInstanceLevelAssocTypeUri(),
+            al
+        );
     }
 
     // ---
