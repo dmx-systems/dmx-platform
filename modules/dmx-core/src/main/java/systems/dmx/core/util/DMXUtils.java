@@ -9,6 +9,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.PlayerModel;
+import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.TopicPlayerModel;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
@@ -76,6 +77,15 @@ public class DMXUtils {
         for (T item : items) {
             if (item.getId() == id) {
                 return item;
+            }
+        }
+        return null;
+    }
+
+    public static <T extends RelatedObjectModel> T findByAssocId(long assocId, Iterable<T> objects) {
+        for (T object : objects) {
+            if (object.getRelatingAssoc().getId() == assocId) {
+                return object;
             }
         }
         return null;
