@@ -4,6 +4,8 @@ import static systems.dmx.core.Constants.*;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.DMXObjectModel;
+import systems.dmx.core.model.RelatedTopicModel;
+import systems.dmx.core.util.DMXUtils;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,10 +52,35 @@ class ChildTopicsFetcher {
                     }
                 }
             } else if (cardinalityUri.equals(MANY)) {
-                for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), compDef)) {
+                List<? extends RelatedTopicModel> _childTopics = fetchChildTopics(object.getId(), compDef);
+                int a = 0;
+                for (RelatedAssocModelImpl assoc : newChildTopicsSequence(object.getId(), compDef)) {
+                    RelatedTopicModel childTopic = DMXUtils.findByAssocId(assoc.id, _childTopics);
+                    if (childTopic == null) {
+                        throw new RuntimeException("DB inconsistency: assoc " + assoc.id +
+                            " is in sequence but not in " + _childTopics);
+                    }
                     childTopics.add(compDefUri, childTopic);
-                    if (deep) {
-                        fetchChildTopics(childTopic, deep);    // recursion
+                    a++;
+                }
+                if (a != _childTopics.size()) {
+                    if (a > 0) {
+                        throw new RuntimeException("DB inconsistency: " + a + " values in sequence when " +
+                            "there should be " + _childTopics.size() + ", parentTopicId=" + object.getId() +
+                            ", compDefUri=\"" + compDefUri + "\"");
+                    } else if (_childTopics.size() > 0) {
+                        logger.info("### No sequence for " + _childTopics.size() + " \"" + compDefUri + "\" values");
+                        for (RelatedTopicModel childTopic : _childTopics) {
+                            childTopics.add(compDefUri, childTopic);
+                        }
+                    }
+                }
+                if (deep) {
+                    List<? extends RelatedTopicModel> topics = childTopics.getTopicsOrNull(compDefUri);
+                    if (topics != null) {
+                        for (RelatedTopicModel topic : topics) {
+                            fetchChildTopics((DMXObjectModelImpl) topic, deep);    // recursion
+                        }
                     }
                 }
             } else {
@@ -66,6 +93,16 @@ class ChildTopicsFetcher {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // ### TODO: copy in ValueIntegrator
+    private ChildTopicsSequence newChildTopicsSequence(long parentTopicId, CompDefModel compDef) {
+        return new ChildTopicsSequence(
+            parentTopicId,
+            compDef.getChildTypeUri(),
+            compDef.getInstanceLevelAssocTypeUri(),
+            al
+        );
+    }
 
     /**
      * Fetches the child topic models (recursively) of the given object model and updates it in-place.
@@ -84,7 +121,7 @@ class ChildTopicsFetcher {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel compDef) {
-        return al.sd.fetchRelatedTopic(
+        return al.sd.fetchRelatedTopic(     // direct DB access is required as sequence is not per-user
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             PARENT, CHILD,
@@ -93,7 +130,7 @@ class ChildTopicsFetcher {
     }
 
     private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
-        return al.db.fetchRelatedTopics(
+        return al.db.fetchRelatedTopics(    // direct DB access is required as sequence is not per-user
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             PARENT, CHILD,

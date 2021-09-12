@@ -627,6 +627,7 @@ class ValueIntegrator {
         logger.info("### " + n + " sequence segments deleted");
     }
 
+    // ### TODO: copy in ChildTopicsFetcher
     private ChildTopicsSequence newChildTopicsSequence(long parentTopicId, CompDefModel compDef) {
         return new ChildTopicsSequence(
             parentTopicId,
