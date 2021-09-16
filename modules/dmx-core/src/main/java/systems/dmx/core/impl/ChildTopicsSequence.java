@@ -23,6 +23,8 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
     private AccessLayer al;
     private ModelFactoryImpl mf;
 
+    // private Logger logger = Logger.getLogger(getClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     ChildTopicsSequence(long parentTopicId, String childTypeUri, String assocTypeUri, AccessLayer al) {
@@ -166,33 +168,32 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     // ---
 
-    /* private RelatedAssocModelImpl getPredecessorAssoc(RelatedTopicModelImpl childTopic) {
-        return getPredecessorAssoc(childTopic.getRelatingAssoc());
-    } */
+    /**
+     * @return  the association that connects the parent topic with its first child topic, or <code>null</code> if there
+     *          is no child topic. The returned association's "relating association" is of type "Sequence" and
+     *          connects the returned association (role type is "Sequence Start") with the parent topic.
+     */
+    private RelatedAssocModelImpl getFirstAssoc() {
+        RelatedAssocModelImpl firstAssoc = null;
+        for (RelatedAssocModelImpl assoc : al.db.fetchTopicRelatedAssocs(parentTopicId, SEQUENCE, DEFAULT,
+            SEQUENCE_START, assocTypeUri)) {
+            if (assoc.getDMXObjectByRole(CHILD).getTypeUri().equals(childTypeUri)) {
+                if (firstAssoc != null) {
+                    throw new RuntimeException("Ambiguous sequence start, parentTopicId=" + parentTopicId +
+                        ", childTypeUri=\"" + childTypeUri + "\", assocTypeUri=\"" + assocTypeUri + "\"");
+                }
+                firstAssoc = assoc;
+            }
+        }
+        return firstAssoc;
+    }
 
     /**
      * @return      possibly null
      */
     private RelatedAssocModelImpl getPredecessorAssoc(long assocId) {
+        // FIXME: direct db access needed
         return al.getAssocRelatedAssoc(assocId, SEQUENCE, SUCCESSOR, PREDECESSOR, assocTypeUri);
-    }
-
-    // ---
-
-    /**
-     * @return  the association that connects the parent topic with its first child topic, or <code>null</code> if there
-     *          is no child topic. The returned association's "relating association" is of type "Assoc" and
-     *          connects the returned association (role type is "Sequence Start") with the parent topic.
-     */
-    private RelatedAssocModelImpl getFirstAssoc() {
-        return al.getTopicRelatedAssoc(parentTopicId, SEQUENCE, DEFAULT, SEQUENCE_START, assocTypeUri);
-    }
-
-    /**
-     * Convenience.
-     */
-    private RelatedAssocModelImpl getSuccessorAssoc(RelatedTopicModelImpl childTopic) {
-        return getSuccessorAssoc(childTopic.getRelatingAssoc());
     }
 
     /**
@@ -202,6 +203,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
      *          The returned association's "relating association" is of type "Sequence".
      */
     private RelatedAssocModelImpl getSuccessorAssoc(AssocModelImpl assoc) {
+        // FIXME: direct db access needed
         List<RelatedAssocModelImpl> succAssocs = al.getAssocRelatedAssocs(assoc.id, SEQUENCE, PREDECESSOR, SUCCESSOR,
             assocTypeUri);
         RelatedAssocModelImpl succAssoc = null;
@@ -219,40 +221,7 @@ class ChildTopicsSequence implements Iterable<RelatedAssocModelImpl> {
 
     // ---
 
-    /**
-     * Returns the <code>RelatedTopic</code> representation of the specified child topic. ### TODO: drop it
-     *
-     * @param   childTopicId    ID of the child topic to return.
-     *
-     * @return  a <code>RelatedTopic</code> that represents the specified child topic.
-     *          Its "relating association" is the one that connects this sequence's parent topic with the child topic.
-     *
-     * @throws  RuntimeException    if the specified ID is not one of this sequence's child topics.
-     */
-    private RelatedTopicModelImpl getChildTopic(long childTopicId) {
-        AssocModelImpl assoc = al.getAssocBetweenTopicAndTopic(assocTypeUri, parentTopicId, childTopicId, PARENT,
-            CHILD);
-        if (assoc == null) {
-            throw new RuntimeException("Topic " + childTopicId + " is not a child of topic " + parentTopicId);
-        }
-        RelatedTopicModelImpl childTopic = childTopic(assoc);
-        checkTopic(childTopic);
-        return childTopic;
-    }
-
     private RelatedTopicModelImpl childTopic(AssocModelImpl assoc) {
         return (RelatedTopicModelImpl) assoc.getDMXObjectByRole(CHILD);
-    }
-
-    private long assocId(RelatedTopicModelImpl childTopic) {
-        return childTopic.getRelatingAssoc().getId();
-    }
-
-    private void checkTopic(TopicModelImpl topic) {
-        String typeUri = topic.getTypeUri();
-        if (!typeUri.equals(childTypeUri)) {
-            throw new RuntimeException("Topic " + topic.getId() + " is of type \"" + typeUri +
-                "\" but expected is \"" + childTypeUri + "\"");
-        }
     }
 }

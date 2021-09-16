@@ -58,7 +58,8 @@ class ChildTopicsFetcher {
                     RelatedTopicModel childTopic = DMXUtils.findByAssocId(assoc.id, _childTopics);
                     if (childTopic == null) {
                         throw new RuntimeException("DB inconsistency: assoc " + assoc.id +
-                            " is in sequence but not in " + _childTopics);
+                            " is in sequence but not in " + _childTopics + ", assoc=" + assoc + ", child topic=" +
+                            assoc.getDMXObjectByRole(CHILD));
                     }
                     childTopics.add(compDefUri, childTopic);
                     a++;
@@ -121,7 +122,7 @@ class ChildTopicsFetcher {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModelImpl fetchChildTopic(long objectId, CompDefModel compDef) {
-        return al.sd.fetchRelatedTopic(     // direct DB access is required as sequence is not per-user
+        return al.sd.fetchRelatedTopic(         // direct DB access is required as sequence is not per-user
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             PARENT, CHILD,
@@ -130,7 +131,7 @@ class ChildTopicsFetcher {
     }
 
     private List<RelatedTopicModelImpl> fetchChildTopics(long objectId, CompDefModel compDef) {
-        return al.db.fetchRelatedTopics(    // direct DB access is required as sequence is not per-user
+        return al.db.fetchRelatedTopics(        // direct DB access is required as sequence is not per-user
             objectId,
             compDef.getInstanceLevelAssocTypeUri(),
             PARENT, CHILD,
