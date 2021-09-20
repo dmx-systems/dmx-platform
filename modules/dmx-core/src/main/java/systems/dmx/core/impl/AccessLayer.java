@@ -1075,16 +1075,12 @@ public final class AccessLayer {
     // ---
 
     private <M extends DMXObjectModelImpl> M integrateValues(M newValues) {
-        try {
-            M value = new ValueIntegrator(this).integrate(newValues, null, null).value;   // targetObject=compDef=null
-            // sanity check
-            if (value == null) {
-                throw new DMXException("ValueIntegrator yields no result", CriticalityLevel.WARNING);
-            }
-            //
-            return value;
-        } catch (Exception e) {
-            throw new RuntimeException("Integrating new values failed, newValues=" + newValues, e);
+        M value = new ValueIntegrator(this).integrate(newValues, null, null).value;     // targetObject=compDef=null
+        // sanity check
+        if (value == null) {
+            throw new DMXException("ValueIntegrator yields no result", CriticalityLevel.WARNING);
         }
+        //
+        return value;
     }
 }

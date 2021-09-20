@@ -577,19 +577,21 @@ class ValueIntegrator {
         if (sequenceHasChanges) {
             createSequence(parent.id, compDef, oldChildTopics.getTopicsOrNull(compDefUri));
         } else {
-            List<Long> oldAssocIds = oldValues.stream().map(
-                childTopic -> childTopic.getRelatingAssoc().getId()
-            ).collect(Collectors.toList());
-            List<RelatedTopicModelImpl> newValues = childValues.stream().map(
-                value -> (RelatedTopicModelImpl) value._newValues
-            ).collect(Collectors.toList());
-            List<Long> newAssocIds = newValues.stream().map(
-                value -> value.getRelatingAssoc().getId()
-            ).collect(Collectors.toList());
-            if (!oldAssocIds.equals(newAssocIds)) {
-                logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
-                deleteSequence(parent.id, compDef);
-                createSequence(parent.id, compDef, newValues);
+            if (oldValues != null) {
+                List<Long> oldAssocIds = oldValues.stream().map(
+                    childTopic -> childTopic.getRelatingAssoc().getId()
+                ).collect(Collectors.toList());
+                List<RelatedTopicModelImpl> newValues = childValues.stream().map(
+                    value -> (RelatedTopicModelImpl) value._newValues
+                ).collect(Collectors.toList());
+                List<Long> newAssocIds = newValues.stream().map(
+                    value -> value.getRelatingAssoc().getId()
+                ).collect(Collectors.toList());
+                if (!oldAssocIds.equals(newAssocIds)) {
+                    logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
+                    deleteSequence(parent.id, compDef);
+                    createSequence(parent.id, compDef, newValues);
+                }
             }
         }
     }
@@ -630,7 +632,7 @@ class ValueIntegrator {
             predAssoc = s.insert(value.getRelatingAssoc(), predAssoc);
             n++;
         }
-        logger.info("### " + n + " sequence segments created");
+        logger.info("### " + n + " \"" + compDef.getCompDefUri() + "\" sequence segments created");
     }
 
     private void deleteSequence(long parentTopicId, CompDefModel compDef) {
@@ -639,7 +641,7 @@ class ValueIntegrator {
             assoc.getRelatingAssoc().delete();
             n++;
         }
-        logger.info("### " + n + " sequence segments deleted");
+        logger.info("### " + n + " \"" + compDef.getCompDefUri() + "\" sequence segments deleted");
     }
 
     // ### TODO: copy in ChildTopicsFetcher
