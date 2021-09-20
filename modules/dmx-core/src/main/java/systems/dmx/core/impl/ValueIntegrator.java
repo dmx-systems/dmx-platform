@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 
@@ -572,8 +573,24 @@ class ValueIntegrator {
                 updateRelatingAssoc(assoc, compDefUri, newValues);
             }
         }
+        // update sequence
         if (sequenceHasChanges) {
             createSequence(parent.id, compDef, oldChildTopics.getTopicsOrNull(compDefUri));
+        } else {
+            List<Long> oldAssocIds = oldValues.stream().map(
+                childTopic -> childTopic.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            List<RelatedTopicModelImpl> newValues = childValues.stream().map(
+                value -> (RelatedTopicModelImpl) value._newValues
+            ).collect(Collectors.toList());
+            List<Long> newAssocIds = newValues.stream().map(
+                value -> value.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            if (!oldAssocIds.equals(newAssocIds)) {
+                logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
+                deleteSequence(parent.id, compDef);
+                createSequence(parent.id, compDef, newValues);
+            }
         }
     }
 
