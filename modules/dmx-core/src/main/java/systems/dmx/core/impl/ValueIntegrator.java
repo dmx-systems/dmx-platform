@@ -541,13 +541,11 @@ class ValueIntegrator {
             }
             // 1) delete assignment if exists AND value has changed or emptied
             //
-            boolean deleted = false;
             if (valueChanged) {
                 if (newValueIsEmpty) {
                     logger.fine("### Deleting assignment (compDefUri=\"" + compDefUri + "\") from composite " +
                         parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
-                deleted = true;
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
@@ -559,14 +557,14 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(parent, newValue, compDefUri, deleted);
+                assoc = createChildAssoc(parent, newValue, compDefUri, valueChanged);
                 // update memory
                 oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
             // 3) update relating assoc
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
-            if (assoc == null && oldValueExists && !deleted) {
+            if (assoc == null && oldValueExists && !valueChanged) {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
@@ -931,8 +929,8 @@ class ValueIntegrator {
                                             // Needed to update the assoc value once the parent assignment for this
                                             // value is created (updateAssignmentsMany()).
 
-        long originalId;                    // The ID of the value to be replaced by "value" (when "value" is not null)
-                                            // resp. the ID of the value to be removed (when "value" is null).
+        long originalId;                    // The ID of the value to be replaced by "value" (if "value" is not null)
+                                            // resp. the ID of the value to be removed (if "value" is null).
                                             // Needed to update a multi-value (updateAssignmentsMany()).
                                             // Saved here cause it is overwritten (integrate()).
 
