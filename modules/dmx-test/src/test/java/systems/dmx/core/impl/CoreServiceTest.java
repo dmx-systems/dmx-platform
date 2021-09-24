@@ -563,8 +563,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.success();
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            assertTrue(cause.getMessage().startsWith("Integrating new values failed"));
-            cause = cause.getCause();
             assertTrue(cause.getMessage().startsWith("Value integration failed"));
             cause = cause.getCause();
             assertTrue(cause.getMessage().startsWith("Creating single topic failed"));
