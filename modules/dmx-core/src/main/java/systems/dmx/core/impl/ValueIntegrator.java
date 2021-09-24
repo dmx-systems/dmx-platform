@@ -314,13 +314,12 @@ class ValueIntegrator {
         if (isValueType() && !isFacetUpdate) {
             return unifyChildTopics(childValues, type);
         } else {
-            UnifiedValue value = identifyParent(childValues);
-            DMXObjectModelImpl parent = value.value;
-            if (parent != null) {
+            UnifiedValue parent = identifyParent(childValues);
+            if (parent.value != null) {
                 ChangeReportImpl report = updateAssignments(parent, childValues);
-                value.report = report;
+                parent.report = report;
             }
-            return value;
+            return parent;
         }
     }
 
@@ -412,19 +411,20 @@ class ValueIntegrator {
      * @param   childValues     key: compDefUri
      *                          value: UnifiedValue or List<UnifiedValue>
      */
-    private ChangeReportImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
+    private ChangeReportImpl updateAssignments(UnifiedValue parent, Map<String, Object> childValues) {
         ChangeReportImpl report = new ChangeReportImpl();
         for (String compDefUri : compDefUris()) {
             // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
             // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
             // levels) as it is build bottom-up (starting from the simple values at the leaves).
-            parent.loadChildTopics(compDef(compDefUri), true);    // deep=true
+            DMXObjectModelImpl _parent = parent.value;
+            _parent.loadChildTopics(compDef(compDefUri), true);     // deep=true
             Object childValue = childValues.get(compDefUri);
             // Note: for partial create/update requests childValue might be null
             if (childValue != null) {
                 if (isOne(compDefUri)) {
-                    updateAssignmentsOne(parent, (UnifiedValue) childValue, compDefUri, report);
+                    updateAssignmentsOne(_parent, (UnifiedValue) childValue, compDefUri, report);
                 } else {
                     updateAssignmentsMany(parent, (List<UnifiedValue>) childValue, compDefUri, report);
                 }
@@ -501,9 +501,10 @@ class ValueIntegrator {
     /**
      * @param   childValues   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String compDefUri,
+    private void updateAssignmentsMany(UnifiedValue parent, List<UnifiedValue> childValues, String compDefUri,
                                        ChangeReportImpl report) {
-        ChildTopicsModelImpl oldChildTopics = parent.getChildTopics();
+        DMXObjectModelImpl _parent = parent.value;
+        ChildTopicsModelImpl oldChildTopics = _parent.getChildTopics();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(compDefUri);     // may be null
         CompDefModel compDef = compDef(compDefUri);
         boolean sequenceHasChanges = false;
@@ -537,7 +538,7 @@ class ValueIntegrator {
                 // update sequence
                 if (!sequenceHasChanges) {
                     sequenceHasChanges = true;
-                    deleteSequence(parent.id, compDef);
+                    deleteSequence(_parent.id, compDef);
                 }
             }
             // 1) delete assignment if exists AND value has changed or emptied
@@ -545,7 +546,7 @@ class ValueIntegrator {
             if (valueChanged) {
                 if (newValueIsEmpty) {
                     logger.fine("### Deleting assignment (compDefUri=\"" + compDefUri + "\") from composite " +
-                        parent.id + " (typeUri=\"" + type.uri + "\")");
+                        _parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
                 // update DB
                 oldValue.getRelatingAssoc().delete();
@@ -558,7 +559,7 @@ class ValueIntegrator {
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(parent, newValue, compDefUri, valueChanged);
+                assoc = createChildAssoc(_parent, newValue, compDefUri, valueChanged);
                 // update memory
                 oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
@@ -575,9 +576,10 @@ class ValueIntegrator {
         }
         // update sequence
         if (sequenceHasChanges) {
-            createSequence(parent.id, compDef, oldChildTopics.getTopicsOrNull(compDefUri));
+            createSequence(_parent.id, compDef, oldChildTopics.getTopicsOrNull(compDefUri));
         } else {
-            if (oldValues != null) {
+            // detect "update order" request
+            if (oldValues != null && !parent.created) {
                 List<Long> oldAssocIds = oldValues.stream().map(
                     childTopic -> childTopic.getRelatingAssoc().getId()
                 ).collect(Collectors.toList());
@@ -589,8 +591,8 @@ class ValueIntegrator {
                 ).collect(Collectors.toList());
                 if (!oldAssocIds.equals(newAssocIds)) {
                     logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
-                    deleteSequence(parent.id, compDef);
-                    createSequence(parent.id, compDef, newValues);
+                    deleteSequence(_parent.id, compDef);
+                    createSequence(_parent.id, compDef, newValues);
                 }
             }
         }
@@ -824,14 +826,14 @@ class ValueIntegrator {
             if (isOne(compDefUri)) {
                 TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
                 if (childTopic != null) {
-                    AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);         // update DB
+                    AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);        // update DB
                     childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
                 }
             } else {
                 for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
                     TopicModel childTopic = value.value;
                     if (childTopic != null) {
-                        AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);     // update DB
+                        AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);    // update DB
                         childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
                     }
                 }
