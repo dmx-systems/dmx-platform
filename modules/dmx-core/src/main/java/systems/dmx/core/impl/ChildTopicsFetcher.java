@@ -55,7 +55,7 @@ class ChildTopicsFetcher {
                 List<? extends RelatedTopicModel> _childTopics = fetchChildTopics(object.getId(), compDef);
                 int a = 0;
                 for (RelatedAssocModelImpl assoc : newChildTopicsSequence(object.getId(), compDef)) {
-                    RelatedTopicModel childTopic = DMXUtils.findByAssocId(assoc.id, _childTopics);
+                    RelatedTopicModel childTopic = DMXUtils.findByAssoc(assoc.id, _childTopics);
                     if (childTopic == null) {
                         throw new RuntimeException("DB inconsistency: assoc " + assoc.id +
                             " is in sequence but not in " + _childTopics + ", assoc=" + assoc + ", child topic=" +

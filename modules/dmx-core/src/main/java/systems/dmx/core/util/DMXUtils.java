@@ -82,13 +82,24 @@ public class DMXUtils {
         return null;
     }
 
-    public static <T extends RelatedObjectModel> T findByAssocId(long assocId, Iterable<T> objects) {
+    public static <T extends RelatedObjectModel> T findByAssoc(long assocId, Iterable<T> objects) {
         for (T object : objects) {
             if (object.getRelatingAssoc().getId() == assocId) {
                 return object;
             }
         }
         return null;
+    }
+
+    public static int indexOfAssoc(long assocId, Iterable<? extends RelatedObjectModel> objects) {
+        int i = 0;
+        for (RelatedObjectModel object : objects) {
+            if (object.getRelatingAssoc().getId() == assocId) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
     }
 
     public static <M> List<M> toModelList(Iterable<? extends DMXObject> objects) {
