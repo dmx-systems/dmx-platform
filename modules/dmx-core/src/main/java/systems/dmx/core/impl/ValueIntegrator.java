@@ -591,8 +591,18 @@ class ValueIntegrator {
                 ).collect(Collectors.toList());
                 if (!oldAssocIds.equals(newAssocIds)) {
                     logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
+                    // update DB
                     deleteSequence(_parent.id, compDef);
                     createSequence(_parent.id, compDef, newValues);
+                    // update memory
+                    for (long assocId : newAssocIds) {
+                        int i = DMXUtils.indexOfAssoc(assocId, oldValues);
+                        if (i == -1) {
+                            throw new RuntimeException("Updating sequence order failed, assoc " + assocId +
+                                " not found in " + oldAssocIds);
+                        }
+                        oldValues.add(oldValues.remove(i));
+                    }
                 }
             }
         }
@@ -634,7 +644,7 @@ class ValueIntegrator {
             predAssoc = s.insert(value.getRelatingAssoc(), predAssoc);
             n++;
         }
-        logger.info("### " + n + " \"" + compDef.getCompDefUri() + "\" sequence segments created");
+        logger.info("### " + n + " sequence segments created (\"" + compDef.getCompDefUri() + "\")");
     }
 
     private void deleteSequence(long parentTopicId, CompDefModel compDef) {
@@ -643,7 +653,7 @@ class ValueIntegrator {
             assoc.getRelatingAssoc().delete();
             n++;
         }
-        logger.info("### " + n + " \"" + compDef.getCompDefUri() + "\" sequence segments deleted");
+        logger.info("### " + n + " sequence segments deleted (\"" + compDef.getCompDefUri() + "\")");
     }
 
     // ### TODO: copy in ChildTopicsFetcher
