@@ -1013,6 +1013,13 @@ public class Neo4jStorage implements DMXStorage {
             playerNode,
             getRelationshipType(playerModel.getRoleTypeUri())
         );
+        // ID transfer for by-URI players
+        if (playerModel instanceof TopicPlayerModel) {
+            if (((TopicPlayerModel) playerModel).topicIdentifiedByUri()) {
+                playerModel.setId(playerNode.getId());
+            }
+        }
+        //
         return playerNode;
     }
 
