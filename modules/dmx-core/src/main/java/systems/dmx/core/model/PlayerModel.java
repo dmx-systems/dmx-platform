@@ -11,11 +11,13 @@ public interface PlayerModel extends JSONEnabled, Cloneable {
 
     long getId();
 
-    String getTypeUri();
-
     String getRoleTypeUri();
 
+    String getTypeUri();
+
     // ---
+
+    void setId(long id);
 
     void setRoleTypeUri(String roleTypeUri);
 

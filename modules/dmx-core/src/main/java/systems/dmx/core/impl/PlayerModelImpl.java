@@ -36,16 +36,21 @@ abstract class PlayerModelImpl implements PlayerModel {
     }
 
     @Override
-    public final String getTypeUri() {
-        return (String) al.db.fetchProperty(getId(), "typeUri");
-    }
-
-    @Override
     public final String getRoleTypeUri() {
         return roleTypeUri;
     }
 
+    @Override
+    public final String getTypeUri() {
+        return (String) al.db.fetchProperty(getId(), "typeUri");
+    }
+
     // ---
+
+    @Override
+    public final void setId(long id) {
+        this.id = id;
+    }
 
     @Override
     public final void setRoleTypeUri(String roleTypeUri) {
