@@ -59,6 +59,10 @@ class TypeStorage {
         return assocType != null ? assocType : fetchAssocType(assocTypeUri);
     }
 
+    private TypeModelImpl getTypeIfExists(String typeUri) {
+        return typeCache.get(typeUri);
+    }
+
     // ---
 
     void putInTypeCache(TypeModelImpl type) {
@@ -70,20 +74,6 @@ class TypeStorage {
         if (typeCache.remove(typeUri) == null) {
             throw new RuntimeException("Type \"" + typeUri + "\" not found in type cache");
         }
-    }
-
-    // ---
-
-    TypeModelImpl getType(String typeUri) {
-        TypeModelImpl type = getTypeIfExists(typeUri);
-        if (type == null) {
-            throw new RuntimeException("Type \"" + typeUri + "\" not found in type cache");
-        }
-        return type;
-    }
-
-    private TypeModelImpl getTypeIfExists(String typeUri) {
-        return typeCache.get(typeUri);
     }
 
 
@@ -384,12 +374,6 @@ class TypeStorage {
         return assoc;
     }
 
-    private CompDefModelImpl addPlayerIds(CompDefModelImpl compDef) {
-        compDef.getPlayerByRole(PARENT_TYPE).id = compDef.getParentType().id;
-        compDef.getPlayerByRole(CHILD_TYPE).id  = compDef.getChildType().id;
-        return compDef;
-    }
-
     // ---
 
     private List<CompDefModel> sortCompDefs(Map<Long, CompDefModel> compDefs, List<Long> sequence) {
@@ -419,7 +403,7 @@ class TypeStorage {
         try {
             // Note: the passed "compDef" is what is stored in type cache. The value integrator (as called by
             // createAssoc()) does not update that model in-place.
-            AssocModelImpl assoc = al.createAssoc(addPlayerIds(compDef));
+            AssocModelImpl assoc = al.createAssoc(compDef);
             // We must explicitly update the type cache with the integration result (as returned by createAssoc()).
             // Both values are needed, the simple one (as being displayed in webclient's type editor), and the composite
             // one (as its relating assocs are needed when revealing a comp def child topic in webclient).

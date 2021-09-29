@@ -102,8 +102,6 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-
-
     @Override
     String className() {
         return "comp def";
@@ -196,20 +194,6 @@ class CompDefModelImpl extends AssocModelImpl implements CompDefModel {
             throw new RuntimeException("Checking comp def READability failed (" + this + ")", e);
         }
     }
-
-
-
-    // === Helper ===
-
-    TypeModelImpl getParentType() {
-        return al.typeStorage.getType(getParentTypeUri());
-    }
-
-    TypeModelImpl getChildType() {
-        return al.typeStorage.getType(getChildTypeUri());
-    }
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
