@@ -7,7 +7,7 @@
       </dmx-comp-def>
     </template>
     <draggable v-else :list="compDefs" :animation="300">
-      <!-- 3 lines duplicated in favor of code splitting; TODO: avoid -->
+      <!-- 3 lines duplicated in favor of code splitting -->
       <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
         :key="compDef.compDefUri" @click.native="click(compDef)">
       </dmx-comp-def>
