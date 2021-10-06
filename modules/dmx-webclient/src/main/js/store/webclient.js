@@ -24,6 +24,9 @@ const state = {
                             //    mount: [compDef]
                             // }
 
+  resizerPos: 0.7 * window.innerWidth,    // x coordinate in pixel (number); the initial value must correspond
+                                          // with CSS variable --detail-panel-trans-x in dmx-detail-panel.vue
+
   detailRenderers: {        // Registered detail renderers; comprises object renderers and value renderers:
     object: {},             // {
     value: {}               //   typeUri: component
@@ -61,9 +64,6 @@ const state = {
                             //     }
                             //   ]
                             // }
-
-  resizerPos: 0.7 * window.innerWidth,    // x coordinate in pixel (number); the initial value must correspond with
-                            // initial value of CSS variable --detail-panel-trans-x in dmx-detail-panel.vue
 
   quillConfig: {
     options: {
