@@ -6,7 +6,8 @@ import dmx from 'dmx-api'
 Vue.use(Vuex)
 
 window.addEventListener('resize', e => {
-  store.dispatch('repositionResizer')
+  // read state from view
+  store.dispatch('setResizerPos', document.querySelector('.dmx-topicmap-panel').clientWidth)
 })
 
 const state = {
@@ -61,7 +62,8 @@ const state = {
                             //   ]
                             // }
 
-  resizerPos: 0,            // x coordinate in pixel
+  resizerPos: 0.7 * window.innerWidth,    // x coordinate in pixel (number); the initial value must correspond with
+                            // initial value of CSS variable --detail-panel-trans-x in dmx-detail-panel.vue
 
   quillConfig: {
     options: {
@@ -208,12 +210,8 @@ const actions = {
 
   // Resizer
 
-  positionResizer (_, pos) {
+  setResizerPos (_, pos) {
     state.resizerPos = pos
-  },
-
-  repositionResizer ({dispatch}) {
-    dispatch('positionResizer', document.querySelector('.dmx-topicmap-panel').clientWidth)
   },
 
   //

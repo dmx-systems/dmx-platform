@@ -1,5 +1,5 @@
 <template>
-  <div class="dmx-resizer" :style="{left}" v-if="visible" @mousedown="onMouseDown"></div>
+  <div class="dmx-resizer" :style="{left: left + 'px'}" v-if="visible" @mousedown="onMouseDown"></div>
 </template>
 
 <script>
@@ -12,12 +12,13 @@ export default {
     },
 
     left () {
-      return `${this.$store.state.resizerPos}px`
+      return this.$store.state.resizerPos
     }
   },
 
   methods: {
-    onMouseDown({pageX: initialPageX}) {
+
+    onMouseDown ({pageX: initialPageX}) {
       const self = this
       const container = document.querySelector('.dmx-webclient')
       const panelL    = document.querySelector('.dmx-topicmap-panel')
@@ -29,7 +30,7 @@ export default {
 
       const onMouseMove = function ({pageX}) {
         const pos = resize(pageX - initialPageX)
-        self.$store.dispatch('positionResizer', pos)
+        self.$store.dispatch('setResizerPos', pos)
       }
 
       const onMouseUp = function () {
@@ -48,6 +49,18 @@ export default {
 
       addEventListener('mousemove', onMouseMove)
       addEventListener('mouseup', onMouseUp)
+    },
+
+    // Public API
+
+    resize () {
+        const container = document.querySelector('.dmx-webclient')        //
+        const panelL    = document.querySelector('.dmx-topicmap-panel')   // TODO: DRY
+        const panelR    = document.querySelector('.dmx-detail-panel')     //
+        const paneLWidth = this.left
+        const paneRWidth = container.clientWidth - paneLWidth
+        panelL.style.width = `${paneLWidth}px`
+        panelR.style.width = `${paneRWidth}px`
     }
   }
 }

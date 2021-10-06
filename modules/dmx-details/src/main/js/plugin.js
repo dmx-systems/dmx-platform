@@ -16,9 +16,8 @@ export default ({store}) => {
       getter: state => state.details.visible,
       callback: (visible) => {
         Vue.nextTick(() => {
-          store.dispatch('resizeTopicmapRenderer')
           if (visible) {
-            store.dispatch('repositionResizer')
+            document.querySelector('.dmx-resizer').__vue__.resize()
           }
         })
       }
@@ -43,7 +42,8 @@ export default ({store}) => {
                              assocTypes: state.typeCache.assocTypes,
                              roleTypes:  state.typeCache.roleTypes
                            }),                                                                /* eslint indent: "off" */
-          quillConfig:     state => state.quillConfig
+          quillConfig:     state => state.quillConfig,
+          transX:          state => state.resizerPos
         },
         listeners: {
           'tab-click':           tabClick,

@@ -57,7 +57,7 @@ router.beforeEach((to, from, next) => {
   // TODO: rethink router instantiation time
   if (store.state.details && store.state.details.visible && store.state.object &&
       (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
-    const detailPanel = document.querySelector('.dmx-detail-panel').__vue__
+    const detailPanel = document.querySelector('.dmx-detail-panel').__vue__.$parent     // $parent <transition>
     const isDirty = detailPanel.isDirty()
     // console.log('isDirty', isDirty, store.state.object.id)
     if (isDirty) {
