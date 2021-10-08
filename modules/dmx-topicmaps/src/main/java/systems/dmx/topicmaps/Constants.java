@@ -12,6 +12,7 @@ public class Constants {
 
     // Assoc Types
     public static final String TOPICMAP_CONTEXT     = "dmx.topicmaps.topicmap_context";
+    public static final String BACKGROUND_IMAGE     = "dmx.topicmaps.background_image";
 
     // Role Types
     public static final String TOPICMAP_CONTENT     = "dmx.topicmaps.topicmap_content";

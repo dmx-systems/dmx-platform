@@ -1,62 +1,87 @@
-// Part of DMX 5.0-beta-4
+// Part of DMX 5.0-beta-4, modified in DMX 5.3
 // Runs ALWAYS
 
-{
-  "topic_types": [
-    {
-      "value":       "Topicmap Name",
-      "uri":         "dmx.topicmaps.topicmap_name",
-      "dataTypeUri": "dmx.core.text"
-    },
-    {
-      "value":       "Topicmap Description",
-      "uri":         "dmx.topicmaps.topicmap_description",
-      "dataTypeUri": "dmx.core.html"
-    },
-    {
-      "value":       "Topicmap Type URI",
-      "uri":         "dmx.topicmaps.topicmap_type_uri",
-      "dataTypeUri": "dmx.core.text"
-    },
-    {
-      "value":       "Topicmap",
-      "uri":         "dmx.topicmaps.topicmap",
-      "dataTypeUri": "dmx.core.entity",
-      "compDefs": [
-        {
-          "childTypeUri":        "dmx.topicmaps.topicmap_name",
-          "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.topicmaps.topicmap_description",
-          "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.topicmaps.topicmap_type_uri",
-          "childCardinalityUri": "dmx.core.one"
-        }
-      ],
-      "viewConfigTopics": [
-        {
-          "typeUri": "dmx.webclient.view_config",
-          "children": {
-            "dmx.webclient.icon": "\uf069"
+[
+  {
+    "assoc_types": [
+      {
+        "value":       "Background Image",
+        "uri":         "dmx.topicmaps.background_image",
+        "dataTypeUri": "dmx.core.text",
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.color": "hsl(5, 50%, 53%)",
+              "dmx.webclient.color#dmx.webclient.background_color": "hsl(5, 80%, 96%)"
+            }
           }
-        }
-      ]
-    }
-  ],
-  "assoc_types": [
-    {
-      "value":       "Topicmap Context",
-      "uri":         "dmx.topicmaps.topicmap_context",
-      "dataTypeUri": "dmx.core.text"
-    }
-  ],
-  "role_types": [
-    {
-      "value": "Topicmap Content",
-      "uri":   "dmx.topicmaps.topicmap_content"
-    }
-  ]
-}
+        ]
+      }
+    ]
+  },
+  {
+    "topic_types": [
+      {
+        "value":       "Topicmap Name",
+        "uri":         "dmx.topicmaps.topicmap_name",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Topicmap Description",
+        "uri":         "dmx.topicmaps.topicmap_description",
+        "dataTypeUri": "dmx.core.html"
+      },
+      {
+        "value":       "Topicmap Type URI",
+        "uri":         "dmx.topicmaps.topicmap_type_uri",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Topicmap",
+        "uri":         "dmx.topicmaps.topicmap",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "dmx.topicmaps.topicmap_name",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.topicmaps.topicmap_description",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.topicmaps.topicmap_type_uri",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.files.file",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "dmx.topicmaps.background_image"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.icon": "\uf069"
+            }
+          }
+        ]
+      }
+    ],
+    "assoc_types": [
+      {
+        "value":       "Topicmap Context",
+        "uri":         "dmx.topicmaps.topicmap_context",
+        "dataTypeUri": "dmx.core.text"
+      }
+    ],
+    "role_types": [
+      {
+        "value": "Topicmap Content",
+        "uri":   "dmx.topicmaps.topicmap_content"
+      }
+    ]
+  }
+]
