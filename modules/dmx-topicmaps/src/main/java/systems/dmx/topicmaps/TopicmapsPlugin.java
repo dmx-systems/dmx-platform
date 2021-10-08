@@ -100,7 +100,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             logger.info("Fetching topicmap " + topicmapId + ", includeChildren=" + includeChildren);
             // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
-            Topic topicmapTopic = dmx.getTopic(topicmapId);
+            Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
             return new Topicmap(
                 topicmapTopic.getModel(),
                 fetchTopicmapViewProps(topicmapTopic),

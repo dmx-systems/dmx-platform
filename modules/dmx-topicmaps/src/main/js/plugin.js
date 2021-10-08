@@ -14,6 +14,7 @@ export default ({store, dmx}) => {
           object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
           writable:        state => state.writable,
           detailRenderers: state => state.detailRenderers,
+          topicmap:        state => state.topicmaps.topicmap,
           topicmapTypes:   state => state.topicmaps.topicmapTypes,
           toolbarCompDefs: state => ({
             left:  state.compDefs['toolbar-left'],

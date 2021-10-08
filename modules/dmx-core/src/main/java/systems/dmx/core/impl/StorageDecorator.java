@@ -256,9 +256,10 @@ public class StorageDecorator {
         case 1:
             return topics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (objectId=" +
-                objectId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
-                "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
+            // TODO: use this format for all ambiguity exceptions
+            throw new RuntimeException("Ambiguity: object " + objectId + " has " + topics.size() + " related \"" +
+                othersTopicTypeUri + "\" topics, assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" +
+                myRoleTypeUri + "\", " + "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", topics=" + topics);
         }
     }
 
