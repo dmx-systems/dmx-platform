@@ -21,7 +21,7 @@
     "dmx-login-dialog": "2.0.1",
     "dmx-object-renderer": "https://github.com/dmx-systems/dmx-object-renderer.git",
     "dmx-search-widget": "2.1.0",
-    "dmx-topicmap-panel": "2.2.0",
+    "dmx-topicmap-panel": "https://github.com/dmx-systems/dmx-topicmap-panel.git",
     "dmx-websocket": "2.0.1",
     "element-ui": "2.13.2",
     "vue": "2.6.11",
