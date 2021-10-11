@@ -55,7 +55,7 @@
             "childCardinalityUri": "dmx.core.one"
           },
           {
-            "childTypeUri":        "dmx.files.file",
+            "childTypeUri":        "dmx.base.url",
             "childCardinalityUri": "dmx.core.one",
             "customAssocTypeUri":  "dmx.topicmaps.background_image"
           }

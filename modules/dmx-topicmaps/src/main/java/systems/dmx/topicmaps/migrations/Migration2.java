@@ -1,7 +1,7 @@
 package systems.dmx.topicmaps.migrations;
 
+import static systems.dmx.base.Constants.*;
 import static systems.dmx.core.Constants.*;
-import static systems.dmx.files.Constants.*;
 import static systems.dmx.topicmaps.Constants.*;
 import static systems.dmx.webclient.Constants.*;
 import systems.dmx.core.service.Migration;
@@ -21,7 +21,7 @@ public class Migration2 extends Migration {
         dmx.createAssocType(mf.newAssocTypeModel(BACKGROUND_IMAGE, "Background Image", TEXT));
         dmx.getTopicType(TOPICMAP).addCompDef(mf.newCompDefModel(
             BACKGROUND_IMAGE, false, false,
-            TOPICMAP, FILE, ONE
+            TOPICMAP, URL, ONE
         )).getViewConfig()
             .setConfigValue(VIEW_CONFIG, COLOR, "hsl(5, 50%, 53%)")
             .setConfigValue(VIEW_CONFIG, COLOR + "#" + BACKGROUND_COLOR, "hsl(5, 80%, 96%)");
