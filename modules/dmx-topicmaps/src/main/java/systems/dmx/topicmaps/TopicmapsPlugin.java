@@ -513,12 +513,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private ViewProps fetchTopicViewProps(Assoc topicmapContext) {
-        return mf.newViewProps(
+        ViewProps viewProps = mf.newViewProps(
             (Integer) topicmapContext.getProperty(X),
             (Integer) topicmapContext.getProperty(Y),
             visibility(topicmapContext),
             pinned(topicmapContext)
         );
+        if (topicmapContext.hasProperty(WIDTH)) {
+            viewProps.set(WIDTH, topicmapContext.getProperty(WIDTH));
+        }
+        if (topicmapContext.hasProperty(HEIGHT)) {
+            viewProps.set(HEIGHT, topicmapContext.getProperty(HEIGHT));
+        }
+        return viewProps;
     }
 
     private ViewProps fetchAssocViewProps(Assoc topicmapContext) {
@@ -526,6 +533,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             visibility(topicmapContext),
             pinned(topicmapContext)
         );
+        // TODO: WIDTH/HEIGHT
     }
 
     private boolean visibility(Assoc topicmapContext) {

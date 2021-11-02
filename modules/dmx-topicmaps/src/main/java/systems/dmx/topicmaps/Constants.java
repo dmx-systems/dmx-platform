@@ -27,4 +27,6 @@ public class Constants {
     public static final String Y                    = "dmx.topicmaps.y";    // topic only
     public static final String VISIBILITY           = "dmx.topicmaps.visibility";
     public static final String PINNED               = "dmx.topicmaps.pinned";
+    public static final String WIDTH                = "dmx.topicmaps.width";
+    public static final String HEIGHT               = "dmx.topicmaps.height";
 }
