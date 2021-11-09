@@ -50,3 +50,11 @@ deploy-to-central:
     - mvn clean deploy -P release
   only:
     - tags
+
+trigger-project:
+  stage: deploy
+  trigger: dmx-contrib/dmx-docker
+  only:
+    - master
+  except:
+    - tags
