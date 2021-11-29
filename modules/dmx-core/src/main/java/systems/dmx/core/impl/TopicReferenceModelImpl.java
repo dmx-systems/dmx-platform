@@ -81,22 +81,21 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
     TopicModelImpl resolve() {
         try {
             TopicModelImpl topic;
-            // Note: the resolved topic must be fetched including its child topics.
-            // They might be required for label calculation and/or at client-side. ### TODO?
             if (isReferenceById()) {
-                topic = al.db.fetchTopic(id);    // .loadChildTopics();  // TODO?
+                topic = al.db.fetchTopic(id);
             } else if (isReferenceByUri()) {
                 topic = al.sd.fetchTopic("uri", uri);
                 if (topic == null) {
                     throw new RuntimeException("Topic with URI \"" + uri + "\" not found");
                 }
-                // .loadChildTopics();  // TODO?
             } else {
                 throw new RuntimeException("Invalid " + this);
             }
+            // Note: the resolved topic must be fetched including its child topics.
+            // They might be required for label calculation and/or at client-side.
             // TODO: why is set() required?
             // Without it the custom assoc type refs in the type cache are unresolved (ID=-1) after bootstrap
-            this.set(topic);
+            this.set(topic.loadChildTopics(true));      // deep=true
             return topic;
         } catch (Exception e) {
             throw new RuntimeException("Resolving a topic reference failed (" + this + ")", e);
