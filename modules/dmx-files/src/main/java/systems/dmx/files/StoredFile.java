@@ -7,6 +7,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
+// TODO: drop this class. Use File topic instead?
 public class StoredFile implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

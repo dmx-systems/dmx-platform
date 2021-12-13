@@ -198,7 +198,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // 3) file system representation
             Topic fileTopic = createFileTopic(repoFile);
             Topic folderTopic = fetchOrCreateFolderTopic(directory);
-            RelatedTopic topic = createFolderAssoc(folderTopic.getId(), fileTopic);
+            RelatedTopic topic = createFolderAssoc(folderTopic.getId(), fileTopic).loadChildTopics();
             return new StoredFile(repoFile.getName(), repoPath(fileTopic), fileTopic.getId(), topic);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
