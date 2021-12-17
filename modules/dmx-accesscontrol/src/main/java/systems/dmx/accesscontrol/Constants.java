@@ -12,4 +12,7 @@ public class Constants {
 
     // Assoc Types
     public static final String MEMBERSHIP    = "dmx.accesscontrol.membership";
+
+    // Misc
+    public static final String ADMIN_USERNAME = "admin";
 }

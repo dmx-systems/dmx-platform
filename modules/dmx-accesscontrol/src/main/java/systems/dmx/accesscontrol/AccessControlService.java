@@ -16,7 +16,7 @@ public interface AccessControlService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Admin user account
-    static final String ADMIN_USERNAME = "admin";
+    static final String ADMIN_USERNAME = "admin";       // DEPRECATED; use ADMIN_USERNAME from Constants.java instead
     static final String ADMIN_INITIAL_PASSWORD = System.getProperty("dmx.security.initial_admin_password", "");
 
     // Administration workspace
