@@ -8,18 +8,21 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './websocket'
 
-console.log('[DMX] 2021/12/17')
+console.log('[DMX] 2021/12/25')
 
 // 1) Init dmx library
 // The dmx library must be inited *before* the dmx-webclient component is instantiated.
 // The dmx-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
-const dmxReady = dmx.init({
+dmx.init({
   store,
   onHttpError,
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Create Vue root instance
+// 2) Populate type cache
+const typeCacheReady = store.dispatch('initTypeCache')
+
+// 3) Create Vue root instance
 // Instantiates router-view and dmx-webclient components.
 const root = new Vue({
   el: '#app',
@@ -28,7 +31,7 @@ const root = new Vue({
   render: h => h(App)
 })
 
-// 3) Load plugins + mount toplevel components
+// 4) Load plugins + mount toplevel components
 // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
 // boxes -- component mounting must perform not before all plugins are loaded.
 // Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
@@ -41,7 +44,7 @@ loadPlugins(extraElementUI).then(() => {
   store.dispatch('mountComponents', webclient)
 })
 
-// 4) Register own renderers
+// 5) Register own renderers
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.icon',
@@ -58,13 +61,13 @@ store.dispatch('registerDetailRenderer', {
   component: require('./components/dmx-arrow-select').default
 })
 
-// 5) Initial navigation
+// 6) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
   // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
   // The type cache must be ready *before* "initialNavigation" is dispatched.
-  dmxReady,
+  typeCacheReady,
   // Initial navigation might involve "select the 1st workspace", so the workspace
   // topics must be already loaded.
   store.state.workspaces.ready
@@ -72,13 +75,13 @@ Promise.all([
   store.dispatch('initialNavigation')
 })
 
-// Windows workaround to suppress the browser's native context menu on
-// - right-clicking the canvas (to invoke search/create dialog)
-// - right-clicking a topic/assoc (to invoke Cytoscape context menu)
-// - a dialog appears as the reaction of a Cytoscape context menu command
+// 7) Windows workaround to suppress the browser's native context menu on
+//   - right-clicking the canvas (to invoke search/create dialog)
+//   - right-clicking a topic/assoc (to invoke Cytoscape context menu)
+//   - a dialog appears as the reaction of a Cytoscape context menu command
 // Note: in contrast to other platforms on Windows the target of the "contextmenu" event is not the canvas but
-// - a dialog (or its wrapper) e.g. the search/create dialog
-// - a message box (or its wrapper) e.g. the deletion warning
+//   - a dialog (or its wrapper) e.g. the search/create dialog
+//   - a message box (or its wrapper) e.g. the deletion warning
 // Note: in contrast to a dialog the message box is not a child of <dmx-webclient> component, so we attach
 // the listener directly to <body>.
 document.body.addEventListener('contextmenu', e => {
