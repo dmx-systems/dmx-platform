@@ -70,7 +70,7 @@ class ChildTopicsFetcher {
                             "there should be " + _childTopics.size() + ", parentTopicId=" + object.getId() +
                             ", compDefUri=\"" + compDefUri + "\"");
                     } else if (_childTopics.size() > 0) {
-                        logger.info("### No sequence for " + _childTopics.size() + " \"" + compDefUri + "\" values");
+                        logger.fine("### No sequence for " + _childTopics.size() + " \"" + compDefUri + "\" values");
                         for (RelatedTopicModel childTopic : _childTopics) {
                             childTopics.add(compDefUri, childTopic);
                         }

@@ -8,7 +8,7 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './websocket'
 
-console.log('[DMX] 2021/12/25')
+console.log('[DMX] 2022/01/02')
 
 // 1) Init dmx library
 // The dmx library must be inited *before* the dmx-webclient component is instantiated.

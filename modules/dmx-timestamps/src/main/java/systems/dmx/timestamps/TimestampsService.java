@@ -20,6 +20,12 @@ public interface TimestampsService {
 
     void setModified(DMXObject object);
 
+    /**
+     * Retrieves the CREATED/MODIFIED timestamps and stores them in the given object's model (under synthetic comp def
+     * URIs <code>dmx.timestamps.created</code> and <code>dmx.timestamps.modified</code>).
+     */
+    void enrichWithTimestamps(DMXObject object);
+
     // === Retrieval ===
 
     Collection<Topic> getTopicsByCreationTime(long from, long to);

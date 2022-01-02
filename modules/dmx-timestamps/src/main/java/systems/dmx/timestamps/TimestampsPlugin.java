@@ -101,6 +101,14 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
         storeTimestamp(object);
     }
 
+    @Override
+    public void enrichWithTimestamps(DMXObject object) {
+        long objectId = object.getId();
+        ChildTopicsModel childTopics = object.getChildTopics().getModel()
+            .set(CREATED, getCreationTime(objectId))
+            .set(MODIFIED, getModificationTime(objectId));
+    }
+
 
 
     // === Retrieval ===
@@ -182,12 +190,12 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     @Override
     public void preSendTopic(Topic topic) {
-        enrichWithTimestamp(topic);
+        enrichWithTimestamps(topic);
     }
 
     @Override
     public void preSendAssoc(Assoc assoc) {
-        enrichWithTimestamp(assoc);
+        enrichWithTimestamps(assoc);
     }
 
     // ---
@@ -237,13 +245,6 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     private DMXObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
         return entity instanceof DMXObject ? (DMXObject) entity : null;
-    }
-
-    private void enrichWithTimestamp(DMXObject object) {
-        long objectId = object.getId();
-        ChildTopicsModel childTopics = object.getChildTopics().getModel()
-            .set(CREATED, getCreationTime(objectId))
-            .set(MODIFIED, getModificationTime(objectId));
     }
 
     // ---
