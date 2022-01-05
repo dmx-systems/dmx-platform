@@ -5,7 +5,6 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.ChangeReport;
@@ -104,7 +103,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     @Override
     public void enrichWithTimestamps(DMXObject object) {
         long objectId = object.getId();
-        ChildTopicsModel childTopics = object.getChildTopics().getModel()
+        object.getChildTopics().getModel()
             .set(CREATED, getCreationTime(objectId))
             .set(MODIFIED, getModificationTime(objectId));
     }

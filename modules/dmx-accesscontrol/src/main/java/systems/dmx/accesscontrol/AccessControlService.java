@@ -1,6 +1,7 @@
 package systems.dmx.accesscontrol;
 
 import systems.dmx.core.Assoc;
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Permissions;
@@ -215,6 +216,12 @@ public interface AccessControlService {
      * @return  The username of the modifier, or <code>null</code> if no modifier is set.
      */
     String getModifier(long objectId);
+
+    /**
+     * Retrieves the CREATOR/MODIFIER usernames and stores them in the given object's model (under synthetic child type
+     * URIs <code>dmx.accesscontrol.creator</code> and <code>dmx.accesscontrol.modifier</code>).
+     */
+    void enrichWithUserInfo(DMXObject object);
 
 
 

@@ -4,7 +4,7 @@ import SHA256 from './lib/sha256'
 const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
-  username: undefined,      // the logged in user (string); falsish if no user is logged in
+  username: undefined,      // the logged in user (String); falsish if no user is logged in
   // Login dialog
   visible: false,           // Login dialog visibility
   extensions: []            // extra Vue components for the Login dialog

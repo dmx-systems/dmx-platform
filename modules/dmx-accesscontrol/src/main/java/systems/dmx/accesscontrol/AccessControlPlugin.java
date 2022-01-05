@@ -120,11 +120,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ### TODO: copy in Credentials.java
     private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
 
-    // Property URIs
-    private static final String PROP_CREATOR  = "dmx.accesscontrol.creator";
-    private static final String PROP_OWNER    = "dmx.accesscontrol.owner";
-    private static final String PROP_MODIFIER = "dmx.accesscontrol.modifier";
-
     // Events
     private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUser.class) {
         @Override
@@ -336,13 +331,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public String getWorkspaceOwner(@PathParam("workspaceId") long workspaceId) {
         // ### TODO: delegate to Core's PrivilegedAccess.getOwner()?
-        return dmx.hasProperty(workspaceId, PROP_OWNER) ? (String) dmx.getProperty(workspaceId, PROP_OWNER) : null;
+        return dmx.hasProperty(workspaceId, OWNER) ? (String) dmx.getProperty(workspaceId, OWNER) : null;
     }
 
     @Override
     public void setWorkspaceOwner(Topic workspace, String username) {
         try {
-            workspace.setProperty(PROP_OWNER, username, true);  // addToIndex=true
+            workspace.setProperty(OWNER, username, true);  // addToIndex=true
         } catch (Exception e) {
             throw new RuntimeException("Setting the workspace owner of " + info(workspace) + " failed (username=" +
                 username + ")", e);
@@ -406,7 +401,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getModifier(@PathParam("id") long objectId) {
-        return dmx.hasProperty(objectId, PROP_MODIFIER) ? (String) dmx.getProperty(objectId, PROP_MODIFIER) : null;
+        return dmx.hasProperty(objectId, MODIFIER) ? (String) dmx.getProperty(objectId, MODIFIER) : null;
+    }
+
+    @Override
+    public void enrichWithUserInfo(DMXObject object) {
+        long objectId = object.getId();
+        object.getChildTopics().getModel()
+            .set(CREATOR, getCreator(objectId))
+            .set(MODIFIER, getModifier(objectId));
     }
 
 
@@ -417,28 +420,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
-        return dmx.getTopicsByProperty(PROP_CREATOR, username);
+        return dmx.getTopicsByProperty(CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dmx.getTopicsByProperty(PROP_OWNER, username);
+        return dmx.getTopicsByProperty(OWNER, username);
     }
 
     @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Assoc> getAssocsByCreator(@PathParam("username") String username) {
-        return dmx.getAssocsByProperty(PROP_CREATOR, username);
+        return dmx.getAssocsByProperty(CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
     public Collection<Assoc> getAssocsByOwner(@PathParam("username") String username) {
-        return dmx.getAssocsByProperty(PROP_OWNER, username);
+        return dmx.getAssocsByProperty(OWNER, username);
     }
 
 
@@ -910,7 +913,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private void setCreator(DMXObject object, String username) {
         try {
-            object.setProperty(PROP_CREATOR, username, true);   // addToIndex=true
+            object.setProperty(CREATOR, username, true);   // addToIndex=true
         } catch (Exception e) {
             throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
                 e);
@@ -930,7 +933,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void setModifier(DMXObject object, String username) {
-        object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
+        object.setProperty(MODIFIER, username, false);     // addToIndex=false
     }
 
     // ---
