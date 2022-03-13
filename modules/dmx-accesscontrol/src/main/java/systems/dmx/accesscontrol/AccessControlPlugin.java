@@ -346,6 +346,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    @GET
+    @Path("/workspace/{workspaceId}/memberships")
+    @Override
+    public List<RelatedTopic> getMemberships(@PathParam("workspaceId") long workspaceId) {
+        try {
+            return dmx.getTopic(workspaceId).getRelatedTopics(MEMBERSHIP, DEFAULT, DEFAULT, USERNAME);
+        } catch (Exception e) {
+            throw new RuntimeException("Getting memberships of workspace " + workspaceId + " failed", e);
+        }
+    }
+
     @POST
     @Path("/user/{username}/workspace/{workspaceId}")
     @Transactional

@@ -2,12 +2,14 @@ package systems.dmx.accesscontrol;
 
 import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Permissions;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 
@@ -166,6 +168,11 @@ public interface AccessControlService {
     void setWorkspaceOwner(Topic workspace, String username);
 
     // ---
+
+    /**
+     * @return  a list of Username topics. The "relating" part is the Membership association.
+     */
+    List<RelatedTopic> getMemberships(long workspaceId);
 
     /**
      * Makes the given user a member of the given workspace.

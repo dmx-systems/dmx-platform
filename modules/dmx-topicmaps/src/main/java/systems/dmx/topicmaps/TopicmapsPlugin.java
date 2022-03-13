@@ -157,7 +157,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             // Note: a Topicmap Context assoc is owned by "System"; it gets no workspace assignment
             dmx.getPrivilegedAccess().runInWorkspaceContext(-1, () -> {     // throws Exception
                 if (getTopicMapcontext(topicmapId, topicId) != null) {      // TODO: idempotence?
-                    throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
+                    throw new RuntimeException("Topic " + topicId + " already added to topicmap " + topicmapId);
                 }
                 createTopicMapcontext(topicmapId, topicId, viewProps);
                 return null;
