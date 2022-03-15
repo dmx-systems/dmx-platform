@@ -7,6 +7,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Permissions;
 import systems.dmx.core.service.accesscontrol.SharingMode;
+import systems.dmx.core.util.IdList;
 
 import java.util.Collection;
 import java.util.List;
@@ -190,6 +191,13 @@ public interface AccessControlService {
      * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
      */
     boolean isMember(String username, long workspaceId);
+
+    /**
+     * @return  a list of Username topics. The "relating" part is the Membership association.
+     */
+    List<RelatedTopic> bulkUpdateMemberships(long workspaceId, IdList addUserIds, IdList removeUserIds);
+
+    // #### TODO: add deleteMembership()
 
     // ---
 

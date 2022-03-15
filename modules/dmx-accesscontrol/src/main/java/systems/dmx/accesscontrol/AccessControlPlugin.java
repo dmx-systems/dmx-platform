@@ -1,7 +1,6 @@
 package systems.dmx.accesscontrol;
 
 import static systems.dmx.accesscontrol.Constants.*;
-import static systems.dmx.files.Constants.*;
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
@@ -46,7 +45,9 @@ import systems.dmx.core.service.event.PreUpdateTopic;
 import systems.dmx.core.service.event.ServiceRequestFilter;
 import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.DMXUtils;
+import systems.dmx.core.util.IdList;
 import systems.dmx.core.util.JavaUtils;
+import static systems.dmx.files.Constants.*;
 import systems.dmx.files.FilesService;
 import systems.dmx.files.event.CheckDiskQuota;
 import static systems.dmx.workspaces.Constants.*;
@@ -61,15 +62,18 @@ import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -376,6 +380,37 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
+    @PUT
+    @Path("/workspace/{workspaceId}")
+    @Transactional
+    @Override
+    public List<RelatedTopic> bulkUpdateMemberships(@PathParam("workspaceId") long workspaceId,
+                                                    @QueryParam("addUserIds") IdList addUserIds,
+                                                    @QueryParam("removeUserIds") IdList removeUserIds) {
+        try {
+            List<String> usersAdded = new ArrayList();
+            List<String> usersRemoved = new ArrayList();
+            for (long userId : addUserIds) {
+                String username = getUsername(userId);
+                if (!isMember(username, workspaceId)) {
+                    createMembership(username, workspaceId);
+                    usersAdded.add(username);
+                }
+            }
+            for (long userId : removeUserIds) {
+                String username = getUsername(userId);
+                if (deleteMembershipIfExists(userId, workspaceId)) {
+                    usersRemoved.add(username);
+                }
+            }
+            logger.info("### Workspace " + workspaceId + ": users added " + usersAdded + ", users removed " +
+                usersRemoved);
+            return getMemberships(workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Bulk update memberships of workspace " + workspaceId + " failed", e);
+        }
+    }
+
     // ---
 
     @GET
@@ -676,14 +711,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic getUsernameTopicOrThrow(String username) {
-        Topic usernameTopic = getUsernameTopic(username);
-        if (usernameTopic == null) {
-            throw new RuntimeException("Unknown user \"" + username + "\"");
-        }
-        return usernameTopic;
-    }
-
     /**
      * Checks a "workspaceId" argument. 2 checks are performed:
      *   - the workspace ID refers actually to a workspace
@@ -698,11 +725,32 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         Topic workspace = dmx.getTopic(workspaceId);
         String typeUri = workspace.getTypeUri();
         if (!typeUri.equals(WORKSPACE)) {
-            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
+            throw new IllegalArgumentException("Topic " + workspaceId + " is not a Workspace (but a \"" + typeUri +
                 "\")");
         }
         //
         workspace.checkWriteAccess();       // throws AccessControlException
+    }
+
+    /**
+     * @param   id      ID of an Username topic
+     */
+    private String getUsername(long id) {
+        Topic username = dmx.getTopic(id);
+        String typeUri = username.getTypeUri();
+        if (!typeUri.equals(USERNAME)) {
+            throw new IllegalArgumentException("Topic " + id + " is not a Username (but a \"" + typeUri + "\")");
+        }
+        return username.getSimpleValue().toString();
+    }
+
+    private boolean deleteMembershipIfExists(long userId, long workspaceId) {
+        Assoc assoc = dmx.getAssocBetweenTopicAndTopic(MEMBERSHIP, userId, workspaceId, DEFAULT, DEFAULT);
+        if (assoc != null) {
+            assoc.delete();
+            return true;
+        }
+        return false;
     }
 
     // ### TODO: copy in Credentials.java
