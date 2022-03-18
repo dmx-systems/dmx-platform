@@ -228,7 +228,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void checkAdmin() {
-        checkWriteAccess(getAdminWorkspaceId());
+        try {
+            checkWriteAccess(getAdminWorkspaceId());
+        } catch (Exception e) {
+            throw new RuntimeException("User is not an administrator", e);
+        }
     }
 
 
@@ -390,24 +394,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             List<String> usersAdded = new ArrayList();
             List<String> usersRemoved = new ArrayList();
-            for (long userId : addUserIds) {
-                String username = getUsername(userId);
-                if (!isMember(username, workspaceId)) {
-                    createMembership(username, workspaceId);
-                    usersAdded.add(username);
+            if (addUserIds != null) {
+                for (long userId : addUserIds) {
+                    String username = getUsername(userId);
+                    if (!isMember(username, workspaceId)) {
+                        createMembership(username, workspaceId);
+                        usersAdded.add(username);
+                    }
                 }
             }
-            for (long userId : removeUserIds) {
-                String username = getUsername(userId);
-                if (deleteMembershipIfExists(userId, workspaceId)) {
-                    usersRemoved.add(username);
+            if (removeUserIds != null) {
+                for (long userId : removeUserIds) {
+                    String username = getUsername(userId);
+                    if (deleteMembershipIfExists(userId, workspaceId)) {
+                        usersRemoved.add(username);
+                    }
                 }
             }
             logger.info("### Workspace " + workspaceId + ": users added " + usersAdded + ", users removed " +
                 usersRemoved);
             return getMemberships(workspaceId);
         } catch (Exception e) {
-            throw new RuntimeException("Bulk update memberships of workspace " + workspaceId + " failed", e);
+            throw new RuntimeException("Bulk membership update for workspace " + workspaceId + " failed", e);
         }
     }
 
