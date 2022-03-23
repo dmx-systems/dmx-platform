@@ -355,6 +355,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @GET
+    @Path("/user/{username}/memberships")
+    @Override
+    public List<RelatedTopic> getMemberships(@PathParam("username") String username) {
+        try {
+            return getUsernameTopic(username).getRelatedTopics(MEMBERSHIP, DEFAULT, DEFAULT, WORKSPACE);
+        } catch (Exception e) {
+            throw new RuntimeException("Getting memberships of user \"" + username + "\" failed", e);
+        }
+    }
+
+    @GET
     @Path("/workspace/{workspaceId}/memberships")
     @Override
     public List<RelatedTopic> getMemberships(@PathParam("workspaceId") long workspaceId) {
@@ -382,6 +393,40 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public boolean isMember(String username, long workspaceId) {
         return dmx.getPrivilegedAccess().isMember(username, workspaceId);
+    }
+
+    @PUT
+    @Path("/user/{username}")
+    @Transactional
+    @Override
+    public List<RelatedTopic> bulkUpdateMemberships(@PathParam("username") String username,
+                                                    @QueryParam("addWorkspaceIds") IdList addWorkspaceIds,
+                                                    @QueryParam("removeWorkspaceIds") IdList removeWorkspaceIds) {
+        try {
+            List<Long> workspacesAdded = new ArrayList();
+            List<Long> workspacesRemoved = new ArrayList();
+            Topic usernameTopic = getUsernameTopic(username);
+            if (addWorkspaceIds != null) {
+                for (long workspaceId : addWorkspaceIds) {
+                    if (!isMember(username, workspaceId)) {
+                        createMembership(username, workspaceId);
+                        workspacesAdded.add(workspaceId);
+                    }
+                }
+            }
+            if (removeWorkspaceIds != null) {
+                for (long workspaceId : removeWorkspaceIds) {
+                    if (deleteMembershipIfExists(usernameTopic.getId(), workspaceId)) {
+                        workspacesRemoved.add(workspaceId);
+                    }
+                }
+            }
+            logger.info("### User \"" + username + "\": workspaces added " + workspacesAdded + ", workspaces removed " +
+                workspacesRemoved);
+            return getMemberships(username);
+        } catch (Exception e) {
+            throw new RuntimeException("Bulk membership update for user \"" + username + "\" failed", e);
+        }
     }
 
     @PUT

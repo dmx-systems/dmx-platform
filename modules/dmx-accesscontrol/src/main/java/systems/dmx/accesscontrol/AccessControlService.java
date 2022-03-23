@@ -171,7 +171,16 @@ public interface AccessControlService {
     // ---
 
     /**
-     * @return  a list of Username topics. The "relating" part is the Membership association.
+     * Returns the workspaces of the given user.
+     *
+     * @return      a list of Workspace topics. The "relating" part is the Membership association.
+     */
+    List<RelatedTopic> getMemberships(String username);
+
+    /**
+     * Returns the members of the given workspace.
+     *
+     * @return      a list of Username topics. The "relating" part is the Membership association.
      */
     List<RelatedTopic> getMemberships(long workspaceId);
 
@@ -193,7 +202,12 @@ public interface AccessControlService {
     boolean isMember(String username, long workspaceId);
 
     /**
-     * @return  a list of Username topics. The "relating" part is the Membership association.
+     * @return      a list of Username topics. The "relating" part is the Membership association.
+     */
+    List<RelatedTopic> bulkUpdateMemberships(String username, IdList addWorkspaceIds, IdList removeWorkspaceIds);
+
+    /**
+     * @return      a list of Username topics. The "relating" part is the Membership association.
      */
     List<RelatedTopic> bulkUpdateMemberships(long workspaceId, IdList addUserIds, IdList removeUserIds);
 
