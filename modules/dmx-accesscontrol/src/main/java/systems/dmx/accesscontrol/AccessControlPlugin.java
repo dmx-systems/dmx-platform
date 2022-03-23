@@ -382,6 +382,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
+    @Override
+    public Assoc getMembership(String username, long workspaceId) {
+        long userId = getUsernameTopic(username).getId();
+        return dmx.getAssocBetweenTopicAndTopic(MEMBERSHIP, userId, workspaceId, DEFAULT, DEFAULT);
+    }
+
     @POST
     @Path("/user/{username}/workspace/{workspaceId}")
     @Transactional
@@ -406,7 +412,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             List<Long> workspacesAdded = new ArrayList();
             List<Long> workspacesRemoved = new ArrayList();
-            Topic usernameTopic = getUsernameTopic(username);
             if (addWorkspaceIds != null) {
                 for (long workspaceId : addWorkspaceIds) {
                     if (!isMember(username, workspaceId)) {
@@ -417,7 +422,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
             if (removeWorkspaceIds != null) {
                 for (long workspaceId : removeWorkspaceIds) {
-                    if (deleteMembershipIfExists(usernameTopic.getId(), workspaceId)) {
+                    if (deleteMembershipIfExists(username, workspaceId)) {
                         workspacesRemoved.add(workspaceId);
                     }
                 }
@@ -452,7 +457,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             if (removeUserIds != null) {
                 for (long userId : removeUserIds) {
                     String username = getUsername(userId);
-                    if (deleteMembershipIfExists(userId, workspaceId)) {
+                    if (deleteMembershipIfExists(username, workspaceId)) {
                         usersRemoved.add(username);
                     }
                 }
@@ -798,10 +803,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return username.getSimpleValue().toString();
     }
 
-    private boolean deleteMembershipIfExists(long userId, long workspaceId) {
-        Assoc assoc = dmx.getAssocBetweenTopicAndTopic(MEMBERSHIP, userId, workspaceId, DEFAULT, DEFAULT);
-        if (assoc != null) {
-            assoc.delete();
+    private boolean deleteMembershipIfExists(String username, long workspaceId) {
+        Assoc membership = getMembership(username, workspaceId);
+        if (membership != null) {
+            membership.delete();
             return true;
         }
         return false;

@@ -196,13 +196,15 @@ public interface AccessControlService {
      */
     boolean isMember(String username, long workspaceId);
 
+    Assoc getMembership(String username, long workspaceId);
+
     /**
      * Makes the given user a member of the given workspace.
      */
     void createMembership(String username, long workspaceId);
 
     /**
-     * @return      a list of Username topics. The "relating" part is the Membership association.
+     * @return      a list of Workspace topics. The "relating" part is the Membership association.
      */
     List<RelatedTopic> bulkUpdateMemberships(String username, IdList addWorkspaceIds, IdList removeWorkspaceIds);
 
