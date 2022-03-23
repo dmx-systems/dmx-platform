@@ -185,11 +185,6 @@ public interface AccessControlService {
     List<RelatedTopic> getMemberships(long workspaceId);
 
     /**
-     * Makes the given user a member of the given workspace.
-     */
-    void createMembership(String username, long workspaceId);
-
-    /**
      * Checks if a user is a member of the given workspace.
      *
      * @param   username        the user.
@@ -200,6 +195,11 @@ public interface AccessControlService {
      * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
      */
     boolean isMember(String username, long workspaceId);
+
+    /**
+     * Makes the given user a member of the given workspace.
+     */
+    void createMembership(String username, long workspaceId);
 
     /**
      * @return      a list of Username topics. The "relating" part is the Membership association.

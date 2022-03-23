@@ -71,13 +71,13 @@ class AssocImpl extends DMXObjectImpl implements Assoc {
     @Override
     public final RelatedObject getDMXObjectByRole(String roleTypeUri) {
         DMXObjectModelImpl object = getModel().getDMXObjectByRole(roleTypeUri);
-        return object != null ? (RelatedObject) object.instantiate() : null;    // ### TODO: permission check?
+        return object != null ? object.instantiate() : null;        // ### TODO: permission check?
     }
 
     @Override
-    public final DMXObject getDMXObjectByType(String topicTypeUri) {
+    public final RelatedObject getDMXObjectByType(String topicTypeUri) {
         DMXObjectModelImpl object = getModel().getDMXObjectByType(topicTypeUri);
-        return object != null ? object.instantiate() : null;                    // ### TODO: permission check?
+        return object != null ? object.instantiate() : null;        // ### TODO: permission check?
     }
 
     // ---

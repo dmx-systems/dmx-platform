@@ -376,6 +376,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // TODO: RESTfullness
+    @Override
+    public boolean isMember(String username, long workspaceId) {
+        return dmx.getPrivilegedAccess().isMember(username, workspaceId);
+    }
+
     @POST
     @Path("/user/{username}/workspace/{workspaceId}")
     @Transactional
@@ -388,11 +394,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
         }
-    }
-
-    @Override
-    public boolean isMember(String username, long workspaceId) {
-        return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
     @PUT

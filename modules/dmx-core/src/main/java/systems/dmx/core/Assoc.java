@@ -44,14 +44,13 @@ public interface Assoc extends DMXObject {
 
     /**
      * TODO: rename method to "getPlayerObjectByType"
-     * TODO: return <O extends RelatedObject>
      *
      * @return  this association's topic which has the given type.
      *          If there is no such topic, null is returned.    ### FIXDOC
      *          <p>
      *          If there are 2 such topics an exception is thrown.
      */
-    DMXObject getDMXObjectByType(String topicTypeUri);
+    <O extends RelatedObject> O getDMXObjectByType(String topicTypeUri);
 
     // ---
 
