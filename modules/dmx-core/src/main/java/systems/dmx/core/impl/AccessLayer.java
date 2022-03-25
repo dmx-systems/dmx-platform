@@ -165,9 +165,9 @@ public final class AccessLayer {
 
     // ---
 
-    void updateTopic(TopicModelImpl updateModel) {
+    TopicImpl updateTopic(TopicModelImpl updateModel) {
         try {
-            updateTopic(
+            return updateTopic(
                 db.fetchTopic(updateModel.getId()),
                 updateModel
             );
@@ -177,10 +177,10 @@ public final class AccessLayer {
         }
     }
 
-    void updateTopic(TopicModelImpl topic, TopicModelImpl updateModel) {
+    TopicImpl updateTopic(TopicModelImpl topic, TopicModelImpl updateModel) {
         try {
             topic.checkWriteAccess();
-            topic.update(updateModel);
+            return topic.update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic " + topic.getId() + " failed", e);
         }

@@ -136,8 +136,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public void updateTopic(TopicModel updateModel) {
-        al.updateTopic((TopicModelImpl) updateModel);
+    public TopicImpl updateTopic(TopicModel updateModel) {
+        return al.updateTopic((TopicModelImpl) updateModel);
     }
 
     @Override

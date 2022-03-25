@@ -131,8 +131,7 @@ public class WebservicePlugin extends PluginActivator {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(topicId);
-        dmx.updateTopic(model);
-        return new DirectivesResponse();
+        return new DirectivesResponse(dmx.updateTopic(model));
     }
 
     @DELETE

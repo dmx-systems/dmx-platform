@@ -143,7 +143,7 @@ public interface CoreService {
 
     Topic createTopic(TopicModel model);
 
-    void updateTopic(TopicModel updateModel);
+    Topic updateTopic(TopicModel updateModel);
 
     void deleteTopic(long topicId);
 
@@ -231,6 +231,7 @@ public interface CoreService {
 
     Assoc createAssoc(AssocModel model);
 
+    // TODO: return Assoc
     void updateAssoc(AssocModel updateModel);
 
     void deleteAssoc(long assocId);

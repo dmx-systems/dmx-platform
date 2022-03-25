@@ -405,7 +405,7 @@ public class DMXObjectModelImpl implements DMXObjectModel {
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
      */
-    final void update(DMXObjectModelImpl updateModel) {
+    final <O extends DMXObject> O update(DMXObjectModelImpl updateModel) {
         try {
             logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
             DMXObjectModel oldObject = clone();
@@ -423,9 +423,10 @@ public class DMXObjectModelImpl implements DMXObjectModel {
             //
             // Note: in case of a type topic the instantiate() call above creates a cloned model
             // that doesn't reflect the update. Here we instantiate the now updated model.
-            DMXObject object = instantiate();
+            O object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, report, updateModel);
+            return object;
         } catch (Exception e) {
             throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
