@@ -157,7 +157,6 @@ public interface AccessControlService {
      * Returns the owner of a workspace.
      *
      * @return  The username of the owner, or <code>null</code> if no owner is set.
-     *          ### TODO: should throw an exception instead of returning null
      */
     String getWorkspaceOwner(long workspaceId);
 

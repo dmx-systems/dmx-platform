@@ -15,6 +15,7 @@ public interface WorkspacesService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    // DMX workspace
     static final String      DMX_WORKSPACE_NAME = "DMX";
     static final String      DMX_WORKSPACE_URI = "dmx.workspaces.dmx";
     static final SharingMode DMX_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
