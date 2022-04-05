@@ -412,18 +412,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             List<Long> workspacesAdded = new ArrayList();
             List<Long> workspacesRemoved = new ArrayList();
+            // To support applications which react on new memberships by creating further memberships programmatically,
+            // we do the removal first here. Otherwise the just created memberships would be immediately deleted.
+            if (removeWorkspaceIds != null) {
+                for (long workspaceId : removeWorkspaceIds) {
+                    if (deleteMembershipIfExists(username, workspaceId)) {
+                        workspacesRemoved.add(workspaceId);
+                    }
+                }
+            }
             if (addWorkspaceIds != null) {
                 for (long workspaceId : addWorkspaceIds) {
                     if (!isMember(username, workspaceId)) {
                         createMembership(username, workspaceId);
                         workspacesAdded.add(workspaceId);
-                    }
-                }
-            }
-            if (removeWorkspaceIds != null) {
-                for (long workspaceId : removeWorkspaceIds) {
-                    if (deleteMembershipIfExists(username, workspaceId)) {
-                        workspacesRemoved.add(workspaceId);
                     }
                 }
             }
@@ -445,20 +447,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             List<String> usersAdded = new ArrayList();
             List<String> usersRemoved = new ArrayList();
+            if (removeUserIds != null) {
+                for (long userId : removeUserIds) {
+                    String username = getUsername(userId);
+                    if (deleteMembershipIfExists(username, workspaceId)) {
+                        usersRemoved.add(username);
+                    }
+                }
+            }
             if (addUserIds != null) {
                 for (long userId : addUserIds) {
                     String username = getUsername(userId);
                     if (!isMember(username, workspaceId)) {
                         createMembership(username, workspaceId);
                         usersAdded.add(username);
-                    }
-                }
-            }
-            if (removeUserIds != null) {
-                for (long userId : removeUserIds) {
-                    String username = getUsername(userId);
-                    if (deleteMembershipIfExists(username, workspaceId)) {
-                        usersRemoved.add(username);
                     }
                 }
             }
