@@ -13,16 +13,14 @@ console.log('[DMX] 2022/04/09')
 // 1) Init dmx library
 // The dmx library must be inited *before* the dmx-webclient component is instantiated.
 // The dmx-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
-dmx.init({
+const typeCacheReady = dmx.init({
+  topicTypes: 'all',
   store,
   onHttpError,
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Populate type cache
-const typeCacheReady = store.dispatch('initTypeCache')
-
-// 3) Create Vue root instance
+// 2) Create Vue root instance
 // Instantiates router-view and dmx-webclient components.
 const root = new Vue({
   el: '#app',
@@ -31,7 +29,7 @@ const root = new Vue({
   render: h => h(App)
 })
 
-// 4) Load plugins + mount toplevel components
+// 3) Load plugins + mount toplevel components
 // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
 // boxes -- component mounting must perform not before all plugins are loaded.
 // Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
@@ -44,7 +42,7 @@ loadPlugins(extraElementUI).then(() => {
   store.dispatch('mountComponents', webclient)
 })
 
-// 5) Register own renderers
+// 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.icon',
@@ -61,7 +59,7 @@ store.dispatch('registerDetailRenderer', {
   component: require('./components/dmx-arrow-select').default
 })
 
-// 6) Initial navigation
+// 5) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
@@ -75,7 +73,7 @@ Promise.all([
   store.dispatch('initialNavigation')
 })
 
-// 7) Windows workaround to suppress the browser's native context menu on
+// 6) Windows workaround to suppress the browser's native context menu on
 //   - right-clicking the canvas (to invoke search/create dialog)
 //   - right-clicking a topic/assoc (to invoke Cytoscape context menu)
 //   - a dialog appears as the reaction of a Cytoscape context menu command
