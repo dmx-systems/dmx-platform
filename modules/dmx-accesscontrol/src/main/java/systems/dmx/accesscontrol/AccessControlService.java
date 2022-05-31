@@ -195,6 +195,10 @@ public interface AccessControlService {
      */
     boolean isMember(String username, long workspaceId);
 
+    /**
+     * @return      the Membership assoc between the given username and workspace, or <code>null</code> if the
+     *              user is not a member.
+     */
     Assoc getMembership(String username, long workspaceId);
 
     /**

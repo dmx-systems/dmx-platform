@@ -376,12 +376,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    // TODO: RESTfullness
+    // TODO: make it RESTful
     @Override
     public boolean isMember(String username, long workspaceId) {
         return dmx.getPrivilegedAccess().isMember(username, workspaceId);
     }
 
+    // TODO: make it RESTful
     @Override
     public Assoc getMembership(String username, long workspaceId) {
         long userId = getUsernameTopic(username).getId();
