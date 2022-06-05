@@ -588,7 +588,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
-        return al.sd.fetchTopic(USERNAME, username);
+        return al.sd.fetchTopic(USERNAME, username.toLowerCase());
     }
 
     private TopicModelImpl _getUsernameTopicOrThrow(String username) {
