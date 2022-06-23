@@ -120,8 +120,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @param   username        the logged in user, or <code>null</code> if no user is logged in.
      * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
      */
-     @Override
-     public boolean hasReadPermission(String username, long workspaceId) {
+    @Override
+    public boolean hasReadPermission(String username, long workspaceId) {
         SharingMode sharingMode = getSharingMode(workspaceId);
         switch (sharingMode) {
         case PRIVATE:
@@ -145,8 +145,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
      * @param   username        the logged in user, or <code>null</code> if no user is logged in.
      * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
      */
-     @Override
-     public boolean hasWritePermission(String username, long workspaceId) {
+    @Override
+    public boolean hasWritePermission(String username, long workspaceId) {
         SharingMode sharingMode = getSharingMode(workspaceId);
         switch (sharingMode) {
         case PRIVATE:

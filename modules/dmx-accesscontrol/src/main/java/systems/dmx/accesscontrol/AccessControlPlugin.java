@@ -385,8 +385,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // TODO: make it RESTful
     @Override
     public Assoc getMembership(String username, long workspaceId) {
-        long userId = getUsernameTopic(username).getId();
-        return dmx.getAssocBetweenTopicAndTopic(MEMBERSHIP, userId, workspaceId, DEFAULT, DEFAULT);
+        Topic usernameTopic = getUsernameTopic(username);
+        if (usernameTopic == null) {
+            throw new RuntimeException("Unknown username: \"" + username + "\"");
+        }
+        return dmx.getAssocBetweenTopicAndTopic(MEMBERSHIP, usernameTopic.getId(), workspaceId, DEFAULT, DEFAULT);
     }
 
     @POST
