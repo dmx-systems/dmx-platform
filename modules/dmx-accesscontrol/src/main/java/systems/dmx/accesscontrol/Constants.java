@@ -14,8 +14,8 @@ public class Constants {
     public static final String MEMBERSHIP     = "dmx.accesscontrol.membership";
 
     // Props (topic/assoc)
-    public static final String CREATOR        = "dmx.accesscontrol.creator";
     public static final String OWNER          = "dmx.accesscontrol.owner";
+    public static final String CREATOR        = "dmx.accesscontrol.creator";
     public static final String MODIFIER       = "dmx.accesscontrol.modifier";
 
     // Misc

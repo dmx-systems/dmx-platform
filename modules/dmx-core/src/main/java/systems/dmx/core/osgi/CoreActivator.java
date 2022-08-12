@@ -14,6 +14,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +61,7 @@ public class CoreActivator implements BundleActivator {
     public void start(BundleContext bundleContext) {
         try {
             logger.info("========== Starting \"DMX Core\" ==========");
+            logger.info("JVM locale: " + Locale.getDefault());
             this.bundleContext = bundleContext;
             //
             db = openDB(DATABASE_FACTORY, DATABASE_PATH);
