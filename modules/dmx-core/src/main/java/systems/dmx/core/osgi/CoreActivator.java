@@ -14,7 +14,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,8 +62,12 @@ public class CoreActivator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) {
         try {
+            TimeZone zone = TimeZone.getDefault();
             logger.info("========== Starting \"DMX Core\" ==========");
-            logger.info("JVM locale: " + Locale.getDefault());
+            logger.info("JVM defaults:\n  locale: " + Locale.getDefault() + "\n  time zone: \"" +
+                zone.getDisplayName() + "\", ID=" + zone.getID() + ", available IDs: " +
+                Arrays.toString(zone.getAvailableIDs()));
+            //
             this.bundleContext = bundleContext;
             //
             db = openDB(DATABASE_FACTORY, DATABASE_PATH);
