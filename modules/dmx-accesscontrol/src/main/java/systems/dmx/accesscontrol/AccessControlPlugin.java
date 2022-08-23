@@ -352,6 +352,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    @Override
+    public void enrichWithOwnerInfo(Topic workspace) {
+        workspace.getChildTopics().getModel().set(OWNER, getWorkspaceOwner(workspace.getId()));
+    }
+
     // ---
 
     @GET

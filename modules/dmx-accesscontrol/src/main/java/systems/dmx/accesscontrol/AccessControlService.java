@@ -167,6 +167,12 @@ public interface AccessControlService {
      */
     void setWorkspaceOwner(Topic workspace, String username);
 
+    /**
+     * Retrieves the OWNER and stores it in the given topic's model (under synthetic child type URI
+     * <code>dmx.accesscontrol.owner</code>).
+     */
+    void enrichWithOwnerInfo(Topic workspace);
+
     // ---
 
     /**
