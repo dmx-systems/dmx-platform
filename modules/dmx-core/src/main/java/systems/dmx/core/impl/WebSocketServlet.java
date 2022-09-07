@@ -34,23 +34,13 @@ public class WebSocketServlet extends org.eclipse.jetty.websocket.WebSocketServl
     @Override
     public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
         try {
-            checkProtocol(protocol);
-            return new WebSocketConnectionImpl(protocol, clientId(request), session(request), pool, dmx);
+            return new WebSocketConnectionImpl(clientId(request), session(request), pool, dmx);
         } catch (Exception e) {
-            throw new RuntimeException("Opening a WebSocket connection " +
-                (protocol != null ? "for plugin \"" + protocol + "\" " : "") + "failed", e);
+            throw new RuntimeException("Opening a WebSocket connection failed", e);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void checkProtocol(String pluginUri) {
-        if (pluginUri == null) {
-            throw new RuntimeException("A plugin URI is missing in the WebSocket handshake -- Add your " +
-                "plugin's URI as the 2nd argument to the JavaScript WebSocket constructor");
-        }
-        dmx.getPlugin(pluginUri);   // check plugin URI, throws if invalid
-    }
 
     private String clientId(HttpServletRequest request) {
         String clientId = JavaUtils.cookieValue(request, "dmx_client_id");

@@ -24,7 +24,6 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String pluginUri;   // TODO: drop
             String clientId;
     private HttpSession session;
     private WebSocketConnectionPool pool;
@@ -42,9 +41,7 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
     /**
      * @param   session     not null
      */
-    WebSocketConnectionImpl(String pluginUri, String clientId, HttpSession session, WebSocketConnectionPool pool,
-                                                                                    CoreService dmx) {
-        this.pluginUri = pluginUri;
+    WebSocketConnectionImpl(String clientId, HttpSession session, WebSocketConnectionPool pool, CoreService dmx) {
         this.clientId = clientId;
         this.session = session;
         this.pool = pool;
@@ -87,12 +84,11 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
     @Override
     public void onMessage(String message) {
         try {
-            dmx.dispatchEvent(pluginUri, CoreEvent.WEBSOCKET_TEXT_MESSAGE, message);
+            dmx.fireEvent(CoreEvent.WEBSOCKET_TEXT_MESSAGE, message);
         } catch (Exception e) {
             // Note: we don't rethrow to Jetty here. It would not log the exception's cause. DM's exception
             // mapper would not kick in either as the plugin is called from Jetty directly, not Jersey.
-            logger.log(Level.SEVERE, "An error occurred while dispatching a WebSocket message to plugin \"" +
-                pluginUri + "\":", e);
+            logger.log(Level.SEVERE, "An error occurred while processing WebSocket message \"" + message + "\"", e);
         }
     }
 
