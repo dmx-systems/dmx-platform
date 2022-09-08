@@ -6,9 +6,12 @@ import router from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
-import './websocket'
 
-console.log('[DMX] 2022/09/08')
+console.log('[DMX] 2022/09/08-2')
+
+const messageHandler = message => {
+  store.dispatch('_' + message.type, message.args)    // FIXME: use message bus instead of actions
+}
 
 // 1) Init dmx library
 // The dmx library must be inited *before* the dmx-webclient component is instantiated.
@@ -16,6 +19,7 @@ console.log('[DMX] 2022/09/08')
 const typeCacheReady = dmx.init({
   topicTypes: 'all',
   store,
+  messageHandler,
   onHttpError,
   iconRenderers: store.state.iconRenderers
 })
