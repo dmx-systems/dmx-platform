@@ -281,9 +281,25 @@ public interface AccessControlService {
 
     // === Authorization Methods ===
 
+    /**
+     * Returns the names of all authorization methods, as registered by {@link #registerAuthorizationMethod}.
+     *
+     * @return  the names of all registered authorization methods. Might be empty.
+     *          Note: authorization method "BASIC" is not included. This one is not registered by
+     *          {@link #registerAuthorizationMethod}, but is an integral part of the DMX platform.
+     */
     Set<String> getAuthorizationMethods();
 
+    /**
+     * Registers an authorization method under the given name, e.g. "LDAP".
+     *
+     * @throws  RuntimeException    if an authorization method is already registered under the given name.
+     */
     void registerAuthorizationMethod(String name, AuthorizationMethod am);
 
+    /**
+     * Unregisters the authorization method that has been registered under the given name.
+     * If no authorization method is registered under that name nothing happens.
+     */
     void unregisterAuthorizationMethod(String name);
 }
