@@ -29,10 +29,10 @@ import systems.dmx.core.service.event.IntroduceRoleType;
 import systems.dmx.core.service.event.IntroduceTopicType;
 import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
-import systems.dmx.core.service.event.PreDeleteTopic;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -57,8 +57,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                                                                                     IntroduceAssocType,
                                                                                     IntroduceRoleType,
                                                                                     PostCreateTopic,
-                                                                                    PostCreateAssoc,
-                                                                                    PreDeleteTopic {
+                                                                                    PostCreateAssoc {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -136,6 +135,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return workspace;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed" + info, e);
+        }
+    }
+
+    @DELETE
+    @Path("/{workspaceId}")
+    @Transactional
+    @Override
+    public void deleteWorkspace(@PathParam("workspaceId") long workspaceId) {
+        try {
+            checkWorkspaceWriteAccess(workspaceId);
+            deleteWorkspaceContent(workspaceId);
+            dmx.getPrivilegedAccess().deleteWorkspaceTopic(workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting workspace " + workspaceId + " failed", e);
         }
     }
 
@@ -430,19 +443,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         _assignToWorkspace(assoc, workspaceId);
     }
 
-    // ---
-
-    /**
-     * When a workspace is about to be deleted its entire content must be deleted.
-     */
-    @Override
-    public void preDeleteTopic(Topic topic) {
-        if (topic.getTypeUri().equals(WORKSPACE)) {
-            long workspaceId = topic.getId();
-            deleteWorkspaceContent(workspaceId);
-        }
-    }
-
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -526,17 +526,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * @param   workspaceId     the workspace ID to check
      */
     private void checkAssignmentArgs(DMXObject object, long workspaceId) {
-        Topic workspace = dmx.getTopic(workspaceId);
-        String typeUri = workspace.getTypeUri();
-        if (!typeUri.equals(WORKSPACE)) {
-            throw new IllegalArgumentException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri +
-                "\")");
-        }
-        //
-        workspace.checkWriteAccess();       // throws AccessControlException
+        checkWorkspaceWriteAccess(workspaceId);
         if (object != null) {
             object.checkWriteAccess();      // throws AccessControlException
         }
+    }
+
+    private void checkWorkspaceWriteAccess(long workspaceId) {
+        Topic workspace = dmx.getTopic(workspaceId);
+        String typeUri = workspace.getTypeUri();
+        if (!typeUri.equals(WORKSPACE)) {
+            throw new RuntimeException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri + "\")");
+        }
+        workspace.checkWriteAccess();       // throws AccessControlException
     }
 
     // ---
@@ -545,6 +547,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // 1) delete instances by type
             // Note: also instances assigned to other workspaces must be deleted
+            // FIXME: privileged deletion; current user might have no WRITE access for other workspace
             for (Topic topicType : getAssignedTopics(workspaceId, TOPIC_TYPE)) {
                 String typeUri = topicType.getUri();
                 for (Topic topic : dmx.getTopicsByType(typeUri)) {
@@ -564,7 +567,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 topic.delete();
             }
             for (Assoc assoc : getAssignedAssocs(workspaceId)) {
-                assoc.delete();
+                // TODO: can't use AC constant -> cyclic dependency
+                // TODO: move Membership type to Workspaces module?
+                if (!assoc.getTypeUri().equals("dmx.accesscontrol.membership")) {
+                    assoc.delete();
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Deleting content of workspace " + workspaceId + " failed", e);

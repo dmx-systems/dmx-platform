@@ -30,6 +30,8 @@ public interface WorkspacesService {
      */
     Topic createWorkspace(String name, String uri, SharingMode sharingMode);
 
+    void deleteWorkspace(long workspaceId);
+
     // ---
 
     /**
