@@ -379,6 +379,18 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         return contextTracker.getValue();
     }
 
+    // ---
+
+    @Override
+    public void deleteWorkspaceTopic(long workspaceId) {
+        TopicModelImpl workspace = al.getTopic(workspaceId);
+        String typeUri = workspace.getTypeUri();
+        if (!typeUri.equals(WORKSPACE)) {
+            throw new RuntimeException("Topic " + workspaceId + " is not a workspace (but a \"" + typeUri + "\")");
+        }
+        al.deleteTopic(workspace);
+    }
+
 
 
     // === Topicmaps ===
@@ -564,7 +576,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = getTypeUri(workspaceId);
         if (!typeUri.equals(WORKSPACE)) {
-            throw new RuntimeException("Object " + workspaceId + " is not a workspace, but a \"" + typeUri + "\"");
+            throw new RuntimeException("Object " + workspaceId + " is not a workspace (but a \"" + typeUri + "\")");
         }
     }
 
@@ -654,8 +666,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             throw new RuntimeException("Unknown workspace \"" + uri + "\"");
         }
         if (!workspace.getTypeUri().equals(WORKSPACE)) {
-            throw new RuntimeException("Topic \"" + uri + "\" is not a workspace but a \"" + workspace.getTypeUri() +
-                "\"");
+            throw new RuntimeException("Topic \"" + uri + "\" is not a workspace (but a \"" + workspace.getTypeUri() +
+                "\")");
         }
         //
         return workspace;

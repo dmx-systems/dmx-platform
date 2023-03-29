@@ -299,7 +299,7 @@ public interface AccessControlService {
 
     /**
      * Unregisters the authorization method that has been registered under the given name.
-     * If no authorization method is registered under that name nothing happens.
+     * If no authorization method is registered under that name, nothing happens.
      */
     void unregisterAuthorizationMethod(String name);
 }
