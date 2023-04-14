@@ -300,6 +300,8 @@ public interface PrivilegedAccess {
      * Returns true if an "Email Address" (dmx.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>
+     * The Email Address search is case-insesitive.
+     * <p>
      * Access control is bypassed.
      */
     boolean emailAddressExists(String emailAddress);

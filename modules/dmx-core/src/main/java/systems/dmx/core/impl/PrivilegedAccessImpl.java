@@ -615,7 +615,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     private String _getUsername(String emailAddress) {
         String username = null;
-        for (TopicModelImpl emailAddressTopic : al.db.fetchTopics(EMAIL_ADDRESS, emailAddress)) {
+        // perform case-insesitive email address search
+        for (TopicModelImpl emailAddressTopic : al.db.queryTopicsFulltext(EMAIL_ADDRESS, emailAddress)) {
             TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(USER_MAILBOX, CHILD, PARENT, USERNAME);
             if (usernameTopic != null) {
                 if (username != null) {
