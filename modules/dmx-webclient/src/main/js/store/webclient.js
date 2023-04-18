@@ -3,11 +3,16 @@ import Vuex from 'vuex'
 import {MessageBox} from 'element-ui'
 import dmx from 'dmx-api'
 
+const RATIO = .7            // initial ratio of left/right panel width; must correspond with CSS variable
+                            // --detail-panel-trans-x in dmx-detail-panel.vue
+
 Vue.use(Vuex)
 
 window.addEventListener('resize', e => {
   // read state from view
-  store.dispatch('setResizerPos', document.querySelector('.dmx-topicmap-panel').clientWidth)
+  const pos = store.state.details.visible ? document.querySelector('.dmx-topicmap-panel').clientWidth :
+                                            RATIO * window.innerWidth
+  store.dispatch('setResizerPos', pos)
 })
 
 const state = {
@@ -24,8 +29,7 @@ const state = {
                             //    mount: [compDef]
                             // }
 
-  resizerPos: 0.7 * window.innerWidth,    // x coordinate in pixel (number); the initial value must correspond
-                                          // with CSS variable --detail-panel-trans-x in dmx-detail-panel.vue
+  resizerPos: RATIO * window.innerWidth,    // x coordinate in pixel (number)
 
   detailRenderers: {        // Registered detail renderers; comprises object renderers and value renderers:
     object: {},             // {
