@@ -453,7 +453,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                 // prepare downloading
                 if (request.getParameter("download") != null) {
                     logger.info("### Downloading file \"" + path + "\"");
-                    response.setHeader("Content-Disposition", "attachment;filename=" + path.getName());
+                    response.setHeader("Content-Disposition", "attachment; filename=\"" + path.getName() + "\"");
                 }
             }
         } catch (FileRepositoryException e) {
