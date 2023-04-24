@@ -398,6 +398,10 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
             !(player2 instanceof TopicPlayerModel) || player2.id == -1) {
             return;
         }
+        // For multi-value constituting assocs don't perform duplicate check
+        if (isMultiValueConstituent()) {
+            return;
+        }
         // Note: only readable assocs (access control) are considered
         for (AssocModelImpl assoc : al.getAssocs(typeUri, player1.id, player2.id, player1.roleTypeUri,
                                                                                   player2.roleTypeUri)) {
@@ -412,6 +416,23 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
                     ", existing assoc=" + assoc);
             }
         }
+    }
+
+    private boolean isMultiValueConstituent() {
+        PlayerModelImpl parent = getPlayerByRole(PARENT);
+        PlayerModelImpl child = getPlayerByRole(CHILD);
+        if (parent != null && child != null) {
+            String compDefUri = child.getTypeUri();
+            if (!typeUri.equals(COMPOSITION)) {
+                compDefUri += "#";
+                compDefUri += typeUri;
+            }
+            TypeModelImpl type = parent.getDMXObject().getType();   // TODO: optimization: get type w/o fetching object
+            if (type.hasCompDef(compDefUri) && type.getCompDef(compDefUri).getChildCardinalityUri().equals(MANY)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
