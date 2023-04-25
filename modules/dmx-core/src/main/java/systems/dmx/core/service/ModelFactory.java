@@ -183,7 +183,11 @@ public interface ModelFactory {
 
     TopicDeletionModel newTopicDeletionModel(long topicId);
 
+    TopicDeletionModel newTopicDeletionModel(long topicId, AssocModel relatingAssoc);
+
     TopicDeletionModel newTopicDeletionModel(String topicUri);
+
+    TopicDeletionModel newTopicDeletionModel(String topicUri, AssocModel relatingAssoc);
 
 
 

@@ -122,7 +122,7 @@ class ValueIntegrator {
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
             logger.fine("Referencing " + object);
-            return new UnifiedValue(object, ref.originalId);
+            return new UnifiedValue(object);
         } else {
             return new UnifiedValue();
         }
@@ -515,15 +515,12 @@ class ValueIntegrator {
             boolean newValueIsEmpty = newId == -1;
             // old value
             RelatedTopicModelImpl oldValue = null;
-            long originalId = childValue.originalId;
-            if (originalId != -1) {
+            long assocId = ((RelatedTopicModelImpl) childValue._newValues).getRelatingAssoc().getId();
+            if (assocId != -1) {
                 if (oldValues == null) {
-                    throw new RuntimeException("Tried to replace original topic " + originalId +
-                        " when there are no old topics (null)");
+                    throw new RuntimeException("Invalid assoc ID (" + assocId + ") in update request");
                 }
-                oldValue = findTopic(oldValues, originalId);
-            } else if (!newValueIsEmpty && oldValues != null) {
-                oldValue = findTopicOrNull(oldValues, newId);
+                oldValue = findTopic(oldValues, assocId);
             }
             boolean oldValueExists = oldValue != null;
             //
@@ -551,7 +548,7 @@ class ValueIntegrator {
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
-                removeTopic(oldValues, originalId);
+                removeTopic(oldValues, assocId);
             }
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
@@ -874,34 +871,34 @@ class ValueIntegrator {
     // --- Memory Access ---
 
     // TODO: make generic utility
-    private RelatedTopicModelImpl findTopic(List<RelatedTopicModelImpl> topics, long topicId) {
-        RelatedTopicModelImpl topic = findTopicOrNull(topics, topicId);
+    private RelatedTopicModelImpl findTopic(List<RelatedTopicModelImpl> topics, long assocId) {
+        RelatedTopicModelImpl topic = findTopicOrNull(topics, assocId);
         if (topic == null) {
-            throw new RuntimeException("Topic " + topicId + " not found in " + topics);
+            throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
         }
         return topic;
     }
 
     // TODO: make generic utility
-    private RelatedTopicModelImpl findTopicOrNull(List<RelatedTopicModelImpl> topics, long topicId) {
+    private RelatedTopicModelImpl findTopicOrNull(List<RelatedTopicModelImpl> topics, long assocId) {
         for (RelatedTopicModelImpl topic : topics) {
-            if (topic.id == topicId) {
+            if (topic.getRelatingAssoc().getId() == assocId) {
                 return topic;
             }
         }
         return null;
     }
 
-    private void removeTopic(List<RelatedTopicModelImpl> topics, long topicId) {
+    private void removeTopic(List<RelatedTopicModelImpl> topics, long assocId) {
         Iterator<RelatedTopicModelImpl> i = topics.iterator();
         while (i.hasNext()) {
             RelatedTopicModelImpl topic = i.next();
-            if (topic.id == topicId) {
+            if (topic.getRelatingAssoc().getId() == assocId) {
                 i.remove();
                 return;
             }
         }
-        throw new RuntimeException("Topic " + topicId + " not found in " + topics);
+        throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
     }
 
     /**
@@ -960,11 +957,6 @@ class ValueIntegrator {
                                             // Needed to update the assoc value once the parent assignment for this
                                             // value is created (updateAssignmentsMany()).
 
-        long originalId;                    // The ID of the value to be replaced by "value" (if "value" is not null)
-                                            // resp. the ID of the value to be removed (if "value" is null).
-                                            // Needed to update a multi-value (updateAssignmentsMany()).
-                                            // Saved here cause it is overwritten (integrate()).
-
         ChangeReportImpl report;
 
         private UnifiedValue() {
@@ -979,26 +971,16 @@ class ValueIntegrator {
         }
 
         private UnifiedValue(M value, boolean created) {
-            this(value, created, newValues.id);
-        }
-
-        private UnifiedValue(M value, long originalId) {
-            this(value, false, originalId);
-        }
-
-        private UnifiedValue(M value, boolean created, long originalId) {
             this.value = value;
             this.created = created;
             this._newValues = newValues;
-            this.originalId = originalId;
         }
 
         @Override
         public JSONObject toJSON() {
             try {
                 return new JSONObject()
-                    .put("value", value != null ? value.toJSON() : null)
-                    .put("originalId", originalId);
+                    .put("value", value != null ? value.toJSON() : null);
             } catch (Exception e) {
                 throw new RuntimeException("Serialization failed", e);
             }
