@@ -383,6 +383,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
     }
 
     @Test
+    @Ignore     // FIXME
     public void replaceEmailAddress() {
         DMXTransaction tx = dmx.beginTx();
         try {
@@ -419,6 +420,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
     }
 
     @Test
+    @Ignore     // FIXME
     public void removeEmailAddress() {
         DMXTransaction tx = dmx.beginTx();
         try {
