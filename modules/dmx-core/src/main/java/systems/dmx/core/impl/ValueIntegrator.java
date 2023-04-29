@@ -216,7 +216,7 @@ class ValueIntegrator {
             }
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
-            topic = al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
+            topic = createSingleTopic();
             created = true;
             logger.fine("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
@@ -256,7 +256,7 @@ class ValueIntegrator {
                                                                                 // List<UnifiedValue>; never null
             childValues.put(compDefUri, childValue);
         }
-        UnifiedValue value = unifyComposite(childValues);
+        UnifiedValue value = integrateChildValues(childValues);
         //
         // label calculation
         boolean updated = value.report != null ? value.report.hasChanges() : false;
@@ -308,13 +308,18 @@ class ValueIntegrator {
      *
      * @return  Result value: the unified value, or null if there was nothing to integrate.
      */
-    private UnifiedValue unifyComposite(Map<String, Object> childValues) {
+    private UnifiedValue integrateChildValues(Map<String, Object> childValues) {
         // Note: because a facet does not contribute to the value of a value object
         // a facet update is always an in-place modification
         if (isValueType() && !isFacetUpdate) {
-            return unifyChildTopics(childValues, type);
+            UnifiedValue parent = findParentTopic(childValues, type);
+            if (parent == null) {
+                parent = new UnifiedValue(createCompositeTopic(childValues), true);
+            }
+            return parent;
         } else {
-            UnifiedValue parent = identifyParent(childValues);
+            // modify parent topic in-place
+            UnifiedValue parent = identifyParentTopic(childValues);
             if (parent.value != null) {
                 ChangeReportImpl report = updateAssignments(parent, childValues);
                 parent.report = report;
@@ -324,7 +329,7 @@ class ValueIntegrator {
     }
 
     /**
-     * Identifies the parent to be updated in-place, or creates it.
+     * Identifies the parent to be modified in-place, or creates it.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -332,9 +337,9 @@ class ValueIntegrator {
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  Result value: the parent object, or null if there is no parent
+     * @return  Result value (wrapped in UnifiedValue): the parent object, or null if there is no parent
      */
-    private UnifiedValue identifyParent(Map<String, Object> childValues) {
+    private UnifiedValue identifyParentTopic(Map<String, Object> childValues) {
         if (targetObject != null) {
             return new UnifiedValue(targetObject);
         } else if (isAssoc) {
@@ -347,16 +352,19 @@ class ValueIntegrator {
                 newValues.id, newValues.uri, newValues.typeUri, _newValues.player1, _newValues.player2
             ));
         } else {
+            UnifiedValue parent = null;
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {
                 if (childValues.isEmpty()) {
                     return new UnifiedValue();
                 }
                 Map<String, Object> childTopics = identityChildValues(childValues, identityCompDefUris);
-                return unifyChildTopics(childTopics, identityCompDefUris);
-            } else {
-                return new UnifiedValue(createCompositeTopic(childValues), true);
+                parent = findParentTopic(childTopics, identityCompDefUris);
             }
+            if (parent == null) {
+                parent = new UnifiedValue(createSingleTopic(), true);
+            }
+            return parent;
         }
     }
 
@@ -520,7 +528,7 @@ class ValueIntegrator {
                 if (oldValues == null) {
                     throw new RuntimeException("Invalid assoc ID (" + assocId + ") in update request");
                 }
-                oldValue = findTopic(oldValues, assocId);
+                oldValue = findTopicByAssocId(oldValues, assocId);
             }
             boolean oldValueExists = oldValue != null;
             //
@@ -666,7 +674,7 @@ class ValueIntegrator {
     // ---
 
     /**
-     * Finds a parent topic in the DB that has the given child topics, or creates it.
+     * Finds a parent topic in the DB that has the given child topics.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -679,9 +687,10 @@ class ValueIntegrator {
      *
      * @param   compDefUris     only these child topics are respected
      *
-     * @return  Result value: the found (or created) parent topic, or null if there was nothing to integrate.
+     * @return  Result value (wrapped in UnifiedValue): the found (or created) parent topic, or null if there was
+     *          nothing to integrate. Null if no parent topic was found.
      */
-    private UnifiedValue unifyChildTopics(Map<String, Object> childValues, Iterable<String> compDefUris) {
+    private UnifiedValue findParentTopic(Map<String, Object> childValues, Iterable<String> compDefUris) {
         List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
         if (candidates == null) {
             return new UnifiedValue();
@@ -714,7 +723,7 @@ class ValueIntegrator {
             return new UnifiedValue(comp);
         } else {
             // logger.info("### no composite found, childValues=" + childValues);
-            return new UnifiedValue(createCompositeTopic(childValues), true);
+            return null;
         }
     }
 
@@ -824,10 +833,7 @@ class ValueIntegrator {
      *                          value: UnifiedValue or List<UnifiedValue>
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
-        TopicModelImpl parent = al.createSingleTopic(
-            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
-        );
-        logger.fine("### Creating composite " + parent.id + " (typeUri=\"" + type.uri + "\")");
+        TopicModelImpl parent = createSingleTopic();
         ChildTopicsModelImpl childTopics = parent.getChildTopics();
         for (String compDefUri : childValues.keySet()) {
             if (isOne(compDefUri)) {
@@ -847,6 +853,10 @@ class ValueIntegrator {
             }
         }
         return parent;
+    }
+
+    private TopicModelImpl createSingleTopic() {
+        return al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
     }
 
     // --- DB Access ---
@@ -871,22 +881,13 @@ class ValueIntegrator {
     // --- Memory Access ---
 
     // TODO: make generic utility
-    private RelatedTopicModelImpl findTopic(List<RelatedTopicModelImpl> topics, long assocId) {
-        RelatedTopicModelImpl topic = findTopicOrNull(topics, assocId);
-        if (topic == null) {
-            throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
-        }
-        return topic;
-    }
-
-    // TODO: make generic utility
-    private RelatedTopicModelImpl findTopicOrNull(List<RelatedTopicModelImpl> topics, long assocId) {
+    private RelatedTopicModelImpl findTopicByAssocId(List<RelatedTopicModelImpl> topics, long assocId) {
         for (RelatedTopicModelImpl topic : topics) {
             if (topic.getRelatingAssoc().getId() == assocId) {
                 return topic;
             }
         }
-        return null;
+        throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
     }
 
     private void removeTopic(List<RelatedTopicModelImpl> topics, long assocId) {
@@ -980,7 +981,8 @@ class ValueIntegrator {
         public JSONObject toJSON() {
             try {
                 return new JSONObject()
-                    .put("value", value != null ? value.toJSON() : null);
+                    .put("value", value != null ? value.toJSON() : null)
+                    .put("created", created);
             } catch (Exception e) {
                 throw new RuntimeException("Serialization failed", e);
             }
