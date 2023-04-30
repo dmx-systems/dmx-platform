@@ -329,7 +329,7 @@ class ValueIntegrator {
     }
 
     /**
-     * Identifies the parent to be modified in-place, or creates it.
+     * Identifies the parent topic to be modified in-place, or creates it.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -687,7 +687,7 @@ class ValueIntegrator {
      *
      * @param   compDefUris     only these child topics are respected
      *
-     * @return  Result value (wrapped in UnifiedValue): the found (or created) parent topic, or null if there was
+     * @return  Result value (wrapped in UnifiedValue): the found parent topic, or null if there was
      *          nothing to integrate. Null if no parent topic was found.
      */
     private UnifiedValue findParentTopic(Map<String, Object> childValues, Iterable<String> compDefUris) {

@@ -62,7 +62,7 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
     @Override
     public RelatedTopicModel clone() {
         try {
-            return (RelatedTopicModel) super.clone();
+            return (RelatedTopicModel) super.clone();       // FIXME: clone rel-assoc explicitly
         } catch (Exception e) {
             throw new RuntimeException("Cloning a RelatedTopicModel failed", e);
         }
