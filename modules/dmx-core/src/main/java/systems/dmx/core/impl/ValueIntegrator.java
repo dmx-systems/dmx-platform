@@ -687,8 +687,8 @@ class ValueIntegrator {
      *
      * @param   compDefUris     only these child topics are respected
      *
-     * @return  Result value (wrapped in UnifiedValue): the found parent topic, or null if there was
-     *          nothing to integrate. Null if no parent topic was found.
+     * @return  Result value (wrapped in UnifiedValue): the found parent topic, or null if there was nothing to
+     *          integrate. Null if no parent topic was found.
      */
     private UnifiedValue findParentTopic(Map<String, Object> childValues, Iterable<String> compDefUris) {
         List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
