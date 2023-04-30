@@ -11,9 +11,11 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
+import systems.dmx.core.util.DMXUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -393,10 +395,11 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // add 2nd Email Address
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // replace 1st Email Address
-            Topic ea1 = dmx.getTopicByValue(EMAIL_ADDRESS, new SimpleValue("me@example.com"));
-            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS,
-                mf.newTopicModel(ea1.getId(), new SimpleValue("me@example3.com"))
-            ));
+            List<? extends RelatedTopicModel> eams = person.getModel().getChildTopics().getTopics(EMAIL_ADDRESS);
+            RelatedTopicModel eam = DMXUtils.findByValue(new SimpleValue("me@example.com"), eams).clone();
+            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone the former
+            eam.setSimpleValue("me@example3.com");
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, eam));
             //
             // check memory
             List<RelatedTopic> emailAddresses = children.getTopics(EMAIL_ADDRESS);
