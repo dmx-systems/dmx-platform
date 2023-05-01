@@ -396,8 +396,8 @@ public class PersonTest extends CoreServiceTestEnvironment {
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // replace 1st Email Address
             List<? extends RelatedTopicModel> eams = person.getModel().getChildTopics().getTopics(EMAIL_ADDRESS);
-            RelatedTopicModel eam = DMXUtils.findByValue(new SimpleValue("me@example.com"), eams).clone();
             // Note: in order to re-use a retrieved-from-db model as an update model you have to clone the former
+            RelatedTopicModel eam = DMXUtils.findByValue(new SimpleValue("me@example.com"), eams).clone();
             eam.setSimpleValue("me@example3.com");
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, eam));
             //

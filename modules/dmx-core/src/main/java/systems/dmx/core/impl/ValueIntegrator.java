@@ -585,30 +585,7 @@ class ValueIntegrator {
         } else {
             // detect "update order" request
             if (oldValues != null && !parent.created) {
-                List<Long> oldAssocIds = oldValues.stream().map(
-                    childTopic -> childTopic.getRelatingAssoc().getId()
-                ).collect(Collectors.toList());
-                List<RelatedTopicModelImpl> newValues = childValues.stream().map(
-                    value -> (RelatedTopicModelImpl) value._newValues
-                ).collect(Collectors.toList());
-                List<Long> newAssocIds = newValues.stream().map(
-                    value -> value.getRelatingAssoc().getId()
-                ).collect(Collectors.toList());
-                if (!oldAssocIds.equals(newAssocIds)) {
-                    logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
-                    // update DB
-                    deleteSequence(_parent.id, compDef);
-                    createSequence(_parent.id, compDef, newValues);
-                    // update memory
-                    for (long assocId : newAssocIds) {
-                        int i = DMXUtils.indexOfAssoc(assocId, oldValues);
-                        if (i == -1) {
-                            throw new RuntimeException("Updating sequence order failed, assoc " + assocId +
-                                " not found in " + oldAssocIds);
-                        }
-                        oldValues.add(oldValues.remove(i));
-                    }
-                }
+                updateSequenceOrder(_parent.id, compDef, oldValues, childValues);
             }
         }
     }
@@ -640,6 +617,41 @@ class ValueIntegrator {
     }
 
     // --- Sequence ---
+
+    private void updateSequenceOrder(long parentTopicId, CompDefModel compDef, List<RelatedTopicModelImpl> oldValues,
+                                     List<UnifiedValue> childValues) {
+        try {
+            List<Long> oldAssocIds = oldValues.stream().map(
+                childTopic -> childTopic.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            List<RelatedTopicModelImpl> newValues = childValues.stream().map(
+                value -> (RelatedTopicModelImpl) value._newValues
+            ).collect(Collectors.toList());
+            List<Long> newAssocIds = newValues.stream().map(
+                value -> value.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            if (oldAssocIds.size() != newAssocIds.size() || newAssocIds.contains(-1L)) {
+                throw new IllegalArgumentException("assoc IDs " + oldAssocIds + " -> " + newAssocIds);
+            }
+            if (!oldAssocIds.equals(newAssocIds)) {
+                logger.info("### Updating sequence order \"" + compDef.getCompDefUri() + "\": " + oldAssocIds + " -> " +
+                    newAssocIds);
+                // update DB
+                deleteSequence(parentTopicId, compDef);
+                createSequence(parentTopicId, compDef, newValues);
+                // update memory
+                for (long assocId : newAssocIds) {
+                    int i = DMXUtils.indexOfAssoc(assocId, oldValues);
+                    if (i == -1) {
+                        throw new RuntimeException("assoc " + assocId + " not found in " + oldAssocIds);
+                    }
+                    oldValues.add(oldValues.remove(i));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating sequence order failed", e);
+        }
+    }
 
     private void createSequence(long parentTopicId, CompDefModel compDef, List<RelatedTopicModelImpl> values) {
         ChildTopicsSequence s = newChildTopicsSequence(parentTopicId, compDef);
