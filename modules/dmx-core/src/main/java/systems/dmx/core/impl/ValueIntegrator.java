@@ -643,7 +643,7 @@ class ValueIntegrator {
                 for (long assocId : newAssocIds) {
                     int i = DMXUtils.indexOfAssoc(assocId, oldValues);
                     if (i == -1) {
-                        throw new RuntimeException("assoc " + assocId + " not found in " + oldAssocIds);
+                        throw new IllegalArgumentException("assoc " + assocId + " not found in " + oldAssocIds);
                     }
                     oldValues.add(oldValues.remove(i));
                 }

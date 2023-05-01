@@ -396,7 +396,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // replace 1st Email Address
             List<? extends RelatedTopicModel> eams = person.getModel().getChildTopics().getTopics(EMAIL_ADDRESS);
-            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone the former
+            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone it
             RelatedTopicModel eam = DMXUtils.findByValue(new SimpleValue("me@example.com"), eams).clone();
             eam.setSimpleValue("me@example3.com");
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, eam));
@@ -429,11 +429,13 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // create Person
             Topic person = createPerson();
             ChildTopics children = person.getChildTopics();
-            Topic ea1 = children.getTopics(EMAIL_ADDRESS).get(0);
             // add 2nd Email Address
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, "me@example2.com"));
             // remove 1st Email Address
-            person.update(mf.newChildTopicsModel().addDeletionRef(EMAIL_ADDRESS, ea1.getId()));
+            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone it
+            RelatedTopicModel ea1 = children.getTopics(EMAIL_ADDRESS).get(0).getModel().clone();
+            ea1.setSimpleValue("");
+            person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, ea1));
             //
             // check memory
             List<RelatedTopic> emailAddresses = children.getTopics(EMAIL_ADDRESS);
