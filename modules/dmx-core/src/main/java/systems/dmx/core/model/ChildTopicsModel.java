@@ -285,11 +285,15 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // ---
 
+    // FIXME: drop it. Since we can have duplicate multi-values a topic ID is not sufficient, we need the assoc ID.
+    // Add a RelatedTopicModel with an empty topic value instead.
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      */
     ChildTopicsModel addDeletionRef(String compDefUri, long refTopicId);
 
+    // FIXME: drop it. Since we can have duplicate multi-values a topic URI is not sufficient, we need the assoc ID.
+    // Add a RelatedTopicModel with an empty topic value instead.
     /**
      * Adds a by-URI topic deletion reference to a multiple-valued child.
      */

@@ -434,7 +434,7 @@ public class PersonTest extends CoreServiceTestEnvironment {
             // remove 1st Email Address
             // Note: in order to re-use a retrieved-from-db model as an update model you have to clone it
             RelatedTopicModel ea1 = children.getTopics(EMAIL_ADDRESS).get(0).getModel().clone();
-            ea1.setSimpleValue("");
+            ea1.setSimpleValue("");     // setting empty value removes that child-topic assignment
             person.update(mf.newChildTopicsModel().add(EMAIL_ADDRESS, ea1));
             //
             // check memory

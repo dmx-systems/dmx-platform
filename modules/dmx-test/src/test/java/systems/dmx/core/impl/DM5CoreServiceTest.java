@@ -9,6 +9,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -77,7 +78,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void addDeletionRef_int() {
+    public void deleteMultivalue_int() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineLottoModel();
@@ -94,7 +95,10 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertSame(23, numbers.get(0).getSimpleValue().intValue());
             assertSame(42, numbers.get(1).getSimpleValue().intValue());
             //
-            draw.update(mf.newChildTopicsModel().addDeletionRef("lotto.number", numbers.get(0).getId()));
+            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone it
+            RelatedTopicModel num = numbers.get(0).getModel().clone();
+            num.setSimpleValue("");     // setting empty value removes that child-topic assignment
+            draw.update(mf.newChildTopicsModel().add("lotto.number", num));
             //
             draw = dmx.getTopic(drawId);
             numbers = draw.getChildTopics().getTopics("lotto.number");
@@ -106,7 +110,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void addDeletionRef_string() {
+    public void deleteMultivalue_string() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineManyNamesEntityModel();
@@ -126,7 +130,10 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("Alice", names.get(0).getSimpleValue().toString());
             assertEquals("Bob", names.get(1).getSimpleValue().toString());
             //
-            entity.update(mf.newChildTopicsModel().addDeletionRef(SIMPLE_NAME, names.get(0).getId()));
+            // Note: in order to re-use a retrieved-from-db model as an update model you have to clone it
+            RelatedTopicModel name = names.get(0).getModel().clone();
+            name.setSimpleValue("");    // setting empty value removes that child-topic assignment
+            entity.update(mf.newChildTopicsModel().add(SIMPLE_NAME, name));
             //
             entity = dmx.getTopic(entityId);
             names = entity.getChildTopics().getTopics(SIMPLE_NAME);
