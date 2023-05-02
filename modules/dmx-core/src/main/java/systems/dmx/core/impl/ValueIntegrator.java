@@ -122,7 +122,7 @@ class ValueIntegrator {
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
             logger.fine("Referencing " + object);
-            return new UnifiedValue(object, ref.originalId);
+            return new UnifiedValue(object);
         } else {
             return new UnifiedValue();
         }
@@ -216,7 +216,7 @@ class ValueIntegrator {
             }
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
-            topic = al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
+            topic = createSingleTopic();
             created = true;
             logger.fine("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
@@ -256,7 +256,7 @@ class ValueIntegrator {
                                                                                 // List<UnifiedValue>; never null
             childValues.put(compDefUri, childValue);
         }
-        UnifiedValue value = unifyComposite(childValues);
+        UnifiedValue value = integrateChildValues(childValues);
         //
         // label calculation
         boolean updated = value.report != null ? value.report.hasChanges() : false;
@@ -308,13 +308,18 @@ class ValueIntegrator {
      *
      * @return  Result value: the unified value, or null if there was nothing to integrate.
      */
-    private UnifiedValue unifyComposite(Map<String, Object> childValues) {
+    private UnifiedValue integrateChildValues(Map<String, Object> childValues) {
         // Note: because a facet does not contribute to the value of a value object
         // a facet update is always an in-place modification
         if (isValueType() && !isFacetUpdate) {
-            return unifyChildTopics(childValues, type);
+            UnifiedValue parent = findParentTopic(childValues, type);
+            if (parent == null) {
+                parent = new UnifiedValue(createCompositeTopic(childValues), true);
+            }
+            return parent;
         } else {
-            UnifiedValue parent = identifyParent(childValues);
+            // modify parent topic in-place
+            UnifiedValue parent = identifyParentTopic(childValues);
             if (parent.value != null) {
                 ChangeReportImpl report = updateAssignments(parent, childValues);
                 parent.report = report;
@@ -324,7 +329,7 @@ class ValueIntegrator {
     }
 
     /**
-     * Identifies the parent to be updated in-place, or creates it.
+     * Identifies the parent topic to be modified in-place, or creates it.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -332,9 +337,9 @@ class ValueIntegrator {
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  Result value: the parent object, or null if there is no parent
+     * @return  Result value (wrapped in UnifiedValue): the parent object, or null if there is no parent
      */
-    private UnifiedValue identifyParent(Map<String, Object> childValues) {
+    private UnifiedValue identifyParentTopic(Map<String, Object> childValues) {
         if (targetObject != null) {
             return new UnifiedValue(targetObject);
         } else if (isAssoc) {
@@ -347,16 +352,19 @@ class ValueIntegrator {
                 newValues.id, newValues.uri, newValues.typeUri, _newValues.player1, _newValues.player2
             ));
         } else {
+            UnifiedValue parent = null;
             List<String> identityCompDefUris = type.getIdentityAttrs();
             if (identityCompDefUris.size() > 0) {
                 if (childValues.isEmpty()) {
                     return new UnifiedValue();
                 }
                 Map<String, Object> childTopics = identityChildValues(childValues, identityCompDefUris);
-                return unifyChildTopics(childTopics, identityCompDefUris);
-            } else {
-                return new UnifiedValue(createCompositeTopic(childValues), true);
+                parent = findParentTopic(childTopics, identityCompDefUris);
             }
+            if (parent == null) {
+                parent = new UnifiedValue(createSingleTopic(), true);
+            }
+            return parent;
         }
     }
 
@@ -515,15 +523,12 @@ class ValueIntegrator {
             boolean newValueIsEmpty = newId == -1;
             // old value
             RelatedTopicModelImpl oldValue = null;
-            long originalId = childValue.originalId;
-            if (originalId != -1) {
+            long assocId = ((RelatedTopicModelImpl) childValue._newValues).getRelatingAssoc().getId();
+            if (assocId != -1) {
                 if (oldValues == null) {
-                    throw new RuntimeException("Tried to replace original topic " + originalId +
-                        " when there are no old topics (null)");
+                    throw new RuntimeException("Invalid assoc ID (" + assocId + ") in update request");
                 }
-                oldValue = findTopic(oldValues, originalId);
-            } else if (!newValueIsEmpty && oldValues != null) {
-                oldValue = findTopicOrNull(oldValues, newId);
+                oldValue = findTopicByAssocId(oldValues, assocId);
             }
             boolean oldValueExists = oldValue != null;
             //
@@ -551,7 +556,7 @@ class ValueIntegrator {
                 // update DB
                 oldValue.getRelatingAssoc().delete();
                 // update memory
-                removeTopic(oldValues, originalId);
+                removeTopic(oldValues, assocId);
             }
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
@@ -580,30 +585,7 @@ class ValueIntegrator {
         } else {
             // detect "update order" request
             if (oldValues != null && !parent.created) {
-                List<Long> oldAssocIds = oldValues.stream().map(
-                    childTopic -> childTopic.getRelatingAssoc().getId()
-                ).collect(Collectors.toList());
-                List<RelatedTopicModelImpl> newValues = childValues.stream().map(
-                    value -> (RelatedTopicModelImpl) value._newValues
-                ).collect(Collectors.toList());
-                List<Long> newAssocIds = newValues.stream().map(
-                    value -> value.getRelatingAssoc().getId()
-                ).collect(Collectors.toList());
-                if (!oldAssocIds.equals(newAssocIds)) {
-                    logger.info("### update order \"" + compDefUri + "\": " + oldAssocIds + " -> " + newAssocIds);
-                    // update DB
-                    deleteSequence(_parent.id, compDef);
-                    createSequence(_parent.id, compDef, newValues);
-                    // update memory
-                    for (long assocId : newAssocIds) {
-                        int i = DMXUtils.indexOfAssoc(assocId, oldValues);
-                        if (i == -1) {
-                            throw new RuntimeException("Updating sequence order failed, assoc " + assocId +
-                                " not found in " + oldAssocIds);
-                        }
-                        oldValues.add(oldValues.remove(i));
-                    }
-                }
+                updateSequenceOrder(_parent.id, compDef, oldValues, childValues);
             }
         }
     }
@@ -635,6 +617,41 @@ class ValueIntegrator {
     }
 
     // --- Sequence ---
+
+    private void updateSequenceOrder(long parentTopicId, CompDefModel compDef, List<RelatedTopicModelImpl> oldValues,
+                                     List<UnifiedValue> childValues) {
+        try {
+            List<Long> oldAssocIds = oldValues.stream().map(
+                childTopic -> childTopic.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            List<RelatedTopicModelImpl> newValues = childValues.stream().map(
+                value -> (RelatedTopicModelImpl) value._newValues
+            ).collect(Collectors.toList());
+            List<Long> newAssocIds = newValues.stream().map(
+                value -> value.getRelatingAssoc().getId()
+            ).collect(Collectors.toList());
+            if (oldAssocIds.size() != newAssocIds.size() || newAssocIds.contains(-1L)) {
+                throw new IllegalArgumentException("assoc IDs " + oldAssocIds + " -> " + newAssocIds);
+            }
+            if (!oldAssocIds.equals(newAssocIds)) {
+                logger.info("### Updating sequence order \"" + compDef.getCompDefUri() + "\": assoc IDs " +
+                    oldAssocIds + " -> " + newAssocIds);
+                // update DB
+                deleteSequence(parentTopicId, compDef);
+                createSequence(parentTopicId, compDef, newValues);
+                // update memory
+                for (long assocId : newAssocIds) {
+                    int i = DMXUtils.indexOfAssoc(assocId, oldValues);
+                    if (i == -1) {
+                        throw new IllegalArgumentException("assoc " + assocId + " not found in " + oldAssocIds);
+                    }
+                    oldValues.add(oldValues.remove(i));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating sequence order failed", e);
+        }
+    }
 
     private void createSequence(long parentTopicId, CompDefModel compDef, List<RelatedTopicModelImpl> values) {
         ChildTopicsSequence s = newChildTopicsSequence(parentTopicId, compDef);
@@ -669,7 +686,7 @@ class ValueIntegrator {
     // ---
 
     /**
-     * Finds a parent topic in the DB that has the given child topics, or creates it.
+     * Finds a parent topic in the DB that has the given child topics.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -682,9 +699,10 @@ class ValueIntegrator {
      *
      * @param   compDefUris     only these child topics are respected
      *
-     * @return  Result value: the found (or created) parent topic, or null if there was nothing to integrate.
+     * @return  Result value (wrapped in UnifiedValue): the found parent topic, or null if there was nothing to
+     *          integrate. Null if no parent topic was found.
      */
-    private UnifiedValue unifyChildTopics(Map<String, Object> childValues, Iterable<String> compDefUris) {
+    private UnifiedValue findParentTopic(Map<String, Object> childValues, Iterable<String> compDefUris) {
         List<? extends TopicModelImpl> candidates = parentCandidates(childValues);
         if (candidates == null) {
             return new UnifiedValue();
@@ -717,7 +735,7 @@ class ValueIntegrator {
             return new UnifiedValue(comp);
         } else {
             // logger.info("### no composite found, childValues=" + childValues);
-            return new UnifiedValue(createCompositeTopic(childValues), true);
+            return null;
         }
     }
 
@@ -827,10 +845,7 @@ class ValueIntegrator {
      *                          value: UnifiedValue or List<UnifiedValue>
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
-        TopicModelImpl parent = al.createSingleTopic(
-            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
-        );
-        logger.fine("### Creating composite " + parent.id + " (typeUri=\"" + type.uri + "\")");
+        TopicModelImpl parent = createSingleTopic();
         ChildTopicsModelImpl childTopics = parent.getChildTopics();
         for (String compDefUri : childValues.keySet()) {
             if (isOne(compDefUri)) {
@@ -850,6 +865,10 @@ class ValueIntegrator {
             }
         }
         return parent;
+    }
+
+    private TopicModelImpl createSingleTopic() {
+        return al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
     }
 
     // --- DB Access ---
@@ -874,34 +893,25 @@ class ValueIntegrator {
     // --- Memory Access ---
 
     // TODO: make generic utility
-    private RelatedTopicModelImpl findTopic(List<RelatedTopicModelImpl> topics, long topicId) {
-        RelatedTopicModelImpl topic = findTopicOrNull(topics, topicId);
-        if (topic == null) {
-            throw new RuntimeException("Topic " + topicId + " not found in " + topics);
-        }
-        return topic;
-    }
-
-    // TODO: make generic utility
-    private RelatedTopicModelImpl findTopicOrNull(List<RelatedTopicModelImpl> topics, long topicId) {
+    private RelatedTopicModelImpl findTopicByAssocId(List<RelatedTopicModelImpl> topics, long assocId) {
         for (RelatedTopicModelImpl topic : topics) {
-            if (topic.id == topicId) {
+            if (topic.getRelatingAssoc().getId() == assocId) {
                 return topic;
             }
         }
-        return null;
+        throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
     }
 
-    private void removeTopic(List<RelatedTopicModelImpl> topics, long topicId) {
+    private void removeTopic(List<RelatedTopicModelImpl> topics, long assocId) {
         Iterator<RelatedTopicModelImpl> i = topics.iterator();
         while (i.hasNext()) {
             RelatedTopicModelImpl topic = i.next();
-            if (topic.id == topicId) {
+            if (topic.getRelatingAssoc().getId() == assocId) {
                 i.remove();
                 return;
             }
         }
-        throw new RuntimeException("Topic " + topicId + " not found in " + topics);
+        throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
     }
 
     /**
@@ -960,11 +970,6 @@ class ValueIntegrator {
                                             // Needed to update the assoc value once the parent assignment for this
                                             // value is created (updateAssignmentsMany()).
 
-        long originalId;                    // The ID of the value to be replaced by "value" (if "value" is not null)
-                                            // resp. the ID of the value to be removed (if "value" is null).
-                                            // Needed to update a multi-value (updateAssignmentsMany()).
-                                            // Saved here cause it is overwritten (integrate()).
-
         ChangeReportImpl report;
 
         private UnifiedValue() {
@@ -979,18 +984,9 @@ class ValueIntegrator {
         }
 
         private UnifiedValue(M value, boolean created) {
-            this(value, created, newValues.id);
-        }
-
-        private UnifiedValue(M value, long originalId) {
-            this(value, false, originalId);
-        }
-
-        private UnifiedValue(M value, boolean created, long originalId) {
             this.value = value;
             this.created = created;
             this._newValues = newValues;
-            this.originalId = originalId;
         }
 
         @Override
@@ -998,7 +994,7 @@ class ValueIntegrator {
             try {
                 return new JSONObject()
                     .put("value", value != null ? value.toJSON() : null)
-                    .put("originalId", originalId);
+                    .put("created", created);
             } catch (Exception e) {
                 throw new RuntimeException("Serialization failed", e);
             }

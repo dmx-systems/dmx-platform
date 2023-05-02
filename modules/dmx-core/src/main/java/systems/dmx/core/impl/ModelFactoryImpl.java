@@ -312,10 +312,6 @@ public class ModelFactoryImpl implements ModelFactory {
                 if (val.has("value")) {
                     RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
                     if (topicRef != null) {
-                        // for updating multi-refs the original ID must be preserved
-                        if (topicRef instanceof TopicReferenceModelImpl && val.has("id")) {
-                            ((TopicReferenceModelImpl) topicRef).originalId = val.getLong("id");
-                        }
                         return topicRef;
                     }
                 }
@@ -359,9 +355,19 @@ public class ModelFactoryImpl implements ModelFactory {
                     return newTopicReferenceModel(topicUri);
                 }
             } else if (val.startsWith(DEL_ID_PREFIX)) {
-                return newTopicDeletionModel(delTopicId(val));
+                long topicId = delTopicId(val);
+                if (relatingAssoc != null) {
+                    return newTopicDeletionModel(topicId, relatingAssoc);
+                } else {
+                    return newTopicDeletionModel(topicId);
+                }
             } else if (val.startsWith(DEL_URI_PREFIX)) {
-                return newTopicDeletionModel(delTopicUri(val));
+                String topicUri = delTopicUri(val);
+                if (relatingAssoc != null) {
+                    return newTopicDeletionModel(topicUri, relatingAssoc);
+                } else {
+                    return newTopicDeletionModel(topicUri);
+                }
             }
         }
         return null;
@@ -595,8 +601,18 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
+    public TopicDeletionModel newTopicDeletionModel(long topicId, AssocModel relatingAssoc) {
+        return new TopicDeletionModelImpl(newRelatedTopicModel(topicId, relatingAssoc));
+    }
+
+    @Override
     public TopicDeletionModel newTopicDeletionModel(String topicUri) {
         return new TopicDeletionModelImpl(newRelatedTopicModel(topicUri));
+    }
+
+    @Override
+    public TopicDeletionModel newTopicDeletionModel(String topicUri, AssocModel relatingAssoc) {
+        return new TopicDeletionModelImpl(newRelatedTopicModel(topicUri, relatingAssoc));
     }
 
 

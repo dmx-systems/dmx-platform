@@ -31,13 +31,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Accesses a multiple-valued child.
      * Throws if there is no such child. ### TODO: explain why not return an empty list instead
      */
-    List<? extends RelatedTopicModel> getTopics(String compDefUri);
+    List<? extends RelatedTopicModel> getTopics(String compDefUri);             // TODO: remove "?" from API
 
     /**
      * Accesses a multiple-valued child.
      * Returns <code>null</code> if there is no such child. ### TODO: explain why not return an empty list instead
      */
-    List<? extends RelatedTopicModel> getTopicsOrNull(String compDefUri);
+    List<? extends RelatedTopicModel> getTopicsOrNull(String compDefUri);       // TODO: remove "?" from API
 
     // ---
 
@@ -285,11 +285,15 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // ---
 
+    // FIXME: drop it. Since we can have duplicate multi-values a topic ID is not sufficient, we need the assoc ID.
+    // Add a RelatedTopicModel with an empty topic value instead.
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      */
     ChildTopicsModel addDeletionRef(String compDefUri, long refTopicId);
 
+    // FIXME: drop it. Since we can have duplicate multi-values a topic URI is not sufficient, we need the assoc ID.
+    // Add a RelatedTopicModel with an empty topic value instead.
     /**
      * Adds a by-URI topic deletion reference to a multiple-valued child.
      */

@@ -124,7 +124,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             CompDefModel compDef = compDefs.remove(compDefUri);
             if (compDef == null) {
-                throw new RuntimeException("Comp def \"" + compDefUri + "\" not found in " + compDefs.keySet());
+                throw new RuntimeException("Type \"" + uri + "\" has no comp def \"" + compDefUri + "\", available: " +
+                    compDefs.keySet());
             }
             return compDef;
         } catch (Exception e) {
@@ -563,8 +564,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             }
         }
         if (compDefUris[0] == null) {
-            throw new RuntimeException("Comp def " + compDefId + " not found in comp defs of type \"" + uri +
-                "\" (" + compDefs.keySet() + ")");
+            throw new RuntimeException("Type \"" + uri + "\" has no comp def with ID " + compDefId + ", available: " +
+                compDefs.keySet());
         }
         return compDefUris;
     }
@@ -611,7 +612,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private CompDefModelImpl getCompDefOrThrow(String compDefUri) {
         CompDefModelImpl compDef = _getCompDef(compDefUri);
         if (compDef == null) {
-            throw new RuntimeException("Comp def \"" + compDefUri + "\" not found in " + compDefs.keySet());
+            throw new RuntimeException("Type \"" + uri + "\" has no comp def \"" + compDefUri + "\", available: " +
+                compDefs.keySet());
         }
         return compDef;
     }

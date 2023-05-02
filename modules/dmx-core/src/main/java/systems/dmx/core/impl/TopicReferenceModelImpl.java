@@ -11,10 +11,6 @@ import java.util.List;
 
 class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicReferenceModel {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    long originalId = -1;
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TopicReferenceModelImpl(RelatedTopicModelImpl relatedTopic) {

@@ -63,5 +63,5 @@ public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     // === Java API ===
 
-    DMXObjectModel clone();
+    DMXObjectModel clone();     // TODO: make generic
 }
