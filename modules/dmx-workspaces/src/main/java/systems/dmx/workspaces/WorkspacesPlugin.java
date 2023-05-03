@@ -14,6 +14,7 @@ import systems.dmx.core.AssocType;
 import systems.dmx.core.CompDef;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -392,7 +393,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void postCreateTopic(Topic topic) {
         // Note: when editing a workspace its parts ("Workspace Name" and "Workspace Description") must not be assigned
         // to the workspace itself. This would create an endless recursion while bubbling the modification timestamp.
-        if (isWorkspacePart(topic)) {
+        if (isWorkspaceConstituent(topic)) {
             return;
         }
         //
@@ -419,7 +420,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void postCreateAssoc(Assoc assoc) {
         // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
-        if (isWorkspaceAssignment(assoc)) {
+        if (isWorkspaceConstituent(assoc)) {
             return;
         }
         //
@@ -579,14 +580,35 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return object.getUri().startsWith("dmx.");
     }
 
-    private boolean isWorkspacePart(Topic topic) {
+    // Workspace constituents get no workspace assignments itself. They might land in the wrong workspace and would
+    // be accidentally deleted along with it. (We don't assign to the workspace itself for pragmatic reasons.)
+    // Note: while updating a workspace new Name and Description topics might be created.
+    private boolean isWorkspaceConstituent(Topic topic) {
         String typeUri = topic.getTypeUri();
         return typeUri.equals(WORKSPACE_NAME) ||
                typeUri.equals(WORKSPACE_DESCRIPTION);
     }
 
-    private boolean isWorkspaceAssignment(Assoc assoc) {
-        return assoc.getTypeUri().equals(WORKSPACE_ASSIGNMENT);
+    // Workspace constituents get no workspace assignments itself. They might land in the wrong workspace and would
+    // be accidentally deleted along with it. (We don't assign to the workspace itself for pragmatic reasons.)
+    // Note: while updating a workspace new associations to Name, Description and Sharing Mode topics might be created.
+    // Note: we don't rely on Composition associations to allow applications to rely on custom types.
+    private boolean isWorkspaceConstituent(Assoc assoc) {
+        if (assoc.getTypeUri().equals(WORKSPACE_ASSIGNMENT)) {
+            return true;
+        } else {
+            RelatedObject parent = assoc.getDMXObjectByRole(PARENT);
+            RelatedObject child = assoc.getDMXObjectByRole(CHILD);
+            if (parent != null && child != null) {
+                String typeUri = child.getTypeUri();
+                if (parent.getTypeUri().equals(WORKSPACE) && (typeUri.equals(WORKSPACE_NAME) ||
+                                                              typeUri.equals(WORKSPACE_DESCRIPTION) ||
+                                                              typeUri.equals(SHARING_MODE))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // ---
