@@ -1,6 +1,7 @@
 package systems.dmx.webservice;
 
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
 import systems.dmx.core.DMXObject;
@@ -19,11 +20,13 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.DirectivesResponse;
+import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.PluginInfo;
 import systems.dmx.core.service.QueryResult;
 import systems.dmx.core.service.TopicResult;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.IdList;
+import systems.dmx.workspaces.WorkspacesService;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -54,6 +57,8 @@ import java.util.logging.Logger;
 public class WebservicePlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    @Inject private WorkspacesService ws;
 
     private Messenger me = new Messenger("systems.dmx.webclient");
 
@@ -585,6 +590,8 @@ public class WebservicePlugin extends PluginActivator {
             dmx.deleteTopicType(t.getUri());
         } else if (typeUri.equals(ASSOC_TYPE)) {
             dmx.deleteAssocType(t.getUri());
+        } else if (typeUri.equals(WORKSPACE)) {
+            ws.deleteWorkspace(id);
         } else {
             dmx.deleteTopic(id);
         }

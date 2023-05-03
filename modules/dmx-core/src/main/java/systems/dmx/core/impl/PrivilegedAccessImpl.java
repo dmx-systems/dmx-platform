@@ -215,7 +215,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             }
             throw new RuntimeException("User \"" + username + "\" has no private workspace");
         } catch (Exception e) {
-            throw new RuntimeException("Private workspace of user \"" + username + "\" can't be determined", e);
+            throw new RuntimeException("Getting private workspace of user \"" + username + "\" failed", e);
         }
     }
 
@@ -341,7 +341,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             }
             return workspaceId;
         } catch (Exception e) {
-            throw new RuntimeException("Workspace assignment of object " + objectId + " can't be determined", e);
+            throw new RuntimeException("Getting workspace assignment of object " + objectId + " failed", e);
         }
     }
 
@@ -574,9 +574,13 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     }
 
     private void checkWorkspaceId(long workspaceId) {
-        String typeUri = getTypeUri(workspaceId);
-        if (!typeUri.equals(WORKSPACE)) {
-            throw new RuntimeException("Object " + workspaceId + " is not a workspace (but a \"" + typeUri + "\")");
+        try {
+            String typeUri = getTypeUri(workspaceId);
+            if (!typeUri.equals(WORKSPACE)) {
+                throw new RuntimeException("Object " + workspaceId + " is not a workspace (but a \"" + typeUri + "\")");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Checking workspace ID " + workspaceId + " failed", e);
         }
     }
 

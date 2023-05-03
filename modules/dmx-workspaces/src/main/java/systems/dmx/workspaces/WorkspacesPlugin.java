@@ -76,14 +76,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject
-    private FacetsService facetsService;
-
-    @Inject
-    private TopicmapsService topicmapsService;
-
-    @Inject
-    private ConfigService configService;
+    @Inject private FacetsService facetsService;
+    @Inject private TopicmapsService topicmapsService;
+    @Inject private ConfigService configService;
 
     private Messenger me = new Messenger();
 
