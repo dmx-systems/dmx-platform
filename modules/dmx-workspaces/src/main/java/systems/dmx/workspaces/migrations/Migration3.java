@@ -1,9 +1,8 @@
 package systems.dmx.workspaces.migrations;
 
-import systems.dmx.workspaces.WorkspacesService;
-
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Migration;
+import systems.dmx.workspaces.WorkspacesService;
 
 
 

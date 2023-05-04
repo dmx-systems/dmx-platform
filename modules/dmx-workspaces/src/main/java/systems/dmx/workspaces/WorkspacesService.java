@@ -64,6 +64,9 @@ public interface WorkspacesService {
 
     /**
      * Assigns an object to a workspace.
+     *
+     * @param   workspaceId     The ID of the workspace to assign the object to.
+     *                          If -1 is given an existing workspace assignment is removed.
      */
     void assignToWorkspace(DMXObject object, long workspaceId);
 
@@ -75,6 +78,9 @@ public interface WorkspacesService {
      * <li>the direct comp defs (not recursively)</li>
      * <li>the direct comp def's view configs</li>
      * </ul>
+     *
+     * @param   workspaceId     The ID of the workspace to assign the type (and its parts) to.
+     *                          If -1 is given the existing workspace assignments are removed.
      */
     void assignTypeToWorkspace(DMXType type, long workspaceId);
 
@@ -84,6 +90,9 @@ public interface WorkspacesService {
      * <li>the role type</li>
      * <li>the role type's view config</li>
      * </ul>
+     *
+     * @param   workspaceId     The ID of the workspace to assign the role type (and its parts) to.
+     *                          If -1 is given the existing workspace assignments are removed.
      */
     void assignRoleTypeToWorkspace(RoleType roleType, long workspaceId);
 

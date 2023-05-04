@@ -19,6 +19,7 @@ import systems.dmx.core.RoleType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.DirectivesResponse;
@@ -500,13 +501,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     private void __assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
-        facetsService.updateFacet(object, WORKSPACE_FACET,
-            mf.newFacetValueModel(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT).setRef(workspaceId)
-        );
-        // Note: we are refering to an existing workspace. So we must set a topic *reference* (using setRef()).
+        FacetValueModel value = mf.newFacetValueModel(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT);
+        if (workspaceId != -1) {
+            value.setRef(workspaceId);
+        } else {
+            value.setDeletionRef(workspaceId);
+        }
+        facetsService.updateFacet(object, WORKSPACE_FACET, value);
         //
         // 2) store assignment property
-        object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
+        if (workspaceId != -1) {
+            object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
+        } else {
+            object.removeProperty(PROP_WORKSPACE_ID);
+        }
     }
 
     /**
@@ -519,10 +527,12 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * If any check fails an exception is thrown.
      *
      * @param   object          the object to check; if null no object check is performed
-     * @param   workspaceId     the workspace ID to check
+     * @param   workspaceId     the ID of the workspace to check; if -1 no workspace related checks are performed
      */
     private void checkAssignmentArgs(DMXObject object, long workspaceId) {
-        checkWorkspaceWriteAccess(workspaceId);
+        if (workspaceId != -1) {
+            checkWorkspaceWriteAccess(workspaceId);
+        }
         if (object != null) {
             object.checkWriteAccess();      // throws AccessControlException
         }
