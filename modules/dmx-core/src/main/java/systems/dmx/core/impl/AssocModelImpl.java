@@ -392,8 +392,9 @@ public class AssocModelImpl extends DMXObjectModelImpl implements AssocModel {
     private void duplicateCheck() {
         // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
         // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
-        // is not yet available in case this association is part of the player's composite structure.
+        // is not yet available in case this association is constitutional for the player's value.
         // Compare to DMXUtils.getPlayerModels()
+        // Compare to WorkspacesPlugin.isWorkspaceConstituent()
         if (!(player1 instanceof TopicPlayerModel) || player1.id == -1 ||
             !(player2 instanceof TopicPlayerModel) || player2.id == -1) {
             return;

@@ -603,15 +603,16 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Workspace constituents get no workspace assignments itself. They might land in the wrong workspace and would
     // be accidentally deleted along with it. (We don't assign to the workspace itself for pragmatic reasons.)
     // Note: while updating a workspace new associations to Name, Description and Sharing Mode topics might be created.
-    // Note: we don't rely on Composition associations to allow applications to rely on custom types.
-    // Note: we can't call assoc.getDMXObjectByRole() as this would build an entire object model, but its "value"
-    // is not yet available in case the given association is part of the player's composite structure.
-    // Compare to DMXUtils.getPlayerModels()
-    // Compare to AssocModelImpl.duplicateCheck()
     private boolean isWorkspaceConstituent(AssocModel assoc) {
         if (assoc.getTypeUri().equals(WORKSPACE_ASSIGNMENT)) {
             return true;
         } else {
+            // Note 1: we don't check the association's type (Composition) to allow applications to make use of custom
+            // types (ZW does).
+            // Note 2: we can't call assoc.getDMXObjectByRole() as this would build an entire object model, but its
+            // "value" is not yet available in case the given association is constitutional for the player's value.
+            // Compare to DMXUtils.getPlayerModels()
+            // Compare to AssocModelImpl.duplicateCheck()
             PlayerModel parent = assoc.getPlayerByRole(PARENT);
             PlayerModel child = assoc.getPlayerByRole(CHILD);
             if (parent != null && child != null) {

@@ -286,8 +286,9 @@ public class DMXUtils {
             return null;
         }
         // Note: we can't call playerModel.getDMXObject() as this would build an entire object model, but its "value"
-        // is not yet available in case the association is part of the player's composite structure.
+        // is not yet available in case the given association is constitutional for the player's value.
         // Compare to AssocModelImpl.duplicateCheck()
+        // Compare to WorkspacesPlugin.isWorkspaceConstituent()
         String t1 = r1.getTypeUri();
         String t2 = r2.getTypeUri();
         PlayerModel player1 = getPlayer(r1, r2, t1, t2, topicTypeUri1, 1);

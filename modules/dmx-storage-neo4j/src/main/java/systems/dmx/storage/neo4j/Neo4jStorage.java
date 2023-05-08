@@ -22,6 +22,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
@@ -45,6 +46,9 @@ import java.util.logging.Logger;
 public class Neo4jStorage implements DMXStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
+
+    // TODO: make it DB vendor agnostic; move to CoreActivator
+    private static final String KEEP_TX_LOG = System.getProperty("dmx.database.keep_tx_log", "2 days");
 
     // --- DB Property Keys ---
     private static final String KEY_NODE_TYPE = "nodeType";
@@ -90,7 +94,10 @@ public class Neo4jStorage implements DMXStorage {
 
     Neo4jStorage(String databasePath, ModelFactoryImpl mf) {
         try {
-            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
+            logger.info("##### Neo4j config:\n  keep_logical_logs=\"" + KEEP_TX_LOG + "\"");
+            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(databasePath)
+                .setConfig(GraphDatabaseSettings.keep_logical_logs, sanitizeConfig(KEEP_TX_LOG))
+                .newGraphDatabase();
             this.relTypeCache = new RelationtypeCache(neo4j);
             //
             // Note: index directories are created with the given names in dmx-db/index/lucene/node/
@@ -1228,6 +1235,20 @@ public class Neo4jStorage implements DMXStorage {
         Node n2 = assocIndex.get(KEY_URI, uri).getSingle();
         if (n1 != null || n2 != null) {
             throw new RuntimeException("URI \"" + uri + "\" is already taken");
+        }
+    }
+
+    /**
+     * Apparently the values of system properties created by Maven while parsing pom.xml are wrapped in double quotes
+     * if they're containing spaces. So in dev mode, when DMX platform is launched by Maven, they must be stripped.
+     * In production mode in contrast, when the system properties are read from .properties file, no double quotes are
+     * present.
+     */
+    private String sanitizeConfig(String value) {
+        if (value.startsWith("\"")) {
+            return value.substring(1, value.length() - 1);
+        } else {
+            return value;
         }
     }
 }

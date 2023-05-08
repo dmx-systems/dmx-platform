@@ -122,6 +122,7 @@
 
         <!-- Database -->
         <dmx.database.path>${project.basedir}/dmx-db</dmx.database.path>
+        <dmx.database.keep_tx_log>2 days</dmx.database.keep_tx_log>
 
         <!-- Logging -->
         <java.util.logging.config.file>
