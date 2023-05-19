@@ -892,16 +892,15 @@ class ValueIntegrator {
 
     // --- Memory Access ---
 
-    // TODO: make generic utility
     private RelatedTopicModelImpl findTopicByAssocId(List<RelatedTopicModelImpl> topics, long assocId) {
-        for (RelatedTopicModelImpl topic : topics) {
-            if (topic.getRelatingAssoc().getId() == assocId) {
-                return topic;
-            }
+        RelatedTopicModelImpl topic = DMXUtils.findByAssoc(assocId, topics);
+        if (topic == null) {
+            throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
         }
-        throw new RuntimeException("Topic with relating assoc " + assocId + " not found in " + topics);
+        return topic;
     }
 
+    // TODO: make generic utility (DMXUtils)
     private void removeTopic(List<RelatedTopicModelImpl> topics, long assocId) {
         Iterator<RelatedTopicModelImpl> i = topics.iterator();
         while (i.hasNext()) {

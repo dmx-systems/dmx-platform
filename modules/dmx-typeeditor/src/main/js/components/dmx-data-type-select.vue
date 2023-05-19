@@ -30,7 +30,7 @@ export default {
 
   props: {
     type: {   // the type whose data type to render
-      type: dmx.Type,
+      type: dmx.DMXType,
       required: true
     }
   },

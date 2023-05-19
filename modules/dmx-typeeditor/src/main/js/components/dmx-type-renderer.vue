@@ -35,7 +35,7 @@ export default {
 
   props: {
     object: {   // the type to render
-      type: dmx.Type,
+      type: dmx.DMXType,
       required: true
     }
   },
