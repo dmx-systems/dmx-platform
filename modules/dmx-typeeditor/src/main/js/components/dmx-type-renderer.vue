@@ -15,7 +15,8 @@
       <dmx-data-type-select v-else :type="type"></dmx-data-type-select>
     </div>
     <!-- Comp Defs -->
-    <dmx-comp-def-list :comp-defs="compDefs" :mode="mode" @comp-def-click="click"></dmx-comp-def-list>
+    <dmx-comp-def-list v-if="type.isComposite" :comp-defs="compDefs" :mode="mode" @comp-def-click="click">
+    </dmx-comp-def-list>
   </div>
 </template>
 
