@@ -57,7 +57,7 @@
         </developer>
     </developers>
 
-    <!-- For a description of the config properties see /dmx-distribution/conf/config.properties -->
+    <!-- For a description of the config properties see /modules/dmx-distribution/conf/config.properties -->
     <properties>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -135,6 +135,9 @@
         <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Time Zone -->
+        <!-- user.timezone>CET</user.timezone -->
 
         <!-- OSGi Container -->
         <org.osgi.framework.bootdelegation>javax.xml.*,org.xml.*,org.w3c.dom</org.osgi.framework.bootdelegation>
