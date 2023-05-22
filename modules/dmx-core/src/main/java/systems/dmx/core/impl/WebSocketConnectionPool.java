@@ -44,8 +44,7 @@ class WebSocketConnectionPool {
     void removeConnection(WebSocketConnectionImpl connection) {
         boolean removed = pool.remove(connection.clientId) != null;
         if (!removed) {
-            throw new RuntimeException("Can't remove WebSocket connection " + connection.clientId +
-                " (client ID) from pool");
+            throw new RuntimeException("Can't remove WebSocket connection " + connection.clientId + " from pool");
         }
     }
 

@@ -73,10 +73,11 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+        Object entity = null;
         try {
             em.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
-            Object entity = response.getEntity();
+            entity = response.getEntity();
             if (entity != null) {
                 //
                 // 1) Loading child topics
@@ -120,7 +121,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             //
             return response;
         } catch (Exception e) {
-            throw new RuntimeException("Response filtering failed", e);
+            throw new RuntimeException("Response filtering failed, entity=" + entity, e);
         }
     }
 

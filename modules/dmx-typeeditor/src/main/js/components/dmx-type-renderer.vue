@@ -5,8 +5,8 @@
     <!-- Type URI -->
     <div class="field">
       <div class="field-label">Type URI</div>
-      <div v-if="infoMode">{{object.uri}}</div>
-      <el-input v-else v-model="object.uri"></el-input><!-- eslint-disable-line vue/no-mutating-props -->
+      <div v-if="infoMode">{{type.uri}}</div>
+      <el-input v-else v-model="type.uri"></el-input><!-- eslint-disable-line vue/no-mutating-props -->
     </div>
     <!-- Data Type -->
     <div class="field">
@@ -24,10 +24,6 @@
 import dmx from 'dmx-api'
 
 export default {
-
-  created () {
-    // console.log('dmx-type-renderer created', this.type)
-  },
 
   mixins: [
     require('./mixins/info-mode').default,

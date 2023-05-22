@@ -440,8 +440,12 @@ public final class AccessLayer {
     }
 
     TopicTypeModelImpl getTopicTypeImplicitly(long topicId) {
-        checkTopicReadAccess(topicId);
-        return _getTopicType(typeUri(topicId));
+        try {
+            checkTopicReadAccess(topicId);
+            return _getTopicType(typeUri(topicId));
+        } catch (Exception e) {
+            throw new RuntimeException("Implicit type fetching for topic " + topicId + " failed", e);
+        }
     }
 
     // ---
@@ -451,8 +455,12 @@ public final class AccessLayer {
     }
 
     AssocTypeModelImpl getAssocTypeImplicitly(long assocId) {
-        checkAssocReadAccess(assocId);
-        return _getAssocType(typeUri(assocId));
+        try {
+            checkAssocReadAccess(assocId);
+            return _getAssocType(typeUri(assocId));
+        } catch (Exception e) {
+            throw new RuntimeException("Implicit type fetching for assoc " + assocId + " failed", e);
+        }
     }
 
     // ---
@@ -462,12 +470,17 @@ public final class AccessLayer {
     }
 
     RoleTypeModelImpl getRoleTypeImplicitly(long assocId, String roleTypeUri) {
-        AssocModelImpl assoc = getAssoc(assocId);           // includes READ check
-        if (assoc.playerCount(roleTypeUri) == 0) {
-            throw new IllegalArgumentException("Role type \"" + roleTypeUri + "\" not used by assoc " + assocId + ": " +
-                assoc);
+        try {
+            AssocModelImpl assoc = getAssoc(assocId);           // includes READ check
+            if (assoc.playerCount(roleTypeUri) == 0) {
+                throw new IllegalArgumentException("Role type \"" + roleTypeUri + "\" not used by assoc " + assocId +
+                    ": " + assoc);
+            }
+            return typeStorage.fetchRoleType(roleTypeUri);      // DB direct access. No permission check.
+        } catch (Exception e) {
+            throw new RuntimeException("Implicit role type fetching for assoc " + assocId + " failed, roleTypeUri=\"" +
+                roleTypeUri + "\"", e);
         }
-        return typeStorage.fetchRoleType(roleTypeUri);      // DB direct access. No permission check.
     }
 
     // ---
