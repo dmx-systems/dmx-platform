@@ -604,7 +604,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private TopicModelImpl _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
-        return al.sd.fetchTopic(USERNAME, username.toLowerCase());
+        return al.sd.queryTopicFulltext(USERNAME, username);        // username search is case-insensitive
     }
 
     private TopicModelImpl _getUsernameTopicOrThrow(String username) {
@@ -618,19 +618,15 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ---
 
     private String _getUsername(String emailAddress) {
-        String username = null;
-        // perform case-insesitive email address search
-        for (TopicModelImpl emailAddressTopic : al.db.queryTopicsFulltext(EMAIL_ADDRESS, emailAddress)) {
+        // email address search is case-insensitive
+        TopicModelImpl emailAddressTopic = al.sd.queryTopicFulltext(EMAIL_ADDRESS, emailAddress);
+        if (emailAddressTopic != null) {
             TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(USER_MAILBOX, CHILD, PARENT, USERNAME);
             if (usernameTopic != null) {
-                if (username != null) {
-                    throw new RuntimeException("Ambiguity: the Username assignment for email address \"" +
-                        emailAddress + "\" is not unique");
-                }
-                username = usernameTopic.getSimpleValue().toString();
+                return usernameTopic.getSimpleValue().toString();
             }
         }
-        return username;
+        return null;
     }
 
     private String _getEmailAddress(String username) {

@@ -65,7 +65,7 @@ public interface PrivilegedAccess {
     // ---
 
     /**
-     * Returns the Username topic that corresponds to a username.
+     * Returns the Username topic that corresponds to a username (case-insensitive).
      *
      * @return  the Username topic, or <code>null</code> if no such Username topic exists.
      */
@@ -300,7 +300,7 @@ public interface PrivilegedAccess {
      * Returns true if an "Email Address" (dmx.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>
-     * The Email Address search is case-insesitive.
+     * The Email Address search is case-insensitive.
      * <p>
      * Access control is bypassed.
      */

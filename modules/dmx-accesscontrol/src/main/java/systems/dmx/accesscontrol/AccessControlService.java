@@ -140,7 +140,7 @@ public interface AccessControlService {
     Topic createUsername(String username);
 
     /**
-     * Returns the "Username" topic for the specified username.
+     * Returns the "Username" topic for the specified username (case-insensitive).
      *
      * @param   username    a username. Must not be null.
      *

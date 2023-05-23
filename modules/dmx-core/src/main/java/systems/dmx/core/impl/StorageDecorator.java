@@ -31,7 +31,7 @@ public class StorageDecorator {
     // Note: not part of storage SPI as it is sole on-top convenience.
 
     /**
-     * Retrieves a single topic by exact value.
+     * Retrieves a single topic by exact value (case-sensitive).
      *
      * @return  The fetched topic, or <code>null</code> if no such topic exists.
      *
@@ -52,6 +52,31 @@ public class StorageDecorator {
             }
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic by value failed", e);
+        }
+    }
+
+    /**
+     * Retrieves a single topic by fulltext search (case-insensitive).
+     *
+     * @return  The fetched topic, or <code>null</code> if no such topic exists.
+     *
+     * @throws  RuntimeException    if more than one topic exists.
+     */
+    public TopicModelImpl queryTopicFulltext(String key, Object value) {
+        try {
+            List<TopicModelImpl> topics = db.queryTopicsFulltext(key, value);
+            int size = topics.size();
+            switch (size) {
+            case 0:
+                return null;
+            case 1:
+                return topics.get(0);
+            default:
+                throw new RuntimeException("Ambiguity: " + size + " topics do match, key=\"" + key + "\", value=" +
+                    value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Querying topic by value failed", e);
         }
     }
 
