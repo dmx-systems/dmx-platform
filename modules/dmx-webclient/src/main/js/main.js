@@ -7,7 +7,7 @@ import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 
-console.log('[DMX] 2023/05/23')
+console.log('[DMX] 5.3')
 
 const messageHandler = message => {
   store.dispatch('_' + message.type, message.args)    // FIXME: use message bus instead of actions

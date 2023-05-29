@@ -7,13 +7,13 @@
     <name>DMX Config</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-config</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.3</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 

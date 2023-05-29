@@ -7,13 +7,13 @@
     <name>DMX Test</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-test</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3</version>
         </dependency>
         <!--
             IMPORTANT: we depend on the following plugins just for their constants. However, we can't depend on any
@@ -35,22 +35,22 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-contacts</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-events</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-datetime</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-storage-neo4j</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3</version>
         </dependency>
     </dependencies>
 </project>
