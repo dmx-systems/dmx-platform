@@ -1,6 +1,7 @@
 maven-build:
   stage: build
   script:
+    - export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=350m"
     - node -v
     - npm -v
     - mvn clean install -P all,dist
