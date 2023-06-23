@@ -7,7 +7,7 @@
     <name>DMX Hot Deploy</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-hot-deploy</artifactId>
-    <version>5.3</version>
+    <version>5.3.1</version>
     <packaging>pom</packaging>
 
     <description>
@@ -18,7 +18,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.3</version>
+        <version>5.3.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
