@@ -38,6 +38,7 @@ import systems.dmx.core.service.event.CheckTopicReadAccess;
 import systems.dmx.core.service.event.CheckTopicWriteAccess;
 import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
+import systems.dmx.core.service.event.PostDeleteTopic;
 import systems.dmx.core.service.event.PostUpdateAssoc;
 import systems.dmx.core.service.event.PostUpdateTopic;
 import systems.dmx.core.service.event.PreCreateAssoc;
@@ -97,6 +98,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                           PreUpdateTopic,
                                                                                           PostCreateTopic,
                                                                                           PostCreateAssoc,
+                                                                                          PostDeleteTopic,
                                                                                           PostUpdateTopic,
                                                                                           PostUpdateAssoc,
                                                                                           ServiceRequestFilter,
@@ -745,6 +747,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         setModifier(assoc);
+    }
+
+    @Override
+    public void postDeleteTopic(TopicModel topic) {
+        if (topic.getTypeUri().equals(USERNAME)) {
+            String username = topic.getSimpleValue().toString();
+            Collection<Topic> workspaces = getWorkspacesByOwner(username);
+            String currentUser = getUsername();
+            logger.info("### Changing owner of " + workspaces.size() + " workspaces from \"" + username + "\" -> \"" +
+                currentUser + "\"");
+            for (Topic workspace : workspaces) {
+                setWorkspaceOwner(workspace, currentUser);
+            }
+        }
     }
 
     // ---
