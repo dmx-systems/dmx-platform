@@ -267,15 +267,13 @@ public interface AccessControlService {
 
     // === Retrieval ===
 
-    Collection<Topic> getTopicsByCreator(String username);
+    Collection<Topic> getWorkspacesByOwner(String username);
 
-    // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
-    Collection<Topic> getTopicsByOwner(String username);
+    Collection<Topic> getTopicsByCreator(String username);
 
     Collection<Assoc> getAssocsByCreator(String username);
 
-    // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
-    Collection<Assoc> getAssocsByOwner(String username);
+    // TODO: get Topics/Assocs by modifier?
 
 
 

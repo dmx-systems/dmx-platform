@@ -533,6 +533,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // === Retrieval ===
 
     @GET
+    @Path("/user/{username}/workspaces")
+    @Override
+    public Collection<Topic> getWorkspacesByOwner(@PathParam("username") String username) {
+        try {
+            List<Topic> workspaces = dmx.getTopicsByProperty(OWNER, username);
+            // Consistency check
+            for (Topic workspace : workspaces) {
+                if (!workspace.getTypeUri().equals(WORKSPACE)) {
+                    throw new RuntimeException("Consistency check failed: topic " + workspace.getId() +
+                        " is not a Workspace, but a \"" + workspace.getTypeUri() + "\"");
+                }
+            }
+            //
+            return workspaces;
+        } catch (Exception e) {
+            throw new RuntimeException("Getting workspaces owned by user \"" + username + "\" failed", e);
+        }
+    }
+
+    @GET
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
@@ -540,24 +560,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @GET
-    @Path("/owner/{username}/topics")
-    @Override
-    public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dmx.getTopicsByProperty(OWNER, username);
-    }
-
-    @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Assoc> getAssocsByCreator(@PathParam("username") String username) {
         return dmx.getAssocsByProperty(CREATOR, username);
-    }
-
-    @GET
-    @Path("/owner/{username}/assocs")
-    @Override
-    public Collection<Assoc> getAssocsByOwner(@PathParam("username") String username) {
-        return dmx.getAssocsByProperty(OWNER, username);
     }
 
 
