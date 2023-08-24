@@ -755,7 +755,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             String username = topic.getSimpleValue().toString();
             Collection<Topic> workspaces = getWorkspacesByOwner(username);
             String currentUser = getUsername();
-            logger.info("### Changing owner of " + workspaces.size() + " workspaces from \"" + username + "\" -> \"" +
+            logger.info("### Transferring ownership of " + workspaces.size() + " workspaces from \"" + username + "\" -> \"" +
                 currentUser + "\"");
             for (Topic workspace : workspaces) {
                 setWorkspaceOwner(workspace, currentUser);
