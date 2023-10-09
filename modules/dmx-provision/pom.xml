@@ -7,13 +7,13 @@
     <name>DMX Provision</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-provision</artifactId>
-    <version>5.3.2</version>
+    <version>5.3.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx</artifactId>
-        <version>5.3.2</version>
+        <version>5.3.3-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <!--
