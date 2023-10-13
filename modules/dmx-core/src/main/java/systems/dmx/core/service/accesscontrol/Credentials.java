@@ -15,7 +15,7 @@ public class Credentials {
 
     public String username;
     public String password;         // plain text
-    public String methodName;       // possibly uninitialized
+    public String methodName;       // auth method, e.g. "BASIC", "LDAP", possibly uninitialized
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

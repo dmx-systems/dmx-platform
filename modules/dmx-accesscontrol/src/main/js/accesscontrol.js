@@ -1,7 +1,4 @@
 import dmx from 'dmx-api'
-import SHA256 from './lib/sha256'
-
-const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
   username: undefined,      // the logged in user (String); falsish if no user is logged in
@@ -46,7 +43,7 @@ const actions = {
   },
 
   createUserAccount (_, {username, password}) {
-    return dmx.rpc.createUserAccount(username, encodePassword(password))
+    return dmx.rpc.createUserAccount(username, password)
   }
 }
 
@@ -55,12 +52,6 @@ const actions = {
 dmx.rpc.getUsername().then(username => {
   state.username = username
 })
-
-// helper
-
-function encodePassword (password) {
-  return ENCODED_PASSWORD_PREFIX + SHA256(password)
-}
 
 //
 
