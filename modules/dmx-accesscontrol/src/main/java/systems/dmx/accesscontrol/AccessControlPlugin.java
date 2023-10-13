@@ -270,7 +270,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         Topic userAccount = pa.runInWorkspaceContext(-1, () ->
             dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
                 .setRef(USERNAME, usernameTopic.getId())
-                .set(PASSWORD, cred.password)))
+                .set(PASSWORD, encodePassword(cred.password))))
         );
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
@@ -845,7 +845,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return false;
     }
 
-    // ### TODO: copy in Credentials.java
+    // ### TODO: copy in PrivilegedAccessImpl.java
     private String encodePassword(String password) {
         return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }

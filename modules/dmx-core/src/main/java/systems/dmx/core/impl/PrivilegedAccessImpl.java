@@ -15,6 +15,7 @@ import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.util.ContextTracker;
+import systems.dmx.core.util.JavaUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -191,7 +192,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         try {
             logger.info("##### Changing password for user \"" + cred.username + "\"");
             TopicModelImpl password = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
-            password._updateSimpleValue(new SimpleValue(cred.password));
+            password._updateSimpleValue(new SimpleValue(encodePassword(cred.password)));
         } catch (Exception e) {
             throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
         }
@@ -468,14 +469,14 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      *
-     * @param   password    The SHA256 encoded password.
+     * @param   password    password in plain text
      */
     private boolean matches(TopicModel usernameTopic, String password) {
         String _password = getPasswordTopic(usernameTopic).getSimpleValue().toString();     // SHA256 encoded
         if (!_password.startsWith(ENCODED_PASSWORD_PREFIX)) {
             throw new RuntimeException("Stored password is not SHA256 encoded");
         }
-        return _password.equals(password);
+        return _password.equals(encodePassword(password));
     }
 
     /**
@@ -513,6 +514,11 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
                 "\", userAccount=" + userAccount);
         }
         return password;
+    }
+
+    // ### TODO: copy in AccessControlPlugin.java
+    private String encodePassword(String password) {
+        return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }
 
     // ---

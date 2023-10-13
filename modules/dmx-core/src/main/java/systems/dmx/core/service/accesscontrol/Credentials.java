@@ -1,7 +1,5 @@
 package systems.dmx.core.service.accesscontrol;
 
-import systems.dmx.core.util.JavaUtils;
-
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.core.util.Base64;
@@ -9,40 +7,38 @@ import com.sun.jersey.core.util.Base64;
 
 
 /**
- * A pair of username and SHA256 encoded password.
+ * A pair of username and password (plain text).
  */
 public class Credentials {
-
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public String username;
-    public String password;             // SHA256 encoded
-    public String plaintextPassword;    // possibly uninitialized
-    public String methodName;           // possibly uninitialized
+    public String password;         // plain text
+    public String methodName;       // possibly uninitialized
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * Used to create an user account programmatically (via migration).
+     * Standard constructor.
+     *
+     * Used e.g. when creating an user account programmatically (via migration or plugin).
      *
      * @param   password    as plain text
      */
     public Credentials(String username, String password) {
         this.username = username;
-        this.password = encodePassword(password);
+        this.password = password;
     }
 
     /**
-     * Used to create an user account programmatically (via Webclient).
-     *
+     * Constructs Credentials from a JSON object.
      * Note: invoked from JAX-RS message body reader (see Webservice's ObjectProvider.java).
      *
+     * Used e.g. when an user account is created interactively (via Webclient).
+     *
      * @param   cred    A JSON object with 2 properties: "username" and "password".
-     *                  The password is expected to be SHA256 encoded.
+     *                  The password is expected to be plain text.
      */
     public Credentials(JSONObject cred) {
         try {
@@ -54,7 +50,7 @@ public class Credentials {
     }
 
     /**
-     * Used to authorize a request.
+     * Constructs Credentials from a request's Authorization header.
      */
     public Credentials(String authHeader) {
         String[] splitted = authHeader.split("\\s+");
@@ -70,20 +66,13 @@ public class Credentials {
         String username = values.length > 0 ? values[0] : "";
         String password = values.length > 1 ? values[1] : "";
         this.username = username;
-        this.password = encodePassword(password);
-        this.plaintextPassword = password;
+        this.password = password;
         this.methodName = method;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public String toString() {
-        return "username=\"" + username + "\", password=\""+ password + "\"";
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private String encodePassword(String password) {
-        return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
+        return "username=\"" + username + "\", password=\"" + password + "\"";
     }
 }
