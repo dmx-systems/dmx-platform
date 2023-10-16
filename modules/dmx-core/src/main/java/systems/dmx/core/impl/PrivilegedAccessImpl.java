@@ -192,13 +192,22 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public void changePassword(Credentials cred) {
         try {
-            logger.info("##### Changing password for user \"" + cred.username + "\"");
+            logger.info("##### Changing password of user \"" + cred.username + "\"");
             TopicModelImpl password = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
             password._updateSimpleValue(new SimpleValue(encodePassword(cred.password)));
             // TODO: salt password
         } catch (Exception e) {
-            throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
+            throw new RuntimeException("Changing password of user \"" + cred.username + "\" failed", e);
         }
+    }
+
+    @Override
+    public void saltPassword(Credentials cred, TopicModel passwordTopic) {
+        logger.info("### Salting password of user \"" + cred.username + "\"");
+        String salt = "abc123";         // TODO: 256 random bits (64 hex characters)
+        String hash = JavaUtils.encodeSHA256(salt + cred.password);
+        ((TopicModelImpl) passwordTopic).storeProperty(PROP_SALT, salt, false);     // addToIndex=false
+        ((TopicModelImpl) passwordTopic).updateSimpleValue(new SimpleValue(hash));
     }
 
     // ---
@@ -478,6 +487,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         TopicModelImpl passwordTopic = getPasswordTopic(usernameTopic);
         String storedHash = passwordTopic.getSimpleValue().toString();     // SHA256 hash
         String username = usernameTopic.getSimpleValue().toString();
+        Credentials cred = new Credentials(username, password);
         if (passwordTopic.hasProperty(PROP_SALT)) {
             logger.info("### Password of user \"" + username + "\" is already salted");
             String salt = (String) passwordTopic.getProperty(PROP_SALT);
@@ -485,8 +495,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         } else {
             boolean isMatch = storedHash.equals(encodePassword(password));
             if (isMatch) {
-                logger.info("### Salting password of user \"" + username + "\"");
-                saltPassword(password, passwordTopic);
+                _saltPassword(cred, passwordTopic);
             }
             return isMatch;
         }
@@ -529,20 +538,10 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         return password;
     }
 
-    /**
-     * Creates a salt for the given password, and
-     * 1) stores the salt as property of the given Password topic
-     * 2) stores the salted password hash as the value of the given Password topic.
-     *
-     * @param   password    valid password as provided by user, plain text
-     */
-    private void saltPassword(String password, TopicModelImpl passwordTopic) {
+    private void _saltPassword(Credentials cred, TopicModelImpl passwordTopic) {
         DMXTransaction tx = al.db.beginTx();
         try {
-            String salt = "abc123";         // TODO: 64 hex characters, 256 bits
-            String hash = JavaUtils.encodeSHA256(salt + password);
-            passwordTopic.storeProperty(PROP_SALT, salt, false);     // addToIndex=false
-            passwordTopic.updateSimpleValue(new SimpleValue(hash));
+            saltPassword(cred, passwordTopic);
             tx.success();
         } catch (Exception e) {
             throw new RuntimeException("Salting a password failed", e);

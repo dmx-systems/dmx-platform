@@ -11,6 +11,7 @@ import systems.dmx.config.ConfigTarget;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
+import systems.dmx.core.ChildTopics;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -731,11 +732,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // encode password
-            RelatedTopic passwordTopic = topic.getChildTopics().getTopic(PASSWORD);
+            // salt password
+            ChildTopics ct = topic.getChildTopics();
+            String username = ct.getTopic(USERNAME).getSimpleValue().toString();
+            RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
             String password = passwordTopic.getSimpleValue().toString();
-            passwordTopic.setSimpleValue(encodePassword(password));
-            // reassign workspace
+            Credentials cred = new Credentials(username, password);
+            dmx.getPrivilegedAccess().saltPassword(cred, passwordTopic.getModel());
+            // reassign workspace       // FIXME
             long workspaceId = getPrivateWorkspace().getId();
             ws.assignToWorkspace(passwordTopic, workspaceId);
             ws.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
