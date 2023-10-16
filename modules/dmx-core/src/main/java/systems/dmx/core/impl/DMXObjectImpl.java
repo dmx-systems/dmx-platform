@@ -215,12 +215,12 @@ abstract class DMXObjectImpl implements DMXObject {
 
     @Override
     public final Object getProperty(String propUri) {
-        return al.db.fetchProperty(getId(), propUri);
+        return model.getProperty(propUri);
     }
 
     @Override
     public final boolean hasProperty(String propUri) {
-        return al.db.hasProperty(getId(), propUri);
+        return model.hasProperty(propUri);
     }
 
     @Override

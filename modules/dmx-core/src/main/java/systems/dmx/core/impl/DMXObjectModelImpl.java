@@ -306,6 +306,14 @@ public class DMXObjectModelImpl implements DMXObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    Object getProperty(String propUri) {
+        return al.db.fetchProperty(id, propUri);
+    }
+
+    boolean hasProperty(String propUri) {
+        return al.db.hasProperty(id, propUri);
+    }
+
     void storeProperty(String propUri, Object propValue, boolean addToIndex) {
         throw new UnsupportedOperationException();
     }
