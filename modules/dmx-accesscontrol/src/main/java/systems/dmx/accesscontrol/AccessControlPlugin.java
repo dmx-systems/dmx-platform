@@ -124,9 +124,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String AUTHENTICATION_REALM = "DMX";
 
-    // ### TODO: copy in Credentials.java
-    private static final String ENCODED_PASSWORD_PREFIX = "-SHA256-";
-
     // Events
     private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUser.class) {
         @Override
@@ -268,15 +265,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Note: a User Account topic (and its child topics) requires special workspace assignments (see next step 3).
         // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
         // "assignToWorkspace" calls are required.)
+        String salt = JavaUtils.random256();
         Topic userAccount = pa.runInWorkspaceContext(-1, () ->
             dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
                 .setRef(USERNAME, usernameTopic.getId())
-                .set(PASSWORD, encodePassword(cred.password))))
+                .set(PASSWORD, JavaUtils.encodeSHA256(salt + cred.password))))
         );
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
         // Privileged assignToWorkspace() calls are required (instead of using the Workspaces service).
         Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
+        logger.info("### Salting password of user \"" + username + "\"");
+        passwordTopic.setProperty(SALT, salt, false);     // addToIndex=false
         long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
         pa.assignToWorkspace(userAccount, privateWorkspaceId);
         pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
@@ -732,7 +732,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // salt password
+            // salt password            // FIXME: only when actually changed
             ChildTopics ct = topic.getChildTopics();
             String username = ct.getTopic(USERNAME).getSimpleValue().toString();
             RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
@@ -847,11 +847,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return true;
         }
         return false;
-    }
-
-    // ### TODO: copy in PrivilegedAccessImpl.java
-    private String encodePassword(String password) {
-        return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }
 
     // --- Disk Quota ---

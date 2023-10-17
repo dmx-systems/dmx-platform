@@ -204,7 +204,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public void saltPassword(Credentials cred, TopicModel passwordTopic) {
         logger.info("### Salting password of user \"" + cred.username + "\"");
-        String salt = "abc123";         // TODO: 256 random bits (64 hex characters)
+        String salt = JavaUtils.random256();
         String hash = JavaUtils.encodeSHA256(salt + cred.password);
         ((TopicModelImpl) passwordTopic).storeProperty(PROP_SALT, salt, false);     // addToIndex=false
         ((TopicModelImpl) passwordTopic).updateSimpleValue(new SimpleValue(hash));
@@ -493,6 +493,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             String salt = (String) passwordTopic.getProperty(PROP_SALT);
             return storedHash.equals(JavaUtils.encodeSHA256(salt + password));
         } else {
+            // legacy account
             boolean isMatch = storedHash.equals(encodePassword(password));
             if (isMatch) {
                 _saltPassword(cred, passwordTopic);
@@ -550,7 +551,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         }
     }
 
-    // ### TODO: copy in AccessControlPlugin.java
+    // legacy accounts
     private String encodePassword(String password) {
         return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }

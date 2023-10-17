@@ -273,7 +273,7 @@ public class JavaUtils {
 
 
 
-    // === Encoding ===
+    // === Security ===
 
     /* static {
         for (Provider p : Security.getProviders()) {
@@ -283,6 +283,10 @@ public class JavaUtils {
             }
         }
     } */
+
+    public static String random256() {
+        return "abc123";         // TODO: 256 random bits (64 hex characters)
+    }
 
     public static String encodeSHA256(String data) {
         try {
