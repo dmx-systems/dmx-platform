@@ -21,7 +21,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import java.util.Map;
 import java.util.Scanner;
@@ -275,29 +275,24 @@ public class JavaUtils {
 
     // === Security ===
 
-    /* static {
-        for (Provider p : Security.getProviders()) {
-            System.out.println("### Security Provider " + p);
-            for (Provider.Service s : p.getServices()) {
-                System.out.println("        " + s);
-            }
-        }
-    } */
-
-    public static String random256() {
-        return "abc123";         // TODO: 256 random bits (64 hex characters)
-    }
-
+    // TODO: rename to e.g. sha256hash()
     public static String encodeSHA256(String data) {
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            return new String(encodeHex(sha256.digest(data.getBytes())));
-        } catch (NoSuchAlgorithmException e) {
+            return encodeHex(sha256.digest(data.getBytes()));
+        } catch (Exception e) {
             throw new RuntimeException("SHA256 encoding failed", e);
         }
     }
 
-    private static char[] encodeHex(byte[] data) {
+    public static String random256() {
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[32];    // 256 bits
+        random.nextBytes(bytes);
+        return encodeHex(bytes);
+    }
+
+    private static String encodeHex(byte[] data) {
         final String DIGITS = "0123456789abcdef";
         int l = data.length;
         char[] out = new char[l << 1];
@@ -306,6 +301,6 @@ public class JavaUtils {
             out[j++] = DIGITS.charAt((0xF0 & data[i]) >>> 4);
             out[j++] = DIGITS.charAt(0x0F & data[i]);
         }
-        return out;
+        return new String(out);
     }
 }
