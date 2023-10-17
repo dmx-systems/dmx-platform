@@ -738,7 +738,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
             String password = passwordTopic.getSimpleValue().toString();
             Credentials cred = new Credentials(username, password);
-            dmx.getPrivilegedAccess().saltPassword(cred, passwordTopic.getModel());
+            dmx.getPrivilegedAccess().storeSaltedPassword(cred, passwordTopic.getModel());
             // reassign workspace       // FIXME
             long workspaceId = getPrivateWorkspace().getId();
             ws.assignToWorkspace(passwordTopic, workspaceId);

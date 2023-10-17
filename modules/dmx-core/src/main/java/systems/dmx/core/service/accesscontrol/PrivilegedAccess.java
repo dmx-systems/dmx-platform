@@ -70,7 +70,7 @@ public interface PrivilegedAccess {
      *
      * @param   password    plain text
      */
-    void saltPassword(Credentials cred, TopicModel passwordTopic);
+    void storeSaltedPassword(Credentials cred, TopicModel passwordTopic);
 
     // ---
 

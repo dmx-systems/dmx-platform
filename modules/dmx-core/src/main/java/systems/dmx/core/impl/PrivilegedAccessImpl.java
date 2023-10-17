@@ -193,16 +193,15 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     public void changePassword(Credentials cred) {
         try {
             logger.info("##### Changing password of user \"" + cred.username + "\"");
-            TopicModelImpl password = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
-            password._updateSimpleValue(new SimpleValue(encodePassword(cred.password)));
-            // TODO: salt password
+            TopicModelImpl passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
+            storeSaltedPassword(cred, passwordTopic);
         } catch (Exception e) {
             throw new RuntimeException("Changing password of user \"" + cred.username + "\" failed", e);
         }
     }
 
     @Override
-    public void saltPassword(Credentials cred, TopicModel passwordTopic) {
+    public void storeSaltedPassword(Credentials cred, TopicModel passwordTopic) {
         logger.info("### Salting password of user \"" + cred.username + "\"");
         String salt = JavaUtils.random256();
         String hash = JavaUtils.encodeSHA256(salt + cred.password);
@@ -496,7 +495,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             // legacy account
             boolean isMatch = storedHash.equals(encodePassword(password));
             if (isMatch) {
-                _saltPassword(cred, passwordTopic);
+                _storeSaltedPassword(cred, passwordTopic);
             }
             return isMatch;
         }
@@ -539,10 +538,10 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         return password;
     }
 
-    private void _saltPassword(Credentials cred, TopicModelImpl passwordTopic) {
+    private void _storeSaltedPassword(Credentials cred, TopicModelImpl passwordTopic) {
         DMXTransaction tx = al.db.beginTx();
         try {
-            saltPassword(cred, passwordTopic);
+            storeSaltedPassword(cred, passwordTopic);
             tx.success();
         } catch (Exception e) {
             throw new RuntimeException("Salting a password failed", e);
