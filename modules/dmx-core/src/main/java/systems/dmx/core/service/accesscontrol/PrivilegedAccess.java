@@ -4,6 +4,7 @@ import systems.dmx.core.Assoc;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
+import systems.dmx.core.model.TopicModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -61,6 +62,15 @@ public interface PrivilegedAccess {
      *                  An user account with the given username must exist. (The username can't be changed.)
      */
     void changePassword(Credentials cred);
+
+    /**
+     * Creates a salt for the given credential's password, and
+     * 1) stores the salt as a property of the given Password topic
+     * 2) stores the salted password hash as the value of the given Password topic.
+     *
+     * @param   password    plain text
+     */
+    void storeSaltedPassword(Credentials cred, TopicModel passwordTopic);
 
     // ---
 

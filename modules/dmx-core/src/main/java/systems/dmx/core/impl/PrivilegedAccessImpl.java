@@ -14,6 +14,7 @@ import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.service.accesscontrol.SharingMode;
+import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.core.util.ContextTracker;
 import systems.dmx.core.util.JavaUtils;
 
@@ -52,6 +53,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     private static final String CONFIGURABLE         = "dmx.config.configurable";
 
     // Property URIs
+    private static final String PROP_SALT            = "dmx.accesscontrol.salt";            // for Password topics
     private static final String PROP_CREATOR         = "dmx.accesscontrol.creator";
     private static final String PROP_OWNER           = "dmx.accesscontrol.owner";
     private static final String PROP_WORKSPACE_ID    = "dmx.workspaces.workspace_id";
@@ -177,7 +179,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             if (usernameTopic == null) {
                 return null;
             }
-            if (!matches(usernameTopic, cred.password)) {
+            if (!isMatch(usernameTopic, cred.password)) {
                 return null;
             }
             return usernameTopic.instantiate();
@@ -190,12 +192,21 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public void changePassword(Credentials cred) {
         try {
-            logger.info("##### Changing password for user \"" + cred.username + "\"");
-            TopicModelImpl password = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
-            password._updateSimpleValue(new SimpleValue(encodePassword(cred.password)));
+            logger.info("##### Changing password of user \"" + cred.username + "\"");
+            TopicModelImpl passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
+            storeSaltedPassword(cred, passwordTopic);
         } catch (Exception e) {
-            throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
+            throw new RuntimeException("Changing password of user \"" + cred.username + "\" failed", e);
         }
+    }
+
+    @Override
+    public void storeSaltedPassword(Credentials cred, TopicModel passwordTopic) {
+        logger.info("### Salting password of user \"" + cred.username + "\"");
+        String salt = JavaUtils.random256();
+        String hash = JavaUtils.encodeSHA256(salt + cred.password);
+        ((TopicModelImpl) passwordTopic).storeProperty(PROP_SALT, salt, false);     // addToIndex=false
+        ((TopicModelImpl) passwordTopic).updateSimpleValue(new SimpleValue(hash));
     }
 
     // ---
@@ -469,14 +480,24 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      *
-     * @param   password    password in plain text
+     * @param   password    password provided by user, plain text
      */
-    private boolean matches(TopicModel usernameTopic, String password) {
-        String _password = getPasswordTopic(usernameTopic).getSimpleValue().toString();     // SHA256 encoded
-        if (!_password.startsWith(ENCODED_PASSWORD_PREFIX)) {
-            throw new RuntimeException("Stored password is not SHA256 encoded");
+    private boolean isMatch(TopicModel usernameTopic, String password) {
+        TopicModelImpl passwordTopic = getPasswordTopic(usernameTopic);
+        String storedHash = passwordTopic.getSimpleValue().toString();     // SHA256 hash
+        String username = usernameTopic.getSimpleValue().toString();
+        Credentials cred = new Credentials(username, password);
+        if (passwordTopic.hasProperty(PROP_SALT)) {
+            String salt = (String) passwordTopic.getProperty(PROP_SALT);
+            return storedHash.equals(JavaUtils.encodeSHA256(salt + password));
+        } else {
+            // legacy account
+            boolean isMatch = storedHash.equals(encodePassword(password));
+            if (isMatch) {
+                _storeSaltedPassword(cred, passwordTopic);
+            }
+            return isMatch;
         }
-        return _password.equals(encodePassword(password));
     }
 
     /**
@@ -516,7 +537,19 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         return password;
     }
 
-    // ### TODO: copy in AccessControlPlugin.java
+    private void _storeSaltedPassword(Credentials cred, TopicModelImpl passwordTopic) {
+        DMXTransaction tx = al.db.beginTx();
+        try {
+            storeSaltedPassword(cred, passwordTopic);
+            tx.success();
+        } catch (Exception e) {
+            throw new RuntimeException("Salting a password failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // used for legacy accounts
     private String encodePassword(String password) {
         return ENCODED_PASSWORD_PREFIX + JavaUtils.encodeSHA256(password);
     }
