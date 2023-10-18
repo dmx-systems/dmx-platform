@@ -271,15 +271,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 .setRef(USERNAME, usernameTopic.getId())
                 .set(PASSWORD, JavaUtils.encodeSHA256(salt + cred.password))))
         );
+        RelatedTopic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
+        passwordTopic.setProperty(SALT, salt, false);     // addToIndex=false
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
         // Privileged assignToWorkspace() calls are required (instead of using the Workspaces service).
-        Topic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
-        logger.info("### Salting password of user \"" + username + "\"");
-        passwordTopic.setProperty(SALT, salt, false);     // addToIndex=false
         long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
         pa.assignToWorkspace(userAccount, privateWorkspaceId);
         pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
+        pa.assignToWorkspace(passwordTopic.getRelatingAssoc(), privateWorkspaceId);
         //
         return usernameTopic;
     }
