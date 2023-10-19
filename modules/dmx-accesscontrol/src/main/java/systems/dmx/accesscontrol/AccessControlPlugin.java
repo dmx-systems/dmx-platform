@@ -271,6 +271,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 .setRef(USERNAME, usernameTopic.getId())
                 .set(PASSWORD, JavaUtils.encodeSHA256(salt + cred.password))))
         );
+        logger.info("### Salting password of user \"" + cred.username + "\"");
         RelatedTopic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
         passwordTopic.setProperty(SALT, salt, false);     // addToIndex=false
         // 3) assign user account and password to private workspace
@@ -719,12 +720,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preUpdateTopic(Topic topic, TopicModel updateModel) {
-        if (topic.getTypeUri().equals(USERNAME)) {
-            SimpleValue newUsername = updateModel.getSimpleValue();
-            String oldUsername = topic.getSimpleValue().toString();
-            if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
-                throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
-                    newUsername + "\")");
+        if (topic.getTypeUri().equals(USER_ACCOUNT)) {
+            TopicModel newUsernameTopic = updateModel.getChildTopics().getTopicOrNull(USERNAME);
+            if (newUsernameTopic != null) {
+                String newUsername = newUsernameTopic.getSimpleValue().toString();
+                String oldUsername = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
+                if (!newUsername.equals(oldUsername)) {
+                    throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
+                        newUsername + "\")");
+                }
             }
         }
     }
