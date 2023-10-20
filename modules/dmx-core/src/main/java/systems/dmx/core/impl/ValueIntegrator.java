@@ -498,6 +498,7 @@ class ValueIntegrator {
             }
             if (assoc != null) {
                 RelatedTopicModelImpl _newValues = newValues.getChildTopics().getTopicOrNull(compDefUri);
+                // RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;     // TODO
                 updateRelatingAssoc(assoc, compDefUri, _newValues);
             }
         } catch (Exception e) {
@@ -868,7 +869,10 @@ class ValueIntegrator {
     }
 
     private TopicModelImpl createSingleTopic() {
-        return al.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value));
+        return al.createSingleTopic(
+            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
+            // mf.newTopicModel(-1, newValues.uri, newValues.typeUri, newValues.value, newValues.childTopics)   // TODO
+        );
     }
 
     // --- DB Access ---

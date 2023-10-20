@@ -447,7 +447,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private long workspaceId(DMXObject object) {
         // 1) Object model (Workspace Facet)
-        TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
+        TopicModel workspace = object.getModel().getChildTopics().getTopicOrNull(
+            WORKSPACE + "#" + WORKSPACE_ASSIGNMENT
         );
         if (workspace != null) {
             logger.fine("==> " + info(object) + ": workspace " + workspace.getId() + " (from object model)");

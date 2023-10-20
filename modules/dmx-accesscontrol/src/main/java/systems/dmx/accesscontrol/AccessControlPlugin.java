@@ -19,6 +19,7 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.PlayerModel;
+// import systems.dmx.core.model.RelatedTopicModel;     // TODO
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -704,8 +705,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 }
             }
         );
-        // custom workspace assignment
         if (p != null) {
+            // custom workspace assignment
             long workspaceId = p[1].getId();
             assoc.getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
         }
@@ -721,6 +722,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preUpdateTopic(Topic topic, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
+            // Username
             TopicModel newUsernameTopic = updateModel.getChildTopics().getTopicOrNull(USERNAME);
             if (newUsernameTopic != null) {
                 String newUsername = newUsernameTopic.getSimpleValue().toString();
@@ -730,6 +732,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                         newUsername + "\")");
                 }
             }
+            // Password
+            /* RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);     // TODO
+            if (passwordTopic != null) {
+                long workspaceId = getPrivateWorkspace().getId();
+                passwordTopic.getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
+                passwordTopic.getRelatingAssoc().getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
+            } */
         }
     }
 
