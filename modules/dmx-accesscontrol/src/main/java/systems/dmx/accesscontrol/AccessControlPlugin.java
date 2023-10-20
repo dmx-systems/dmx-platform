@@ -725,19 +725,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Username
             TopicModel newUsernameTopic = updateModel.getChildTopics().getTopicOrNull(USERNAME);
             if (newUsernameTopic != null) {
+                String username = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
                 String newUsername = newUsernameTopic.getSimpleValue().toString();
-                String oldUsername = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
-                if (!newUsername.equals(oldUsername)) {
-                    throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
+                if (!newUsername.equals(username)) {
+                    throw new RuntimeException("A Username can't be changed (tried \"" + username + "\" -> \"" +
                         newUsername + "\")");
                 }
             }
-            // Password
-            /* RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);     // TODO
+            // Password workspace assignment        // TODO
+            /* RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
             if (passwordTopic != null) {
                 long workspaceId = getPrivateWorkspace().getId();
-                passwordTopic.getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
-                passwordTopic.getRelatingAssoc().getChildTopics().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, workspaceId);
+                String compDefUri = WORKSPACE + "#" + WORKSPACE_ASSIGNMENT;
+                passwordTopic.getChildTopics().setRef(compDefUri, workspaceId);
+                passwordTopic.getRelatingAssoc().getChildTopics().setRef(compDefUri, workspaceId);
             } */
         }
     }
@@ -745,14 +746,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // salt password            // FIXME: only when actually changed
+            // salt password
             ChildTopics ct = topic.getChildTopics();
-            String username = ct.getTopic(USERNAME).getSimpleValue().toString();
             RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
-            String password = passwordTopic.getSimpleValue().toString();
-            Credentials cred = new Credentials(username, password);
-            dmx.getPrivilegedAccess().storeSaltedPassword(cred, passwordTopic.getModel());
-            // reassign workspace       // FIXME
+            if (report.getChanges(PASSWORD) != null) {
+                String username = ct.getTopic(USERNAME).getSimpleValue().toString();
+                String password = passwordTopic.getSimpleValue().toString();
+                Credentials cred = new Credentials(username, password);
+                dmx.getPrivilegedAccess().storeSaltedPassword(cred, passwordTopic.getModel());
+            }
+            // reassign Password to workspace       // FIXME: initial assignment fails if current workspace not writable
             long workspaceId = getPrivateWorkspace().getId();
             ws.assignToWorkspace(passwordTopic, workspaceId);
             ws.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
