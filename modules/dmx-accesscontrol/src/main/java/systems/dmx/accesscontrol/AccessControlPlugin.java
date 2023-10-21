@@ -725,11 +725,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Username
             TopicModel newUsernameTopic = updateModel.getChildTopics().getTopicOrNull(USERNAME);
             if (newUsernameTopic != null) {
-                String username = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
                 String newUsername = newUsernameTopic.getSimpleValue().toString();
+                String username = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
                 if (!newUsername.equals(username)) {
                     throw new RuntimeException("A Username can't be changed (tried \"" + username + "\" -> \"" +
                         newUsername + "\")");
+                }
+            }
+            // Password
+            TopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
+            if (passwordTopic != null) {
+                String password = passwordTopic.getSimpleValue().toString();
+                if (password.equals("")) {
+                    throw new RuntimeException("Password can't be empty");
                 }
             }
             // Password workspace assignment        // TODO
