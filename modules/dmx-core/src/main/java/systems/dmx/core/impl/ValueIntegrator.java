@@ -34,6 +34,16 @@ import java.util.stream.Collectors;
  */
 class ValueIntegrator {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // ### TODO: copies in Constants.java of various plugins
+
+    // Topic Types
+    private static final String WORKSPACE = "dmx.workspaces.workspace";
+
+    // Assoc Types
+    private static final String WORKSPACE_ASSIGNMENT = "dmx.workspaces.workspace_assignment";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DMXObjectModelImpl newValues;
@@ -483,10 +493,12 @@ class ValueIntegrator {
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
             //
+            RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;
+            AssocModelImpl assocModel = newValues.getRelatingAssoc();
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(parent, newValue, compDefUri, deleted);
+                assoc = createChildAssoc(parent, newValue, compDefUri, assocModel, deleted);
                 // update memory
                 oldChildTopics.set(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
@@ -497,9 +509,7 @@ class ValueIntegrator {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl _newValues = newValues.getChildTopics().getTopicOrNull(compDefUri);
-                // RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;     // TODO
-                updateRelatingAssoc(assoc, compDefUri, _newValues);
+                updateRelatingAssoc(assoc, compDefUri, newValues);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childValue=" + childValue +
@@ -562,10 +572,12 @@ class ValueIntegrator {
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
             //
+            RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;
+            AssocModelImpl assocModel = newValues.getRelatingAssoc();
             AssocModelImpl assoc = null;
             if (!newValueIsEmpty && (!oldValueExists || valueChanged)) {
                 // update DB
-                assoc = createChildAssoc(_parent, newValue, compDefUri, valueChanged);
+                assoc = createChildAssoc(_parent, newValue, compDefUri, assocModel, valueChanged);
                 // update memory
                 oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
@@ -576,7 +588,6 @@ class ValueIntegrator {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;
                 updateRelatingAssoc(assoc, compDefUri, newValues);
             }
         }
@@ -841,6 +852,8 @@ class ValueIntegrator {
         }
     }
 
+    // --- DB Access ---
+
     /**
      * @param   childValues     key: compDefUri
      *                          value: UnifiedValue or List<UnifiedValue>
@@ -852,15 +865,15 @@ class ValueIntegrator {
             if (isOne(compDefUri)) {
                 TopicModel childTopic = ((UnifiedValue<TopicModelImpl>) childValues.get(compDefUri)).value;
                 if (childTopic != null) {
-                    AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);        // update DB
-                    childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
+                    AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri, null);      // update DB
+                    childTopics.set(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));            // update memory
                 }
             } else {
                 for (UnifiedValue<TopicModelImpl> value : (List<UnifiedValue>) childValues.get(compDefUri)) {
                     TopicModel childTopic = value.value;
                     if (childTopic != null) {
-                        AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri);    // update DB
-                        childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));    // update memory
+                        AssocModelImpl assoc = createChildAssoc(parent, childTopic, compDefUri, null);  // update DB
+                        childTopics.add(compDefUri, mf.newRelatedTopicModel(childTopic, assoc));        // update memory
                     }
                 }
             }
@@ -870,28 +883,28 @@ class ValueIntegrator {
 
     private TopicModelImpl createSingleTopic() {
         return al.createSingleTopic(
-            mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)
-            // mf.newTopicModel(-1, newValues.uri, newValues.typeUri, newValues.value, newValues.childTopics)   // TODO
+            mf.newTopicModel(-1, newValues.uri, newValues.typeUri, newValues.value, workspaceFacet(newValues))
         );
     }
-
-    // --- DB Access ---
 
     /**
      * Convenience
      */
-    private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri) {
-        return createChildAssoc(parent, child, compDefUri, false);
+    private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
+                                            AssocModelImpl assoc) {
+        return createChildAssoc(parent, child, compDefUri, assoc, false);
     }
 
     private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
-                                            boolean deleted) {
+                                            AssocModelImpl assoc, boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +
             compDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
-        return al.createAssoc(compDef(compDefUri).getInstanceLevelAssocTypeUri(),
+        return al.createAssoc(mf.newAssocModel(
+            compDef(compDefUri).getInstanceLevelAssocTypeUri(),
             parent.createPlayerModel(PARENT),
-            child.createPlayerModel(CHILD)
-        );
+            child.createPlayerModel(CHILD),
+            workspaceFacet(assoc)
+        ));
     }
 
     // --- Memory Access ---
@@ -936,6 +949,17 @@ class ValueIntegrator {
 
     // ---
 
+    private ChildTopicsModel workspaceFacet(DMXObjectModelImpl object) {
+        ChildTopicsModel ct = null;
+        if (object != null) {       // FIXME: object must not null
+            TopicModel ws = object.childTopics.getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT);
+            if (ws != null) {
+                ct = mf.newChildTopicsModel().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, ws.getId());
+            }
+        }
+        return ct;
+    }
+
     private CompDefModel compDef(String compDefUri) {
         if (!isFacetUpdate) {
             return type.getCompDef(compDefUri);
@@ -971,7 +995,7 @@ class ValueIntegrator {
 
         DMXObjectModelImpl _newValues;      // The original "update model" (`newValues`) that resulted in this value.
                                             // Needed to update the assoc value once the parent assignment for this
-                                            // value is created (updateAssignmentsMany()).
+                                            // value is created (updateAssignmentsOne(), updateAssignmentsMany()).
 
         ChangeReportImpl report;
 
