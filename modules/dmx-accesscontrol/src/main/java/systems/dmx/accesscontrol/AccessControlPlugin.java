@@ -19,7 +19,7 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.PlayerModel;
-// import systems.dmx.core.model.RelatedTopicModel;     // TODO
+import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -733,28 +733,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 }
             }
             // Password
-            TopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
+            RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
             if (passwordTopic != null) {
+                // empty check
                 String password = passwordTopic.getSimpleValue().toString();
                 if (password.equals("")) {
                     throw new RuntimeException("Password can't be empty");
                 }
-            }
-            // Password workspace assignment        // TODO
-            /* RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
-            if (passwordTopic != null) {
+                // workspace assignment
                 long workspaceId = getPrivateWorkspace().getId();
                 String compDefUri = WORKSPACE + "#" + WORKSPACE_ASSIGNMENT;
                 passwordTopic.getChildTopics().setRef(compDefUri, workspaceId);
                 passwordTopic.getRelatingAssoc().getChildTopics().setRef(compDefUri, workspaceId);
-            } */
+            }
         }
     }
 
     @Override
     public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
         if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // salt password
+            // salt+hash password
             ChildTopics ct = topic.getChildTopics();
             RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
             if (report.getChanges(PASSWORD) != null) {
@@ -763,10 +761,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 Credentials cred = new Credentials(username, password);
                 dmx.getPrivilegedAccess().storeSaltedPassword(cred, passwordTopic.getModel());
             }
-            // reassign Password to workspace       // FIXME: initial assignment fails if current workspace not writable
-            long workspaceId = getPrivateWorkspace().getId();
-            ws.assignToWorkspace(passwordTopic, workspaceId);
-            ws.assignToWorkspace(passwordTopic.getRelatingAssoc(), workspaceId);
         }
         //
         setModifier(topic);

@@ -952,9 +952,10 @@ class ValueIntegrator {
     private ChildTopicsModel workspaceFacet(DMXObjectModelImpl object) {
         ChildTopicsModel ct = null;
         if (object != null) {       // FIXME: object must not null
-            TopicModel ws = object.childTopics.getTopicOrNull(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT);
+            String compDefUri = WORKSPACE + "#" + WORKSPACE_ASSIGNMENT;
+            TopicModel ws = object.childTopics.getTopicOrNull(compDefUri);
             if (ws != null) {
-                ct = mf.newChildTopicsModel().setRef(WORKSPACE + "#" + WORKSPACE_ASSIGNMENT, ws.getId());
+                ct = mf.newChildTopicsModel().setRef(compDefUri, ws.getId());
             }
         }
         return ct;
