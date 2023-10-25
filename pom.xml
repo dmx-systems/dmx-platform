@@ -115,7 +115,7 @@
         </felix.fileinstall.dir>
 
         <!-- Host -->
-        <dmx.host.url>http://localhost:${org.osgi.service.http.port}/</dmx.host.url>
+        <dmx.host.url>http://localhost:${org.osgi.service.http.port}</dmx.host.url>
 
         <!-- Webservice -->
         <dmx.webservice.path>/</dmx.webservice.path>

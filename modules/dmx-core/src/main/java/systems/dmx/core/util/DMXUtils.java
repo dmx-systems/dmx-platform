@@ -34,7 +34,7 @@ public class DMXUtils {
 
     private static final Logger logger = Logger.getLogger(DMXUtils.class.getName());
 
-    private static final String DMX_HOST_URL = System.getProperty("dmx.host.url");  // ### TODO: default value (#734)
+    private static final String DMX_HOST_URL = System.getProperty("dmx.host.url");
     static {
         logger.info("Host config:\n  dmx.host.url = \"" + DMX_HOST_URL + "\"");
     }
