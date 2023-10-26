@@ -133,6 +133,8 @@ button {
 .el-dialog__body {
   padding: 15px !important;                       /* was 30px 20px */
   line-height: unset !important;                  /* was 24px */
+  word-break: normal !important;                  /* was "break-all" */
+  overflow-wrap: anywhere;
 }
 
 .el-dialog__footer {
