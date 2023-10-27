@@ -118,7 +118,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         ANONYMOUS_WRITE_ALLOWED);
     private static final String SUBNET_FILTER = System.getProperty("dmx.security.subnet_filter", "127.0.0.1/32");
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dmx.security.new_accounts_are_enabled", "true"));
+        System.getProperty("dmx.security.new_accounts_are_enabled", "true")
+    );
+    private static final String SITE_SALT = System.getProperty("dmx.security.site_salt", "");
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
     private static final boolean IS_PUBLIC_INSTALLATION = ANONYMOUS_READ_ALLOWED.equals("ALL");
@@ -270,7 +272,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         Topic userAccount = pa.runInWorkspaceContext(-1, () ->
             dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
                 .setRef(USERNAME, usernameTopic.getId())
-                .set(PASSWORD, JavaUtils.encodeSHA256(salt + cred.password))))
+                .set(PASSWORD, JavaUtils.encodeSHA256(SITE_SALT + salt + cred.password))))
         );
         logger.info("### Salting password of user \"" + cred.username + "\"");
         RelatedTopic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
@@ -759,7 +761,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 String username = ct.getTopic(USERNAME).getSimpleValue().toString();
                 String password = passwordTopic.getSimpleValue().toString();
                 Credentials cred = new Credentials(username, password);
-                dmx.getPrivilegedAccess().storeSaltedPassword(cred, passwordTopic.getModel());
+                dmx.getPrivilegedAccess().storePasswordHash(cred, passwordTopic.getModel());
             }
         }
         //

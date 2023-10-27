@@ -32,6 +32,8 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String SITE_SALT = System.getProperty("dmx.security.site_salt", "");
+
     // ### TODO: copies in Constants.java of various plugins
 
     // Topic Types
@@ -179,7 +181,7 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
             if (usernameTopic == null) {
                 return null;
             }
-            if (!isMatch(usernameTopic, cred.password)) {
+            if (!checkPassword(usernameTopic, cred.password)) {
                 return null;
             }
             return usernameTopic.instantiate();
@@ -194,17 +196,17 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         try {
             logger.info("##### Changing password of user \"" + cred.username + "\"");
             TopicModelImpl passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(cred.username));
-            storeSaltedPassword(cred, passwordTopic);
+            storePasswordHash(cred, passwordTopic);
         } catch (Exception e) {
             throw new RuntimeException("Changing password of user \"" + cred.username + "\" failed", e);
         }
     }
 
     @Override
-    public void storeSaltedPassword(Credentials cred, TopicModel passwordTopic) {
+    public void storePasswordHash(Credentials cred, TopicModel passwordTopic) {
         logger.info("### Salting password of user \"" + cred.username + "\"");
         String salt = JavaUtils.random256();
-        String hash = JavaUtils.encodeSHA256(salt + cred.password);
+        String hash = JavaUtils.encodeSHA256(SITE_SALT + salt + cred.password);
         ((TopicModelImpl) passwordTopic).storeProperty(PROP_SALT, salt, false);     // addToIndex=false
         ((TopicModelImpl) passwordTopic).updateSimpleValue(new SimpleValue(hash));
     }
@@ -478,26 +480,38 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Prerequisite: usernameTopic is not <code>null</code>.
+     * Password check according to DMX's own password management.
      *
-     * @param   password    password provided by user, plain text
+     * Checks if given username and password do match.
+     *
+     * @param   usernameTopic   not <code>null</code>.
+     * @param   password        password provided by user, plain text
+     *
+     * @return  true if username and password match, false otherwise.
      */
-    private boolean isMatch(TopicModel usernameTopic, String password) {
+    private boolean checkPassword(TopicModel usernameTopic, String password) {
         TopicModelImpl passwordTopic = getPasswordTopic(usernameTopic);
-        String storedHash = passwordTopic.getSimpleValue().toString();     // SHA256 hash
+        String storedHash = passwordTopic.getSimpleValue().toString();          // SHA256 hash
         String username = usernameTopic.getSimpleValue().toString();
         Credentials cred = new Credentials(username, password);
+        String compareHash;
+        boolean isMatch;
         if (passwordTopic.hasProperty(PROP_SALT)) {
             String salt = (String) passwordTopic.getProperty(PROP_SALT);
-            return storedHash.equals(JavaUtils.encodeSHA256(salt + password));
-        } else {
-            // legacy account
-            boolean isMatch = storedHash.equals(encodePassword(password));
+            compareHash = JavaUtils.encodeSHA256(SITE_SALT + salt + password);  // canonic: site salt already applied
+            isMatch = storedHash.equals(compareHash);
             if (isMatch) {
-                _storeSaltedPassword(cred, passwordTopic);
+                return true;
             }
-            return isMatch;
+            compareHash = JavaUtils.encodeSHA256(salt + password);              // site salt not yet applied
+        } else {
+            compareHash = encodePassword(password);                             // legacy account, not salted
         }
+        isMatch = storedHash.equals(compareHash);
+        if (isMatch) {
+            _storePasswordHash(cred, passwordTopic);
+        }
+        return isMatch;
     }
 
     /**
@@ -537,10 +551,10 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
         return password;
     }
 
-    private void _storeSaltedPassword(Credentials cred, TopicModelImpl passwordTopic) {
+    private void _storePasswordHash(Credentials cred, TopicModelImpl passwordTopic) {
         DMXTransaction tx = al.db.beginTx();
         try {
-            storeSaltedPassword(cred, passwordTopic);
+            storePasswordHash(cred, passwordTopic);
             tx.success();
         } catch (Exception e) {
             throw new RuntimeException("Salting a password failed", e);
