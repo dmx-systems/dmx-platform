@@ -910,7 +910,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             session = request.getSession();
             String cookie = response.getHeader("Set-Cookie");
             response.setHeader("Set-Cookie", cookie + ";SameSite=Strict");
-            logger.info("### Creating " + info(session) + ", response=" + response);
+            logger.fine("### Creating " + info(session) + ", response=" + response);
         }
         return session;
     }
@@ -1007,7 +1007,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private void _logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);    // create=false
         String username = username(session);                // save username before removing
-        logger.info("##### Logging out from " + info(session));
+        logger.info("##### Logging out as \"" + username + "\"");
+        logger.fine("##### Detaching username from " + info(session));
         // Note: the session is not invalidated. Just the "username" attribute is removed.
         session.removeAttribute("username");
         dmx.fireEvent(POST_LOGOUT_USER, username);

@@ -47,7 +47,7 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
         this.pool = pool;
         this.dmx = dmx;
         // Note: info(session) relies on "dmx"
-        logger.info("### Associating WebSocket connection " + clientId + " with " + info(session));
+        logger.fine("### Associating WebSocket connection " + clientId + " with " + info(session));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -68,14 +68,14 @@ class WebSocketConnectionImpl implements WebSocketConnection, WebSocket, WebSock
 
     @Override
     public void onOpen(Connection connection) {
-        logger.info("Opening WebSocket connection " + clientId);
+        logger.fine("Opening WebSocket connection " + clientId);
         this.connection = connection;
         pool.addConnection(this);
     }
 
     @Override
     public void onClose(int code, String message) {
-        logger.info("Closing WebSocket connection " + clientId);
+        logger.fine("Closing WebSocket connection " + clientId);
         pool.removeConnection(this);
     }
 
