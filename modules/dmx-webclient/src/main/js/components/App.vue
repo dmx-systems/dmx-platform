@@ -153,11 +153,12 @@ button {
 }
 
 .el-notification__content {
-  text-align: unset !important;
+  text-align: unset !important;                   /* was "justify" */
+  overflow-wrap: anywhere;
 }
 
-.el-notification__content p {
-  margin-top: 1em !important;
+.el-notification__content p + p {
+  margin-top: 1em !important;                     /* was 0 */
 }
 
 /* Quill editor */
