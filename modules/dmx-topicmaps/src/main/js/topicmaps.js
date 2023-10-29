@@ -388,20 +388,19 @@ const actions = {
     // 2) update view
     _displayTopicmap(getters, dispatch).then(() => {
       const selection = getters.selection
-      const wasMulti = selection.isMulti()
+      const wasSingle = selection.isSingle()
       adjustSelection(selection)
       // restore selection
-      if (selection.isSingle()) {
-        const id = selection.getObjectId()
-        if (wasMulti) {
-          dispatch(selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute', id)
-        } else if (state.topicmap.hasVisibleObject(id)) {
-          dispatch('renderAsSelected', {
-            id,
-            showDetails: getters.showInmapDetails
-          })
-        } else {
+      if (selection.isEmpty()) {
+        if (wasSingle) {
           dispatch('stripSelectionFromRoute')
+        }
+      } else if (selection.isSingle()) {
+        const id = selection.getObjectId()
+        if (wasSingle) {
+          dispatch('renderAsSelected', {id, showDetails: getters.showInmapDetails})
+        } else {
+          dispatch(selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute', id)
         }
       } else {
         _syncSelectMulti(selection, dispatch)
@@ -737,8 +736,8 @@ function emptyAllSelectionsExcept (topicmapId) {
 }
 
 function adjustSelection (selection) {
-  selection.topicIds = selection.topicIds.filter(id => state.topicmap.hasTopic(id))
-  selection.assocIds = selection.assocIds.filter(id => state.topicmap.hasAssoc(id))
+  selection.topicIds = selection.topicIds.filter(id => state.topicmap.hasVisibleObject(id))
+  selection.assocIds = selection.assocIds.filter(id => state.topicmap.hasVisibleObject(id))
 }
 
 // ---
