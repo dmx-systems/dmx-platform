@@ -377,35 +377,14 @@ const actions = {
   },
 
   reloadTopicmap ({getters, dispatch}) {
-    const topicmapId = _topicmapId(getters)
-    // console.log('reloadTopicmap', topicmapId)
     // 1) update state
     dispatch('clearTopicmapCache')
     // Note: when the topicmap cache is cleared (see dmx-topicmap-panel module) here we remove all topicmap selection
     // states as we can't know if the selected topic/assoc is still contained in the topicmap when loaded with changed
     // authorization.
-    emptyAllSelectionsExcept(topicmapId)
+    emptyAllSelectionsExcept(_topicmapId(getters))
     // 2) update view
-    _displayTopicmap(getters, dispatch).then(() => {
-      const selection = getters.selection
-      const wasSingle = selection.isSingle()
-      adjustSelection(selection)
-      // restore selection
-      if (selection.isEmpty()) {
-        if (wasSingle) {
-          dispatch('stripSelectionFromRoute')
-        }
-      } else if (selection.isSingle()) {
-        const id = selection.getObjectId()
-        if (wasSingle) {
-          dispatch('renderAsSelected', {id, showDetails: getters.showInmapDetails})
-        } else {
-          dispatch(selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute', id)
-        }
-      } else {
-        _syncSelectMulti(selection, dispatch)
-      }
-    })
+    _displayTopicmap(getters, dispatch).then(() => adaptSelection(getters, dispatch))
   },
 
   /**
@@ -735,7 +714,35 @@ function emptyAllSelectionsExcept (topicmapId) {
   })
 }
 
-function adjustSelection (selection) {
+/**
+ * Adapts selection (model, view, and route) of current topicmap to changed authorization.
+ *
+ * Prerequisite: the current topicmap is still readable after authorization change.
+ *
+ * Note: when authorization changes current selection might shrink, never expand. A single selection might
+ * become empty (or stay single), a multi selection might become single or empty (or stay multi).
+ */
+function adaptSelection (getters, dispatch) {
+  const selection = getters.selection
+  const wasSingle = selection.isSingle()
+  shrinkSelection(selection)
+  if (selection.isEmpty()) {
+    if (wasSingle) {
+      dispatch('stripSelectionFromRoute')
+    }
+  } else if (selection.isSingle()) {
+    const id = selection.getObjectId()
+    if (wasSingle) {
+      dispatch('renderAsSelected', {id, showDetails: getters.showInmapDetails})
+    } else {
+      dispatch(selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute', id)
+    }
+  } else {
+    _syncSelectMulti(selection, dispatch)
+  }
+}
+
+function shrinkSelection (selection) {
   selection.topicIds = selection.topicIds.filter(id => state.topicmap.hasVisibleObject(id))
   selection.assocIds = selection.assocIds.filter(id => state.topicmap.hasVisibleObject(id))
 }
