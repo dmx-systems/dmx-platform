@@ -13,42 +13,151 @@ import dmx from 'dmx-api'
 
 Vue.use(VueRouter)
 
-const router = new VueRouter({
-  routes: [
-    {
-      path: '/',
-      component: Webclient
-    },
-    {
-      path: '/topicmap/:topicmapId',
-      name: 'topicmap',
-      component: Webclient
-    },
-    {
-      path: '/topicmap/:topicmapId/topic/:topicId',
-      name: 'topic',
-      component: Webclient
-    },
-    {
-      path: '/topicmap/:topicmapId/assoc/:assocId',
-      name: 'assoc',
-      component: Webclient
-    },
-    {
-      path: '/topicmap/:topicmapId/topic/:topicId/:detail',
-      name: 'topicDetail',
-      component: Webclient
-    },
-    {
-      path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
-      name: 'assocDetail',
-      component: Webclient
-    }
-  ]
-})
+export default function initRouter () {
 
-// use a global guard to perform dirty check
-router.beforeEach((to, from, next) => {
+  const router = new VueRouter({
+    routes: [
+      {
+        path: '/',
+        component: Webclient
+      },
+      {
+        path: '/topicmap/:topicmapId',
+        name: 'topicmap',
+        component: Webclient
+      },
+      {
+        path: '/topicmap/:topicmapId/topic/:topicId',
+        name: 'topic',
+        component: Webclient
+      },
+      {
+        path: '/topicmap/:topicmapId/assoc/:assocId',
+        name: 'assoc',
+        component: Webclient
+      },
+      {
+        path: '/topicmap/:topicmapId/topic/:topicId/:detail',
+        name: 'topicDetail',
+        component: Webclient
+      },
+      {
+        path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
+        name: 'assocDetail',
+        component: Webclient
+      }
+    ]
+  })
+
+  // use a global guard to perform dirty check
+  router.beforeEach((to, from, next) => {
+    console.log('### beforeEach', to, from)
+    performDirtyCheck(to, from, next)
+    navigate(to, from, next)            // FIXME: don't navigate if dirty
+  })
+
+  store.registerModule('routerModule', {
+
+    state: {
+      router
+    },
+
+    actions: {
+
+      callRoute (_, location) {
+        console.log('### callRoute', location)
+        router.push(location)
+      },
+
+      callTopicmapRoute (_, id) {
+        console.log('### callTopicmapRoute', id)
+        router.push({
+          name: 'topicmap',
+          params: {topicmapId: id}
+        })
+      },
+
+      callTopicRoute (_, id) {
+        console.log('### callTopicRoute', id)
+        callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
+      },
+
+      callAssocRoute (_, id) {
+        console.log('### callAssocRoute', id)
+        callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
+      },
+
+      stripSelectionFromRoute () {
+        console.log('### stripSelectionFromRoute')
+        router.push({
+          name: 'topicmap'
+        })
+      },
+
+      /**
+       * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
+       *
+       * Prerequisite: a single selection
+       *
+       * @param   detail    "info", "related", "meta", "config" or "edit"
+       */
+      callDetailRoute ({rootState}, detail) {
+        console.log('### callDetailRoute', detail)
+        const object = rootState.object
+        if (!object) {
+          throw Error('callDetailRoute() when there is no single selection')
+        }
+        router.push({
+          name: object.isTopic ? 'topicDetail' : 'assocDetail',
+          params: {detail}
+        })
+      },
+
+      /**
+       * Redirects to "topicDetail" route.
+       *
+       * @param   id        a topic ID
+       * @param   detail    "info", "related", "meta", "config" or "edit"
+       */
+      callTopicDetailRoute (_, {id, detail}) {
+        console.log('### callTopicDetailRoute', {id, detail})
+        router.push({
+          name: 'topicDetail',
+          params: {topicId: id, detail}
+        })
+      },
+
+      /**
+       * Redirects to "assocDetail" route.
+       *
+       * @param   id        an assoc ID
+       * @param   detail    "info", "related", "meta", "config" or "edit"
+       */
+      callAssocDetailRoute (_, {id, detail}) {
+        console.log('### callAssocDetailRoute', {id, detail})
+        router.push({
+          name: 'assocDetail',
+          params: {assocId: id, detail}
+        })
+      },
+
+      stripDetailFromRoute ({rootState}) {
+        console.log('### stripDetailFromRoute')
+        const object = rootState.object
+        if (!object) {
+          throw Error('stripDetailFromRoute() when there is no single selection')
+        }
+        router.push({
+          name: object.isTopic ? 'topic' : 'assoc'
+        })
+      }
+    }
+  })
+
+  return router
+}
+
+function performDirtyCheck (to, from, next) {
   // Perform a dirty check if all conditions apply:
   //   - the detail panel is visible (in-map details are NOT dirty checked; TODO?)
   //   - there is a selection (the detail panel is not empty)
@@ -88,103 +197,7 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
-})
-
-export default router
-
-store.registerModule('routerModule', {
-
-  state: {
-    router
-  },
-
-  actions: {
-
-    initialNavigation () {
-      initialNavigation(router.currentRoute)
-    },
-
-    callRoute (_, location) {
-      // console.log('callRoute', location)
-      router.push(location)
-    },
-
-    callTopicmapRoute (_, id) {
-      router.push({
-        name: 'topicmap',
-        params: {topicmapId: id}
-      })
-    },
-
-    callTopicRoute (_, id) {
-      callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
-    },
-
-    callAssocRoute (_, id) {
-      callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
-    },
-
-    stripSelectionFromRoute () {
-      router.push({
-        name: 'topicmap'
-      })
-    },
-
-    /**
-     * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
-     *
-     * Prerequisite: a single selection
-     *
-     * @param   detail    "info", "related", "meta", "config" or "edit"
-     */
-    callDetailRoute ({rootState}, detail) {
-      const object = rootState.object
-      if (!object) {
-        throw Error('callDetailRoute() when there is no single selection')
-      }
-      router.push({
-        name: object.isTopic ? 'topicDetail' : 'assocDetail',
-        params: {detail}
-      })
-    },
-
-    /**
-     * Redirects to "topicDetail" route.
-     *
-     * @param   id        a topic ID
-     * @param   detail    "info", "related", "meta", "config" or "edit"
-     */
-    callTopicDetailRoute (_, {id, detail}) {
-      router.push({
-        name: 'topicDetail',
-        params: {topicId: id, detail}
-      })
-    },
-
-    /**
-     * Redirects to "assocDetail" route.
-     *
-     * @param   id        an assoc ID
-     * @param   detail    "info", "related", "meta", "config" or "edit"
-     */
-    callAssocDetailRoute (_, {id, detail}) {
-      router.push({
-        name: 'assocDetail',
-        params: {assocId: id, detail}
-      })
-    },
-
-    stripDetailFromRoute ({rootState}) {
-      const object = rootState.object
-      if (!object) {
-        throw Error('stripDetailFromRoute() when there is no single selection')
-      }
-      router.push({
-        name: object.isTopic ? 'topic' : 'assoc'
-      })
-    }
-  }
-})
+}
 
 /**
  * Redirects to "topic"/"assoc" route while retaining the selected detail tab (if any).
@@ -194,6 +207,7 @@ store.registerModule('routerModule', {
  *   - empty (pinned) detail panel (we don't want restore the tab that was selected before emptying the panel)
  */
 function callObjectRoute (id, paramName, routeName, detailRouteName) {
+  const router = store.state.routerModule.router
   const location = {
     params: {[paramName]: id}
   }
@@ -214,108 +228,11 @@ function callObjectRoute (id, paramName, routeName, detailRouteName) {
   router.push(location)
 }
 
-// TODO: why does the watcher kick in when an initial URL is present?
-// Since when is it this way?
-function registerRouteWatcher () {
-  store.watch(
-    state => state.routerModule.router.currentRoute,
-    (to, from) => {
-      // console.log('### Route watcher', to, from)
-      navigate(to, from)
-    }
-  )
-}
-
-/**
- * Sets up initial app state according to start URL.
- * Selects the intial topicmap and workspace, and pushes the initial route if needed.
- */
-function initialNavigation (route) {
-  //
-  registerRouteWatcher()
-  //
-  let urlPresent
-  // 1) select topicmap
-  // Note: route params read from URL are strings (may be undefined). Route params set by push() are numbers.
-  let topicmapId = id(route.params.topicmapId)
-  const topicId  = id(route.params.topicId)
-  const assocId  = id(route.params.assocId)
-  if (topicmapId) {
-    // console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId,
-    // assocId)
-    urlPresent = true
-  } else {
-    topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
-    if (topicmapId) {
-      // console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
-    } else {
-      // console.log('### Initial navigation (no topicmap cookie present)')
-    }
-  }
-  // topicmap validity check
-  let workspaceId   // valid only if topicmapId is defined after validity check
-  let p             // a promise resolved once validity check is complete
-  if (topicmapId) {
-    // console.log(`Checking workspace of topicmap ${topicmapId}`)
-    // Note: get-assigned-workspace responses are not cached by the browser.
-    // In contrast get-topic responses *are* cached by the browser.
-    // Doing get-assigned-workspace first avoids working with stale data.
-    p = getAssignedWorkspace(topicmapId).then(workspace => {
-      // console.log('Workspace retrieved', workspace)
-      workspaceId = workspace.id
-      // console.log(`Retrieving topic ${topicmapId}`)
-      return dmx.rpc.getTopic(topicmapId)
-    }).then(topic => {
-      // console.log('Topic retrieved', topic)
-      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-        throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
-      }
-    }).catch(error => {
-      console.warn(`Topicmap ${topicmapId} check failed`, error)
-      topicmapId = undefined
-    })
-  } else {
-    p = Promise.resolve()
-  }
-  // 2) select workspace
-  // Note: at this stage a topicmap ID might be available or not. If available it is either obtained from URL or from
-  // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required.
-  // If obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
-  p.then(() => {
-    // console.log('[DMX] Initial topicmap/workspace', topicmapId, workspaceId)
-    if (topicmapId) {
-      store.dispatch('_selectWorkspace', workspaceId).then(() => {    // no route push
-        // the workspace's topicmap topics are now available
-        if (urlPresent) {
-          // Note: 'displayTopicmap' relies on the topicmap topics in order to tell what topicmap renderer to use
-          const p = store.dispatch('displayTopicmap', topicmapId)     // no route push
-          topicId !== undefined && fetchTopic(topicId, p)             // Note: 0 is a valid topic ID
-          assocId               && fetchAssoc(assocId, p)
-        } else {
-          // Note: when the topicmap changes '_selectWorkspace' is dispatched again (see navigate() below).
-          // Calling the topicmap route only when the topicmap topics are available avoids loading them twice.
-          // TODO: avoid dispatching '_selectWorkspace' twice in the first place?
-          store.dispatch('callTopicmapRoute', topicmapId)             // push initial route
-        }
-      })
-    } else {
-      store.dispatch('selectFirstWorkspace')                          // push initial route (indirectly)
-    }
-  })
-  // 3) setup detail panel
-  const detail = route.params.detail
-  if (detail) {
-    store.dispatch('setDetailPanelVisibility', true)
-    store.dispatch('selectDetail', detail)
-  }
-  // console.log('### Initial navigation complete!')
-}
-
 /**
  * Adapts app state when route changes.
  */
-function navigate (to, from) {
-  // console.log('navigate', to, from)
+function navigate (to, from, next) {
+  console.log('workspaces state', store.state.workspaces)   // TODO: initial navigation when no URL path given
   let p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
   const topicmapId = id(to.params.topicmapId)
@@ -368,6 +285,7 @@ function navigate (to, from) {
       }
     }
   }
+  next()
 }
 
 const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
@@ -378,7 +296,7 @@ const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchTopic (id, p) {
-  // console.log('requesting topic', id)
+  console.log('fetchTopic', id)
   // detail panel
   const p2 = dmx.rpc.getTopic(id, true, true).then(topic => {  // includeChildren=true, includeAssocChildren=true
     // console.log('topic', id, 'arrived')

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './components/App'
 import dmx from 'dmx-api'
 import store from './store/webclient'
-import router from './router'
+import initRouter from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
@@ -24,29 +24,30 @@ const typeCacheReady = dmx.init({
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Create Vue root instance
-// Instantiates router-view and dmx-webclient components.
-const root = new Vue({
-  el: '#app',
-  store,
-  router,
-  render: h => h(App)
-})
+// 2) Load plugins
+const pluginsReady = loadPlugins(extraElementUI)
 
-// 3) Load plugins + mount toplevel components
-// Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
-// boxes -- component mounting must perform not before all plugins are loaded.
-// Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
-// plugin's components immediately while plugin initialization. However this would result in unresolved circular
-// dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
-// the Search plugin on the other hand depends on Workspaces `isWritable` state.
-loadPlugins(extraElementUI).then(() => {
-  // Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
+typeCacheReady.then(() => {         // FIXME: wait also for pluginsReady?
+  // 3) Create Vue root instance
+  // Instantiates router-view and dmx-webclient components.
+  const root = new Vue({
+    el: '#app',
+    store,
+    router: initRouter(),
+    render: h => h(App)
+  })
+  // 4) Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
+  // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
+  // boxes -- component mounting must perform not before all plugins are loaded.
+  // Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
+  // plugin's components immediately while plugin initialization. However this would result in unresolved circular
+  // dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
+  // the Search plugin on the other hand depends on Workspaces `isWritable` state.
   const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dmx-webclient>
   store.dispatch('mountComponents', webclient)
 })
 
-// 4) Register own renderers
+// 5) Register own renderers
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.icon',
@@ -61,20 +62,6 @@ store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.arrow_shape',
   component: require('./components/dmx-arrow-select').default
-})
-
-// 5) Initial navigation
-// Initial navigation must take place *after* the webclient plugins are loaded.
-// The "workspaces" store module is registered by the Workspaces plugin.
-Promise.all([
-  // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
-  // The type cache must be ready *before* "initialNavigation" is dispatched.
-  typeCacheReady,
-  // Initial navigation might involve "select the 1st workspace", so the workspace
-  // topics must be already loaded.
-  store.state.workspaces.ready
-]).then(() => {
-  store.dispatch('initialNavigation')
 })
 
 // 6) Windows workaround to suppress the browser's native context menu on
