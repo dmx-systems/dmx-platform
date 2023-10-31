@@ -27,7 +27,7 @@ const typeCacheReady = dmx.init({
 // 2) Load plugins
 const pluginsReady = loadPlugins(extraElementUI)
 
-typeCacheReady.then(() => {         // FIXME: wait also for pluginsReady?
+typeCacheReady.then(() => {         // FIXME: wait also for pluginsReady and workspaces.ready?
   // 3) Create Vue root instance
   // Instantiates router-view and dmx-webclient components.
   const root = new Vue({

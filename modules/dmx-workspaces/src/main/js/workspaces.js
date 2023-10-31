@@ -9,7 +9,8 @@ const state = {
 
   isWritable: undefined,            // true if selected workspace is writable
 
-  workspaceTopics: undefined,       // All workspace topics readable by current user (array of dmx.Topic)
+  workspaceTopics: undefined,       // All workspace topics readable by current user (array of dmx.Topic).
+                                    // Initialzed by fetchWorkspaceTopics()
 
   workspaceCommands: {},            // Registered workspace commands:
                                     //   {

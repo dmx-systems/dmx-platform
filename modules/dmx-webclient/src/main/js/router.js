@@ -232,10 +232,14 @@ function callObjectRoute (id, paramName, routeName, detailRouteName) {
  * Adapts app state when route changes.
  */
 function navigate (to, from, next) {
-  console.log('workspaces state', store.state.workspaces)   // TODO: initial navigation when no URL path given
+  const topicmapId = id(to.params.topicmapId)
+  if (!topicmapId) {
+    initialRedirect(next)
+    return
+  }
+  //
   let p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
-  const topicmapId = id(to.params.topicmapId)
   const topicmapChanged = topicmapId !== id(from.params.topicmapId)
   // Note: route params read from URL are strings. Route params set by push() are numbers.
   if (topicmapChanged) {
@@ -286,6 +290,41 @@ function navigate (to, from, next) {
     }
   }
   next()
+}
+
+function initialRedirect (next) {
+  topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
+  if (topicmapId) {
+    dmx.rpc.getTopic(topicmapId).then(topic => {
+      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+        throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
+      }
+      redirectToTopicmap(topicmapId, next)
+    }).catch(error => {
+      console.warn(`Topicmap ${topicmapId} check failed`, error)
+      redirectToFirstWorkspace(next)
+    })
+  } else {
+    console.log('No dmx_topicmap_id cookie')
+    redirectToFirstWorkspace(next)
+  }
+}
+
+function redirectToFirstWorkspace (next) {
+  const workspaceId = store.state.workspaces.workspaceTopics[0].id
+  console.log('redirectToFirstWorkspace', workspaceId)
+  dmx.rpc.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap').then(topics => {
+    if (!topics.length) {
+      throw Error(`workspace ${workspaceId} has no topicmap`)
+    }
+    const topicmapId = topics[0].id
+    redirectToTopicmap(topicmapId, next)
+  })
+}
+
+function redirectToTopicmap (topicmapId, next) {
+  console.log('redirectToTopicmap', topicmapId)
+  next({name: 'topicmap', params: {topicmapId}})
 }
 
 const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
