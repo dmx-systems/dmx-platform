@@ -11,158 +11,161 @@ import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
 import dmx from 'dmx-api'
 
+export default initRouter
+
 Vue.use(VueRouter)
 
-export default function initRouter () {
+let router    // initialized by initRouter()
 
-  const router = new VueRouter({
-    routes: [
-      {
-        path: '/',
-        component: Webclient
-      },
-      {
-        path: '/topicmap/:topicmapId',
-        name: 'topicmap',
-        component: Webclient
-      },
-      {
-        path: '/topicmap/:topicmapId/topic/:topicId',
-        name: 'topic',
-        component: Webclient
-      },
-      {
-        path: '/topicmap/:topicmapId/assoc/:assocId',
-        name: 'assoc',
-        component: Webclient
-      },
-      {
-        path: '/topicmap/:topicmapId/topic/:topicId/:detail',
-        name: 'topicDetail',
-        component: Webclient
-      },
-      {
-        path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
-        name: 'assocDetail',
-        component: Webclient
-      }
-    ]
+function initRouter () {
+  router = new VueRouter({
+    routes
   })
-
-  // use a global guard to perform dirty check
+  // global guard
   router.beforeEach((to, from, next) => {
     console.log('### beforeEach', to, from)
     performDirtyCheck(to, from, next)
     navigate(to, from, next)            // FIXME: don't navigate if dirty
   })
-
+  // store module
   store.registerModule('routerModule', {
-
-    state: {
-      router
-    },
-
-    actions: {
-
-      callRoute (_, location) {
-        console.log('### callRoute', location)
-        router.push(location)
-      },
-
-      callTopicmapRoute (_, id) {
-        console.log('### callTopicmapRoute', id)
-        router.push({
-          name: 'topicmap',
-          params: {topicmapId: id}
-        })
-      },
-
-      callTopicRoute (_, id) {
-        console.log('### callTopicRoute', id)
-        callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
-      },
-
-      callAssocRoute (_, id) {
-        console.log('### callAssocRoute', id)
-        callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
-      },
-
-      stripSelectionFromRoute () {
-        console.log('### stripSelectionFromRoute')
-        router.push({
-          name: 'topicmap'
-        })
-      },
-
-      /**
-       * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
-       *
-       * Prerequisite: a single selection
-       *
-       * @param   detail    "info", "related", "meta", "config" or "edit"
-       */
-      callDetailRoute ({rootState}, detail) {
-        console.log('### callDetailRoute', detail)
-        const object = rootState.object
-        if (!object) {
-          throw Error('callDetailRoute() when there is no single selection')
-        }
-        router.push({
-          name: object.isTopic ? 'topicDetail' : 'assocDetail',
-          params: {detail}
-        })
-      },
-
-      /**
-       * Redirects to "topicDetail" route.
-       *
-       * @param   id        a topic ID
-       * @param   detail    "info", "related", "meta", "config" or "edit"
-       */
-      callTopicDetailRoute (_, {id, detail}) {
-        console.log('### callTopicDetailRoute', {id, detail})
-        router.push({
-          name: 'topicDetail',
-          params: {topicId: id, detail}
-        })
-      },
-
-      /**
-       * Redirects to "assocDetail" route.
-       *
-       * @param   id        an assoc ID
-       * @param   detail    "info", "related", "meta", "config" or "edit"
-       */
-      callAssocDetailRoute (_, {id, detail}) {
-        console.log('### callAssocDetailRoute', {id, detail})
-        router.push({
-          name: 'assocDetail',
-          params: {assocId: id, detail}
-        })
-      },
-
-      stripDetailFromRoute ({rootState}) {
-        console.log('### stripDetailFromRoute')
-        const object = rootState.object
-        if (!object) {
-          throw Error('stripDetailFromRoute() when there is no single selection')
-        }
-        router.push({
-          name: object.isTopic ? 'topic' : 'assoc'
-        })
-      }
-    }
+    state: {router},
+    actions
   })
-
   return router
 }
+
+const routes = [
+  {
+    path: '/',
+    component: Webclient
+  },
+  {
+    path: '/topicmap/:topicmapId',
+    name: 'topicmap',
+    component: Webclient
+  },
+  {
+    path: '/topicmap/:topicmapId/topic/:topicId',
+    name: 'topic',
+    component: Webclient
+  },
+  {
+    path: '/topicmap/:topicmapId/assoc/:assocId',
+    name: 'assoc',
+    component: Webclient
+  },
+  {
+    path: '/topicmap/:topicmapId/topic/:topicId/:detail',
+    name: 'topicDetail',
+    component: Webclient
+  },
+  {
+    path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
+    name: 'assocDetail',
+    component: Webclient
+  }
+]
+
+const actions = {
+
+  callRoute (_, location) {
+    console.log('### callRoute', location)
+    router.push(location)
+  },
+
+  callTopicmapRoute (_, id) {
+    console.log('### callTopicmapRoute', id)
+    router.push({
+      name: 'topicmap',
+      params: {topicmapId: id}
+    })
+  },
+
+  callTopicRoute (_, id) {
+    console.log('### callTopicRoute', id)
+    callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
+  },
+
+  callAssocRoute (_, id) {
+    console.log('### callAssocRoute', id)
+    callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
+  },
+
+  stripSelectionFromRoute () {
+    console.log('### stripSelectionFromRoute')
+    router.push({
+      name: 'topicmap'
+    })
+  },
+
+  /**
+   * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
+   *
+   * Prerequisite: a single selection
+   *
+   * @param   detail    "info", "related", "meta", "config" or "edit"
+   */
+  callDetailRoute ({rootState}, detail) {
+    console.log('### callDetailRoute', detail)
+    const object = rootState.object
+    if (!object) {
+      throw Error('callDetailRoute() when there is no single selection')
+    }
+    router.push({
+      name: object.isTopic ? 'topicDetail' : 'assocDetail',
+      params: {detail}
+    })
+  },
+
+  /**
+   * Redirects to "topicDetail" route.
+   *
+   * @param   id        a topic ID
+   * @param   detail    "info", "related", "meta", "config" or "edit"
+   */
+  callTopicDetailRoute (_, {id, detail}) {
+    console.log('### callTopicDetailRoute', {id, detail})
+    router.push({
+      name: 'topicDetail',
+      params: {topicId: id, detail}
+    })
+  },
+
+  /**
+   * Redirects to "assocDetail" route.
+   *
+   * @param   id        an assoc ID
+   * @param   detail    "info", "related", "meta", "config" or "edit"
+   */
+  callAssocDetailRoute (_, {id, detail}) {
+    console.log('### callAssocDetailRoute', {id, detail})
+    router.push({
+      name: 'assocDetail',
+      params: {assocId: id, detail}
+    })
+  },
+
+  stripDetailFromRoute ({rootState}) {
+    console.log('### stripDetailFromRoute')
+    const object = rootState.object
+    if (!object) {
+      throw Error('stripDetailFromRoute() when there is no single selection')
+    }
+    router.push({
+      name: object.isTopic ? 'topic' : 'assoc'
+    })
+  }
+}
+
+const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
 
 function performDirtyCheck (to, from, next) {
   // Perform a dirty check if all conditions apply:
   //   - the detail panel is visible (in-map details are NOT dirty checked; TODO?)
   //   - there is a selection (the detail panel is not empty)
   //   - in the route there is a topicmap change or a selection change (or both)
-  // Note: at router instantiation time the details plugin is not yet initialized
+  // Note: at router instantiation time the details plugin is not yet initialized ### TODO: still true?
   // TODO: rethink router instantiation time
   if (store.state.details && store.state.details.visible && store.state.object &&
       (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
@@ -197,35 +200,6 @@ function performDirtyCheck (to, from, next) {
   } else {
     next()
   }
-}
-
-/**
- * Redirects to "topic"/"assoc" route while retaining the selected detail tab (if any).
- *
- * Falls back to "info" tab in 2 cases: when we're coming from ...
- *   - form mode (we don't want stay in form mode when user selects another topic/assoc)
- *   - empty (pinned) detail panel (we don't want restore the tab that was selected before emptying the panel)
- */
-function callObjectRoute (id, paramName, routeName, detailRouteName) {
-  const router = store.state.routerModule.router
-  const location = {
-    params: {[paramName]: id}
-  }
-  // Note: normally the route is the source of truth. But there is an app state not represented in the route: an empty
-  // (pinned) detail panel. We detect that by inspecting both, the "details.visible" app state AND the route's "detail"
-  // segment.
-  if (store.state.details.visible) {
-    location.name = detailRouteName
-    // fallback to "info" tab
-    // Note: when the detail panel is empty there is no "detail" route segment
-    const detail = router.currentRoute.params.detail
-    if (!detail || detail === 'edit') {
-      location.params.detail = 'info'
-    }
-  } else {
-    location.name = routeName
-  }
-  router.push(location)
 }
 
 /**
@@ -327,7 +301,33 @@ function redirectToTopicmap (topicmapId, next) {
   next({name: 'topicmap', params: {topicmapId}})
 }
 
-const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
+/**
+ * Redirects to "topic"/"assoc" route while retaining the selected detail tab (if any).
+ *
+ * Falls back to "info" tab in 2 cases: when we're coming from ...
+ *   - form mode (we don't want stay in form mode when user selects another topic/assoc)
+ *   - empty (pinned) detail panel (we don't want restore the tab that was selected before emptying the panel)
+ */
+function callObjectRoute (id, paramName, routeName, detailRouteName) {
+  const location = {
+    params: {[paramName]: id}
+  }
+  // Note: normally the route is the source of truth. But there is an app state not represented in the route: an empty
+  // (pinned) detail panel. We detect that by inspecting both, the "details.visible" app state AND the route's "detail"
+  // segment.
+  if (store.state.details.visible) {
+    location.name = detailRouteName
+    // fallback to "info" tab
+    // Note: when the detail panel is empty there is no "detail" route segment
+    const detail = router.currentRoute.params.detail
+    if (!detail || detail === 'edit') {
+      location.params.detail = 'info'
+    }
+  } else {
+    location.name = routeName
+  }
+  router.push(location)
+}
 
 /**
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.
