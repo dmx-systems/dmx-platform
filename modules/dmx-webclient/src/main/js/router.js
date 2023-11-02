@@ -24,8 +24,13 @@ function initRouter () {
   // global guard
   router.beforeEach((to, from, next) => {
     console.log('### beforeEach', to, from)
-    performDirtyCheck(to, from, next)
-    navigate(to, from, next)            // FIXME: don't navigate if dirty
+    performDirtyCheck(to, from).then(abort => {
+      if (abort) {
+        next(false)
+      } else {
+        navigate(to, from, next)
+      }
+    })
   })
   // store module
   store.registerModule('routerModule', {
@@ -160,46 +165,52 @@ const actions = {
 
 const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
 
-function performDirtyCheck (to, from, next) {
+/**
+ * @return  Promise which resolves to a boolean: true if user wants abort navigation (to continue editing),
+ *          false otherwise.
+ */
+function performDirtyCheck (to, from) {
   // Perform a dirty check if all conditions apply:
   //   - the detail panel is visible (in-map details are NOT dirty checked; TODO?)
   //   - there is a selection (the detail panel is not empty)
   //   - in the route there is a topicmap change or a selection change (or both)
   // Note: at router instantiation time the details plugin is not yet initialized ### TODO: still true?
   // TODO: rethink router instantiation time
-  if (store.state.details && store.state.details.visible && store.state.object &&
-      (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
-    const detailPanel = document.querySelector('.dmx-detail-panel').__vue__.$parent     // $parent <transition>
-    const isDirty = detailPanel.isDirty()
-    // console.log('isDirty', isDirty, store.state.object.id)
-    if (isDirty) {
-      MessageBox.confirm('There are unsaved changes', 'Warning', {
-        type: 'warning',
-        confirmButtonText: 'Save',
-        cancelButtonText: 'Discard Changes',
-        distinguishCancelAndClose: true
-      }).then(action => {   // -> Save
-        detailPanel.save()
-        next()
-      }).catch(action => {
-        switch (action) {
-        case 'cancel':      // -> Discard Changes
-          next()
-          break
-        case 'close':       // -> Abort Navigation
-          restoreSelection(from)
-          next(false)
-          break
-        default:
-          throw Error(`unexpected MessageBox action: "${action}"`)
-        }
-      })
+  return new Promise(resolve => {
+    if (store.state.details && store.state.details.visible && store.state.object &&
+        (topicmapId(to) !== topicmapId(from) || objectId(to) !== objectId(from))) {
+      const detailPanel = document.querySelector('.dmx-detail-panel').__vue__.$parent     // $parent <transition>
+      const isDirty = detailPanel.isDirty()
+      // console.log('isDirty', isDirty, store.state.object.id)
+      if (isDirty) {
+        MessageBox.confirm('There are unsaved changes', 'Warning', {
+          type: 'warning',
+          confirmButtonText: 'Save',
+          cancelButtonText: 'Discard Changes',
+          distinguishCancelAndClose: true
+        }).then(action => {   // -> Save
+          detailPanel.save()
+          resolve(false)
+        }).catch(action => {
+          switch (action) {
+          case 'cancel':      // -> Discard changes
+            resolve(false)
+            break
+          case 'close':       // -> Continue editing, abort navigation
+            restoreSelection(from)
+            resolve(true)
+            break
+          default:
+            throw Error(`unexpected MessageBox action: "${action}"`)
+          }
+        })
+      } else {
+        resolve(false)
+      }
     } else {
-      next()
+      resolve(false)
     }
-  } else {
-    next()
-  }
+  })
 }
 
 /**
@@ -267,7 +278,7 @@ function navigate (to, from, next) {
 }
 
 function initialRedirect (next) {
-  topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
+  const topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
   if (topicmapId) {
     dmx.rpc.getTopic(topicmapId).then(topic => {
       if (topic.typeUri !== 'dmx.topicmaps.topicmap') {

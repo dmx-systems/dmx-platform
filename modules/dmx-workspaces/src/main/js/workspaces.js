@@ -40,17 +40,6 @@ const actions = {
   },
 
   /**
-   * Dispatched for initial navigation (see router.js), after workspace deletion,
-   * and after logout (see loggedOut() below).
-   *
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectFirstWorkspace ({dispatch}) {
-    selectFirstWorkspace(dispatch)
-  },
-
-  /**
    * Sets the workspace state ("workspaceId" and cookie), and fetches the workspace's topicmap topics
    * if not done already.
    *
@@ -140,6 +129,12 @@ export default {
 
 // Actions helper
 
+/**
+ * Called after workspace deletion and after logout (see loggedOut() below).
+ *
+ * Preconditions:
+ * - the route is *not* yet set.
+ */
 function selectFirstWorkspace (dispatch) {
   selectWorkspace(state.workspaceTopics[0].id, dispatch)
 }

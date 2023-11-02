@@ -27,27 +27,18 @@ const typeCacheReady = dmx.init({
 // 2) Load plugins
 const pluginsReady = loadPlugins(extraElementUI)
 
+// 3) Create Vue root instance
+// Instantiates router-view and dmx-webclient components.
 typeCacheReady.then(() => {         // FIXME: wait also for pluginsReady and workspaces.ready?
-  // 3) Create Vue root instance
-  // Instantiates router-view and dmx-webclient components.
   const root = new Vue({
     el: '#app',
     store,
     router: initRouter(),
     render: h => h(App)
   })
-  // 4) Mount Webclient toplevel components as provided by plugins (mount point: 'webclient')
-  // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
-  // boxes -- component mounting must perform not before all plugins are loaded.
-  // Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
-  // plugin's components immediately while plugin initialization. However this would result in unresolved circular
-  // dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
-  // the Search plugin on the other hand depends on Workspaces `isWritable` state.
-  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dmx-webclient>
-  store.dispatch('mountComponents', webclient)
 })
 
-// 5) Register own renderers
+// 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
   renderer: 'value',
   typeUri: 'dmx.webclient.icon',
@@ -64,7 +55,7 @@ store.dispatch('registerDetailRenderer', {
   component: require('./components/dmx-arrow-select').default
 })
 
-// 6) Windows workaround to suppress the browser's native context menu on
+// 5) Windows workaround to suppress the browser's native context menu on
 //   - right-clicking the canvas (to invoke search/create dialog)
 //   - right-clicking a topic/assoc (to invoke Cytoscape context menu)
 //   - a dialog appears as the reaction of a Cytoscape context menu command
