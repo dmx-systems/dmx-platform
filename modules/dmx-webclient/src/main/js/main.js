@@ -28,8 +28,14 @@ const typeCacheReady = dmx.init({
 const pluginsReady = loadPlugins(extraElementUI)
 
 // 3) Create Vue root instance
-// Instantiates router-view and dmx-webclient components.
-typeCacheReady.then(() => {         // FIXME: wait also for pluginsReady and workspaces.ready?
+// This includes instantiation of the router-view component and, after initial navigation, instantiation of the
+// dmx-webclient component and its child components (as provided by plugins), e.g. Topicmap Panel and the Detail Panel.
+Promise.all([
+  // dmx-webclient component relies on a populated type cache.
+  typeCacheReady,
+  // Initial navigation might involve "select the 1st workspace", so the workspace topics must be already loaded.
+  store.state.workspaces.ready
+]).then(() => {         // FIXME: wait also for pluginsReady?
   const root = new Vue({
     el: '#app',
     store,
