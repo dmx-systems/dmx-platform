@@ -75,11 +75,11 @@ export default {
         // 1) init props
         // Note 1: props must be inited explicitly. E.g. the "detailRenderers" store state is populated while
         // loading plugins and does not change afterwards. The watcher (see step 3) would not fire as it is
-        // registered *after* the plugins are loaded.
+        // registered *after* the plugins are loaded. ### TODO: still true?
         // TODO: think about startup order: instantiating the Webclient component vs. loading the plugins.
         // Note 2: props must be inited *before* the component is instantiated (see step 2). While instantiation
         // the component receives the declared "default" value (plugin.js), if no value is set already.
-        // The default value must not be overridden by an undefined init value.
+        // The default value must not be overridden by an undefined init value. ### TODO: still true?
         const propsData = {}
         for (const prop in compDef.props) {
           propsData[prop] = compDef.props[prop](state)    // call getter function

@@ -23,12 +23,12 @@ function initRouter () {
   })
   // global guard
   router.beforeEach((to, from, next) => {
-    console.log('### beforeEach', to, from)
+    // console.log('### beforeEach', to, from)
     performDirtyCheck(to, from).then(abort => {
       if (abort) {
         next(false)
       } else {
-        navigate(to, from, next)
+        next()
       }
     })
   })
@@ -41,10 +41,6 @@ function initRouter () {
 }
 
 const routes = [
-  {
-    path: '/',
-    component: Webclient
-  },
   {
     path: '/topicmap/:topicmapId',
     name: 'topicmap',
@@ -74,13 +70,16 @@ const routes = [
 
 const actions = {
 
+  initialNavigation () {
+    navigate(router.currentRoute, {params: {}})
+    registerRouteWatcher()
+  },
+
   callRoute (_, location) {
-    console.log('### callRoute', location)
     router.push(location)
   },
 
   callTopicmapRoute (_, id) {
-    console.log('### callTopicmapRoute', id)
     router.push({
       name: 'topicmap',
       params: {topicmapId: id}
@@ -88,17 +87,14 @@ const actions = {
   },
 
   callTopicRoute (_, id) {
-    console.log('### callTopicRoute', id)
     callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
   },
 
   callAssocRoute (_, id) {
-    console.log('### callAssocRoute', id)
     callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
   },
 
   stripSelectionFromRoute () {
-    console.log('### stripSelectionFromRoute')
     router.push({
       name: 'topicmap'
     })
@@ -112,7 +108,6 @@ const actions = {
    * @param   detail    "info", "related", "meta", "config" or "edit"
    */
   callDetailRoute ({rootState}, detail) {
-    console.log('### callDetailRoute', detail)
     const object = rootState.object
     if (!object) {
       throw Error('callDetailRoute() when there is no single selection')
@@ -130,7 +125,6 @@ const actions = {
    * @param   detail    "info", "related", "meta", "config" or "edit"
    */
   callTopicDetailRoute (_, {id, detail}) {
-    console.log('### callTopicDetailRoute', {id, detail})
     router.push({
       name: 'topicDetail',
       params: {topicId: id, detail}
@@ -144,7 +138,6 @@ const actions = {
    * @param   detail    "info", "related", "meta", "config" or "edit"
    */
   callAssocDetailRoute (_, {id, detail}) {
-    console.log('### callAssocDetailRoute', {id, detail})
     router.push({
       name: 'assocDetail',
       params: {assocId: id, detail}
@@ -152,7 +145,6 @@ const actions = {
   },
 
   stripDetailFromRoute ({rootState}) {
-    console.log('### stripDetailFromRoute')
     const object = rootState.object
     if (!object) {
       throw Error('stripDetailFromRoute() when there is no single selection')
@@ -164,6 +156,16 @@ const actions = {
 }
 
 const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
+
+function registerRouteWatcher () {
+  store.watch(
+    state => state.routerModule.router.currentRoute,
+    (to, from) => {
+      // console.log('### Route watcher', to, from)
+      navigate(to, from)
+    }
+  )
+}
 
 /**
  * @return  Promise which resolves to a boolean: true if user wants abort navigation (to continue editing),
@@ -216,10 +218,10 @@ function performDirtyCheck (to, from) {
 /**
  * Adapts app state when route changes.
  */
-function navigate (to, from, next) {
+function navigate (to, from) {
   const topicmapId = id(to.params.topicmapId)
   if (!topicmapId) {
-    initialRedirect(next)
+    defaultNavigation()
     return
   }
   //
@@ -277,39 +279,40 @@ function navigate (to, from, next) {
   next()
 }
 
-function initialRedirect (next) {
+function defaultNavigation () {
+  // console.log('### defaultNavigation')
   const topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
   if (topicmapId) {
     dmx.rpc.getTopic(topicmapId).then(topic => {
       if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
         throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
       }
-      redirectToTopicmap(topicmapId, next)
+      redirectToTopicmap(topicmapId)
     }).catch(error => {
       console.warn(`Topicmap ${topicmapId} check failed`, error)
-      redirectToFirstWorkspace(next)
+      redirectToFirstWorkspace()
     })
   } else {
-    console.log('No dmx_topicmap_id cookie')
-    redirectToFirstWorkspace(next)
+    // console.log('No dmx_topicmap_id cookie')
+    redirectToFirstWorkspace()
   }
 }
 
-function redirectToFirstWorkspace (next) {
+function redirectToFirstWorkspace () {
   const workspaceId = store.state.workspaces.workspaceTopics[0].id
-  console.log('redirectToFirstWorkspace', workspaceId)
+  // console.log('redirectToFirstWorkspace', workspaceId)
   dmx.rpc.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap').then(topics => {
     if (!topics.length) {
       throw Error(`workspace ${workspaceId} has no topicmap`)
     }
     const topicmapId = topics[0].id
-    redirectToTopicmap(topicmapId, next)
+    redirectToTopicmap(topicmapId)
   })
 }
 
-function redirectToTopicmap (topicmapId, next) {
-  console.log('redirectToTopicmap', topicmapId)
-  next({name: 'topicmap', params: {topicmapId}})
+function redirectToTopicmap (topicmapId) {
+  // console.log('redirectToTopicmap', topicmapId)
+  store.dispatch('callTopicmapRoute', topicmapId)
 }
 
 /**

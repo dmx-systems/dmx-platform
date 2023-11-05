@@ -24,25 +24,18 @@ const typeCacheReady = dmx.init({
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Load plugins
-const pluginsReady = loadPlugins(extraElementUI)
-
-// 3) Create Vue root instance
+// 2) Create Vue root instance
 // This includes instantiation of the router-view component and, after initial navigation, instantiation of the
 // dmx-webclient component and its child components (as provided by plugins), e.g. Topicmap Panel and the Detail Panel.
-Promise.all([
-  // dmx-webclient component relies on a populated type cache.
-  typeCacheReady,
-  // Initial navigation might involve "select the 1st workspace", so the workspace topics must be already loaded.
-  store.state.workspaces.ready
-]).then(() => {         // FIXME: wait also for pluginsReady?
-  const root = new Vue({
-    el: '#app',
-    store,
-    router: initRouter(),
-    render: h => h(App)
-  })
+const root = new Vue({
+  el: '#app',
+  store,
+  router: initRouter(),
+  render: h => h(App)
 })
+
+// 3) Load plugins
+const pluginsReady = loadPlugins(extraElementUI)    // FIXME: sync Vue root instantiation (2), or Initial navigation (5)
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
@@ -61,7 +54,17 @@ store.dispatch('registerDetailRenderer', {
   component: require('./components/dmx-arrow-select').default
 })
 
-// 5) Windows workaround to suppress the browser's native context menu on
+// 5) Initial navigation
+Promise.all([
+  // dmx-webclient component relies on a populated type cache.
+  typeCacheReady,
+  // Initial navigation might involve "select the 1st workspace", so the workspace topics must be already loaded.
+  store.state.workspaces.ready
+]).then(() => {
+  store.dispatch('initialNavigation')
+})
+
+// 6) Windows workaround to suppress the browser's native context menu on
 //   - right-clicking the canvas (to invoke search/create dialog)
 //   - right-clicking a topic/assoc (to invoke Cytoscape context menu)
 //   - a dialog appears as the reaction of a Cytoscape context menu command
