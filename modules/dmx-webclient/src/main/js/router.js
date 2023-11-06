@@ -155,8 +155,6 @@ const actions = {
   }
 }
 
-const getAssignedWorkspace = dmx.rpc.getAssignedWorkspace
-
 function registerRouteWatcher () {
   store.watch(
     state => state.routerModule.router.currentRoute,
@@ -232,9 +230,14 @@ function navigate (to, from) {
   if (topicmapChanged) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
-    p = getAssignedWorkspace(topicmapId)
+    p = checkTopicmapId(topicmapId)
+          .then(() => dmx.rpc.getAssignedWorkspace(topicmapId))
           .then(workspace => store.dispatch('_selectWorkspace', workspace.id))
           .then(() => store.dispatch('displayTopicmap', topicmapId))
+          .catch(e => {
+            console.warn(`Route ${to.path} failed (${e.message})`)
+            redirectToFirstWorkspace()
+          })
   } else {
     p = Promise.resolve()
   }
@@ -284,15 +287,12 @@ function defaultNavigation () {
   // console.log('### defaultNavigation')
   const topicmapId = id(dmx.utils.getCookie('dmx_topicmap_id'))
   if (topicmapId) {
-    dmx.rpc.getTopic(topicmapId).then(topic => {
-      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-        throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
-      }
-      redirectToTopicmap(topicmapId)
-    }).catch(error => {
-      console.warn(`Topicmap ${topicmapId} check failed`, error)
-      redirectToFirstWorkspace()
-    })
+    checkTopicmapId(topicmapId)
+      .then(() => redirectToTopicmap(topicmapId))
+      .catch(e => {
+        console.warn(`Invalid dmx_topicmap_id cookie: ${e.message}`)
+        redirectToFirstWorkspace()
+      })
   } else {
     // console.log('No dmx_topicmap_id cookie')
     redirectToFirstWorkspace()
@@ -314,6 +314,14 @@ function redirectToFirstWorkspace () {
 function redirectToTopicmap (topicmapId) {
   // console.log('redirectToTopicmap', topicmapId)
   store.dispatch('callTopicmapRoute', topicmapId)
+}
+
+function checkTopicmapId (id) {
+  return dmx.rpc.getTopic(id).then(topic => {
+    if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+      throw Error(`${id} is not a topicmap, but a ${topic.typeUri}`)
+    }
+  })
 }
 
 /**
