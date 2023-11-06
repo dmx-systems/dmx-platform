@@ -232,12 +232,9 @@ function navigate (to, from) {
   if (topicmapChanged) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
-    p = new Promise(resolve => {
-      getAssignedWorkspace(topicmapId)
-        .then(workspace => store.dispatch('_selectWorkspace', workspace.id))
-        .then(() => store.dispatch('displayTopicmap', topicmapId))
-        .then(resolve)
-    })
+    p = getAssignedWorkspace(topicmapId)
+          .then(workspace => store.dispatch('_selectWorkspace', workspace.id))
+          .then(() => store.dispatch('displayTopicmap', topicmapId))
   } else {
     p = Promise.resolve()
   }
@@ -250,33 +247,37 @@ function navigate (to, from) {
   const newId = assocId    || topicId           // Note: assocId    is checked first as newId must be a number
   const topicChanged = topicId !== oldTopicId
   const assocChanged = assocId !== oldAssocId
-  if ((topicChanged || topicmapChanged) && topicId !== undefined) {             // Note: 0 is a valid topic ID
-    fetchTopic(topicId, p)
-  }
-  if ((assocChanged || topicmapChanged) && assocId) {
-    fetchAssoc(assocId, p)
-  }
-  if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {    // Note: 0 is a valid topic ID
-    // detail panel
-    store.dispatch('emptyDisplay')
-    // topicmap panel
+  let p2
+  if ((topicChanged || topicmapChanged) && topicId !== undefined) {                     // Note: 0 is a valid topic ID
+    p2 = fetchAndDisplayTopic(topicId, p)
+  } else if ((assocChanged || topicmapChanged) && assocId) {
+    p2 = fetchAndDisplayAssoc(assocId, p)
+  } else if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {     // Note: 0 is a valid topic ID
+    store.dispatch('emptyDisplay')                              // -> dmx-webclient
     if (!topicmapChanged) {
-      p.then(() => store.dispatch('unsetSelection', oldId))
+      p.then(() => store.dispatch('unsetSelection', oldId))     // -> dmx-topicmaps
     }
+    p2 = Promise.resolve()
+  } else {
+    p2 = Promise.resolve()
   }
-  // 3) detail panel
-  const detail = to.params.detail
-  const oldDetail = from.params.detail
-  if (detail !== oldDetail) {
-    store.dispatch('setDetailPanelVisibility', detail !== undefined || store.state.details.pinned)
-    if (detail) {
-      store.dispatch('selectDetail', detail)
-      if (!oldDetail && oldId === newId) {
-        store.dispatch('_removeDetail')
+  // 3) detail panel tab
+  p2.then(() => {
+    const detail = to.params.detail
+    const oldDetail = from.params.detail
+    if (detail !== oldDetail) {
+      store.dispatch('setDetailPanelVisibility', detail !== undefined || store.state.details.pinned)
+      if (detail) {
+        store.dispatch('selectDetail', detail)
+        if (!oldDetail && oldId === newId) {
+          store.dispatch('_removeDetail')
+        }
       }
     }
-  }
-  next()
+  }).catch(e => {
+    console.warn(`Route ${to.path} failed (${e.message})`)
+    redirectToTopicmap(topicmapId)        // strip selection
+  })
 }
 
 function defaultNavigation () {
@@ -347,25 +348,18 @@ function callObjectRoute (id, paramName, routeName, detailRouteName) {
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.
  *
  * @param   p   a promise resolved once the topicmap rendering is complete.
+ * @return      a promise resolved once the topicmap rendering is complete and the selection is done.
  */
-function fetchTopic (id, p) {
-  console.log('fetchTopic', id)
-  // detail panel
+function fetchAndDisplayTopic (id, p) {
   const p2 = dmx.rpc.getTopic(id, true, true).then(topic => {  // includeChildren=true, includeAssocChildren=true
-    // console.log('topic', id, 'arrived')
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
     p.then(() => {
-      store.dispatch('displayObject', topic)
+      store.dispatch('displayObject', topic)              // -> dmx-webclient
     })
   })
-  // topicmap panel
-  p.then(() => {
-    store.dispatch('setTopicSelection', {id, p: p2})
-  }).catch(error => {
-    // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
-    // If the topicmap panel fails to render the topic the detail panel is supposed to stay empty.
-    console.error(`Rendering topic ${id} as selected failed`, error)
+  return p.then(() => {
+    store.dispatch('setTopicSelection', {id, p: p2})      // -> dmx-topicmaps
   })
 }
 
@@ -373,23 +367,18 @@ function fetchTopic (id, p) {
  * Fetches the given assoc, displays it in the detail panel, and renders it as selected in the topicmap panel.
  *
  * @param   p   a promise resolved once the topicmap rendering is complete.
+ * @return      a promise resolved once the topicmap rendering is complete and the selection is done.
  */
-function fetchAssoc (id, p) {
-  // detail panel
+function fetchAndDisplayAssoc (id, p) {
   const p2 = dmx.rpc.getAssoc(id, true, true).then(assoc => {  // includeChildren=true, includeAssocChildren=true
     // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
     // The "object" state must not be set before a topicmap renderer is instantiated.
     p.then(() => {
-      store.dispatch('displayObject', assoc)
+      store.dispatch('displayObject', assoc)              // -> dmx-webclient
     })
   })
-  // topicmap panel
-  p.then(() => {
-    store.dispatch('setAssocSelection', {id, p: p2})
-  }).catch(error => {
-    // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
-    // If the topicmap panel fails to render the assoc the detail panel is supposed to stay empty.
-    console.error(`Rendering assoc ${id} as selected failed`, error)
+  return p.then(() => {
+    store.dispatch('setAssocSelection', {id, p: p2})      // -> dmx-topicmaps
   })
 }
 
