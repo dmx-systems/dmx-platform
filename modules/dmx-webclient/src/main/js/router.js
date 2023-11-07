@@ -235,7 +235,7 @@ function navigate (to, from) {
           .then(workspace => store.dispatch('_selectWorkspace', workspace.id))
           .then(() => store.dispatch('displayTopicmap', topicmapId))
           .catch(e => {
-            console.warn(`Route ${to.path} failed (${e.message})`)
+            console.warn(`Route ${to.path} failed (${e})`)
             redirectToFirstWorkspace()
           })
   } else {
@@ -278,7 +278,7 @@ function navigate (to, from) {
       }
     }
   }).catch(e => {
-    console.warn(`Route ${to.path} failed (${e.message})`)
+    console.warn(`Route ${to.path} failed (${e})`)
     redirectToTopicmap(topicmapId)        // strip selection
   })
 }
@@ -290,11 +290,11 @@ function defaultNavigation () {
     checkTopicmapId(topicmapId)
       .then(() => redirectToTopicmap(topicmapId))
       .catch(e => {
-        console.warn(`Invalid dmx_topicmap_id cookie: ${e.message}`)
+        console.warn(`Invalid dmx_topicmap_id cookie (value: ${topicmapId}). ${e}`)
         redirectToFirstWorkspace()
       })
   } else {
-    // console.log('No dmx_topicmap_id cookie')
+    // console.log('No dmx_topicmap_id cookie present')
     redirectToFirstWorkspace()
   }
 }
@@ -320,12 +320,6 @@ function checkTopicmapId (id) {
   return dmx.rpc.getTopic(id).then(topic => {
     if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
       throw Error(`${id} is not a topicmap, but a ${topic.typeUri}`)
-    }
-  }).catch(e => {
-    if (e.response) {                       // errors thrown by axios have a 'response' property
-      throw Error(e.response.data.cause)    // DMX error responses have 'level', 'error', and 'cause' properties
-    } else {
-      throw e
     }
   })
 }
@@ -371,6 +365,8 @@ function fetchAndDisplayTopic (id, p) {
     p.then(() => {
       store.dispatch('displayObject', topic)              // -> dmx-webclient
     })
+  }).catch(e => {
+    console.warn(`${e}`)
   })
   return p.then(() => {
     store.dispatch('setTopicSelection', {id, p: p2})      // -> dmx-topicmaps
@@ -390,6 +386,8 @@ function fetchAndDisplayAssoc (id, p) {
     p.then(() => {
       store.dispatch('displayObject', assoc)              // -> dmx-webclient
     })
+  }).catch(e => {
+    console.warn(`${e}`)
   })
   return p.then(() => {
     store.dispatch('setAssocSelection', {id, p: p2})      // -> dmx-topicmaps
