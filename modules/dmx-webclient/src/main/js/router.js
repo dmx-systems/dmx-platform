@@ -321,6 +321,12 @@ function checkTopicmapId (id) {
     if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
       throw Error(`${id} is not a topicmap, but a ${topic.typeUri}`)
     }
+  }).catch(e => {
+    if (e.response) {                       // errors thrown by axios have a 'response' property
+      throw Error(e.response.data.cause)    // DMX error responses have 'level', 'error', and 'cause' properties
+    } else {
+      throw e
+    }
   })
 }
 
