@@ -14,8 +14,6 @@ const messageHandler = message => {
 }
 
 // 1) Init dmx library
-// The dmx library must be inited *before* the dmx-webclient component is instantiated.
-// The dmx-webclient component relies on the "typeCache" store module as registered by dmx.init(). ### TODO: still true?
 const typeCacheReady = dmx.init({
   topicTypes: 'all',
   store,
@@ -24,18 +22,16 @@ const typeCacheReady = dmx.init({
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Create Vue root instance
-// This includes instantiation of the router-view component and, after initial navigation, instantiation of the
-// dmx-webclient component and its child components (as provided by plugins), e.g. Topicmap Panel and the Detail Panel.
-const root = new Vue({
+// 2) Load plugins
+store.state.pluginsReady = loadPlugins(extraElementUI)
+
+// 3) Create Vue root instance
+new Vue({
   el: '#app',
   store,
   router: initRouter(),
   render: h => h(App)
 })
-
-// 3) Load plugins
-const pluginsReady = loadPlugins(extraElementUI)    // FIXME: sync Vue root instantiation (2), or Initial navigation (5)
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
