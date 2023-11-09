@@ -260,27 +260,26 @@ function navigate (to, from) {
     if (!topicmapChanged) {
       p.then(() => store.dispatch('unsetSelection', oldId))     // -> dmx-topicmaps
     }
-    p2 = Promise.resolve()
-  } else {
-    p2 = Promise.resolve()
   }
+  p2 && p2.catch(e => {
+    console.warn(`Route ${to.path} failed (${e})`)
+    // give detail panel time to appear (before it closes again) to let the dirty check work when selection is stripped
+    Vue.nextTick(() => {
+      redirectToTopicmap(topicmapId)      // strip selection
+    })
+  })
   // 3) detail panel tab
-  p2.then(() => {
-    const detail = to.params.detail
-    const oldDetail = from.params.detail
-    if (detail !== oldDetail) {
-      store.dispatch('setDetailPanelVisibility', detail !== undefined || store.state.details.pinned)
-      if (detail) {
-        store.dispatch('selectDetail', detail)
-        if (!oldDetail && oldId === newId) {
-          store.dispatch('_removeDetail')
-        }
+  const detail = to.params.detail
+  const oldDetail = from.params.detail
+  if (detail !== oldDetail) {
+    store.dispatch('setDetailPanelVisibility', detail !== undefined || store.state.details.pinned)
+    if (detail) {
+      store.dispatch('selectDetail', detail)
+      if (!oldDetail && oldId === newId) {
+        store.dispatch('_removeDetail')
       }
     }
-  }).catch(e => {
-    console.warn(`Route ${to.path} failed (${e})`)
-    redirectToTopicmap(topicmapId)        // strip selection
-  })
+  }
 }
 
 function defaultNavigation () {
