@@ -301,6 +301,52 @@ public class DMXUtils {
         return null;
     }
 
+
+
+    // *******************
+    // *** File System ***
+    // *******************
+
+
+
+    /**
+     * Returns the DMX platform's configuration directory. This is the directory where DMX's
+     * <code>config.properties</code> file resides. The path to this file is configurable by the
+     * <code>felix.system.properties</code> system property when the platform is launched.
+     * <p>
+     * Plugins can use the configuration directory for storing external plugin-specific resource files.
+     * By convention inside that directory there are per-plugin sub directories, named according to the
+     * respective plugin's repository name. These directories are created by the administrator.
+     * <p>
+     * So a plugin typically accesses its resource files by e.g.:
+     * <p>
+     * <code>DMXUtils.getConfigDir() + "dmx-linqa/" + fileName</code>
+     *
+     * @return  the DMX platform's configuration directory as derived from the <code>felix.system.properties</code>
+     *          system property (as configured by administrator), ending with "/". If that system property is not set
+     *          an empty string is returned, functioning as "current directory". This is the case in particular in
+     *          development mode, when DMX platform is run via Maven (via Pax Runner). While development create the
+     *          per-plugin configuration directory inside Pax Runner's `runner` directory, e.g.:
+     * <pre><code>
+     *          dmx-platform/
+     *              runner/
+     *                  dmx-linqa/
+     *                      custom.css
+     * </code></pre>
+     */
+    public static String getConfigDir() {
+        String systemProps = System.getProperty("felix.system.properties");
+        if (systemProps != null) {
+            if (systemProps.startsWith("file:") && systemProps.endsWith("config.properties")) {
+                return systemProps.substring("file:".length(), systemProps.length() - "config.properties".length());
+            } else {
+                throw new RuntimeException("Unexpected felix.system.properties: \"" + systemProps + "\"");
+            }
+        } else {
+            return "";
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private static PlayerModel getPlayer(PlayerModel r1, PlayerModel r2, String t1, String t2, String topicTypeUri,
