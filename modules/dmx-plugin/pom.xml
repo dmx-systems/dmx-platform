@@ -7,7 +7,7 @@
     <name>DMX Plugin</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-plugin</artifactId>
-    <version>5.3.3-SNAPSHOT</version>
+    <version>5.3.3</version>
     <packaging>pom</packaging>
 
     <description>
@@ -20,7 +20,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-hot-deploy</artifactId>
-        <version>5.3.3-SNAPSHOT</version>
+        <version>5.3.3</version>
         <relativePath>../dmx-hot-deploy/pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
-            <version>5.3.3-SNAPSHOT</version>
+            <version>5.3.3</version>
         </dependency>
     </dependencies>
 

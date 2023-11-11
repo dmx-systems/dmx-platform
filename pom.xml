@@ -7,7 +7,7 @@
     <name>DMX</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx</artifactId>
-    <version>5.3.3-SNAPSHOT</version>
+    <version>5.3.3</version>
     <packaging>pom</packaging>
 
     <description>DMX is a knowledge building platform</description>
@@ -54,6 +54,16 @@
             <id>aische</id>
             <name>Daniel van den Eijkel</name>
             <email>dvde@gmx.net</email>
+        </developer>
+        <developer>
+            <id>rsc</id>
+            <name>Robert Schuster</name>
+            <email>robert.schuster.rs01@gmail.com</email>
+        </developer>
+        <developer>
+            <id>gev</id>
+            <name>Gloria Euroza Vazquez</name>
+            <email>gloria.euroza@dmx.berlin</email>
         </developer>
     </developers>
 
