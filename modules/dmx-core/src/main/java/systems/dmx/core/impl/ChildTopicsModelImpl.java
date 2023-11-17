@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.CompDefModel;
 import systems.dmx.core.model.RelatedTopicModel;
@@ -351,14 +352,10 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public final ChildTopicsModel addDeletionRef(String compDefUri, long refTopicId) {
-        add(compDefUri, mf.newTopicDeletionModel(refTopicId));
-        return this;
-    }
-
-    @Override
-    public final ChildTopicsModel addDeletionRef(String compDefUri, String refTopicUri) {
-        add(compDefUri, mf.newTopicDeletionModel(refTopicUri));
+    public final ChildTopicsModel addDeletionRef(String compDefUri, long assocId) {
+        AssocModel assoc = mf.newAssocModel();
+        assoc.setId(assocId);
+        add(compDefUri, mf.newTopicDeletionModel(-1, assoc));
         return this;
     }
 

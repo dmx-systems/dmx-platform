@@ -355,19 +355,21 @@ public class ModelFactoryImpl implements ModelFactory {
                     return newTopicReferenceModel(topicUri);
                 }
             } else if (val.startsWith(DEL_ID_PREFIX)) {
-                long topicId = delTopicId(val);
+                // long topicId = delTopicId(val);
                 if (relatingAssoc != null) {
-                    return newTopicDeletionModel(topicId, relatingAssoc);
+                    return newTopicDeletionModel(-1, relatingAssoc);
                 } else {
-                    return newTopicDeletionModel(topicId);
+                    // return newTopicDeletionModel(topicId);       // TODO: error?
+                    throw new RuntimeException("No assoc given for deleting \"" + val + "\"");
                 }
-            } else if (val.startsWith(DEL_URI_PREFIX)) {
-                String topicUri = delTopicUri(val);
+            } else if (val.startsWith(DEL_URI_PREFIX)) {            // TODO: still needed?
+                /* String topicUri = delTopicUri(val);
                 if (relatingAssoc != null) {
                     return newTopicDeletionModel(topicUri, relatingAssoc);
                 } else {
                     return newTopicDeletionModel(topicUri);
-                }
+                } */
+                throw new RuntimeException("Deleting by URI not implemented");
             }
         }
         return null;
@@ -398,9 +400,10 @@ public class ModelFactoryImpl implements ModelFactory {
         return val.substring(REF_URI_PREFIX.length());
     }
 
+    /* TODO: drop it
     private long delTopicId(String val) {
         return Long.parseLong(val.substring(DEL_ID_PREFIX.length()));
-    }
+    } */
 
     private String delTopicUri(String val) {
         return val.substring(DEL_URI_PREFIX.length());

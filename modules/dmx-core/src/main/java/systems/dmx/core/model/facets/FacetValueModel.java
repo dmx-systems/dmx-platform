@@ -99,12 +99,8 @@ public interface FacetValueModel extends ChildTopicsModel {
     // ---
 
     /**
-     * Adds a by-ID topic deletion reference to a multiple-valued facet.
+     * Adds a topic deletion reference to a multiple-valued facet. Note: the topic to be deleted is referred to by
+     * association ID. The topic might occur several times in the same multi-value, so topic ID/URI would not be unique.
      */
-    FacetValueModel addDeletionRef(long refTopicId);
-
-    /**
-     * Adds a by-URI topic deletion reference to a multiple-valued facet.
-     */
-    FacetValueModel addDeletionRef(String refTopicUri);
+    FacetValueModel addDeletionRef(long assocId);
 }

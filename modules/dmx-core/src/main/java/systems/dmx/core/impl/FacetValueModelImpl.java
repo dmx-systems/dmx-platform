@@ -101,11 +101,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // ---
 
-    public FacetValueModel addDeletionRef(long refTopicId) {
-        return (FacetValueModel) addDeletionRef(compDefUri, refTopicId);
-    }
-
-    public FacetValueModel addDeletionRef(String refTopicUri) {
-        return (FacetValueModel) addDeletionRef(compDefUri, refTopicUri);
+    public FacetValueModel addDeletionRef(long assocId) {
+        return (FacetValueModel) addDeletionRef(compDefUri, assocId);
     }
 }
