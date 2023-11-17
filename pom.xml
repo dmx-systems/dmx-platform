@@ -7,7 +7,7 @@
     <name>DMX</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx</artifactId>
-    <version>5.3.3</version>
+    <version>5.3.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>DMX is a knowledge building platform</description>

@@ -2,6 +2,13 @@
 Version History
 ===============
 
+
+5.3.4
+-----
+
+*unreleased*
+
+
 5.3.3
 -----
 
@@ -35,3 +42,28 @@ Nov 11, 2023
 - Core API: add `getConfigDir()` to `DMXUtils` (#527) Thanks to @thebohemian!
 - Core's ValueIntegrator supports custom workspace assignments for created topics/associations (#519)
 - Webservice: boolean return values of RESTful methods are JSON serialized automatically (#516) Thanks to @thebohemian!
+
+
+5.3.2
+-----
+
+Aug 24, 2023
+
+#### Improvements:
+
+- When an user is deleted the ownership of her workspaces is transfered to the current user
+
+#### Plugin development:
+
+- AccessControl API: add `getWorkspacesByOwner()`
+
+
+5.3.1
+-----
+
+Jun 23, 2023
+
+#### Improvements:
+
+- The Webclient recovers after a network or server problem, e.g. when internet goes away or server is restarted.
+  An alert is shown and after pressing OK the Webclient is relaunched. Obtained by updating to `dmx-api` 3.0.1
