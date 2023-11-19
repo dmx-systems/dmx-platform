@@ -131,6 +131,11 @@ public final class AccessLayer {
         return new ReadableIterable(db.fetchAllTopics());
     }
 
+    void indexTopicFulltext(long topicId, String text, String indexKey) {
+        // FIXME: check WRITE permission
+        db.indexTopicFulltext(topicId, text, indexKey);
+    }
+
     // ---
 
     TopicModelImpl createTopic(TopicModelImpl model) {

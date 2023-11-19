@@ -139,6 +139,8 @@ public interface CoreService {
      */
     TopicResult queryTopicsFulltext(String query, String typeUri, boolean searchChildTopics);
 
+    void indexTopicFulltext(long topicId, String text, String indexKey);
+
     // ---
 
     Topic createTopic(TopicModel model);

@@ -128,6 +128,11 @@ public class CoreServiceImpl implements CoreService {
         );
     }
 
+    @Override
+    public void indexTopicFulltext(long topicId, String text, String indexKey) {
+        al.indexTopicFulltext(topicId, text, indexKey);
+    }
+
     // ---
 
     @Override
