@@ -75,6 +75,8 @@ public interface DMXStorage {
      */
     void storeTopicValue(long topicId, SimpleValue value, String indexKey, boolean isHtmlValue);
 
+    void indexTopicFulltext(long topicId, String text, String indexKey);
+
     // ---
 
     /**
