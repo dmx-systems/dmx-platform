@@ -502,14 +502,14 @@ class ValueIntegrator {
                 // update memory
                 oldChildTopics.set(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
-            // 3) update relating assoc
+            // 3) update relating assoc value
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
             if (assoc == null && oldValueExists && !deleted) {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                updateRelatingAssoc(assoc, compDefUri, newValues);
+                updateAssocValue(assoc, compDefUri, newValues);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childValue=" + childValue +
@@ -581,14 +581,14 @@ class ValueIntegrator {
                 // update memory
                 oldChildTopics.add(compDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
-            // 3) update relating assoc
+            // 3) update relating assoc value
             //
             // take the old assoc if no new one is created, there is an old one, and it has not been deleted
             if (assoc == null && oldValueExists && !valueChanged) {
                 assoc = oldValue.getRelatingAssoc();
             }
             if (assoc != null) {
-                updateRelatingAssoc(assoc, compDefUri, newValues);
+                updateAssocValue(assoc, compDefUri, newValues);
             }
         }
         // update sequence
@@ -602,7 +602,10 @@ class ValueIntegrator {
         }
     }
 
-    private void updateRelatingAssoc(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
+    /**
+     * Updates an association's value (simple or composite).
+     */
+    private void updateAssocValue(AssocModelImpl assoc, String compDefUri, RelatedTopicModelImpl newValues) {
         try {
             // Note: for partial create/update requests newValues might be null
             if (newValues != null) {
@@ -612,15 +615,10 @@ class ValueIntegrator {
                 // in updating the assoc value.
                 _newValues.setPlayer1(null);
                 _newValues.setPlayer2(null);
-                // Note: if no relating assocs are contained in a create/update request the model factory
-                // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
-                // TODO: is condition needed? => yes, try create new topic
-                if (_newValues.typeUri != null) {
-                    assoc.update(_newValues);
-                    // TODO: access control? Note: currently the child assocs of a workspace have no workspace
-                    // assignments. With strict access control, updating a workspace topic would fail.
-                    // al.updateAssoc(assoc, _newValues);
-                }
+                assoc.update(_newValues);
+                // TODO: access control? Note: currently the child assocs of a workspace have no workspace
+                // assignments. With strict access control, updating a workspace topic would fail.
+                // al.updateAssoc(assoc, _newValues);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating relating assoc " + assoc.id + " failed, compDefUri=\"" + compDefUri +
@@ -895,6 +893,13 @@ class ValueIntegrator {
         return createChildAssoc(parent, child, compDefUri, assoc, false);
     }
 
+    /**
+     * Creates a (Composition) association between a parent and a child. No association value is set.
+     * Optionally an custom workspace assignment is performed for the created assoc.
+     *
+     * @param   compDefUri      the association's type is determined by this comp def.
+     * @param   assoc           a possible custom workspace assignment is taken from this assoc.
+     */
     private AssocModelImpl createChildAssoc(DMXObjectModel parent, DMXObjectModel child, String compDefUri,
                                             AssocModelImpl assoc, boolean deleted) {
         logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (compDefUri=\"" +

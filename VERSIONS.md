@@ -13,6 +13,7 @@ Version History
 - CoreService API: add `indexTopicFulltext()` (#529)
 - Deleting a particular value from a muti-value is now supported for duplicate values. (#528) Thanks to @gevlish!  
   Core API (BREAKING CHANGE): `ChildTopicsModel`'s `addDeletionRef()` takes `assocId` argument.
+- Core: assoc type must not be set to update assoc value (#530) Thanks to @gevlish!
 
 
 5.3.3
