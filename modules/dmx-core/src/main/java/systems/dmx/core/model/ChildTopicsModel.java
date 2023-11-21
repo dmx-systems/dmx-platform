@@ -213,6 +213,22 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      */
     ChildTopicsModel setRef(String compDefUri, String refTopicUri);
 
+    /**
+     * Puts a by-ID topic reference in a single-valued child.
+     * An existing reference is overwritten.
+     *
+     * @param   assoc   provides a value (simple or composite) for the created relating association.
+     */
+    ChildTopicsModel setRef(String compDefUri, long refTopicId, AssocModel assoc);
+
+    /**
+     * Puts a by-URI topic reference in a single-valued child.
+     * An existing reference is overwritten.
+     *
+     * @param   assoc   provides a value (simple or composite) for the created relating association.
+     */
+    ChildTopicsModel setRef(String compDefUri, String refTopicUri, AssocModel assoc);
+
     // ---
 
     /**
@@ -282,6 +298,20 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Adds a by-URI topic reference to a multiple-valued child.
      */
     ChildTopicsModel addRef(String compDefUri, String refTopicUri);
+
+    /**
+     * Adds a by-ID topic reference to a multiple-valued child.
+     *
+     * @param   assoc   provides a value (simple or composite) for the created relating association.
+     */
+    ChildTopicsModel addRef(String compDefUri, long refTopicId, AssocModel assoc);
+
+    /**
+     * Adds a by-URI topic reference to a multiple-valued child.
+     *
+     * @param   assoc   provides a value (simple or composite) for the created relating association.
+     */
+    ChildTopicsModel addRef(String compDefUri, String refTopicUri, AssocModel assoc);
 
     // ---
 

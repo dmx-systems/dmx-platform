@@ -265,6 +265,18 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return this;
     }
 
+    @Override
+    public final ChildTopicsModel setRef(String compDefUri, long refTopicId, AssocModel assoc) {
+        set(compDefUri, mf.newTopicReferenceModel(refTopicId, assoc));
+        return this;
+    }
+
+    @Override
+    public final ChildTopicsModel setRef(String compDefUri, String refTopicUri, AssocModel assoc) {
+        set(compDefUri, mf.newTopicReferenceModel(refTopicUri, assoc));
+        return this;
+    }
+
     // ---
 
     @Override
@@ -346,6 +358,18 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     @Override
     public final ChildTopicsModel addRef(String compDefUri, String refTopicUri) {
         add(compDefUri, mf.newTopicReferenceModel(refTopicUri));
+        return this;
+    }
+
+    @Override
+    public final ChildTopicsModel addRef(String compDefUri, long refTopicId, AssocModel assoc) {
+        add(compDefUri, mf.newTopicReferenceModel(refTopicId, assoc));
+        return this;
+    }
+
+    @Override
+    public final ChildTopicsModel addRef(String compDefUri, String refTopicUri, AssocModel assoc) {
+        add(compDefUri, mf.newTopicReferenceModel(refTopicUri, assoc));
         return this;
     }
 

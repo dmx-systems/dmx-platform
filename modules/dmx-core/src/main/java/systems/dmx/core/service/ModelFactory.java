@@ -161,6 +161,8 @@ public interface ModelFactory {
 
     // === TopicReferenceModel ===
 
+    // TODO: make internal?
+
     TopicReferenceModel newTopicReferenceModel(long topicId);
 
     TopicReferenceModel newTopicReferenceModel(long topicId, AssocModel relatingAssoc);

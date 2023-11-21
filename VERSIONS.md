@@ -15,6 +15,7 @@ Version History
   Core API (BREAKING CHANGE): `ChildTopicsModel`'s `addDeletionRef()` takes `assocId` argument.
 - Core: assoc type must not be set to update assoc value (#530) Thanks to @gevlish!
 - ModelFactory API: add newAssocModel(SimpleValue) (#531) Thanks to @gevlish!
+- ChildTopicsModel API: add add/setRef() w/ AssocModel param (#531) Thanks to @gevlish!
 
 
 5.3.3
