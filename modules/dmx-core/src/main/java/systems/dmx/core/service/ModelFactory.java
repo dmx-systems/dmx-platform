@@ -70,6 +70,8 @@ public interface ModelFactory {
     AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2,
                              SimpleValue value, ChildTopicsModel childTopics);
 
+    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2);
+
     AssocModel newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2);
 
     AssocModel newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2,
@@ -78,13 +80,11 @@ public interface ModelFactory {
     // ### TODO: Refactoring needed. See comments in impl.
     AssocModel newAssocModel();
 
-    // ### TODO: Refactoring needed. See comments in impl.
+    AssocModel newAssocModel(SimpleValue value);
+
     AssocModel newAssocModel(ChildTopicsModel childTopics);
 
-    // ### TODO: Refactoring needed. See comments in impl.
     AssocModel newAssocModel(String typeUri, ChildTopicsModel childTopics);
-
-    AssocModel newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2);
 
     AssocModel newAssocModel(AssocModel assoc);
 

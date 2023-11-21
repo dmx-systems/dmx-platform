@@ -136,6 +136,11 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
+    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2) {
+        return newAssocModel(id, uri, typeUri, player1, player2, null, null);
+    }
+
+    @Override
     public AssocModelImpl newAssocModel(String typeUri, PlayerModel player1, PlayerModel player2) {
         return newAssocModel(-1, null, typeUri, player1, player2, null, null);
     }
@@ -153,23 +158,19 @@ public class ModelFactoryImpl implements ModelFactory {
         return newAssocModel(-1, null, null, null, null, null, null);
     }
 
-    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    // ### TODO: make internal?
+    @Override
+    public AssocModel newAssocModel(SimpleValue value) {
+        return newAssocModel(-1, null, null, null, null, value, null);
+    }
+
     @Override
     public AssocModelImpl newAssocModel(ChildTopicsModel childTopics) {
         return newAssocModel(null, childTopics);
     }
 
-    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    // ### TODO: make internal?
     @Override
     public AssocModelImpl newAssocModel(String typeUri, ChildTopicsModel childTopics) {
         return newAssocModel(typeUri, null, null, childTopics);
-    }
-
-    @Override
-    public AssocModelImpl newAssocModel(long id, String uri, String typeUri, PlayerModel player1, PlayerModel player2) {
-        return newAssocModel(id, uri, typeUri, player1, player2, null, null);
     }
 
     @Override
