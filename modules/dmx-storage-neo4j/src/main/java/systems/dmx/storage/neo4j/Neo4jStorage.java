@@ -212,10 +212,8 @@ public class Neo4jStorage implements DMXStorage {
     @Override
     public void indexTopicFulltext(long topicId, String text, String indexKey) {
         Node topicNode = fetchTopicNode(topicId);
-        // FIXME: former File topic value (= file name) is overwritten in index. File topics are not searchable by
-        // file name anymore, only the File Name topic will be found.
-        indexNodeValue(topicNode, text, IndexMode.FULLTEXT,     indexKey, null, topicFulltextIndex);  // exactIndex=null
-        indexNodeValue(topicNode, text, IndexMode.FULLTEXT_KEY, indexKey, null, topicFulltextIndex);  // exactIndex=null
+        topicFulltextIndex.add(topicNode, KEY_FULLTEXT, text);
+        topicFulltextIndex.add(topicNode, indexKey, text);
     }
 
     // ---
