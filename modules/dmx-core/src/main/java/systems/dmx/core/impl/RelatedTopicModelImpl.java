@@ -41,15 +41,7 @@ public class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopi
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON();
-            // Note: the relating association might be uninitialized and thus not serializable.
-            // This is the case at least for enrichments which have no underlying topics (e.g. timestamps).
-            // ### TODO: remodel enrichments? Don't put them in a child topics model but in a proprietary field?
-            if (relatingAssoc.getPlayer1() != null) {
-                o.put("assoc", relatingAssoc.toJSON());
-            }
-            //
-            return o;
+            return super.toJSON().put("assoc", relatingAssoc.toJSON());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

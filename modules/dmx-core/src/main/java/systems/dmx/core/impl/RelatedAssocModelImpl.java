@@ -24,6 +24,10 @@ public class RelatedAssocModelImpl extends AssocModelImpl implements RelatedAsso
         return relatingAssoc;
     }
 
+    // FIXME: define toJSON()?
+    // FIXME: define clone()?
+    // Compare to RelatedTopicModelImpl.java
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
