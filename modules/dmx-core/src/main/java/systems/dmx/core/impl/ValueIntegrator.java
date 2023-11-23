@@ -615,10 +615,15 @@ class ValueIntegrator {
                 // in updating the assoc value.
                 _newValues.setPlayer1(null);
                 _newValues.setPlayer2(null);
-                assoc.update(_newValues);
-                // TODO: access control? Note: currently the child assocs of a workspace have no workspace
-                // assignments. With strict access control, updating a workspace topic would fail.
-                // al.updateAssoc(assoc, _newValues);
+                // Note: if no relating assocs are contained in a create/update request the model factory
+                // creates assocs anyways, but these are completely uninitialized.
+                // TODO: is condition needed? => yes, try create new workspace
+                if (_newValues.typeUri != null) {
+                    assoc.update(_newValues);
+                    // TODO: access control? Note: currently the child assocs of a workspace have no workspace
+                    // assignments. With strict access control, updating a workspace topic would fail. TODO: still true?
+                    // al.updateAssoc(assoc, _newValues);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating relating assoc " + assoc.id + " failed, compDefUri=\"" + compDefUri +
