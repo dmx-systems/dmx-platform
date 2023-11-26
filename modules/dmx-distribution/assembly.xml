@@ -33,6 +33,8 @@
                 <include>org.apache.servicemix.bundles:*</include>
                 <!--include>org.ops4j.pax.web:*</include-->
                 <include>org.slf4j:*</include>
+                <include>org.apache.aries.spifly:*</include>
+                <include>org.ow2.asm:*</include>
                 <include>org.codehaus.jettison:*</include>
             </includes>
             <fileMode>0444</fileMode>
