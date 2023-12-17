@@ -175,7 +175,7 @@ function isWorkspaceReadable () {
 }
 
 function updateWorkspaceCookie () {
-  // console.log('dmx_workspace_id', state.workspaceId)
+  // console.log('updateWorkspaceCookie', state.workspaceId)
   dmx.utils.setCookie('dmx_workspace_id', state.workspaceId)
 }
 

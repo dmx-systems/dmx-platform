@@ -618,7 +618,7 @@ class ValueIntegrator {
                 // Note: if no relating assocs are contained in a create/update request the model factory
                 // creates assocs anyways, but these are completely uninitialized.
                 // TODO: is condition needed? => yes, try create new workspace
-                if (_newValues.typeUri != null) {
+                if (_newValues.value != null || _newValues.childTopics.size() > 0) {
                     assoc.update(_newValues);
                     // TODO: access control? Note: currently the child assocs of a workspace have no workspace
                     // assignments. With strict access control, updating a workspace topic would fail. TODO: still true?

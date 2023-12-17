@@ -41,6 +41,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.compDefs    = toMap(compDefs);
+        // Note: at construction time "viewConfig" CAN be null (and be initialized later on by setViewConfig()).
+        // See viewConfig related comment in fetchTopicType()/fetchAssocType() (TypeStorage.java).
         this.viewConfig  = viewConfig;
     }
 

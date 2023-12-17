@@ -330,7 +330,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     public File getFile(String repoPath) {
         String operation = "Accessing the file/directory at repository path \"" + repoPath + "\"";
         try {
-            logger.info(operation);
+            logger.fine(operation);
             //
             File file = absolutePath(repoPath);     // throws FileRepositoryException
             checkExistence(file);                   // throws FileRepositoryException
@@ -346,7 +346,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     public File getFile(long fileTopicId) {
         String operation = "Accessing the file/directory of File/Folder topic " + fileTopicId;
         try {
-            logger.info(operation);
+            logger.fine(operation);
             //
             String repoPath = repoPath(fileTopicId);
             File file = absolutePath(repoPath);     // throws FileRepositoryException
