@@ -12,11 +12,14 @@ Version History
 
 - CoreService API: add `indexTopicFulltext()` (#529)
     - DMXStorage SPI: add `indexTopicFulltext()` (#529)
-- Deleting a particular value from a muti-value is now supported for duplicate values. (#528) Thanks to @gevlish!  
+- Deleting a particular value from a muti-value is now supported for duplicate child values. (#528) Thanks to @gevlish!  
   Core API (BREAKING CHANGE): `ChildTopicsModel`'s `addDeletionRef()` takes `assocId` argument.
 - Core: assoc type must not be set to update assoc value (#530) Thanks to @gevlish!
+- Fix: RelatedTopicModel JSON serialization includes "assoc" (#530)
 - ModelFactory API: add newAssocModel(SimpleValue) (#531) Thanks to @gevlish!
 - ChildTopicsModel API: add add/setRef() w/ AssocModel param (#531) Thanks to @gevlish!
+- Upgrade to SLF4J 2.0, adding Aries SPI Fly and ASM dependencies (#533)
+- Improve resource handling: `resources-static/` obsolete (#535, #504)
 
 
 5.3.3
