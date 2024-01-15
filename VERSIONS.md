@@ -8,6 +8,13 @@ Version History
 
 *unreleased*
 
+#### Improvements:
+
+#### Bug fixes:
+
+- Fix: render color emojis in all browsers and platforms (#536)
+    - On all platforms the DMX Webclient utilizes the "Ubuntu" web font (#536)
+
 #### Plugin development:
 
 - CoreService API: add `indexTopicFulltext()` (#529)

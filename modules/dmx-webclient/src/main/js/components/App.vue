@@ -8,18 +8,23 @@
 </template>
 
 <style>
+@import url(../../resources-build/ubuntu-font/fonts.css);
+
 :root {
   /*
-    Note 1: we use the native font of the respective platform.
-      https://make.wordpress.org/core/2016/07/07/native-fonts-in-4-6/
-      https://bitsofco.de/the-new-system-font-stack/
-    Update: since Cytoscape 3.3 "BlinkMacSystemFont" lets crash Chrome on macOS.
-      https://github.com/cytoscape/cytoscape.js/issues/2249
-    As a workaround since DMX 5.0-beta-3 we replace "BlinkMacSystemFont" by "system-ui" which is supported by both,
-    Safari and Chrome. Firefox (at least up to version 66) still needs "-apple-system".
-      https://caniuse.com/#feat=font-family-system-ui
+    Note 1: we no longer use the platform's system font (font-family: system-ui) as Chrome on a Mac renders some emojis
+      (e.g. U+263A White Smiling Face, U+2708 Airplane) as small black glyphs then while Firefox and Safari render all
+      emojis nicely and in color. The origin is that the macOS system font ("SF Pro"), while being a text font, it also
+      contains small black glyphs for some emoji code points and these compete with the dedicated "Apple Color Emoji"
+      font. When SF Pro is selected Chrome renders all characters with this font and falls back to "Apple Color Emoji"
+      only for glyphs not found in SF Pro. Firefox (as well as Safari) on the other hand always use the "Apple Color
+      Emoji" font for rendering emoji characters.
+        https://fullystacked.net/using-emoji-on-the-web/
+        https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
+      To have colorful emoji rendering in all browsers the solution is utilizing a font for primary text rendering which
+      does not contain any emoji glphys, e.g. the "Ubuntu" web font.
 
-    Note 2: multiple-word font names like "Segoe UI" are not quoted.
+    Note 2: multiple-word font names like "Apple Color Emoji" are not quoted.
     In various browsers DOM style.getPropertyValue() works differently (see https://jsfiddle.net/jri_/tt8o97yu/2/):
       Safari: converts " -> '
       Chrome: converts ' -> "
@@ -33,8 +38,8 @@
     All the mess vanish if multiple-word font names are not quoted at all in CSS. There are some debates whether this
     is valid CSS or not. Fact is multiple-word font names without quotes do work in all major browsers.
   */
-  --main-font-family: -apple-system, system-ui, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue,
-      sans-serif;
+  --main-font-family: Ubuntu, Twemoji Country Flags, Twemoji Mozilla, Apple Color Emoji, Segoe UI Emoji,
+      Segoe UI Symbol, Noto Color Emoji, EmojiOne Color, Android Emoji, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
   --label-color: #909399;   /* matches --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
@@ -72,12 +77,12 @@ body {
 }
 
 input {
-  font-family: var(--main-font-family);
+  font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
   font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes */
 }
 
 button {
-  font-family: var(--main-font-family);
+  font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
   font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes */
 }
 
