@@ -1,7 +1,7 @@
 {
   "name": "dmx-webclient",
-  "version": "5.3.3",
-  "description": "The DMX 5 Webclient",
+  "version": "5.3.4",
+  "description": "The DMX Webclient",
   "author": "Jörg Richter <jri@dmx.berlin>",
   "license": "AGPL-3.0",
   "repository": {

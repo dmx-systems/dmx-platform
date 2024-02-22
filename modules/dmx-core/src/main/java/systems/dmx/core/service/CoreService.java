@@ -339,8 +339,7 @@ public interface CoreService {
      */
     boolean hasProperty(long id, String propUri);
 
-    // Note: there is no setter here. If we want one we actually need 2 setters: one for topics, one for assocs.
-    // This is because the storage layer maintains separate indexes for topics and assocs.
+    // Note: setProperty() and removeProperty() are located in DMXObject API.
 
     // ---
 

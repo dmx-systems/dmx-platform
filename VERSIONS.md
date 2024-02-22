@@ -6,27 +6,36 @@ Version History
 5.3.4
 -----
 
-*unreleased*
+Feb 22, 2024
 
-#### Improvements:
+#### New plugins available
 
-#### Bug fixes:
+- [dmx-pdf-search](https://github.com/dmx-systems/dmx-pdf-search) - fulltext search for PDF files,
+  works transparently in DMX Webclient's search dialog
+- [dmx-tesseract](https://github.com/dmx-systems/dmx-tesseract) - integrates the
+  [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine, works together with `dmx-pdf-search` plugin
 
-- Fix: render color emojis in all browsers and platforms (#536)
-    - On all platforms the DMX Webclient utilizes the "Ubuntu" web font (#536)
+#### Bug fixes
 
-#### Plugin development:
+- Render color emojis in all browsers and platforms (#536)
+    - Related: on all platforms the DMX Webclient uses "Ubuntu" as main font (#536)
 
-- CoreService API: add `indexTopicFulltext()` (#529)
-    - DMXStorage SPI: add `indexTopicFulltext()` (#529)
-- Deleting a particular value from a muti-value is now supported for duplicate child values. (#528) Thanks to @gevlish!  
-  Core API (BREAKING CHANGE): `ChildTopicsModel`'s `addDeletionRef()` takes `assocId` argument.
-- Core: assoc type must not be set to update assoc value (#530) Thanks to @gevlish!
-- Fix: RelatedTopicModel JSON serialization includes "assoc" (#530)
-- ModelFactory API: add newAssocModel(SimpleValue) (#531) Thanks to @gevlish!
-- ChildTopicsModel API: add add/setRef() w/ AssocModel param (#531) Thanks to @gevlish!
-- Upgrade to SLF4J 2.0, adding Aries SPI Fly and ASM dependencies (#533)
-- Improve resource handling: `resources-static/` obsolete (#535, #504)
+#### Plugin development
+
+- Core support for custom fulltext indexing, e.g. for making PDF content searchable (#529)
+    - `CoreService` API: add `indexTopicFulltext()`
+    - `DMXStorage` SPI: add `indexTopicFulltext()`
+- Extended Core API support for DB updates (Thanks to @gevlish!)
+    - Deleting a particular value from a multi-value is now supported for duplicate values (#528)  
+      BREAKING CHANGE: `ChildTopicsModel`'s `addDeletionRef()` takes an `assocId` argument (instead of `topicId`).
+    - `ModelFactory` API: add `newAssocModel()` with `SimpleValue` parameter (#531)
+    - `ChildTopicsModel` API: add `addRef()`/`setRef()` with `AssocModel` parameter (#531)
+    - In an update-assoc-value call the assoc type is not required to be set (#530)
+- Improved handling of web resources (Thanks to @thebohemian!)
+    - Webpack output goes to `target/` (instead of `src/`), `resources-static/` is obsolete,
+      `clean-webpack-plugin` is not needed anymore (#535, #504)
+- Core fix: `RelatedTopicModel` JSON serialization includes `assoc`
+- Platform's SLF4J is upgraded to 2.0, includes Aries SPI Fly and ASM dependencies (#533)
 
 
 5.3.3
@@ -34,7 +43,7 @@ Version History
 
 Nov 11, 2023
 
-#### Improvements:
+#### Improvements
 
 - Security: password hashes are stored with salt (#518) Thanks to @almereyda!
     - Optional additional site-wide salting, new config property `dmx.security.site_salt`
@@ -42,12 +51,12 @@ Nov 11, 2023
 - Security: include session IDs in server log only at FINE level (#514) Thanks to @junes!
 - Configuration: in config.properties explain `dmx.host.url` in more detail (#517)
 
-#### Bug fixes:
+#### Bug fixes
 
 - Several URL bugs fixed related to logout/reload (#524)
     - Strip selection from URL if selected topic/association not readable anymore after logout
     - Invalid routes (stale topicmap ID and/or topic ID) are redirected to valid route
-- Several password related bugs fixed:
+- Several password related bug fixes
     - Several users can have the same password (#85)
     - Saving an user account w/o any changes works as expected (#520)
     - User can change her password also if she lacks WRITE permission for the current workspace (#519)
@@ -56,7 +65,7 @@ Nov 11, 2023
 - Webclient search results don't break in-mid word (#522) Thanks to @gevlish!
 - Line wrap Webclient error notifications (#525)
 
-#### Plugin development:
+#### Plugin development
 
 - Core API (BREAKING CHANGE): `Credentials` makes plain text password available (#515) Thanks to @thebohemian!
 - Core API: add `getConfigDir()` to `DMXUtils` (#527) Thanks to @thebohemian!
@@ -69,11 +78,11 @@ Nov 11, 2023
 
 Aug 24, 2023
 
-#### Improvements:
+#### Improvements
 
-- When an user is deleted the ownership of her workspaces is transfered to the current user
+- When an user is deleted the ownership of her workspaces is transferred to the current user
 
-#### Plugin development:
+#### Plugin development
 
 - AccessControl API: add `getWorkspacesByOwner()`
 
@@ -83,7 +92,7 @@ Aug 24, 2023
 
 Jun 23, 2023
 
-#### Improvements:
+#### Improvements
 
 - The Webclient recovers after a network or server problem, e.g. when internet goes away or server is restarted.
   An alert is shown and after pressing OK the Webclient is relaunched. Obtained by updating to `dmx-api` 3.0.1

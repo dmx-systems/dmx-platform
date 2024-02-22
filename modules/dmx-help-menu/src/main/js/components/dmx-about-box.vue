@@ -5,7 +5,7 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.3.4-SNAPSHOT
+        5.3.4
       </div>
       <div class="field">
         <div class="field-label">Released</div>
@@ -19,7 +19,7 @@
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2023&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
+        2024&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
           DMX Systems
         </el-link>
       </div>
