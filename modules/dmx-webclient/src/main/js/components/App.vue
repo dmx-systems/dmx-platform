@@ -121,7 +121,7 @@ button {
 
 .el-dialog__header {
   padding: 4px 15px 3px !important;               /* was 20px 20px 10px */
-  background-image: url("../../resources/dots.png");
+  background-image: url("../../resources-build/dots.png");
 }
 
 .el-dialog__title {
