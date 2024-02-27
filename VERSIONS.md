@@ -3,6 +3,12 @@ Version History
 ===============
 
 
+5.3.5
+-----
+
+not released
+
+
 5.3.4
 -----
 
@@ -18,11 +24,11 @@ Feb 22, 2024
 #### Bug fixes
 
 - Render color emojis in all browsers and platforms (#536)
-    - Related: on all platforms the DMX Webclient uses "Ubuntu" as main font (#536)
+    - Related: on all platforms the DMX Webclient uses the "Ubuntu" web font as primary font (#536)
 
 #### Plugin development
 
-- Core support for custom fulltext indexing, e.g. for making PDF content searchable (#529)
+- Core support for custom fulltext indexing, used e.g. by `dmx-pdf-search` plugin (#529)
     - `CoreService` API: add `indexTopicFulltext()`
     - `DMXStorage` SPI: add `indexTopicFulltext()`
 - Extended Core API support for DB updates (Thanks to @gevlish!)
@@ -34,7 +40,7 @@ Feb 22, 2024
 - Improved handling of web resources (Thanks to @thebohemian!)
     - Webpack output goes to `target/` (instead of `src/`), `resources-static/` is obsolete,
       `clean-webpack-plugin` is not needed anymore (#535, #504)
-- Core fix: `RelatedTopicModel` JSON serialization includes `assoc`
+- Core fix: `RelatedTopicModel` JSON serialization includes `assoc` property
 - Platform's SLF4J is upgraded to 2.0, includes Aries SPI Fly and ASM dependencies (#533)
 
 

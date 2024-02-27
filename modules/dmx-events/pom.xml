@@ -7,13 +7,13 @@
     <name>DMX Events</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-events</artifactId>
-    <version>5.3.4</version>
+    <version>5.3.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.3.4</version>
+        <version>5.3.5-SNAPSHOT</version>
         <relativePath>../dmx-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-contacts</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-timestamps</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
