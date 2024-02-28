@@ -55,7 +55,7 @@ deploy-to-gitlab-maven:
   tags:
     - docker
   script:
-    - 'mvn -Pall,gitlab-maven-deployment deploy -s ci_settings.xml'
+    - 'mvn -Pall,gitlab-maven-deployment deploy -DskipTests=true -s ci_settings.xml '
   only:
     - master
     - main
