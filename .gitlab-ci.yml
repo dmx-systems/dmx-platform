@@ -46,6 +46,21 @@ copy-release:
   only:
     - tags
 
+deploy-to-gitlab-maven:
+  image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
+  stage: deploy
+  tags:
+    - docker
+#    - shell
+  #image: maven:3.6-jdk-11
+  script:
+    - 'mvn -Pgitlab-maven-deployment deploy -s ci_settings.xml'
+  only:
+    - master
+    - main
+    - dm4
+  #allow_failure: true
+
 deploy-to-central:
   stage: deploy
   script:
