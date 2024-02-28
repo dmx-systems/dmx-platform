@@ -25,22 +25,16 @@ public class UploadedFile {
     private String name;
     private long size;
     private InputStream in;
-    private DiskQuotaCheck diskQuotaCheck;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public UploadedFile(String name, long size, InputStream in, DiskQuotaCheck diskQuotaCheck) {
+    public UploadedFile(String name, long size, InputStream in) {
         this.name = name;
         this.size = size;
         this.in = in;
-        this.diskQuotaCheck = diskQuotaCheck;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // === File Metadata ===
 
     /**
      * Returns the original filename in the client's filesystem, as provided by the browser (or other client software).
@@ -49,6 +43,17 @@ public class UploadedFile {
      */
     public String getName() {
         return name;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    /**
+     * Returns an InputStream that can be used to retrieve the contents of the uploaded file.
+     */
+    public InputStream getInputStream() {
+        return in;
     }
 
 
@@ -84,13 +89,6 @@ public class UploadedFile {
         return fileItem.get();
     }*/
 
-    /**
-     * Returns an InputStream that can be used to retrieve the contents of the uploaded file.
-     */
-    public InputStream getInputStream() {
-        return in;
-    }
-
 
 
     // === Java API ===
@@ -103,12 +101,10 @@ public class UploadedFile {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Performs a disk quota check for the current user, and if it succeeds, writes this uploaded file to disk.
+     * Writes this uploaded file to disk.
      */
     void write(File file) {
         try {
-            diskQuotaCheck.check(size);
-            // TODO: compare with FilesPlugin.createFile()
             OutputStream out = new FileOutputStream(file);
             IOUtils.copy(in, out);
             in.close();

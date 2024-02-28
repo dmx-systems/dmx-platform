@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,6 +54,11 @@ import java.util.regex.Pattern;
 @Path("/files")
 @Produces("application/json")
 public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilter, PathMapper {
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    @Context
+    private HttpServletRequest request;
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -190,6 +196,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // 1) pre-checks
             File directory = absolutePath(repoPath);    // throws FileRepositoryException
             checkExistence(directory);                  // throws FileRepositoryException
+            checkDiskQuota(file.getSize());             // throws RuntimeException
             //
             // 2) store file
             File repoFile = unusedPath(directory, file);
@@ -782,6 +789,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         } catch (Exception e) {
             throw new RuntimeException("Checking authorization for repository path \"" + repoPath + "\" failed", e);
         }
+    }
+
+    private void checkDiskQuota(long fileSize) {
+        new DiskQuotaCheck(request, dmx).check(fileSize);
     }
 
     private String userInfo(String username) {

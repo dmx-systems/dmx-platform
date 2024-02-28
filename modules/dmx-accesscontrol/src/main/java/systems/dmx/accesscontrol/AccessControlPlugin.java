@@ -818,6 +818,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             " bytes, disk quota: " + diskQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {
+            // FIXME: throw AccessControlException?
             throw new RuntimeException("Disk quota of " + userInfo(username) + " exceeded, diskQuota=" + diskQuota +
                 " bytes, occupiedSpace=" + occupiedSpace + " bytes, fileSize=" + fileSize + " bytes");
         }
