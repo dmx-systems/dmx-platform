@@ -8,6 +8,7 @@ maven-build:
     - node -v
     - npm -v
     - mvn clean install -P all,dist
+    - echo "BUILD_JOB_ID=${CI_JOB_ID}" > target/.build_job_id.env
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
