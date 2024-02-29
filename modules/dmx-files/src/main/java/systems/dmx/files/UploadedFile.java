@@ -1,5 +1,6 @@
 package systems.dmx.files;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -54,6 +55,20 @@ public class UploadedFile {
      */
     public InputStream getInputStream() {
         return in;
+    }
+
+    /**
+     * Transforms the InputStream into a BufferedInputStream and sets a mark. This allows to call reset() later on in
+     * order to read the stream's bytes again. Should be called <i>before</i> you read any bytes from the stream.
+     * <p>
+     * Call {@link #getInputStream} <i>after</i> calling {@link #setBuffered} in order to get the actual
+     * BufferedInputStream.
+     * <p>
+     * Calling reset() without calling {@link #setBuffered} before throws an IOException.
+     */
+    public void setBuffered() {
+        in = new BufferedInputStream(in, (int) size);
+        in.mark((int) size + 1);
     }
 
 
