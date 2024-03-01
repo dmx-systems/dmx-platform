@@ -27,8 +27,8 @@ copy-ci:
     - shell
   script:
     - DISTDIR='modules/dmx-distribution/target'
-    - source S{DISTDIR}/.build_job_id.env
-    - rm S{DISTDIR}/.build_job_id.env
+    - source ${DISTDIR}/.build_job_id.env
+    - rm ${DISTDIR}/.build_job_id.env
     - WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-version.cgi?'
     - ZIPFILE="$( basename $(ls ${DISTDIR}/dmx-*.zip | tail -n1) )"
     - APPEND="$( date +%F )_${CI_PIPELINE_ID}"
