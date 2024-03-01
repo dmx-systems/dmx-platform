@@ -12,6 +12,7 @@ maven-build:
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
+      - modules/dmx-distribution/target/.build_job_id.env
 
 javadoc:
   stage: build
