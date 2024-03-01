@@ -83,8 +83,6 @@ deploy-to-central:
     - tags
 
 trigger-deb-project:
-  tags:
-    - shell
   stage: deploy
   trigger: dmx-platform/dmx-build-deb
   only:
@@ -93,8 +91,6 @@ trigger-deb-project:
     - tags
 
 trigger-docker-project:
-  tags:
-    - shell
   stage: deploy
   trigger: dmx-contrib/dmx-docker
   only:
