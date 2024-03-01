@@ -43,13 +43,19 @@ copy-ci:
 
 copy-release:
   stage: deploy
-  dependencies:
-    - maven-build
+  tags:
+    - shell
   script:
     - DISTDIR='modules/dmx-distribution/target'
-    - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
-    - echo "ZIPFILE = ${ZIPFILE}"
-    - cp ${ZIPFILE} /var/www/download.dmx.systems/dmx-${CI_COMMIT_TAG}.zip
+    - source ${DISTDIR}/.build_job_id.env
+    - rm ${DISTDIR}/.build_job_id.env
+    - WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-version.cgi?'
+    - ZIPFILE="$( basename $(ls ${DISTDIR}/dmx-*.zip | tail -n1) )"
+    - PARAMS=("&append=none&project=${CI_PROJECT_NAME}&tag=${CI_COMMIT_TAG}")
+    - RESULT="$( wget --server-response -q -O - "${WEBCGI}/${CI_PROJECT_PATH}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/${DISTDIR}/${ZIPFILE}${PARAMS}" 2>&1 | head -n1 )"
+    - echo "RESULT=${RESULT}"
+  dependencies:
+    - maven-build
   only:
     - tags
 
