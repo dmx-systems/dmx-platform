@@ -8,6 +8,7 @@ maven-build:
     - node -v
     - npm -v
     - mvn clean install -P all,dist
+    - echo "BUILD_JOB_ID=${CI_JOB_ID}" > .build_job_id.env
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
@@ -33,7 +34,7 @@ copy-ci-and-deploy:
     - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
     ## trigger `dmx-build-deb` pipeline
-    - curl -s -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline >/dev/null
+    # - curl -s -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline >/dev/null
   only:
     - master
 
@@ -69,7 +70,15 @@ deploy-to-central:
   only:
     - tags
 
-trigger-project:
+trigger-deb-project:
+  stage: deploy
+  trigger: dmx-platform/dmx-build-deb
+  only:
+    - master
+  except:
+    - tags
+
+trigger-docker-project:
   stage: deploy
   trigger: dmx-contrib/dmx-docker
   only:
