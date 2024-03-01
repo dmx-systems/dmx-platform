@@ -72,7 +72,10 @@ deploy-to-gitlab-maven:
     - dm4
 
 deploy-to-central:
+  image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
   stage: deploy
+  tags:
+    - docker
   script:
     - export MAVEN_OPTS="-Xmx512m"
     - mvn clean deploy -P release
@@ -80,6 +83,8 @@ deploy-to-central:
     - tags
 
 trigger-deb-project:
+  tags:
+    - shell
   stage: deploy
   trigger: dmx-platform/dmx-build-deb
   only:
@@ -88,6 +93,8 @@ trigger-deb-project:
     - tags
 
 trigger-docker-project:
+  tags:
+    - shell
   stage: deploy
   trigger: dmx-contrib/dmx-docker
   only:
