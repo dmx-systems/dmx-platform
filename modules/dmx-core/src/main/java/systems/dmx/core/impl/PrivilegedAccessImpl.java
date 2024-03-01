@@ -281,17 +281,14 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
 
     @Override
     public String getUsername(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session == null) {
-                return null;
-            }
-            return username(session);
-        } catch (IllegalStateException e) {
-            // Note: this happens if request is a proxy object (injected by Jersey) and a request method is called
-            // outside request scope. This is the case while system startup.
-            return null;    // user is unknown
+        if (!inRequestScope(request)) {
+            return null;
         }
+        HttpSession session = request.getSession(false);    // create=false
+        if (session == null) {
+            return null;
+        }
+        return username(session);
     }
 
     @Override
@@ -306,6 +303,23 @@ class PrivilegedAccessImpl implements PrivilegedAccess {
     @Override
     public String username(HttpSession session) {
         return (String) session.getAttribute("username");
+    }
+
+    @Override
+    public boolean inRequestScope(HttpServletRequest request) {
+        try {
+            request.getMethod();
+            return true;
+        } catch (IllegalStateException e) {
+            // Note: this happens if request is a proxy object (injected by Jersey) and any method is
+            // called on it outside request scope, that is when there is no thread-local request.
+            // This is the case while system startup.
+            return false;
+        } catch (NullPointerException e) {
+            // While system startup request might be null.
+            // Jersey might not have injected the proxy object yet.
+            return false;
+        }
     }
 
 

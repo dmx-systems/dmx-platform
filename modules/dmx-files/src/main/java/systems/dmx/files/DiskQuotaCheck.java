@@ -4,6 +4,7 @@ import systems.dmx.config.ConfigService;
 import systems.dmx.core.Topic;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import static systems.dmx.files.Constants.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,11 @@ class DiskQuotaCheck {
 
     void check(long fileSize) {
         // Note: we can't use AccessControlService (cyclic dependency), so we do privileged access
-        String username = dmx.getPrivilegedAccess().getUsername(request);
+        PrivilegedAccess pa = dmx.getPrivilegedAccess();
+        if (!pa.inRequestScope(request)) {
+            return;
+        }
+        String username = pa.getUsername(request);
         if (username == null) {
             throw new RuntimeException("User <anonymous> has no disk quota");
         }

@@ -143,6 +143,15 @@ public interface PrivilegedAccess {
      */
     String username(HttpSession session);
 
+    /**
+     * Returns true if the running code was triggered from "outside", that is by a HTTP request, or from "inside",
+     * that is while platform startup, in particular when an migration is running.
+     *
+     * @param   request     a request obtained via JAX-RS context injection, actually a proxy object which manages
+     *                      thread-local request values. Must not be null.
+     */
+    boolean inRequestScope(HttpServletRequest request);
+
 
 
     // === Workspaces / Memberships ===
