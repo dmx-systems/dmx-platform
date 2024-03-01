@@ -20,23 +20,25 @@ javadoc:
     - mvn -P all javadoc:aggregate
     - rsync -a --delete target/site/apidocs/ /var/www/apidocs.dmx.systems/apidocs/
 
-copy-ci-and-deploy:
+copy-ci:
   stage: deploy
+  tags:
+    - shell
+  script:
+    - source .build_job_id.env
+    - rm .build_job_id.env
+    - WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-version.cgi?'
+    - DISTDIR='modules/dmx-distribution/target'
+    - ZIPFILE="$( basename $(ls ${DISTDIR}/dmx-*.zip | tail -n1) )"
+    - APPEND="$( date +%F )_${CI_PIPELINE_ID}"
+    - PARAMS=("&append=${APPEND}&project=${CI_PROJECT_NAME}&tag=none")
+    - RESULT="$( wget --server-response -q -O - "${WEBCGI}/${CI_PROJECT_PATH}/-/jobs/${BUILD_JOB_ID}/artifacts/raw/${DISTDIR}/${ZIPFILE}${PARAMS}" 2>&1 | head -n1 )"
+    - echo "RESULT=${RESULT}"
   dependencies:
     - maven-build
-  script:
-    - DISTDIR='modules/dmx-distribution/target'
-    - ZIPFILE="$( ls ${DISTDIR}/dmx-*.zip )"
-    - echo "ZIPFILE = ${ZIPFILE}"
-    - FILENAME="$( basename ${ZIPFILE} .zip )"
-    - NUNC="$( date +%F )"
-    - MY_JOB_TOKEN="$(</home/gitlab-runner/.after-maven-build.token)"
-    - cp ${ZIPFILE} /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
-    - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
-    ## trigger `dmx-build-deb` pipeline
-    # - curl -s -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline >/dev/null
   only:
     - master
+    - main
 
 copy-release:
   stage: deploy
