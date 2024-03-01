@@ -8,7 +8,7 @@ maven-build:
     - node -v
     - npm -v
     - mvn clean install -P all,dist
-    - echo "BUILD_JOB_ID=${CI_JOB_ID}" > .build_job_id.env
+    - echo "BUILD_JOB_ID=${CI_JOB_ID}" > modules/dmx-distribution/target/.build_job_id.env
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
@@ -25,10 +25,10 @@ copy-ci:
   tags:
     - shell
   script:
-    - source .build_job_id.env
-    - rm .build_job_id.env
-    - WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-version.cgi?'
     - DISTDIR='modules/dmx-distribution/target'
+    - source S{DISTDIR}/.build_job_id.env
+    - rm S{DISTDIR}/.build_job_id.env
+    - WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-version.cgi?'
     - ZIPFILE="$( basename $(ls ${DISTDIR}/dmx-*.zip | tail -n1) )"
     - APPEND="$( date +%F )_${CI_PIPELINE_ID}"
     - PARAMS=("&append=${APPEND}&project=${CI_PROJECT_NAME}&tag=none")
