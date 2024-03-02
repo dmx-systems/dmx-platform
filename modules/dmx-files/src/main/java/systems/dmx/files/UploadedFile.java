@@ -67,7 +67,9 @@ public class UploadedFile {
      * Calling reset() without calling {@link #setBuffered} before throws an IOException.
      */
     public void setBuffered() {
-        in = new BufferedInputStream(in, (int) size);
+        if (!in.markSupported()) {
+            in = new BufferedInputStream(in, (int) size);
+        }
         in.mark((int) size + 1);
     }
 
