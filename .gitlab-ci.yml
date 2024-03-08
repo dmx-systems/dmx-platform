@@ -19,6 +19,7 @@ javadoc:
     - docker
   script:
     - export MAVEN_OPTS="-Xmx512m"
+    - mvn --version
     - mvn -P all javadoc:aggregate
     - zip -r target/apidocs.zip target/site/apidocs
   artifacts:
