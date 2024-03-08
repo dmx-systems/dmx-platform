@@ -31,8 +31,8 @@ publish-apidocs:
     - shell
   script:
     - deploy/ci-publish-apidocs.sh
-#  dependencies:
-#    - maven-build
+  dependencies:
+    - javadoc
 
 publish-snapshot:
   stage: deploy
