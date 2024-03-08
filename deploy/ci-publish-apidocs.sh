@@ -25,7 +25,7 @@ fi
 WEBCGI='https://download.dmx.systems/cgi-bin/v1/deploy-apidocs.cgi?'
 
 ## action: call cgi-bin
-RESULT="$( wget --server-response -q -O - "${WEBCGI}/${CI_PROJECT_PATH}/-/jobs/${MAVEN_BUILD_JOB_ID}/download" 2>&1 | head -n1 )"
+RESULT="$( wget --server-response -q -O - "${WEBCGI}/${CI_PROJECT_PATH}/-/jobs/${MAVEN_BUILD_JOB_ID}/artifacts/raw/target/apidocs.zip" 2>&1 | head -n1 )"
 if [ -z "$( echo "${RESULT}" | grep 200 | grep OK )" ]; then
     echo "ERROR! Failed to trigger download for apidocs. (RESULT=${RESULT})"
     exit 1
