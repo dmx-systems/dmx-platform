@@ -15,6 +15,7 @@
           - declares the `dmx-core` dependency as needed by all DMX plugins
           - preconfigures the DMX default bundle activator
           - derives the hot deployment feature
+          - includes JUnit5, Mockito 4.x and AssertJ dependencies for out of the box Java8-compatible unit testing
     </description>
 
     <parent>
@@ -25,7 +26,10 @@
     </parent>
 
     <properties>
+        <assertj.version>3.25.3</assertj.version>
+        <mockito.version>4.11.0</mockito.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
     </properties>
 
@@ -34,6 +38,42 @@
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-core</artifactId>
             <version>5.3.5-SNAPSHOT</version>
+        </dependency>
+
+        <!-- unit testing framework -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- mocking framework -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- assertions -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
