@@ -19,7 +19,7 @@ javadoc:
     - export MAVEN_OPTS="-Xmx512m"
     - mvn -P all javadoc:aggregate
     #- rsync -a --delete target/site/apidocs/ /var/www/apidocs.dmx.systems/apidocs/
-  after_script:
+#  after_script:
     - zip -r target/apidocs.zip target/site/apidocs
   artifacts:
     paths:
