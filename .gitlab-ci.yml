@@ -21,10 +21,18 @@ javadoc:
     #- rsync -a --delete target/site/apidocs/ /var/www/apidocs.dmx.systems/apidocs/
   after_script:
     - zip -r target/apidocs.zip target/site/apidocs
-    - deploy/ci-publish-apidocs.sh
   artifacts:
     paths:
       - target/*
+
+publish-apidocs:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - deploy/ci-publish-apidocs.sh
+#  dependencies:
+#    - maven-build
 
 publish-snapshot:
   stage: deploy
