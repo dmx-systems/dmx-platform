@@ -31,7 +31,7 @@ publish-apidocs:
   tags:
     - shell
   script:
-    - deploy/ci-publish-apidocs.sh
+    - ci-publish-apidocs.sh
   dependencies:
     - javadoc
   only:
