@@ -27,6 +27,7 @@
 
     <properties>
         <assertj.version>3.25.3</assertj.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <mockito.version>4.11.0</mockito.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
@@ -154,6 +155,11 @@
                         <Bundle-Activator>systems.dmx.core.osgi.PluginActivator</Bundle-Activator>
                     </instructions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
