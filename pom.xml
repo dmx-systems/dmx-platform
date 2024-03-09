@@ -69,8 +69,6 @@
 
     <!-- For a description of the config properties see /modules/dmx-distribution/conf/config.properties -->
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
