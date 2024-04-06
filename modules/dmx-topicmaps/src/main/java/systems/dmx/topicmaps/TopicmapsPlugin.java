@@ -112,16 +112,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    @Override
-    public Assoc getTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssocBetweenTopicAndTopic(TOPICMAP_CONTEXT, topicmapId, topicId, DEFAULT, TOPICMAP_CONTENT);
-    }
-
-    @Override
-    public Assoc getAssocMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssocBetweenTopicAndAssoc(TOPICMAP_CONTEXT, topicmapId, assocId, DEFAULT, TOPICMAP_CONTENT);
-    }
-
     @GET
     @Path("/object/{id}")
     @Override
@@ -222,6 +212,26 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     // ---
+
+    @Override
+    public ViewProps getTopicViewProps(long topicmapId, long topicId) {
+        return fetchTopicViewProps(getTopicMapcontext(topicmapId, topicId));
+    }
+
+    @Override
+    public ViewProps getAssocViewProps(long topicmapId, long assocId) {
+        return fetchAssocViewProps(getAssocMapcontext(topicmapId, assocId));
+    }
+
+    @Override
+    public Assoc getTopicMapcontext(long topicmapId, long topicId) {
+        return dmx.getAssocBetweenTopicAndTopic(TOPICMAP_CONTEXT, topicmapId, topicId, DEFAULT, TOPICMAP_CONTENT);
+    }
+
+    @Override
+    public Assoc getAssocMapcontext(long topicmapId, long assocId) {
+        return dmx.getAssocBetweenTopicAndAssoc(TOPICMAP_CONTEXT, topicmapId, assocId, DEFAULT, TOPICMAP_CONTENT);
+    }
 
     @PUT
     @Path("/{id}/topic/{topicId}")

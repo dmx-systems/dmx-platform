@@ -34,10 +34,6 @@ public interface TopicmapsService {
      */
     Topicmap getTopicmap(long topicmapId, boolean includeChildren);
 
-    Assoc getTopicMapcontext(long topicmapId, long topicId);
-
-    Assoc getAssocMapcontext(long topicmapId, long assocId);
-
     /**
      * Returns all topicmaps which contain the given topic/assoc.
      * Only those topicmaps are returned in which the given topic/assoc is <i>visible</i> (not hidden).
@@ -74,6 +70,21 @@ public interface TopicmapsService {
     void addRelatedTopicToTopicmap(long topicmapId, long topicId, long assocId, ViewProps viewProps);
 
     // ---
+
+    /**
+     * Retrieves a topic's standard view properties: "x", "y", "visibility", "pinned", "width", and "height".
+     * The latter 2 are optional, the returned view props object will contain these only if available in DB.
+     */
+    ViewProps getTopicViewProps(long topicmapId, long topicId);
+
+    /**
+     * Retrieves an assoc's standard view properties: "visibility" and "pinned".
+     */
+    ViewProps getAssocViewProps(long topicmapId, long assocId);
+
+    Assoc getTopicMapcontext(long topicmapId, long topicId);
+
+    Assoc getAssocMapcontext(long topicmapId, long assocId);
 
     void setTopicViewProps(long topicmapId, long topicId, ViewProps viewProps);
 
