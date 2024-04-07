@@ -73,6 +73,11 @@ class ViewPropsImpl implements ViewProps {
     }
 
     @Override
+    public String getString(String propUri) {
+        return (String) get(propUri);
+    }
+
+    @Override
     public int getInt(String propUri) {
         return (Integer) get(propUri);
     }
