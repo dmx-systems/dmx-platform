@@ -91,6 +91,8 @@ deploy-to-central:
 
 trigger-deb-project:
   stage: deploy
+  dependencies:
+    - publish-snapshot
   trigger: dmx-platform/dmx-build-deb
   only:
     - master
@@ -99,6 +101,8 @@ trigger-deb-project:
 
 trigger-docker-project:
   stage: deploy
+  dependencies:
+    - publish-snapshot
   trigger: dmx-contrib/dmx-docker
   only:
     - master
