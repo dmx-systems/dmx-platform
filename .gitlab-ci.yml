@@ -1,3 +1,8 @@
+stages:
+  - build
+  - deploy
+  - trigger
+
 maven-build:
   image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
   stage: build
@@ -90,9 +95,7 @@ deploy-to-central:
     - tags
 
 trigger-deb-project:
-  stage: deploy
-  dependencies:
-    - publish-snapshot
+  stage: trigger
   trigger: dmx-platform/dmx-build-deb
   only:
     - master
@@ -100,9 +103,7 @@ trigger-deb-project:
     - tags
 
 trigger-docker-project:
-  stage: deploy
-  dependencies:
-    - publish-snapshot
+  stage: trigger
   trigger: dmx-contrib/dmx-docker
   only:
     - master
