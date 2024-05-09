@@ -105,52 +105,6 @@ public interface AccessControlService {
      */
     void checkAdmin();
 
-
-
-    // === User Accounts ===
-
-    /**
-     * Creates an user account.
-     * Only DMX admins are allowed to create user accounts.
-     *
-     * @throws  RuntimeException    if the requesting user is not a DMX admin.
-     *
-     * @return  The "Username" topic of the created user account.
-     */
-    Topic createUserAccount(Credentials cred);
-
-    /**
-     * Creates an user account.
-     * This is a privileged method: no permissions are checked.
-     * <p>
-     * Security: this method is not callable from outside as it has no REST interface. So the DMX platform is still
-     * secure. On the other hand, a 3rd-party plugin which provides a RESTful interface to this method is required
-     * to apply an additional authorization measure, e.g. a short-living access token sent via email.
-     *
-     * @return  The "Username" topic of the created user account.
-     */
-    Topic _createUserAccount(Credentials cred) throws Exception;        // TODO: don't throw checked ex
-
-    /**
-     * Creates a Username topic and a private workspace.
-     * TODO: rename to createUsernameAndPrivateWorkspace?
-     * 
-     * @return  The created "Username" topic.
-     */
-    Topic createUsername(String username);
-
-    /**
-     * Returns the "Username" topic for the specified username (case-insensitive).
-     *
-     * @param   username    a username. Must not be null.
-     *
-     * @return  The "Username" topic (type <code>dmx.accesscontrol.username</code>),
-     *          or <code>null</code> if no such username exists.
-     */
-    Topic getUsernameTopic(String username);
-
-
-
     // === Workspaces / Memberships ===
 
     /**
