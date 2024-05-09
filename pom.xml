@@ -331,6 +331,7 @@
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-accesscontrol</module>
+                <module>modules/dmx-account-management</module>
                 <module>modules/dmx-facets</module>
                 <module>modules/dmx-timestamps</module>
                 <module>modules/dmx-caching</module>
@@ -405,6 +406,7 @@
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-accesscontrol</module>
+                <module>modules/dmx-account-management</module>
                 <module>modules/dmx-facets</module>
                 <module>modules/dmx-timestamps</module>
                 <module>modules/dmx-caching</module>
