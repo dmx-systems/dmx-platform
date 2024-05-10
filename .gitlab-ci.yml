@@ -15,7 +15,7 @@ maven-build:
     - mvn clean test -P all,dist
   artifacts:
     paths:
-      - modules/dmx-distribution/target/
+      - modules/*/target/
 
 maven-install:
   image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
