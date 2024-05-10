@@ -12,10 +12,27 @@ maven-build:
     - export MAVEN_OPTS="-Xmx512m"
     - node -v
     - npm -v
-    - mvn clean install -P all,dist
+    - mvn clean test -P all,dist
+  artifacts:
+    paths:
+      - modules/dmx-distribution/target/
+
+maven-install:
+  image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
+  stage: build
+  tags:
+    - docker
+  script:
+    - export MAVEN_OPTS="-Xmx512m"
+    - mvn install -P all,dist
   artifacts:
     paths:
       - modules/dmx-distribution/target/*.zip
+  dependencies:
+    - maven-build
+  only:
+    - master
+    - main
 
 javadoc:
   image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
