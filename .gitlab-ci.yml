@@ -71,7 +71,7 @@ publish-snapshot:
   script:
     - ci-publish.sh snapshot
   dependencies:
-    - maven-build
+    - maven-install
   rules:
     - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG == null && $CI_PIPELINE_SOURCE != 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TAG == null && $CI_PIPELINE_SOURCE != 'merge_request_event'
@@ -83,7 +83,7 @@ publish-release:
   script:
     - ci-publish.sh release
   dependencies:
-    - maven-build
+    - maven-install
   rules:
     - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG != null && $CI_PIPELINE_SOURCE != 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TAG != null && $CI_PIPELINE_SOURCE != 'merge_request_event'
