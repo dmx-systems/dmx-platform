@@ -1,3 +1,7 @@
+# A temporary fix for accessing the local docker repo is to unset $DOCKER_AUTH_CONFIG
+variables:
+  DOCKER_AUTH_CONFIG:
+
 stages:
   - build
   - deploy
