@@ -80,6 +80,10 @@ public class JavaUtils {
             return "video/x-flv";
         } else if (extension.equals("svg")) {
             return "image/svg+xml";
+        } else if (extension.equals("woff")) {
+            return "font/woff";
+        } else if (extension.equals("woff2")) {
+            return "font/woff2";
         }
         // TODO: use a system property instead a hardcoded list
         //

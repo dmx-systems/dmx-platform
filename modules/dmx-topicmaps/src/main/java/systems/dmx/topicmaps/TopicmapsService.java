@@ -38,6 +38,8 @@ public interface TopicmapsService {
      * Returns all topicmaps which contain the given topic/assoc.
      * Only those topicmaps are returned in which the given topic/assoc is <i>visible</i> (not hidden).
      *
+     * TODO: rename to findTopicmaps() or something likes this
+     *
      * @param   objectId    a topic ID or an assoc ID
      *
      * @return  topics of type Topicmap
