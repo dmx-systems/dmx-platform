@@ -84,10 +84,12 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public void registerAccountManagementMethod(AccountManagementMethod method) {
         accountManagementMethods.put(method.name(), method);
+        accessControlService.registerAuthorizationMethod(method.name(), method);
     }
 
     @Override
     public void unregisterAccountManagementMethod(AccountManagementMethod method) {
+        accessControlService.unregisterAuthorizationMethod(method.name());
         accountManagementMethods.remove(method.name());
     }
 

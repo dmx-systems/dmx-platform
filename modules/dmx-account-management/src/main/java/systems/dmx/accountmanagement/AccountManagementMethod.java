@@ -1,10 +1,11 @@
 package systems.dmx.accountmanagement;
 
+import systems.dmx.accesscontrol.AuthorizationMethod;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
 
 
-public interface AccountManagementMethod {
+public interface AccountManagementMethod extends AuthorizationMethod {
 
     String name();
 
