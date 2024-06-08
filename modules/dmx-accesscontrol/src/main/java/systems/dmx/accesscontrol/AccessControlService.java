@@ -105,6 +105,22 @@ public interface AccessControlService {
      */
     void checkAdmin();
 
+
+
+    // === User Accounts ===
+
+    /**
+     * Returns the "Username" topic for the specified username (case-insensitive).
+     *
+     * @param   username    a username. Must not be null.
+     *
+     * @return  The "Username" topic (type <code>dmx.accesscontrol.username</code>),
+     *          or <code>null</code> if no such username exists.
+     */
+    Topic getUsernameTopic(String username);
+
+
+
     // === Workspaces / Memberships ===
 
     /**

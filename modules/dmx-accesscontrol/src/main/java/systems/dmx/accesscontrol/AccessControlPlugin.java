@@ -229,6 +229,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    @GET
+    @Path("/username/{username}")
+    @Override
+    public Topic getUsernameTopic(@PathParam("username") String username) {
+        return dmx.getPrivilegedAccess().getUsernameTopic(username);
+    }
+
+
+
     // === Workspaces / Memberships ===
 
     @GET
@@ -1018,10 +1027,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean inRequestScope() {
         return dmx.getPrivilegedAccess().inRequestScope(request);
-    }
-
-    private Topic getUsernameTopic(String username) {
-        return dmx.getPrivilegedAccess().getUsernameTopic(username);
     }
 
 
