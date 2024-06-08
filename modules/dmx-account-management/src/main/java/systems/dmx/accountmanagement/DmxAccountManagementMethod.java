@@ -2,6 +2,8 @@ package systems.dmx.accountmanagement;
 
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
+import systems.dmx.core.impl.TopicModelImpl;
+import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.accesscontrol.Credentials;
@@ -17,7 +19,7 @@ final class DmxAccountManagementMethod implements AccountManagementMethod {
 
     private final static Logger logger = Logger.getLogger(DmxAccountManagementMethod.class.getName());
 
-    static final String NAME = "Basic";
+    static final String NAME = "DMX";
 
     private final CoreService dmx;
 
@@ -34,6 +36,11 @@ final class DmxAccountManagementMethod implements AccountManagementMethod {
     @Override
     public String name() {
         return NAME;
+    }
+
+    @Override
+    public Topic checkCredentials(Credentials credentials) {
+        return dmx.getPrivilegedAccess().checkCredentials(credentials);
     }
 
     @Override
