@@ -220,14 +220,17 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             CheckCredentialsResult result = amm.checkCredentials(credentials);
             if (result.success) {
                 if (result.usernameTopic != null) {
+                    logger.info(String.format("Credentials check successful and username topic present for %s", credentials.username));
                     // topic already present, just return it
                     return result.usernameTopic;
                 } else {
+                    logger.info(String.format("Credentials check successful but lookup or creation required for %s", credentials.username));
                     // lookup and possible creation necessary
                     return lookupOrCreateUsernameTopic(credentials.username, amm.name());
                 }
             } else {
                 // credential check failed
+                logger.info(String.format("Credentials check failed for %s", credentials.username));
                 return null;
             }
         };
