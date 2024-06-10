@@ -1,11 +1,12 @@
 package systems.dmx.accountmanagement;
 
 import systems.dmx.accesscontrol.AuthorizationMethod;
+import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
 
 
-public interface AccountManagementMethod extends AuthorizationMethod {
+public interface AccountManagementMethod {
 
     String name();
 
@@ -29,5 +30,7 @@ public interface AccountManagementMethod extends AuthorizationMethod {
      * @param username
      */
     void onUsernameDeleted(String username);
+
+    CheckCredentialsResult checkCredentials(Credentials credentials);
 
 }

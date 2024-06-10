@@ -1,6 +1,7 @@
 package systems.dmx.accountmanagement;
 
 import systems.dmx.accesscontrol.AccessControlService;
+import systems.dmx.accesscontrol.AuthorizationMethod;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -18,6 +19,7 @@ import systems.dmx.core.service.event.PostDeleteTopic;
 import systems.dmx.core.service.event.PostUpdateTopic;
 import systems.dmx.core.service.event.PreDeleteTopic;
 import systems.dmx.core.service.event.PreUpdateTopic;
+import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.workspaces.WorkspacesService;
 
 import javax.ws.rs.Consumes;
@@ -84,7 +86,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public void registerAccountManagementMethod(AccountManagementMethod method) {
         accountManagementMethods.put(method.name(), method);
-        accessControlService.registerAuthorizationMethod(method.name(), method);
+        accessControlService.registerAuthorizationMethod(method.name(), asAuthorizationMethod(method));
     }
 
     @Override
@@ -123,14 +125,11 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         logger.info(String.format("Creating user account '%s' with method '%s'", username, methodName));
 
         // 1) create Username topic and private workspace
-        final Topic usernameTopic = createUsernameAndPrivateWorkspace(username);
+        final Topic usernameTopic = createUsernameAndPrivateWorkspace(username, methodName);
 
         // 2) Create actual account
         AccountManagementMethod method = getAccountManagementMethod(methodName);
         method.createAccount(cred);
-
-        // Links account management method to username
-        usernameTopic.setProperty(ACCOUNT_MANAGEMENT_METHOD_NAME, method.name(), true);
 
         return usernameTopic;
     }
@@ -213,7 +212,45 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-    private Topic createUsernameAndPrivateWorkspace(final String username) {
+
+    private AuthorizationMethod asAuthorizationMethod(final AccountManagementMethod amm) {
+        // Implements an AuthorizationMethod that uses the AccountManagementMethod to check the credentials interpreting
+        // its complex result and doing a username topic lookup and creation if necessary.
+        return credentials -> {
+            CheckCredentialsResult result = amm.checkCredentials(credentials);
+            if (result.success) {
+                if (result.usernameTopic != null) {
+                    // topic already present, just return it
+                    return result.usernameTopic;
+                } else {
+                    // lookup and possible creation necessary
+                    return lookupOrCreateUsernameTopic(credentials.username, amm.name());
+                }
+            } else {
+                // credential check failed
+                return null;
+            }
+        };
+    }
+
+    private Topic lookupOrCreateUsernameTopic(String username, String methodName) {
+        Topic usernameTopic = accessControlService.getUsernameTopic(username);
+        if (usernameTopic != null) {
+            return usernameTopic;
+        } else {
+            DMXTransaction tx = dmx.beginTx();
+            try {
+                usernameTopic = createUsernameAndPrivateWorkspace(username, methodName);
+                tx.success();
+
+                return usernameTopic;
+            } finally {
+                tx.finish();
+            }
+        }
+    }
+
+    private Topic createUsernameAndPrivateWorkspace(final String username, String methodName) {
         try {
             logger.info("Creating username topic \"" + username + "\"");
             PrivilegedAccess pa = dmx.getPrivilegedAccess();
@@ -246,7 +283,10 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
             // This is to support the "DMX Sign-up" 3rd-party plugin.
             pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
-            //
+            // 5)
+            // Links account management method to username
+            usernameTopic.setProperty(ACCOUNT_MANAGEMENT_METHOD_NAME, methodName, true);
+
             return usernameTopic;
         } catch (Exception e) {
             throw new RuntimeException("Creating username topic \"" + username + "\" failed", e);
