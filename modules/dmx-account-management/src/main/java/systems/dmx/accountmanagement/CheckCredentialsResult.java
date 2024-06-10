@@ -2,7 +2,7 @@ package systems.dmx.accountmanagement;
 
 import systems.dmx.core.Topic;
 
-public class CheckCredentialsResult {
+public final class CheckCredentialsResult {
     private CheckCredentialsResult(boolean success, Topic usernameTopic) {
         this.success = success;
         this.usernameTopic = usernameTopic;
@@ -12,7 +12,7 @@ public class CheckCredentialsResult {
 
     public final Topic usernameTopic;
 
-    public static CheckCredentialsResult success(Topic usernameTopic) {
+    static CheckCredentialsResult success(Topic usernameTopic) {
         if (usernameTopic == null) {
             throw new IllegalArgumentException("usernameTopic must not be null");
         }

@@ -1,7 +1,5 @@
 package systems.dmx.accountmanagement;
 
-import systems.dmx.accesscontrol.AuthorizationMethod;
-import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
 
