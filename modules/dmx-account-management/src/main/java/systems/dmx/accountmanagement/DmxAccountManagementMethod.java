@@ -39,8 +39,9 @@ final class DmxAccountManagementMethod implements AccountManagementMethod {
     }
 
     @Override
-    public Topic checkCredentials(Credentials credentials) {
-        return dmx.getPrivilegedAccess().checkCredentials(credentials);
+    public CheckCredentialsResult checkCredentials(Credentials credentials) {
+        Topic usernameTopic = dmx.getPrivilegedAccess().checkCredentials(credentials);
+        return (usernameTopic != null) ? CheckCredentialsResult.success(usernameTopic) : CheckCredentialsResult.failed();
     }
 
     @Override
