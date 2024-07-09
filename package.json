@@ -19,7 +19,7 @@
     "dmx-api": "3.0.1",
     "dmx-cytoscape-renderer": "3.0.1",
     "dmx-detail-panel": "3.0.1",
-    "dmx-login-dialog": "2.0.1",
+    "dmx-login-dialog": "3.0.0",
     "dmx-object-renderer": "3.0.1",
     "dmx-search-widget": "2.1.0",
     "dmx-topic-list": "2.0.1",
