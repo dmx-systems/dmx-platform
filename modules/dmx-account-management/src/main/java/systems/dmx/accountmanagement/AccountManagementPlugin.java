@@ -41,11 +41,11 @@ import static systems.dmx.workspaces.Constants.WORKSPACE_ASSIGNMENT;
 public class AccountManagementPlugin extends PluginActivator implements AccountManagementService, PreDeleteTopic,
         PreUpdateTopic, PostDeleteTopic, PostUpdateTopic {
 
-    private static final Logger logger = Logger.getLogger(AccountManagementPlugin.class.getName());
+    static final Logger logger = Logger.getLogger(AccountManagementPlugin.class.getName());
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ACCOUNT_MANAGEMENT_METHOD = System.getProperty("dmx.accountmanagement.method", DmxAccountManagementMethod.NAME);
+    private static final String ACCOUNT_MANAGEMENT_METHOD = System.getProperty("dmx.accountmanagement.method", DmxAccountManager.NAME);
 
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
             System.getProperty("dmx.security.new_accounts_are_enabled", "true")
@@ -57,12 +57,12 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
-    private WorkspacesService ws;
+    WorkspacesService ws;
 
     @Inject
-    private AccessControlService accessControlService;
+    AccessControlService accessControlService;
 
-    private final Map<String, AccountManagementMethod> accountManagementMethods = new HashMap<>();
+    private final Map<String, AccountManager> accountManagementMethods = new HashMap<>();
 
     static {
         logger.info("Security config:" +
@@ -74,7 +74,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public void init() {
         // registers built-in account management method
-        registerAccountManagementMethod(new DmxAccountManagementMethod(dmx, mf, SITE_SALT));
+        registerAccountManager(new DmxAccountManager(dmx, mf, SITE_SALT));
     }
 
     // ****************************
@@ -84,24 +84,24 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     // === User Accounts ===
 
     @Override
-    public void registerAccountManagementMethod(AccountManagementMethod method) {
-        accountManagementMethods.put(method.name(), method);
-        accessControlService.registerAuthorizationMethod(method.name(), asAuthorizationMethod(method));
+    public void registerAccountManager(AccountManager accountManager) {
+        accountManagementMethods.put(accountManager.name(), accountManager);
+        accessControlService.registerAuthorizationMethod(accountManager.name(), asAuthorizationMethod(accountManager));
     }
 
     @Override
-    public void unregisterAccountManagementMethod(AccountManagementMethod method) {
-        accessControlService.unregisterAuthorizationMethod(method.name());
-        accountManagementMethods.remove(method.name());
+    public void unregisterAccountManager(AccountManager accountManager) {
+        accessControlService.unregisterAuthorizationMethod(accountManager.name());
+        accountManagementMethods.remove(accountManager.name());
     }
 
     @Override
-    public List<String> getAccountManagementMethods() {
+    public List<String> getAccountManager() {
         return new ArrayList<>(accountManagementMethods.keySet());
     }
 
     @Override
-    public String getConfiguredAccountManagementMethod() { return ACCOUNT_MANAGEMENT_METHOD; }
+    public String getConfiguredAccountManager() { return ACCOUNT_MANAGEMENT_METHOD; }
 
     @POST
     @Path("/user-account")
@@ -128,7 +128,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         final Topic usernameTopic = createUsernameAndPrivateWorkspace(username, methodName);
 
         // 2) Create actual account
-        AccountManagementMethod method = getAccountManagementMethod(methodName);
+        AccountManager method = getAccountManagementMethod(methodName);
         method.createAccount(cred);
 
         return usernameTopic;
@@ -213,7 +213,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private AuthorizationMethod asAuthorizationMethod(final AccountManagementMethod amm) {
+    private AuthorizationMethod asAuthorizationMethod(final AccountManager amm) {
         // Implements an AuthorizationMethod that uses the AccountManagementMethod to check the credentials interpreting
         // its complex result and doing a username topic lookup and creation if necessary.
         return credentials -> {
@@ -270,9 +270,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             // Note: a Username topic requires special workspace assignment (see step 4 below).
             // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
             // "assignToWorkspace" calls are required.)
-            usernameTopic = pa.runInWorkspaceContext(-1, () ->
-                    dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)))
-            );
+            usernameTopic = pa.runInWorkspaceContext(-1, () -> dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username))));
             // 3) create private workspace
             accessControlService.setWorkspaceOwner(
                     ws.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE), username
@@ -288,7 +286,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
             // 5)
             // Links account management method to username
-            usernameTopic.setProperty(ACCOUNT_MANAGEMENT_METHOD_NAME, methodName, true);
+            usernameTopic.setProperty(ACCOUNT_MANAGER_NAME, methodName, true);
 
             return usernameTopic;
         } catch (Exception e) {
@@ -296,19 +294,19 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         }
     }
 
-    private AccountManagementMethod getAccountManagementMethod(String methodName) {
+    private AccountManager getAccountManagementMethod(String methodName) {
         return accountManagementMethods.get(
                 accountManagementMethods.containsKey(methodName)
                         ? methodName
-                        : DmxAccountManagementMethod.NAME
+                        : DmxAccountManager.NAME
         );
     }
 
-    private AccountManagementMethod getAccountManagementMethodForUsername(Topic usernameTopic) {
+    private AccountManager getAccountManagementMethodForUsername(Topic usernameTopic) {
         String methodName =
-                (usernameTopic.hasProperty(ACCOUNT_MANAGEMENT_METHOD_NAME))
-                        ? usernameTopic.getProperty(ACCOUNT_MANAGEMENT_METHOD_NAME).toString()
-                        : DmxAccountManagementMethod.NAME;
+                (usernameTopic.hasProperty(ACCOUNT_MANAGER_NAME))
+                        ? usernameTopic.getProperty(ACCOUNT_MANAGER_NAME).toString()
+                        : DmxAccountManager.NAME;
 
         return getAccountManagementMethod(methodName);
     }

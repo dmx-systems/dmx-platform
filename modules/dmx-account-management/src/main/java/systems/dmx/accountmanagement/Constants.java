@@ -14,5 +14,5 @@ public final class Constants {
     // Props (topic/assoc)
     public static final String SALT           = "dmx.accesscontrol.salt";           // for Password topics
 
-    static final String ACCOUNT_MANAGEMENT_METHOD_NAME           = "dmx.accountmanagement.method";
+    static final String ACCOUNT_MANAGER_NAME = "dmx.accountmanager.name";
 }

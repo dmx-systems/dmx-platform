@@ -4,7 +4,7 @@ import systems.dmx.core.service.accesscontrol.Credentials;
 
 
 
-public interface AccountManagementMethod {
+public interface AccountManager {
 
     String name();
 
@@ -29,6 +29,15 @@ public interface AccountManagementMethod {
      */
     void onUsernameDeleted(String username);
 
+    /**
+     * Check whether the given credentials are valid in the underlying system.
+     * <p>
+     * Non-DMX implementations are supposed to tell the platform via the return value, that a username topic
+     * lookup is necessary. See {@link CheckCredentialsResult} for details on how to do that.
+     *
+     * @param credentials
+     * @return
+     */
     CheckCredentialsResult checkCredentials(Credentials credentials);
 
 }

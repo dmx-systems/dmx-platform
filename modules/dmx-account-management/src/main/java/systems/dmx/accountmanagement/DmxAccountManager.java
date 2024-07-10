@@ -2,8 +2,6 @@ package systems.dmx.accountmanagement;
 
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.impl.TopicModelImpl;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.accesscontrol.Credentials;
@@ -15,9 +13,9 @@ import java.util.logging.Logger;
 import static systems.dmx.accountmanagement.Constants.*;
 
 
-final class DmxAccountManagementMethod implements AccountManagementMethod {
+final class DmxAccountManager implements AccountManager {
 
-    private final static Logger logger = Logger.getLogger(DmxAccountManagementMethod.class.getName());
+    private final static Logger logger = Logger.getLogger(DmxAccountManager.class.getName());
 
     static final String NAME = "DMX";
 
@@ -27,7 +25,7 @@ final class DmxAccountManagementMethod implements AccountManagementMethod {
 
     private final String siteSalt;
 
-    DmxAccountManagementMethod(CoreService dmx, ModelFactory mf, String siteSalt) {
+    DmxAccountManager(CoreService dmx, ModelFactory mf, String siteSalt) {
         this.dmx = dmx;
         this.mf = mf;
         this.siteSalt = siteSalt;

@@ -17,17 +17,44 @@ public interface AccountManagementService {
 
     // === User Accounts ===
 
-    void registerAccountManagementMethod(AccountManagementMethod method);
-
-    void unregisterAccountManagementMethod(AccountManagementMethod method);
-
-    List<String> getAccountManagementMethods();
-
-    String getConfiguredAccountManagementMethod();
+    /**
+     * Register an {@link AccountManager} instance with the platform.
+     *
+     * The instance is used to derive an {@link systems.dmx.accesscontrol.AuthorizationMethod} instance that is
+     * registered with the same name.
+     *
+     * @param accountManager
+     */
+    void registerAccountManager(AccountManager accountManager);
 
     /**
-     * Creates an user account.
+     * Unregisters an {@link AccountManager} instance from the platform.
+     *
+     * An {@link systems.dmx.accesscontrol.AuthorizationMethod} instance with the same is unregistered automatically
+     * as well.
+     *
+     * @param accountManager
+     */
+    void unregisterAccountManager(AccountManager accountManager);
+
+    /** Returns a list of known registered account manager names.
+     *
+     * @return
+     */
+    List<String> getAccountManager();
+
+    /** Returns the account manager name that is configured to be used by the platform by default.
+     *
+     * @return
+     */
+    String getConfiguredAccountManager();
+
+    /**
+     * Creates a user account.
      * Only DMX admins are allowed to create user accounts.
+     * <p>
+     * The user is created either with the configured account manager of the platform or with the account manager that
+     * is specified throught the "method" property of the {@link Credentials} instance.
      *
      * @throws  RuntimeException    if the requesting user is not a DMX admin.
      *
@@ -36,8 +63,11 @@ public interface AccountManagementService {
     Topic createUserAccount(Credentials cred);
 
     /**
-     * Creates an user account.
+     * Creates a user account.
      * This is a privileged method: no permissions are checked.
+     * <p>
+     * The user is created either with the configured account manager of the platform or with the account manager that
+     * is specified throught the "method" property of the {@link Credentials} instance.
      * <p>
      * Security: this method is not callable from outside as it has no REST interface. So the DMX platform is still
      * secure. On the other hand, a 3rd-party plugin which provides a RESTful interface to this method is required
@@ -49,7 +79,7 @@ public interface AccountManagementService {
 
     /**
      * Changes the password of an account to the newly given credentials.
-     *
+     * <p>
      * Depending on the system that ultimately performs the password change, the current credentials are necessary.
      * It can be <code>null</code> if not necessary.
      *
