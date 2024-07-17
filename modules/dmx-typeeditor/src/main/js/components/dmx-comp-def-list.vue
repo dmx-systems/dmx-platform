@@ -34,7 +34,7 @@ export default {
   methods: {
 
     marked (compDef) {
-      return this.$store.getters.visibleAssocIds.includes(compDef.id)
+      return this.$store.getters.visibleAssocIds?.includes(compDef.id)
     },
 
     click (compDef) {

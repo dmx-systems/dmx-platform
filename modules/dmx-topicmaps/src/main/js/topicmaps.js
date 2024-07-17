@@ -540,8 +540,7 @@ const getters = {
   },
 
   topicmapTypeUri (state, getters) {
-    const topicmapTopic = getters.topicmapTopic
-    return topicmapTopic && topicmapTopic.children['dmx.topicmaps.topicmap_type_uri'].value
+    return getters.topicmapTopic?.children['dmx.topicmaps.topicmap_type_uri'].value
   },
 
   /**
@@ -553,12 +552,13 @@ const getters = {
   },
 
   visibleTopicIds (state) {
-    // Note: at startup state.topicmap is undefined
-    return state.topicmap && state.topicmap.topics.filter(topic => topic.isVisible()).map(topic => topic.id)
+    // Note: at startup or at renderer switch state.topicmap is undefined
+    return state.topicmap?.topics.filter(topic => topic.isVisible()).map(topic => topic.id)
   },
 
   visibleAssocIds (state) {
-    return state.topicmap && state.topicmap.assocs.filter(assoc => assoc.isVisible()).map(assoc => assoc.id)
+    // Note: at startup or at renderer switch state.topicmap is undefined
+    return state.topicmap?.assocs.filter(assoc => assoc.isVisible()).map(assoc => assoc.id)
   }
 }
 
@@ -601,7 +601,7 @@ function _selectTopicmap (id, dispatch) {
   // console.log('_selectTopicmap', id)
   // Note: for cross-workspace jumps the workspace's map topics might not yet be loaded and no selection object
   // available. In that case we call the topicmap route. It will load the map topics and init the selection objects.
-  if (selection && selection.isSingle()) {
+  if (selection?.isSingle()) {
     const type = selection.getType()
     dispatch('callRoute', {
       name: type,

@@ -17,9 +17,9 @@ export default ({store}) => {
           visible:          state => state.search.visible,
           extraMenuItems:   state => state.search.extraMenuItems,
           createEnabled:    state => state.workspaces.isWritable,
-          markerTopicIds:   (_, getters) => getters && getters.visibleTopicIds,
-          markerAssocIds:   (_, getters) => getters && getters.visibleAssocIds,
-          createTopicTypes: (_, getters) => getters && getters.createTopicTypes,  // TODO: getters is undefined on start
+          markerTopicIds:   (_, getters) => getters?.visibleTopicIds,
+          markerAssocIds:   (_, getters) => getters?.visibleAssocIds,
+          createTopicTypes: (_, getters) => getters?.createTopicTypes,    // TODO: getters is undefined at startup
           searchAssocTypes: () => dmx.typeCache.getAllAssocTypes(),
           topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
         },
