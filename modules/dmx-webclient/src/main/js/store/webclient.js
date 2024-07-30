@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {MessageBox} from 'element-ui'
 import dmx from 'dmx-api'
 
 const RATIO = .7            // initial ratio of left/right panel width; must correspond with CSS variable
@@ -111,19 +110,6 @@ const actions = {
     object.update().then(response => {
       dispatch('_processDirectives', response.directives)
     })
-  },
-
-  deleteMulti ({dispatch}, idLists) {
-    confirmDeletion(idLists).then(() => {
-      // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
-      // update client state + sync view (for immediate visual feedback)
-      idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
-      idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
-      // update server state
-      dmx.rpc.deleteMulti(idLists).then(response => {
-        dispatch('_processDirectives', response.directives)
-      })
-    }).catch(() => {})    // suppress unhandled rejection on cancel
   },
 
   // ---
@@ -256,38 +242,6 @@ function displayObjectIf (object) {
 function isSelected (id) {
   const object = state.object
   return object && object.id === id
-}
-
-function confirmDeletion (idLists) {
-  const _size = size(idLists)
-  if (!_size) {
-    throw Error('confirmDeletion() called with empty idLists')
-  }
-  let message, buttonText
-  if (_size > 1) {
-    message = "You're about to delete multiple items!"
-    buttonText = `Delete ${_size} items`
-  } else {
-    message = `You're about to delete a ${viewObject(idLists).typeName}!`
-    buttonText = 'Delete'
-  }
-  return MessageBox.confirm(message, 'Warning', {
-    type: 'warning',
-    confirmButtonText: buttonText,
-    confirmButtonClass: 'el-button--danger',
-    showClose: false
-  })
-}
-
-// copy in cytoscape-view.js (module dmx-cytoscape-renderer)
-// TODO: unify selection models (see selection.js in dmx-topicmaps module)
-function size (idLists) {
-  return idLists.topicIds.length + idLists.assocIds.length
-}
-
-function viewObject (idLists) {
-  const id = idLists.topicIds.length ? idLists.topicIds[0] : idLists.assocIds[0]
-  return state.topicmaps.topicmap.getObject(id)
 }
 
 //

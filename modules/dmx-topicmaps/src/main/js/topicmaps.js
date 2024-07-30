@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import {MessageBox} from 'element-ui'
 import dmx from 'dmx-api'
 import Selection from './selection'
 
@@ -7,6 +8,8 @@ const state = {
   topicmap: undefined,        // The rendered topicmap (dmx.Topicmap).
                               // Set by _displayTopicmap()
                               // TODO: undefined for non-standard topicmaps, e.g. Geomap
+
+  topicmapWritable: false,    // If the current topicmap is writable (Boolean)
 
   topicmapTopics: {},         // Per-workspace loaded topicmap topics (including children):
                               //   {
@@ -305,54 +308,29 @@ const actions = {
     })
   },
 
-  _hideTopic ({dispatch}, id) {
-    // update state
-    unselectIfCascade(id, dispatch)
+  // TODO: adapt 2 actions
+
+  hideMulti ({dispatch}, idLists) {
+    // update state + view (for immediate visual feedback)
+    idLists.topicIds.forEach(id => hideTopic(id, dispatch))
+    idLists.assocIds.forEach(id => hideAssoc(id, dispatch))
+    // update server
+    if (state.topicmapWritable) {
+      dmx.rpc.hideMulti(state.topicmap.id, idLists)
+    }
   },
 
-  _hideAssoc ({dispatch}, id) {
-    // update state
-    unselectIfCascade(id, dispatch)
-  },
-
-  /**
-   * Updates "topicmapTopics" and "selectedTopicmapId" state in case the deleted topic is a topicmap.
-   * Supports deletion of both, standard maps and special maps (e.g. a Geomap or Tableview).
-   *
-   * Preconditions:
-   * - the current topicmap is a standard map AND
-   * - the given "id" refers to a topic in that topicmap
-   * OR
-   * - the given "id" refers to a topicmap (standard or special).
-   *
-   * Low-level action that updates client state and view when a topic is about to be deleted.
-   * The caller is responsible for updating the server state.
-   *
-   * Note: there is no universal high-level action to delete a single topic.
-   * This is to realize a delete-multi operation as a single request.
-   */
-  _deleteTopic ({getters, rootState, dispatch}, id) {
-    if (getters.topicmapTypeUri === 'dmx.topicmaps.topicmap') {
-      // abort if deleted topic is not a topicmap
-      const topic = state.topicmap.getTopic(id)
-      if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-        return
-      }
-      // sanity check
-      if (state.topicmap.id !== id) {
-        throw Error(`topicmap ${id} can't be deleted as it is not selected`)
-      }
-    }
-    // select another topicmap, or create a new one if this was the last one
-    const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
-    if (topicmapTopic) {
-      // Note: selecting a new topicmap is not strictly required. It would be selected while directives processing
-      // anyways. But we do it here (before the delete request is actually sent) for quick user feedback.
-      _selectTopicmap(topicmapTopic.id, dispatch)
-    } else {
-      // FIXME: synchronization. Create topicmap *before* processing response of delete request
-      dispatch('createTopicmap', {})
-    }
+  deleteMulti ({getters, rootState, dispatch}, idLists) {
+    confirmDeletion(idLists).then(() => {
+      // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
+      // update client state + sync view (for immediate visual feedback)
+      idLists.topicIds.forEach(id => deleteTopic(id, getters, rootState, dispatch))
+      idLists.assocIds.forEach(id => deleteAssoc(id))
+      // update server state
+      dmx.rpc.deleteMulti(idLists).then(response => {
+        dispatch('_processDirectives', response.directives)
+      })
+    }).catch(() => {})    // suppress unhandled rejection on cancel
   },
 
   //
@@ -630,7 +608,10 @@ function _displayTopicmap (getters, dispatch) {
   const topicmapTopic = getters.topicmapTopic
   const selection = getters.selection
   return topicmapTopic.isWritable()
-    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))    // dispatch into topicmap-panel
+    .then(writable => {
+      state.topicmapWritable = writable
+      return dispatch('showTopicmap', {topicmapTopic, writable, selection})    // dispatch into topicmap-panel
+    })
     .then(topicmap => {
       state.topicmap = topicmap
     })
@@ -656,7 +637,135 @@ function _syncUnselectMulti (selection, dispatch) {
   }
 }
 
+function confirmDeletion (idLists) {
+  const _size = size(idLists)
+  if (!_size) {
+    throw Error('confirmDeletion() called with empty idLists')
+  }
+  let message, buttonText
+  if (_size > 1) {
+    message = "You're about to delete multiple items!"
+    buttonText = `Delete ${_size} items`
+  } else {
+    message = `You're about to delete a ${viewObject(idLists).typeName}!`
+    buttonText = 'Delete'
+  }
+  return MessageBox.confirm(message, 'Warning', {
+    type: 'warning',
+    confirmButtonText: buttonText,
+    confirmButtonClass: 'el-button--danger',
+    showClose: false
+  })
+}
+
+// copy in cytoscape-view.js (module dmx-cytoscape-renderer)
+// TODO: unify selection models (see selection.js in dmx-topicmaps module)
+function size (idLists) {
+  return idLists.topicIds.length + idLists.assocIds.length
+}
+
+function viewObject (idLists) {
+  const id = idLists.topicIds.length ? idLists.topicIds[0] : idLists.assocIds[0]
+  return state.topicmap.getObject(id)
+}
+
 // ---
+
+// TODO: adapt 4 functions
+
+function hideTopic (id, dispatch) {
+  // update state
+  unselectIfCascade(id, dispatch)
+  hideAssocsWithPlayer(id)
+  state.topicmap.getTopic(id).setVisibility(false)
+  // update view
+  dispatch('removeObject', id)
+}
+
+function hideAssoc (id, dispatch) {
+  // update state
+  unselectIfCascade(id, dispatch)
+  if (!state.topicmap.hasAssoc(id)) {   // Note: idempotence is needed for hide-multi
+    return
+  }
+  removeAssocsWithPlayer(id)            // Note: topicmap contexts of *explicitly* hidden assocs are removed
+  state.topicmap.removeAssoc(id)        // Note: topicmap contexts of *explicitly* hidden assocs are removed
+  // update view
+  dispatch('removeObject', id)
+}
+
+function deleteTopic (id, getters, rootState, dispatch) {
+  handleTopicmapDeletion(id, getters, rootState, dispatch)
+  //
+  // update state
+  removeAssocsWithPlayer(id)
+  state.topicmap.removeTopic(id)
+  // update view
+  dispatch('removeObject', id)
+}
+
+function deleteAssoc (id) {
+  if (!state.topicmap.hasAssoc(id)) {   // Note: idempotence is needed for delete-multi
+    return
+  }
+  // update state
+  removeAssocsWithPlayer(id)
+  state.topicmap.removeAssoc(id)
+  // update view
+  dispatch('removeObject', id)
+}
+
+/**
+ * Updates "topicmapTopics" and "selectedTopicmapId" state in case the deleted topic is a topicmap.
+ * Supports deletion of both, standard maps and special maps (e.g. a Geomap or Tableview).
+ *
+ * Preconditions:
+ * - the current topicmap is a standard map AND
+ * - the given "id" refers to a topic in that topicmap
+ * OR
+ * - the given "id" refers to a topicmap (standard or special).
+ */
+function handleTopicmapDeletion(id, getters, rootState, dispatch) {
+  if (getters.topicmapTypeUri === 'dmx.topicmaps.topicmap') {
+    // abort if deleted topic is not a topicmap
+    const topic = state.topicmap.getTopic(id)
+    if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+      return
+    }
+    // sanity check
+    if (state.topicmap.id !== id) {
+      throw Error(`topicmap ${id} can't be deleted as it is not selected`)
+    }
+  }
+  // select another topicmap, or create a new one if this was the last one
+  const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
+  if (topicmapTopic) {
+    // Note: selecting a new topicmap is not strictly required. It would be selected while directives processing
+    // anyways. But we do it here (before the delete request is actually sent) for quick user feedback.
+    _selectTopicmap(topicmapTopic.id, dispatch)
+  } else {
+    // FIXME: synchronization. Create topicmap *before* processing response of delete request
+    dispatch('createTopicmap', {})
+  }
+}
+
+// ---
+
+function hideAssocsWithPlayer (id) {
+  state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
+    assoc.setVisibility(false)
+    // _removeDetailIfOnscreen(assoc.id)  // ### TODO
+    hideAssocsWithPlayer(assoc.id)        // recursion
+  })
+}
+
+function removeAssocsWithPlayer (id) {
+  state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
+    state.topicmap.removeAssoc(assoc.id)
+    // _removeDetailIfOnscreen(assoc.id)  // ### TODO
+    removeAssocsWithPlayer(assoc.id)      // recursion
+  })
+}
 
 function unselectIfCascade (id, dispatch) {
   // console.log('unselectIfCascade', id)
