@@ -2,6 +2,7 @@ package systems.dmx.accountmanagement;
 
 import systems.dmx.accesscontrol.AccessControlService;
 import systems.dmx.accesscontrol.AuthorizationMethod;
+import systems.dmx.accesscontrol.DeprecatedUserAccountMethods;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -39,7 +40,7 @@ import static systems.dmx.workspaces.Constants.WORKSPACE_ASSIGNMENT;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccountManagementPlugin extends PluginActivator implements AccountManagementService, PreDeleteTopic,
-        PreUpdateTopic, PostDeleteTopic, PostUpdateTopic {
+        PreUpdateTopic, PostDeleteTopic, PostUpdateTopic, DeprecatedUserAccountMethods {
 
     static final Logger logger = Logger.getLogger(AccountManagementPlugin.class.getName());
 
@@ -132,6 +133,13 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         method.createAccount(cred);
 
         return usernameTopic;
+    }
+
+    @Override
+    @Deprecated
+    public Topic createUsername(String username) {
+        // TODO: Remove in next major DMX iteration
+        return createUsernameAndPrivateWorkspace(username, DmxAccountManager.NAME);
     }
 
     @Override

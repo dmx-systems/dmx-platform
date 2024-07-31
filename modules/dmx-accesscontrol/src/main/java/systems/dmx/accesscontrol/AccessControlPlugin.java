@@ -1,6 +1,7 @@
 package systems.dmx.accesscontrol;
 
 import static systems.dmx.accesscontrol.Constants.*;
+
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
@@ -164,8 +165,36 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ****************************
     // *** AccessControlService ***
     // ****************************
+    @Override
+    @Deprecated
+    public Topic createUserAccount(Credentials cred) {
+        // TODO: Remove in next major DMX iteration
+        return DeprecatedUserAccountMethods.call(
+                getBundleContext(),
+                (service) -> service.createUserAccount(cred));
+    }
 
+    @Override
+    @Deprecated
+    public Topic _createUserAccount(Credentials cred) throws Exception {
+        // TODO: Remove in next major DMX iteration
+        try {
+            return DeprecatedUserAccountMethods.call(
+                    getBundleContext(),
+                    (service) -> service._createUserAccount(cred));
+        } catch (DeprecatedUserAccountMethods.CallableException ce) {
+            throw ce.causeFromCallable;
+        }
+    }
 
+    @Override
+    @Deprecated
+    public Topic createUsername(String username) {
+        // TODO: Remove in next major DMX iteration
+        return DeprecatedUserAccountMethods.call(
+                getBundleContext(),
+                (service) -> service.createUsername(username));
+    }
 
     // === User Session ===
 

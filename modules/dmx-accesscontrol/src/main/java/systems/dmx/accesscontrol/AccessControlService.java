@@ -38,7 +38,16 @@ public interface AccessControlService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // === Deprecated in AccessControlService: User Accounts ===
 
+    @Deprecated
+    Topic createUserAccount(Credentials cred);
+
+    @Deprecated
+    Topic _createUserAccount(Credentials cred) throws Exception;
+
+    @Deprecated
+    Topic createUsername(String username);
 
     // === User Session ===
 
