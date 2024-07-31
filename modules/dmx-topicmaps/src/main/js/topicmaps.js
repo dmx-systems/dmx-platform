@@ -325,7 +325,7 @@ const actions = {
       // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
       // update client state + sync view (for immediate visual feedback)
       idLists.topicIds.forEach(id => deleteTopic(id, getters, rootState, dispatch))
-      idLists.assocIds.forEach(id => deleteAssoc(id))
+      idLists.assocIds.forEach(id => deleteAssoc(id, dispatch))
       // update server state
       dmx.rpc.deleteMulti(idLists).then(response => {
         dispatch('_processDirectives', response.directives)
@@ -676,7 +676,7 @@ function viewObject (idLists) {
 function hideTopic (id, dispatch) {
   // update state
   unselectIfCascade(id, dispatch)
-  hideAssocsWithPlayer(id)
+  hideAssocsWithPlayer(id, dispatch)
   state.topicmap.getTopic(id).setVisibility(false)
   // update view
   dispatch('removeObject', id)
@@ -688,7 +688,7 @@ function hideAssoc (id, dispatch) {
   if (!state.topicmap.hasAssoc(id)) {   // Note: idempotence is needed for hide-multi
     return
   }
-  removeAssocsWithPlayer(id)            // Note: topicmap contexts of *explicitly* hidden assocs are removed
+  removeAssocsWithPlayer(id, dispatch)  // Note: topicmap contexts of *explicitly* hidden assocs are removed
   state.topicmap.removeAssoc(id)        // Note: topicmap contexts of *explicitly* hidden assocs are removed
   // update view
   dispatch('removeObject', id)
@@ -698,18 +698,18 @@ function deleteTopic (id, getters, rootState, dispatch) {
   handleTopicmapDeletion(id, getters, rootState, dispatch)
   //
   // update state
-  removeAssocsWithPlayer(id)
+  removeAssocsWithPlayer(id, dispatch)
   state.topicmap.removeTopic(id)
   // update view
   dispatch('removeObject', id)
 }
 
-function deleteAssoc (id) {
+function deleteAssoc (id, dispatch) {
   if (!state.topicmap.hasAssoc(id)) {   // Note: idempotence is needed for delete-multi
     return
   }
   // update state
-  removeAssocsWithPlayer(id)
+  removeAssocsWithPlayer(id, dispatch)
   state.topicmap.removeAssoc(id)
   // update view
   dispatch('removeObject', id)
@@ -751,19 +751,19 @@ function handleTopicmapDeletion(id, getters, rootState, dispatch) {
 
 // ---
 
-function hideAssocsWithPlayer (id) {
+function hideAssocsWithPlayer (id, dispatch) {
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
-    assoc.setVisibility(false)
-    // _removeDetailIfOnscreen(assoc.id)  // ### TODO
-    hideAssocsWithPlayer(assoc.id)        // recursion
+    assoc.setVisibility(false)                  // update state
+    dispatch('removeObject', assoc.id)          // update view
+    hideAssocsWithPlayer(assoc.id, dispatch)    // recursion
   })
 }
 
-function removeAssocsWithPlayer (id) {
+function removeAssocsWithPlayer (id, dispatch) {
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
-    state.topicmap.removeAssoc(assoc.id)
-    // _removeDetailIfOnscreen(assoc.id)  // ### TODO
-    removeAssocsWithPlayer(assoc.id)      // recursion
+    state.topicmap.removeAssoc(assoc.id)        // update state
+    dispatch('removeObject', assoc.id)          // update view
+    removeAssocsWithPlayer(assoc.id, dispatch)  // recursion
   })
 }
 
@@ -771,7 +771,7 @@ function unselectIfCascade (id, dispatch) {
   // console.log('unselectIfCascade', id)
   dispatch('unselectIf', id)
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
-    unselectIfCascade(assoc.id, dispatch)      // recursion
+    unselectIfCascade(assoc.id, dispatch)       // recursion
   })
 }
 
