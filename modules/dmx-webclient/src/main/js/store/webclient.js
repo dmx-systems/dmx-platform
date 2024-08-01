@@ -114,15 +114,6 @@ const actions = {
 
   // ---
 
-  unselectIf ({dispatch}, id) {
-    // console.log('unselectIf', id, isSelected(id))
-    if (isSelected(id)) {
-      dispatch('stripSelectionFromRoute')
-    }
-  },
-
-  // ---
-
   registerComponent (_, compDef) {
     const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
     compDefs.push(compDef)
@@ -191,14 +182,8 @@ const actions = {
       case 'UPDATE_TOPIC':
         displayObjectIf(new dmx.Topic(dir.arg))
         break
-      case 'DELETE_TOPIC':
-        dispatch('unselectIf', dir.arg.id)
-        break
       case 'UPDATE_ASSOC':
         displayObjectIf(new dmx.Assoc(dir.arg))
-        break
-      case 'DELETE_ASSOC':
-        dispatch('unselectIf', dir.arg.id)
         break
       }
     })
@@ -239,9 +224,11 @@ function displayObjectIf (object) {
   }
 }
 
+/**
+ * @return  true if the given object ID represents the current single-selection, if there is one, falsish otherwise
+ */
 function isSelected (id) {
-  const object = state.object
-  return object && object.id === id
+  return state.object?.id === id
 }
 
 //

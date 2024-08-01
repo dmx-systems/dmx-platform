@@ -152,12 +152,6 @@ const actions = {
     // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
-  // TODO: drop it? Meanwhile selection state is updated for *all* cached topicmaps by dmx-topicmap-panel
-  unselectIf ({getters}, id) {
-    // console.log('unselectIf', id)
-    getters.selection.remove(id)
-  },
-
   // Note: by design multi-selections behave different than single selections:
   // - multi selections are not represented in the browser URL.
   // - the object details of a multi selection are *not* displayed in-map (unless pinned).
@@ -310,10 +304,10 @@ const actions = {
 
   // TODO: adapt 2 actions
 
-  hideMulti ({dispatch}, idLists) {
+  hideMulti ({getters, rootState, dispatch}, idLists) {
     // update state + view (for immediate visual feedback)
-    idLists.topicIds.forEach(id => hideTopic(id, dispatch))
-    idLists.assocIds.forEach(id => hideAssoc(id, dispatch))
+    idLists.topicIds.forEach(id => hideTopic(id, getters, rootState, dispatch))
+    idLists.assocIds.forEach(id => hideAssoc(id, getters, rootState, dispatch))
     // update server
     if (state.topicmapWritable) {
       dmx.rpc.hideMulti(state.topicmap.id, idLists)
@@ -436,20 +430,20 @@ const actions = {
     }
   },
 
-  _setTopicVisibility ({getters, dispatch}, {topicmapId, topicId, visibility}) {
+  _setTopicVisibility ({getters, rootState, dispatch}, {topicmapId, topicId, visibility}) {
     // console.log('_setTopicVisibility (Topicmaps Module)', topicmapId, topicId, visibility)
     if (topicmapId === _topicmapId(getters)) {
       if (!visibility) {
-        unselectIfCascade(topicId, dispatch)      // update state
+        unselectIfCascade(topicId, getters, rootState, dispatch)      // update state
       }
     }
   },
 
-  _setAssocVisibility ({getters, dispatch}, {topicmapId, assocId, visibility}) {
+  _setAssocVisibility ({getters, rootState, dispatch}, {topicmapId, assocId, visibility}) {
     // console.log('_setAssocVisibility (Topicmaps Module)', topicmapId, assocId, visibility)
     if (topicmapId === _topicmapId(getters)) {
       if (!visibility) {
-        unselectIfCascade(assocId, dispatch)      // update state
+        unselectIfCascade(assocId, getters, rootState, dispatch)      // update state
       }
     }
   },
@@ -466,6 +460,7 @@ const actions = {
         }
         break
       case 'DELETE_TOPIC':
+        unselectIf(dir.arg.id, getters, rootState, dispatch)
         topic = new dmx.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
           deleteTopicmap(topic, getters, rootState, dispatch)
@@ -474,6 +469,7 @@ const actions = {
         removeFromAllSelections(dir.arg.id)
         break
       case 'DELETE_ASSOC':
+        unselectIf(dir.arg.id, getters, rootState, dispatch)
         removeFromAllSelections(dir.arg.id)
         break
       }
@@ -673,18 +669,18 @@ function viewObject (idLists) {
 
 // TODO: adapt 4 functions
 
-function hideTopic (id, dispatch) {
+function hideTopic (id, getters, rootState, dispatch) {
   // update state
-  unselectIfCascade(id, dispatch)
+  unselectIfCascade(id, getters, rootState, dispatch)
   hideAssocsWithPlayer(id, dispatch)
   state.topicmap.getTopic(id).setVisibility(false)
   // update view
   dispatch('removeObject', id)
 }
 
-function hideAssoc (id, dispatch) {
+function hideAssoc (id, getters, rootState, dispatch) {
   // update state
-  unselectIfCascade(id, dispatch)
+  unselectIfCascade(id, getters, rootState, dispatch)
   if (!state.topicmap.hasAssoc(id)) {   // Note: idempotence is needed for hide-multi
     return
   }
@@ -698,6 +694,7 @@ function deleteTopic (id, getters, rootState, dispatch) {
   handleTopicmapDeletion(id, getters, rootState, dispatch)
   //
   // update state
+  // Note: unselecting (and possible route change) is done while processing DELETE directives (see webclient.js)
   removeAssocsWithPlayer(id, dispatch)
   state.topicmap.removeTopic(id)
   // update view
@@ -709,6 +706,7 @@ function deleteAssoc (id, dispatch) {
     return
   }
   // update state
+  // Note: unselecting (and possible route change) is done while processing DELETE directives (see webclient.js)
   removeAssocsWithPlayer(id, dispatch)
   state.topicmap.removeAssoc(id)
   // update view
@@ -767,11 +765,11 @@ function removeAssocsWithPlayer (id, dispatch) {
   })
 }
 
-function unselectIfCascade (id, dispatch) {
+function unselectIfCascade (id, getters, rootState, dispatch) {
   // console.log('unselectIfCascade', id)
-  dispatch('unselectIf', id)
+  unselectIf(id, getters, rootState, dispatch)
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
-    unselectIfCascade(assoc.id, dispatch)       // recursion
+    unselectIfCascade(assoc.id, getters, rootState, dispatch)       // recursion
   })
 }
 
@@ -854,6 +852,21 @@ function adaptSelection (getters, dispatch) {
 function shrinkSelection (selection) {
   selection.topicIds = selection.topicIds.filter(id => state.topicmap.hasVisibleObject(id))
   selection.assocIds = selection.assocIds.filter(id => state.topicmap.hasVisibleObject(id))
+}
+
+function unselectIf (id, getters, rootState, dispatch) {
+  // console.log('unselectIf', id)
+  if (isSelected(id, rootState)) {
+    dispatch('stripSelectionFromRoute')
+  }
+  getters.selection.remove(id)
+}
+
+/**
+ * @return  true if the given object ID represents the current single-selection, if there is one, falsish otherwise
+ */
+function isSelected (id, rootState) {
+  return rootState.object?.id === id
 }
 
 // ---

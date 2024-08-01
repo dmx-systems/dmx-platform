@@ -9,7 +9,7 @@
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Jul 30, 2024
+        Jul 31, 2024
       </div>
       <div class="field">
         <div class="field-label">License</div>
