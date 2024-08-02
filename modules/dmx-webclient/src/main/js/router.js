@@ -94,9 +94,17 @@ const actions = {
     callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
   },
 
-  stripSelectionFromRoute () {
+  /**
+   * @param   noViewUpdate  if true the topicmap renderer's view will not be updated, only its selection-model. This
+   *                        might be needed when strip-selection is triggered programmatically in the course of an hide/
+   *                        delete operation. In this case the renderer's view might not be able to update anymore as
+   *                        certain on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already.
+   *                        The view update can be safely omitted as the object is about to disappear anyways.
+   */
+  stripSelectionFromRoute (_, noViewUpdate) {
     router.push({
-      name: 'topicmap'
+      name: 'topicmap',
+      params: {noViewUpdate}    // misuse "params" for transporting that flag to the router's navigate() function
     })
   },
 
@@ -256,12 +264,15 @@ function navigate (to, from) {
   } else if ((assocChanged || topicmapChanged) && assocId) {
     p2 = fetchAndDisplayAssoc(assocId, p)
   } else if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {     // Note: 0 is a valid topic ID
-    store.dispatch('emptyDisplay')                              // -> dmx-webclient
+    store.dispatch('emptyDisplay')                        // -> dmx-webclient
     if (!topicmapChanged) {
-      p.then(() => store.dispatch('unsetSelection', oldId))     // -> dmx-topicmaps
+      p.then(() => store.dispatch('unsetSelection', {     // -> dmx-topicmaps
+        id: oldId,
+        noViewUpdate: to.params.noViewUpdate
+      }))
     }
   }
-  p2 && p2.catch(e => {
+  p2?.catch(e => {
     console.warn(`Route ${to.path} failed (${e})`)
     // give detail panel time to appear (before it closes again), it's DOM is needed for the imminent dirty check
     Vue.nextTick(() => {

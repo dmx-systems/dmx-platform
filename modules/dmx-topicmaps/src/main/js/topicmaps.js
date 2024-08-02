@@ -211,15 +211,20 @@ const actions = {
    * Postcondition:
    * - "selections" state is up-to-date.
    *
-   * @param   id    id of the topic/assoc to unselect
+   * @param   id            id of the topic/assoc to unselect
+   * @param   noViewUpdate  if true the actual renderer's view will not be updated, only its model. This might be needed
+   *                        when unset-selection is triggered programmatically in the course of an hide/delete
+   *                        operation. In this case the renderer's view might not be able to update anymore as certain
+   *                        on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already. The view
+   *                        update can be safely omitted as the object is about to disappear anyways.
    */
-  unsetSelection ({getters, dispatch}, id) {
+  unsetSelection ({getters, dispatch}, {id, noViewUpdate}) {
     const selection = getters.selection
-    // console.log('unsetSelection', id, selection.topicIds, selection.assocIds)
+    // console.log('unsetSelection', id, noViewUpdate, selection.topicIds, selection.assocIds)
     if (typeof id !== 'number') {
       throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
     }
-    dispatch('renderAsUnselected')          // update view
+    dispatch('renderAsUnselected', noViewUpdate)  // update view
     if (!selection) {
       // This can happen while workspace deletion. The workspace topic is removed from the topicmap, causing
       // unsetSelection(). The topicmap might be deleted aleady in the course of deleting the workspace content.
@@ -231,13 +236,13 @@ const actions = {
       // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
       // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
       // is up-to-date already.
-      selection.empty()                     // update state
+      selection.empty()                           // update state
     } else if (selection.isMulti()) {
       // If a single selection is extended to a multi selection the URL's selection part is stripped, causing the router
       // to remove the single selection from state and view. The former single selection must be visually restored in
       // order to match the multi selection state. The low-level '_renderAsSelected' action manipulates the view only.
       // The normal 'renderAsSelected' action would display the in-map details.
-      dispatch('_renderAsSelected', id)     // update view
+      dispatch('_renderAsSelected', id)           // update view
     }
   },
 
@@ -857,7 +862,7 @@ function shrinkSelection (selection) {
 function unselectIf (id, getters, rootState, dispatch) {
   // console.log('unselectIf', id)
   if (isSelected(id, rootState)) {
-    dispatch('stripSelectionFromRoute')
+    dispatch('stripSelectionFromRoute', true)     // noViewUpdate=true
   }
   getters.selection.remove(id)
 }
