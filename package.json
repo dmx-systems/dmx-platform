@@ -17,7 +17,7 @@
     "axios": "0.18.1",
     "country-flag-emoji-polyfill": "0.1.5",
     "dmx-api": "3.0.1",
-    "dmx-cytoscape-renderer": "https://github.com/dmx-systems/dmx-cytoscape-renderer.git",
+    "dmx-cytoscape-renderer": "3.5.0",
     "dmx-detail-panel": "3.0.1",
     "dmx-login-dialog": "2.0.1",
     "dmx-object-renderer": "3.0.1",

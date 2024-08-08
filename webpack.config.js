@@ -29,7 +29,7 @@ module.exports = (env = {}) => {
         {
           test: /\.js$/,
           loader: 'babel-loader',
-          // Note: dmx-cytoscape-renderer makes use of ?. Conditional Chaining JS operator and needs to go through babel
+          // Note: dmx-cytoscape-renderer makes use of ?. Optional Chaining JS operator and needs to go through babel
           exclude: /node_modules\/(?!dmx-cytoscape-renderer)/   // x(?!y) is Negative Lookahead Assertion regex operator
         },
         {
