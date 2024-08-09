@@ -1,6 +1,7 @@
 package systems.dmx.accesscontrol;
 
 import static systems.dmx.accesscontrol.Constants.*;
+
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
 import systems.dmx.config.ConfigCustomizer;
@@ -11,7 +12,6 @@ import systems.dmx.config.ConfigTarget;
 import static systems.dmx.core.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.AssocType;
-import systems.dmx.core.ChildTopics;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -19,7 +19,6 @@ import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssocModel;
 import systems.dmx.core.model.AssocPlayerModel;
 import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -32,19 +31,15 @@ import systems.dmx.core.service.accesscontrol.AccessControlException;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.Permissions;
-import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
-import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.service.event.CheckAssocReadAccess;
 import systems.dmx.core.service.event.CheckAssocWriteAccess;
 import systems.dmx.core.service.event.CheckTopicReadAccess;
 import systems.dmx.core.service.event.CheckTopicWriteAccess;
 import systems.dmx.core.service.event.PostCreateAssoc;
 import systems.dmx.core.service.event.PostCreateTopic;
-import systems.dmx.core.service.event.PostDeleteTopic;
 import systems.dmx.core.service.event.PostUpdateAssoc;
 import systems.dmx.core.service.event.PostUpdateTopic;
 import systems.dmx.core.service.event.PreCreateAssoc;
-import systems.dmx.core.service.event.PreUpdateTopic;
 import systems.dmx.core.service.event.ServiceRequestFilter;
 import systems.dmx.core.service.event.StaticResourceFilter;
 import systems.dmx.core.util.DMXUtils;
@@ -83,7 +78,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -97,10 +91,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                           CheckAssocReadAccess,
                                                                                           CheckAssocWriteAccess,
                                                                                           PreCreateAssoc,
-                                                                                          PreUpdateTopic,
                                                                                           PostCreateTopic,
                                                                                           PostCreateAssoc,
-                                                                                          PostDeleteTopic,
                                                                                           PostUpdateTopic,
                                                                                           PostUpdateAssoc,
                                                                                           ServiceRequestFilter,
@@ -154,9 +146,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Context private HttpServletRequest request;
     @Context private HttpServletResponse response;
 
-    private Map<String, AuthorizationMethod> authorizationMethods = new HashMap();
+    private final Map<String, AuthorizationMethod> authorizationMethods = new HashMap<>();
 
-    private static Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
+    private static final Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
 
     static {
         logger.info("Security config:" +
@@ -173,8 +165,36 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ****************************
     // *** AccessControlService ***
     // ****************************
+    @Override
+    @Deprecated
+    public Topic createUserAccount(Credentials cred) {
+        // TODO: Remove in next major DMX iteration
+        return DeprecatedUserAccountMethods.call(
+                getBundleContext(),
+                (service) -> service.createUserAccount(cred));
+    }
 
+    @Override
+    @Deprecated
+    public Topic _createUserAccount(Credentials cred) throws Exception {
+        // TODO: Remove in next major DMX iteration
+        try {
+            return DeprecatedUserAccountMethods.call(
+                    getBundleContext(),
+                    (service) -> service._createUserAccount(cred));
+        } catch (DeprecatedUserAccountMethods.CallableException ce) {
+            throw ce.causeFromCallable;
+        }
+    }
 
+    @Override
+    @Deprecated
+    public Topic createUsername(String username) {
+        // TODO: Remove in next major DMX iteration
+        return DeprecatedUserAccountMethods.call(
+                getBundleContext(),
+                (service) -> service.createUsername(username));
+    }
 
     // === User Session ===
 
@@ -235,97 +255,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             checkWriteAccess(getAdminWorkspaceId());
         } catch (Exception e) {
             throw new RuntimeException("User is not an administrator", e);
-        }
-    }
-
-
-
-    // === User Accounts ===
-
-    @POST
-    @Path("/user-account")
-    @Transactional
-    @Override
-    public Topic createUserAccount(Credentials cred) {
-        try {
-            checkAdmin();
-            return _createUserAccount(cred);
-        } catch (Exception e) {
-            throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
-        }
-    }
-
-    @Override
-    public Topic _createUserAccount(final Credentials cred) throws Exception {
-        String username = cred.username;
-        PrivilegedAccess pa = dmx.getPrivilegedAccess();
-        logger.info("Creating user account \"" + username + "\"");
-        //
-        // 1) create Username topic and private workspace
-        final Topic usernameTopic = createUsername(username);
-        //
-        // 2) create User Account
-        // Note: a User Account topic (and its child topics) requires special workspace assignments (see next step 3).
-        // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
-        // "assignToWorkspace" calls are required.)
-        String salt = JavaUtils.random256();
-        Topic userAccount = pa.runInWorkspaceContext(-1, () ->
-            dmx.createTopic(mf.newTopicModel(USER_ACCOUNT, mf.newChildTopicsModel()
-                .setRef(USERNAME, usernameTopic.getId())
-                .set(PASSWORD, JavaUtils.encodeSHA256(SITE_SALT + salt + cred.password))))
-        );
-        logger.info("### Salting password of user \"" + cred.username + "\"");
-        RelatedTopic passwordTopic = userAccount.getChildTopics().getTopic(PASSWORD);
-        passwordTopic.setProperty(SALT, salt, false);     // addToIndex=false
-        // 3) assign user account and password to private workspace
-        // Note: the current user has no READ access to the private workspace just created.
-        // Privileged assignToWorkspace() calls are required (instead of using the Workspaces service).
-        long privateWorkspaceId = pa.getPrivateWorkspace(username).getId();
-        pa.assignToWorkspace(userAccount, privateWorkspaceId);
-        pa.assignToWorkspace(passwordTopic, privateWorkspaceId);
-        pa.assignToWorkspace(passwordTopic.getRelatingAssoc(), privateWorkspaceId);
-        //
-        return usernameTopic;
-    }
-
-    @Override
-    public Topic createUsername(final String username) {
-        try {
-            logger.info("Creating username topic \"" + username + "\"");
-            PrivilegedAccess pa = dmx.getPrivilegedAccess();
-            //
-            // 1) check username uniqueness
-            // Note: we can't do this check in the preCreateTopic() listener. If such an username topic exists already
-            // the DMX value integrator will reuse this one instead of trying to create a new one. The preCreateTopic()
-            // listener will not trigger.
-            Topic usernameTopic = getUsernameTopic(username);
-            if (usernameTopic != null) {
-                throw new RuntimeException("Username \"" + username + "\" exists already");
-            }
-            // 2) create Username topic
-            // Note: a Username topic requires special workspace assignment (see step 4 below).
-            // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
-            // "assignToWorkspace" calls are required.)
-            usernameTopic = pa.runInWorkspaceContext(-1, () ->
-                dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username)))
-            );
-            // 3) create private workspace
-            setWorkspaceOwner(
-                ws.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE), username
-            );
-            // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's
-            // private workspace has been created by the new user itself. Instead we set the *current* user as the
-            // creator/modifier (via postCreateTopic() listener). In case of the "admin" user account the creator/
-            // modifier remain undefined as it is actually created by the system itself.
-            //
-            // 4) assign username topic to "System" workspace
-            // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
-            // This is to support the "DMX Sign-up" 3rd-party plugin.
-            pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
-            //
-            return usernameTopic;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating username topic \"" + username + "\" failed", e);
         }
     }
 
@@ -722,48 +651,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void preUpdateTopic(Topic topic, TopicModel updateModel) {
-        if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // Username
-            TopicModel newUsernameTopic = updateModel.getChildTopics().getTopicOrNull(USERNAME);
-            if (newUsernameTopic != null) {
-                String newUsername = newUsernameTopic.getSimpleValue().toString();
-                String username = topic.getChildTopics().getTopic(USERNAME).getSimpleValue().toString();
-                if (!newUsername.equals(username)) {
-                    throw new RuntimeException("A Username can't be changed (tried \"" + username + "\" -> \"" +
-                        newUsername + "\")");
-                }
-            }
-            // Password
-            RelatedTopicModel passwordTopic = updateModel.getChildTopics().getTopicOrNull(PASSWORD);
-            if (passwordTopic != null) {
-                // empty check
-                String password = passwordTopic.getSimpleValue().toString();
-                if (password.equals("")) {
-                    throw new RuntimeException("Password can't be empty");
-                }
-                // workspace assignment
-                long workspaceId = getPrivateWorkspace().getId();
-                String compDefUri = WORKSPACE + "#" + WORKSPACE_ASSIGNMENT;
-                passwordTopic.getChildTopics().setRef(compDefUri, workspaceId);
-                passwordTopic.getRelatingAssoc().getChildTopics().setRef(compDefUri, workspaceId);
-            }
-        }
-    }
-
-    @Override
     public void postUpdateTopic(Topic topic, ChangeReport report, TopicModel updateModel) {
-        if (topic.getTypeUri().equals(USER_ACCOUNT)) {
-            // salt+hash password
-            ChildTopics ct = topic.getChildTopics();
-            RelatedTopic passwordTopic = ct.getTopic(PASSWORD);
-            if (report.getChanges(PASSWORD) != null) {
-                String username = ct.getTopic(USERNAME).getSimpleValue().toString();
-                String password = passwordTopic.getSimpleValue().toString();
-                Credentials cred = new Credentials(username, password);
-                dmx.getPrivilegedAccess().storePasswordHash(cred, passwordTopic.getModel());
-            }
-        }
         //
         setModifier(topic);
     }
@@ -771,20 +659,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateAssoc(Assoc assoc, ChangeReport report, AssocModel updateModel) {
         setModifier(assoc);
-    }
-
-    @Override
-    public void postDeleteTopic(TopicModel topic) {
-        if (topic.getTypeUri().equals(USERNAME)) {
-            String username = topic.getSimpleValue().toString();
-            Collection<Topic> workspaces = getWorkspacesByOwner(username);
-            String currentUser = getUsername();
-            logger.info("### Transferring ownership of " + workspaces.size() + " workspaces from \"" + username +
-                "\" -> \"" + currentUser + "\"");
-            for (Topic workspace : workspaces) {
-                setWorkspaceOwner(workspace, currentUser);
-            }
-        }
     }
 
     // ---
@@ -1183,7 +1057,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private boolean inRequestScope() {
         return dmx.getPrivilegedAccess().inRequestScope(request);
     }
-
 
 
     // === Logging ===

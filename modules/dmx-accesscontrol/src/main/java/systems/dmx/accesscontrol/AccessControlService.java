@@ -38,7 +38,16 @@ public interface AccessControlService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // === Deprecated in AccessControlService: User Accounts ===
 
+    @Deprecated
+    Topic createUserAccount(Credentials cred);
+
+    @Deprecated
+    Topic _createUserAccount(Credentials cred) throws Exception;
+
+    @Deprecated
+    Topic createUsername(String username);
 
     // === User Session ===
 
@@ -108,36 +117,6 @@ public interface AccessControlService {
 
 
     // === User Accounts ===
-
-    /**
-     * Creates an user account.
-     * Only DMX admins are allowed to create user accounts.
-     *
-     * @throws  RuntimeException    if the requesting user is not a DMX admin.
-     *
-     * @return  The "Username" topic of the created user account.
-     */
-    Topic createUserAccount(Credentials cred);
-
-    /**
-     * Creates an user account.
-     * This is a privileged method: no permissions are checked.
-     * <p>
-     * Security: this method is not callable from outside as it has no REST interface. So the DMX platform is still
-     * secure. On the other hand, a 3rd-party plugin which provides a RESTful interface to this method is required
-     * to apply an additional authorization measure, e.g. a short-living access token sent via email.
-     *
-     * @return  The "Username" topic of the created user account.
-     */
-    Topic _createUserAccount(Credentials cred) throws Exception;        // TODO: don't throw checked ex
-
-    /**
-     * Creates a Username topic and a private workspace.
-     * TODO: rename to createUsernameAndPrivateWorkspace?
-     * 
-     * @return  The created "Username" topic.
-     */
-    Topic createUsername(String username);
 
     /**
      * Returns the "Username" topic for the specified username (case-insensitive).
