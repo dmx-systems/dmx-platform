@@ -93,6 +93,11 @@
         </dependency>
         <dependency>
             <groupId>systems.dmx</groupId>
+            <artifactId>dmx-account-management</artifactId>
+            <version>5.3.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>systems.dmx</groupId>
             <artifactId>dmx-facets</artifactId>
             <version>5.3.5-SNAPSHOT</version>
         </dependency>
