@@ -46,10 +46,11 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ACCOUNT_MANAGEMENT_METHOD = System.getProperty("dmx.accountmanagement.method", DmxAccountManager.NAME);
+    private static final String ACCOUNT_MANAGEMENT_METHOD = System.getProperty("dmx.accountmanagement.method",
+        DmxAccountManager.NAME);
 
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
-            System.getProperty("dmx.security.new_accounts_are_enabled", "true")
+        System.getProperty("dmx.security.new_accounts_are_enabled", "true")
     );
     private static final String SITE_SALT = System.getProperty("dmx.security.site_salt", "");
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
@@ -63,6 +64,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Inject
     AccessControlService accessControlService;
 
+    // TODO: rename to "accountManagers"
     private final Map<String, AccountManager> accountManagementMethods = new HashMap<>();
 
     static {
@@ -72,15 +74,25 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // *** Hooks ***
+
     @Override
-    public void init() {
-        // registers built-in account management method
-        registerAccountManager(new DmxAccountManager(dmx, mf, SITE_SALT));
+    public void serviceArrived(Object service) {
+        if (service instanceof AccessControlService) {
+            // registers built-in account manager
+            registerAccountManager(new DmxAccountManager(dmx, mf, SITE_SALT));
+        }
     }
 
-    // ****************************
+    @Override
+    public void serviceGone(Object service) {
+        if (service instanceof AccessControlService) {
+            // needed for plugin hot redeployment (avoids "Authorization method already registered" error)
+            unregisterAccountManager(getAccountManagementMethod(DmxAccountManager.NAME));
+        }
+    }
+
     // *** AccountManagementService ***
-    // ****************************
 
     // === User Accounts ===
 
@@ -90,6 +102,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         accessControlService.registerAuthorizationMethod(accountManager.name(), asAuthorizationMethod(accountManager));
     }
 
+    // TODO: change param to manager *name* (String), more convenient for caller?
     @Override
     public void unregisterAccountManager(AccountManager accountManager) {
         accessControlService.unregisterAuthorizationMethod(accountManager.name());
@@ -228,11 +241,13 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             CheckCredentialsResult result = amm.checkCredentials(credentials);
             if (result.success) {
                 if (result.usernameTopic != null) {
-                    logger.info(String.format("Credentials check successful and username topic present for %s", credentials.username));
+                    logger.info(String.format("Credentials check successful and username topic present for %s",
+                        credentials.username));
                     // topic already present, just return it
                     return result.usernameTopic;
                 } else {
-                    logger.info(String.format("Credentials check successful but lookup or creation required for %s", credentials.username));
+                    logger.info(String.format("Credentials check successful but lookup or creation required for %s",
+                        credentials.username));
                     // lookup and possible creation necessary
                     return lookupOrCreateUsernameTopic(credentials.username, amm.name());
                 }
@@ -278,7 +293,8 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             // Note: a Username topic requires special workspace assignment (see step 4 below).
             // So we suppress standard workspace assignment. (We can't set the actual workspace here as privileged
             // "assignToWorkspace" calls are required.)
-            usernameTopic = pa.runInWorkspaceContext(-1, () -> dmx.createTopic(mf.newTopicModel(USERNAME, new SimpleValue(username))));
+            usernameTopic = pa.runInWorkspaceContext(-1, () -> dmx.createTopic(mf.newTopicModel(USERNAME,
+                new SimpleValue(username))));
             // 3) create private workspace
             accessControlService.setWorkspaceOwner(
                     ws.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE), username
@@ -295,28 +311,27 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             // 5)
             // Links account management method to username
             usernameTopic.setProperty(ACCOUNT_MANAGER_NAME, methodName, true);
-
             return usernameTopic;
         } catch (Exception e) {
             throw new RuntimeException("Creating username topic \"" + username + "\" failed", e);
         }
     }
 
+    // TODO: rename to getAccountManager
     private AccountManager getAccountManagementMethod(String methodName) {
         return accountManagementMethods.get(
-                accountManagementMethods.containsKey(methodName)
-                        ? methodName
-                        : DmxAccountManager.NAME
+            accountManagementMethods.containsKey(methodName)
+                ? methodName
+                : DmxAccountManager.NAME
         );
     }
 
+    // TODO: rename to getAccountManagerForUsername
     private AccountManager getAccountManagementMethodForUsername(Topic usernameTopic) {
         String methodName =
-                (usernameTopic.hasProperty(ACCOUNT_MANAGER_NAME))
-                        ? usernameTopic.getProperty(ACCOUNT_MANAGER_NAME).toString()
-                        : DmxAccountManager.NAME;
-
+            (usernameTopic.hasProperty(ACCOUNT_MANAGER_NAME))
+                ? usernameTopic.getProperty(ACCOUNT_MANAGER_NAME).toString()
+                : DmxAccountManager.NAME;
         return getAccountManagementMethod(methodName);
     }
-
 }

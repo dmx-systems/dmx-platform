@@ -95,7 +95,7 @@ public class AccountManagementPluginTest {
     @DisplayName("init() should add 'DMX' account manager")
     void init_should_add_dmx_account_manager() {
         // when:
-        subject.init();
+        subject.serviceArrived(accessControlService);
 
         // then:
         assertThat(subject.getAccountManager()).isEqualTo(Collections.singletonList("DMX"));
