@@ -46,7 +46,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ACCOUNT_MANAGEMENT_METHOD = System.getProperty("dmx.accountmanagement.method",
+    private static final String ACCOUNT_MANAGER_NAME = System.getProperty("dmx.accountmanagement.manager",
         DmxAccountManager.NAME);
 
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
@@ -64,8 +64,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Inject
     AccessControlService accessControlService;
 
-    // TODO: rename to "accountManagers"
-    private final Map<String, AccountManager> accountManagementMethods = new HashMap<>();
+    private final Map<String, AccountManager> accountManagers = new HashMap<>();
 
     static {
         logger.info("Security config:" +
@@ -88,7 +87,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     public void serviceGone(Object service) {
         if (service instanceof AccessControlService) {
             // needed for plugin hot redeployment (avoids "Authorization method already registered" error)
-            unregisterAccountManager(getAccountManagementMethod(DmxAccountManager.NAME));
+            unregisterAccountManager(getAccountManager(DmxAccountManager.NAME));
         }
     }
 
@@ -98,24 +97,23 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     @Override
     public void registerAccountManager(AccountManager accountManager) {
-        accountManagementMethods.put(accountManager.name(), accountManager);
+        accountManagers.put(accountManager.name(), accountManager);
         accessControlService.registerAuthorizationMethod(accountManager.name(), asAuthorizationMethod(accountManager));
     }
 
-    // TODO: change param to manager *name* (String), more convenient for caller?
     @Override
     public void unregisterAccountManager(AccountManager accountManager) {
         accessControlService.unregisterAuthorizationMethod(accountManager.name());
-        accountManagementMethods.remove(accountManager.name());
+        accountManagers.remove(accountManager.name());
     }
 
     @Override
-    public List<String> getAccountManager() {
-        return new ArrayList<>(accountManagementMethods.keySet());
+    public List<String> getAccountManagerNames() {
+        return new ArrayList<>(accountManagers.keySet());
     }
 
     @Override
-    public String getConfiguredAccountManager() { return ACCOUNT_MANAGEMENT_METHOD; }
+    public String getConfiguredAccountManagerName() { return ACCOUNT_MANAGER_NAME; }
 
     @POST
     @Path("/user-account")
@@ -134,7 +132,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     public Topic _createUserAccount(final Credentials cred) {
         String username = cred.username;
         // If set, the methodName controls in which system a user is created, otherwise use the configured method
-        String methodName = cred.methodName != null ? cred.methodName : ACCOUNT_MANAGEMENT_METHOD;
+        String methodName = cred.methodName != null ? cred.methodName : ACCOUNT_MANAGER_NAME;
 
         logger.info(String.format("Creating user account '%s' with method '%s'", username, methodName));
 
@@ -142,7 +140,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         final Topic usernameTopic = createUsernameAndPrivateWorkspace(username, methodName);
 
         // 2) Create actual account
-        AccountManager method = getAccountManagementMethod(methodName);
+        AccountManager method = getAccountManager(methodName);
         method.createAccount(cred);
 
         return usernameTopic;
@@ -158,7 +156,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public void changePassword(Credentials currentCred, Credentials newCred) {
         Topic usernameTopic = dmx.getPrivilegedAccess().getUsernameTopic(newCred.username);
-        getAccountManagementMethodForUsername(usernameTopic).changePassword(currentCred, newCred);
+        getAccountManageForUsername(usernameTopic).changePassword(currentCred, newCred);
     }
 
     // ---
@@ -199,7 +197,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             String username = topic.getSimpleValue().toString();
 
             // Removes user data from potentially external systems
-            getAccountManagementMethodForUsername(topic).onUsernameDeleted(username);
+            getAccountManageForUsername(topic).onUsernameDeleted(username);
         }
     }
 
@@ -310,28 +308,26 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             pa.assignToWorkspace(usernameTopic, pa.getSystemWorkspaceId());
             // 5)
             // Links account management method to username
-            usernameTopic.setProperty(ACCOUNT_MANAGER_NAME, methodName, true);
+            usernameTopic.setProperty(Constants.ACCOUNT_MANAGER_NAME, methodName, true);
             return usernameTopic;
         } catch (Exception e) {
             throw new RuntimeException("Creating username topic \"" + username + "\" failed", e);
         }
     }
 
-    // TODO: rename to getAccountManager
-    private AccountManager getAccountManagementMethod(String methodName) {
-        return accountManagementMethods.get(
-            accountManagementMethods.containsKey(methodName)
+    private AccountManager getAccountManager(String methodName) {
+        return accountManagers.get(
+            accountManagers.containsKey(methodName)
                 ? methodName
                 : DmxAccountManager.NAME
         );
     }
 
-    // TODO: rename to getAccountManagerForUsername
-    private AccountManager getAccountManagementMethodForUsername(Topic usernameTopic) {
+    private AccountManager getAccountManageForUsername(Topic usernameTopic) {
         String methodName =
-            (usernameTopic.hasProperty(ACCOUNT_MANAGER_NAME))
-                ? usernameTopic.getProperty(ACCOUNT_MANAGER_NAME).toString()
+            (usernameTopic.hasProperty(Constants.ACCOUNT_MANAGER_NAME))
+                ? usernameTopic.getProperty(Constants.ACCOUNT_MANAGER_NAME).toString()
                 : DmxAccountManager.NAME;
-        return getAccountManagementMethod(methodName);
+        return getAccountManager(methodName);
     }
 }

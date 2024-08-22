@@ -78,14 +78,14 @@ public class AccountManagementPluginTest {
     @DisplayName("after creation should not contain any account manager")
     void should_not_contain_any_account_manager() {
         // then:
-        assertThat(subject.getAccountManager()).isEqualTo(Collections.emptyList());
+        assertThat(subject.getAccountManagerNames()).isEqualTo(Collections.emptyList());
     }
 
     @Test
     @DisplayName("getConfiguredAccountManager() should be 'DMX' by default")
     void getConfiguredAccountManager_should_be_dmx() {
         // when:
-        String result = subject.getConfiguredAccountManager();
+        String result = subject.getConfiguredAccountManagerName();
 
         // then:
         assertThat(result).isEqualTo("DMX");
@@ -98,7 +98,7 @@ public class AccountManagementPluginTest {
         subject.serviceArrived(accessControlService);
 
         // then:
-        assertThat(subject.getAccountManager()).isEqualTo(Collections.singletonList("DMX"));
+        assertThat(subject.getAccountManagerNames()).isEqualTo(Collections.singletonList("DMX"));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class AccountManagementPluginTest {
         subject.registerAccountManager(accountManager);
 
         // then:
-        assertThat(subject.getAccountManager()).isEqualTo(Collections.singletonList(accountManagerName));
+        assertThat(subject.getAccountManagerNames()).isEqualTo(Collections.singletonList(accountManagerName));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class AccountManagementPluginTest {
         subject.unregisterAccountManager(accountManager);
 
         // then:
-        assertThat(subject.getAccountManager()).isEqualTo(Collections.emptyList());
+        assertThat(subject.getAccountManagerNames()).isEqualTo(Collections.emptyList());
     }
 
     @Test

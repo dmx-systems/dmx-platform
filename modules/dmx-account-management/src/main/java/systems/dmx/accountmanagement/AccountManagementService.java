@@ -41,13 +41,13 @@ public interface AccountManagementService {
      *
      * @return
      */
-    List<String> getAccountManager();
+    List<String> getAccountManagerNames();
 
     /** Returns the account manager name that is configured to be used by the platform by default.
      *
      * @return
      */
-    String getConfiguredAccountManager();
+    String getConfiguredAccountManagerName();
 
     /**
      * Creates a user account.
