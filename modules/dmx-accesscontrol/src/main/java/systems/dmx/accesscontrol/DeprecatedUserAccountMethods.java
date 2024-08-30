@@ -6,6 +6,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
 
+
 @Deprecated
 public interface DeprecatedUserAccountMethods {
 
@@ -20,7 +21,8 @@ public interface DeprecatedUserAccountMethods {
     }
 
     static <V> V call(BundleContext bundleContext, DeprecatedAccountManagementServiceCallable<V> callable) {
-        ServiceReference<?> sr = bundleContext.getServiceReference("systems.dmx.accountmanagement.AccountManagementService");
+        ServiceReference<?> sr = bundleContext.getServiceReference(
+            "systems.dmx.accountmanagement.AccountManagementService");
         try {
             DeprecatedUserAccountMethods service = (DeprecatedUserAccountMethods) bundleContext.getService(sr);
             return service != null ? callable.call(service) : null;
@@ -38,5 +40,4 @@ public interface DeprecatedUserAccountMethods {
             causeFromCallable = cause;
         }
     }
-
 }
