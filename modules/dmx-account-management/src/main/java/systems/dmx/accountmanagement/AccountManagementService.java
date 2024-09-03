@@ -1,5 +1,6 @@
 package systems.dmx.accountmanagement;
 
+import systems.dmx.accountmanagement.configuration.Configuration;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
@@ -87,4 +88,20 @@ public interface AccountManagementService {
      * @param newCred Credentials containing the new password.
      */
     void changePassword(Credentials currentCred, Credentials newCred);
+
+    /**
+     * Tells whether a given password string fulfills the password complexity rules that the platform would enforce
+     * during account creation and password change.
+     *
+     * @param password
+     * @return
+     */
+    Boolean isPasswordComplexEnough(String password);
+
+    /**
+     * Returns the typed configuration of the plugin.
+     *
+     * @return
+     */
+    Configuration getConfiguration();
 }

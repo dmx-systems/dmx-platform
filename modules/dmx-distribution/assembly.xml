@@ -36,6 +36,7 @@
                 <include>org.apache.aries.spifly:*</include>
                 <include>org.ow2.asm:*</include>
                 <include>org.codehaus.jettison:*</include>
+                <include>org.passay:*</include>
             </includes>
             <fileMode>0444</fileMode>
             <outputDirectory>bundle</outputDirectory>

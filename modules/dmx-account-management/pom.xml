@@ -29,6 +29,13 @@
             <artifactId>dmx-accesscontrol</artifactId>
             <version>5.3.5-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>1.6.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>

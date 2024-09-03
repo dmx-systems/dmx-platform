@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import systems.dmx.accesscontrol.AccessControlService;
 import systems.dmx.accesscontrol.AuthorizationMethod;
+import systems.dmx.accountmanagement.configuration.Configuration;
+import systems.dmx.accountmanagement.configuration.ExpectedPasswordComplexity;
+import systems.dmx.accountmanagement.usecase.IsPasswordComplexEnoughUseCase;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.service.accesscontrol.Credentials;
@@ -35,6 +37,10 @@ public class AccountManagementPluginTest {
 
     private final AccountManagementPlugin subject = new AccountManagementPlugin();
 
+    private final Configuration configuration = mock();
+
+    private final IsPasswordComplexEnoughUseCase isPasswordComplexEnoughUseCase = mock();
+
     private final PrivilegedAccess privilegedAccess = mock();
     private final CoreService dmx = mock();
 
@@ -44,9 +50,22 @@ public class AccountManagementPluginTest {
     private final AccessControlService accessControlService = mock();
 
     private void set(Object o, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = PluginActivator.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(o, value);
+        setImpl(o, fieldName, value, o.getClass());
+    }
+
+    private void setImpl(Object o, String fieldName, Object value, Class<?> klass) throws NoSuchFieldException, IllegalAccessException {
+        try {
+            Field field = klass.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(o, value);
+        } catch (NoSuchFieldException nsfe) {
+            Class<?> superclass = klass.getSuperclass();
+            if (superclass != null) {
+                setImpl(o, fieldName, value, superclass);
+            } else {
+                throw nsfe;
+            }
+        }
     }
 
     @BeforeEach
@@ -57,12 +76,14 @@ public class AccountManagementPluginTest {
 
         when(dmx.createTopic(any())).thenReturn(mock());
 
+        // by default password complexity is matched
+        when(isPasswordComplexEnoughUseCase.invoke(any(), anyString())).thenReturn(true);
+
         // by default no user present
         when(privilegedAccess.getUsernameTopic(anyString())).thenReturn(null);
 
         // by default run the Callable and return its result
-        when(privilegedAccess.runInWorkspaceContext(anyLong(), any())).thenAnswer((InvocationOnMock invocation) ->
-                invocation.<Callable<Topic>>getArgument(1).call());
+        when(privilegedAccess.runInWorkspaceContext(anyLong(), any())).thenAnswer((InvocationOnMock invocation) -> invocation.<Callable<Topic>>getArgument(1).call());
         doNothing().when(privilegedAccess).assignToWorkspace(any(), anyLong());
         when(dmx.getPrivilegedAccess()).thenReturn(privilegedAccess);
 
@@ -70,6 +91,8 @@ public class AccountManagementPluginTest {
 
         set(subject, "dmx", dmx);
         set(subject, "mf", mf);
+        set(subject, "isPasswordComplexEnoughUseCase", isPasswordComplexEnoughUseCase);
+        set(subject, "configuration", configuration);
         subject.ws = ws;
         subject.accessControlService = accessControlService;
     }
@@ -82,13 +105,17 @@ public class AccountManagementPluginTest {
     }
 
     @Test
-    @DisplayName("getConfiguredAccountManager() should be 'DMX' by default")
+    @DisplayName("getConfiguredAccountManager() should be returned from configuration")
     void getConfiguredAccountManager_should_be_dmx() {
+        // given:
+        final String accountManager = "accountManager";
+        when(configuration.getAccountManager()).thenReturn(accountManager);
         // when:
         String result = subject.getConfiguredAccountManagerName();
 
         // then:
-        assertThat(result).isEqualTo("DMX");
+        verify(configuration).getAccountManager();
+        assertThat(result).isEqualTo(accountManager);
     }
 
     @Test
@@ -164,6 +191,57 @@ public class AccountManagementPluginTest {
         // then:
         verify(accessControlService).unregisterAuthorizationMethod(accountManagerName);
     }
+    @Test
+    @DisplayName("_createUserAccount() should check password complexity of given new password")
+    void _createUserAccount_should_check_password_complexity() {
+        // given:
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        String newPassword = "newPassword";
+        Credentials newCredentials = new Credentials("userName", newPassword);
+
+        // Makes rest of subject method run through
+        String accountManagerName = "DMX";
+        AccountManager accountManager = mock();
+        when(accountManager.name()).thenReturn(accountManagerName);
+        doNothing().when(accountManager).createAccount(any());
+        subject.registerAccountManager(accountManager);
+
+        // when:
+        subject._createUserAccount(newCredentials);
+
+        // then:
+        verify(isPasswordComplexEnoughUseCase).invoke(complexity, newPassword);
+    }
+
+    @Test
+    @DisplayName("_createUserAccount() should throw InsufficientPasswordComplexityException when password complexity not matched")
+    void _createUserAccount_should_throw() {
+        // given:
+        int expectedMinPasswordLength = 42;
+        int expectedMaxPasswordLength = 47_11;
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedMinPasswordLength()).thenReturn(expectedMinPasswordLength);
+        when(configuration.getExpectedMaxPasswordLength()).thenReturn(expectedMaxPasswordLength);
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        when(isPasswordComplexEnoughUseCase.invoke(any(), anyString())).thenReturn(false);
+
+        // when:
+        Runnable result = () -> {
+            subject._createUserAccount(mock());
+        };
+
+        // then:
+        assertThatThrownBy(result::run).isInstanceOf(InsufficientPasswordComplexityException.class)
+                .matches(throwable -> {
+                    InsufficientPasswordComplexityException e = (InsufficientPasswordComplexityException) throwable;
+                    return e.expectedPasswordComplexity == complexity
+                            && e.expectedMinPasswordLength == expectedMinPasswordLength
+                            && e.expectedMaxPasswordLength == expectedMaxPasswordLength;
+                });
+    }
 
     @Test
     @DisplayName("_createUserAccount() should create account with the method present in the credentials")
@@ -176,10 +254,7 @@ public class AccountManagementPluginTest {
 
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -200,16 +275,86 @@ public class AccountManagementPluginTest {
 
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
 
         // when:
         subject._createUserAccount(credentials);
 
         // then:
         verify(accountManager).createAccount(credentials);
+    }
+
+    @Test
+    @DisplayName("createUserAccount() should check password complexity of given new password")
+    void createUserAccount_should_check_password_complexity() {
+        // given:
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        String newPassword = "newPassword";
+        Credentials newCredentials = new Credentials("userName", newPassword);
+
+        // Makes rest of subject method run through
+        String accountManagerName = "DMX";
+        AccountManager accountManager = mock();
+        when(accountManager.name()).thenReturn(accountManagerName);
+        doNothing().when(accountManager).createAccount(any());
+        subject.registerAccountManager(accountManager);
+
+        // when:
+        subject.createUserAccount(newCredentials);
+
+        // then:
+        verify(isPasswordComplexEnoughUseCase).invoke(complexity, newPassword);
+    }
+
+    @Test
+    @DisplayName("createUserAccount() should not check password complexity for admin user")
+    void createUserAccount_should_not_check_password_complexity_for_admin() {
+        // given:
+        Credentials newCredentials = new Credentials(AccessControlService.ADMIN_USERNAME, "newPassword");
+
+        // Makes rest of subject method run through
+        String accountManagerName = "DMX";
+        AccountManager accountManager = mock();
+        when(accountManager.name()).thenReturn(accountManagerName);
+        doNothing().when(accountManager).createAccount(any());
+        subject.registerAccountManager(accountManager);
+
+        // when:
+        subject.createUserAccount(newCredentials);
+
+        // then:
+        verify(isPasswordComplexEnoughUseCase, times(0)).invoke(any(), anyString());
+    }
+
+    @Test
+    @DisplayName("createUserAccount() should throw InsufficientPasswordComplexityException when password complexity not matched")
+    void createUserAccount_should_throw() {
+        // given:
+        int expectedMinPasswordLength = 42;
+        int expectedMaxPasswordLength = 47_11;
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedMinPasswordLength()).thenReturn(expectedMinPasswordLength);
+        when(configuration.getExpectedMaxPasswordLength()).thenReturn(expectedMaxPasswordLength);
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        when(isPasswordComplexEnoughUseCase.invoke(any(), anyString())).thenReturn(false);
+
+        // when:
+        Runnable result = () -> {
+            subject._createUserAccount(mock());
+        };
+
+        // then:
+        assertThatThrownBy(result::run)
+                .isInstanceOf(InsufficientPasswordComplexityException.class)
+                .matches(throwable -> {
+                    InsufficientPasswordComplexityException e = (InsufficientPasswordComplexityException) throwable;
+                    return e.expectedPasswordComplexity == complexity
+                            && e.expectedMinPasswordLength == expectedMinPasswordLength
+                            && e.expectedMaxPasswordLength == expectedMaxPasswordLength;
+                });
     }
 
     @Test
@@ -221,10 +366,7 @@ public class AccountManagementPluginTest {
         doNothing().when(accountManager).createAccount(any());
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
 
         // when:
         subject.createUserAccount(credentials);
@@ -245,10 +387,7 @@ public class AccountManagementPluginTest {
         // Not doing anything means, the user is an admin
         doNothing().when(accessControlService).checkAdmin();
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
 
         // when:
         subject.createUserAccount(credentials);
@@ -274,10 +413,62 @@ public class AccountManagementPluginTest {
         ThrowableAssert.ThrowingCallable callable = () -> subject.createUserAccount(mock());
 
         // then:
-        assertThatThrownBy(callable)
-                .isInstanceOf(RuntimeException.class)
-                .hasCause(throwable);
+        assertThatThrownBy(callable).isInstanceOf(RuntimeException.class).hasCause(throwable);
         verify(accountManager, times(0)).createAccount(any());
+    }
+
+    @Test
+    @DisplayName("changePassword() should check password complexity of given new password")
+    void changePassword_should_check_password_complexity() {
+        // given:
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        String newPassword = "newPassword";
+        Credentials newCredentials = new Credentials("userName", newPassword);
+
+        // Makes rest of subject method run through
+        AccountManager accountManager = mock();
+        when(accountManager.name()).thenReturn("DMX");
+        doNothing().when(accountManager).changePassword(any(), any());
+        subject.registerAccountManager(accountManager);
+        Topic userNameTopic = mock();
+        when(userNameTopic.hasProperty(any())).thenReturn(false);
+        when(privilegedAccess.getUsernameTopic(anyString())).thenReturn(userNameTopic);
+
+        // when:
+        subject.changePassword(mock(), newCredentials);
+
+        // then:
+        verify(isPasswordComplexEnoughUseCase).invoke(complexity, newPassword);
+    }
+
+    @Test
+    @DisplayName("changePassword() should throw InsufficientPasswordComplexityException when password complexity not matched")
+    void changePassword_should_throw() {
+        // given:
+        int expectedMinPasswordLength = 42;
+        int expectedMaxPasswordLength = 47_11;
+        ExpectedPasswordComplexity complexity = mock();
+        when(configuration.getExpectedMinPasswordLength()).thenReturn(expectedMinPasswordLength);
+        when(configuration.getExpectedMaxPasswordLength()).thenReturn(expectedMaxPasswordLength);
+        when(configuration.getExpectedPasswordComplexity()).thenReturn(complexity);
+
+        when(isPasswordComplexEnoughUseCase.invoke(any(), anyString())).thenReturn(false);
+
+        // when:
+        Runnable result = () -> {
+            subject.changePassword(mock(), mock());
+        };
+
+        // then:
+        assertThatThrownBy(result::run).isInstanceOf(InsufficientPasswordComplexityException.class)
+                .matches(throwable -> {
+                    InsufficientPasswordComplexityException e = (InsufficientPasswordComplexityException) throwable;
+                    return e.expectedPasswordComplexity == complexity
+                            && e.expectedMinPasswordLength == expectedMinPasswordLength
+                            && e.expectedMaxPasswordLength == expectedMaxPasswordLength;
+                });
     }
 
     @Test
@@ -458,7 +649,7 @@ public class AccountManagementPluginTest {
         verify(accessControlService).getWorkspacesByOwner(userName);
         verify(accessControlService).getUsername();
 
-        for(Topic workspace : workspaces) {
+        for (Topic workspace : workspaces) {
             verify(accessControlService).setWorkspaceOwner(workspace, loggedInUser);
         }
     }
@@ -498,10 +689,7 @@ public class AccountManagementPluginTest {
 
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -529,10 +717,7 @@ public class AccountManagementPluginTest {
 
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -562,10 +747,7 @@ public class AccountManagementPluginTest {
 
         subject.registerAccountManager(accountManager);
 
-        Credentials credentials = new Credentials(
-                "username",
-                "password"
-        );
+        Credentials credentials = new Credentials("username", "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -597,10 +779,7 @@ public class AccountManagementPluginTest {
         subject.registerAccountManager(accountManager);
 
         String userName = "username";
-        Credentials credentials = new Credentials(
-                userName,
-                "password"
-        );
+        Credentials credentials = new Credentials(userName, "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -640,10 +819,7 @@ public class AccountManagementPluginTest {
         subject.registerAccountManager(accountManager);
 
         String userName = "username";
-        Credentials credentials = new Credentials(
-                userName,
-                "password"
-        );
+        Credentials credentials = new Credentials(userName, "password");
         credentials.methodName = accountManagerName;
 
         // when:
@@ -654,4 +830,18 @@ public class AccountManagementPluginTest {
         assertThat(result).isEqualTo(usernameTopic);
     }
 
+    @Test
+    @DisplayName("isPasswordComplexEnough() should call IsPasswordComplexEnoughUseCase and return its value")
+    void isPasswordComplexEnough_should_call_IsPasswordComplexEnoughUseCase() {
+        // given:
+        String givenPassword = "passwurst";
+        when(isPasswordComplexEnoughUseCase.invoke(any(), any())).thenReturn(true);
+
+        // when:
+        Boolean result = subject.isPasswordComplexEnough(givenPassword);
+
+        // then:
+        verify(isPasswordComplexEnoughUseCase).invoke(any(), eq(givenPassword));
+        assertThat(result).isTrue();
+    }
 }

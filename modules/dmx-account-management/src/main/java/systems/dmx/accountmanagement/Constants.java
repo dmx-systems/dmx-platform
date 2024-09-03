@@ -14,5 +14,10 @@ public final class Constants {
     // Props (topic/assoc)
     public static final String SALT           = "dmx.accesscontrol.salt";           // for Password topics
 
-    static final String ACCOUNT_MANAGER_NAME = "dmx.accountmanager.name";
+    public static final String EXPECTED_PASSWORD_COMPLEXITY = "dmx.accountmanager.expected_password_complexity";
+
+    public static final String EXPECTED_MIN_PASSWORD_LENGTH = "dmx.accountmanager.expected_min_password_length";
+
+    public static final String EXPECTED_MAX_PASSWORD_LENGTH = "dmx.accountmanager.expected_max_password_length";
+    public static final String ACCOUNT_MANAGER_NAME = "dmx.accountmanager.name";
 }

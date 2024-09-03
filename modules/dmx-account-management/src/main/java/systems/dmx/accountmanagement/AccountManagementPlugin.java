@@ -3,6 +3,8 @@ package systems.dmx.accountmanagement;
 import systems.dmx.accesscontrol.AccessControlService;
 import systems.dmx.accesscontrol.AuthorizationMethod;
 import systems.dmx.accesscontrol.DeprecatedUserAccountMethods;
+import systems.dmx.accountmanagement.configuration.Configuration;
+import systems.dmx.accountmanagement.usecase.IsPasswordComplexEnoughUseCase;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -23,10 +25,8 @@ import systems.dmx.core.service.event.PreUpdateTopic;
 import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.workspaces.WorkspacesService;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -46,17 +46,23 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ACCOUNT_MANAGER_NAME = System.getProperty("dmx.accountmanagement.manager",
-        DmxAccountManager.NAME);
-
-    private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dmx.security.new_accounts_are_enabled", "true")
-    );
     private static final String SITE_SALT = System.getProperty("dmx.security.site_salt", "");
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private final Configuration configuration = new Configuration(
+            DmxAccountManagementConfigOptions.NEW_ACCOUNTS_ARE_ENABLED,
+            DmxAccountManagementConfigOptions.ACCOUNT_MANAGER_NAME,
+            DmxAccountManagementConfigOptions.CONFIG_EXPECTED_PASSWORD_COMPLEXITY,
+            DmxAccountManagementConfigOptions.CONFIG_EXPECTED_MIN_PASSWORD_LENGTH,
+            DmxAccountManagementConfigOptions.CONFIG_EXPECTED_MAX_PASSWORD_LENGTH
+    );
+
+    private final IsPasswordComplexEnoughUseCase isPasswordComplexEnoughUseCase = new IsPasswordComplexEnoughUseCase(
+            configuration
+    );
 
     @Inject
     WorkspacesService ws;
@@ -66,14 +72,15 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     private final Map<String, AccountManager> accountManagers = new HashMap<>();
 
-    static {
-        logger.info("Security config:" +
-                "\n  dmx.security.new_accounts_are_enabled = " + NEW_ACCOUNTS_ARE_ENABLED);
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // *** Hooks ***
+
+    @Override
+    public void init() {
+        logger.info("Security config:" +
+                "\n  dmx.security.new_accounts_are_enabled = " + configuration.isNewAccountsAreEnabled());
+    }
 
     @Override
     public void serviceArrived(Object service) {
@@ -113,7 +120,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     }
 
     @Override
-    public String getConfiguredAccountManagerName() { return ACCOUNT_MANAGER_NAME; }
+    public String getConfiguredAccountManagerName() { return configuration.getAccountManager(); }
 
     @POST
     @Path("/user-account")
@@ -131,6 +138,9 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public Topic _createUserAccount(final Credentials cred) {
         String username = cred.username;
+        if (!AccessControlService.ADMIN_USERNAME.equals(username)) {
+            requireComplexPassword(cred.password);
+        }
         // If set, the methodName controls in which system a user is created, otherwise use the configured method
         String methodName = cred.methodName != null ? cred.methodName : ACCOUNT_MANAGER_NAME;
 
@@ -155,8 +165,37 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     @Override
     public void changePassword(Credentials currentCred, Credentials newCred) {
+        requireComplexPassword(newCred.password);
+
         Topic usernameTopic = dmx.getPrivilegedAccess().getUsernameTopic(newCred.username);
         getAccountManagerForUsername(usernameTopic).changePassword(currentCred, newCred);
+    }
+
+    // === Password complexity ===
+
+    @GET
+    @Path("/check/password-complexity/{password : [^/]* }")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public Boolean isPasswordComplexEnough(String password) {
+        return isPasswordComplexEnoughUseCase.invoke(configuration.getExpectedPasswordComplexity(), password);
+    }
+
+    private void requireComplexPassword(String password) throws InsufficientPasswordComplexityException {
+        if (!isPasswordComplexEnough(password)) {
+            throw new InsufficientPasswordComplexityException(
+                    configuration.getExpectedMinPasswordLength(),
+                    configuration.getExpectedMaxPasswordLength(),
+                    configuration.getExpectedPasswordComplexity()
+            );
+        }
+    }
+
+    // === Configuration ===
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     // ---
