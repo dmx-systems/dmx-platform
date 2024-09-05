@@ -91,6 +91,7 @@
         <dmx.security.subnet_filter>127.0.0.1/32</dmx.security.subnet_filter>
 
         <!-- User Accounts -->
+        <dmx.accountmanagement.manager>DMX</dmx.accountmanagement.manager>
         <dmx.security.initial_admin_password></dmx.security.initial_admin_password>
         <dmx.security.new_accounts_are_enabled>true</dmx.security.new_accounts_are_enabled>
         <dmx.security.site_salt></dmx.security.site_salt>
