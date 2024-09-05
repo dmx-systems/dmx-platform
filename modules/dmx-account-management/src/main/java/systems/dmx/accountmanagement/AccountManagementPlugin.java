@@ -156,7 +156,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     @Override
     public void changePassword(Credentials currentCred, Credentials newCred) {
         Topic usernameTopic = dmx.getPrivilegedAccess().getUsernameTopic(newCred.username);
-        getAccountManageForUsername(usernameTopic).changePassword(currentCred, newCred);
+        getAccountManagerForUsername(usernameTopic).changePassword(currentCred, newCred);
     }
 
     // ---
@@ -197,7 +197,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
             String username = topic.getSimpleValue().toString();
 
             // Removes user data from potentially external systems
-            getAccountManageForUsername(topic).onUsernameDeleted(username);
+            getAccountManagerForUsername(topic).onUsernameDeleted(username);
         }
     }
 
@@ -323,7 +323,7 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
         );
     }
 
-    private AccountManager getAccountManageForUsername(Topic usernameTopic) {
+    private AccountManager getAccountManagerForUsername(Topic usernameTopic) {
         String methodName =
             (usernameTopic.hasProperty(Constants.ACCOUNT_MANAGER_NAME))
                 ? usernameTopic.getProperty(Constants.ACCOUNT_MANAGER_NAME).toString()
