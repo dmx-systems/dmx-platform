@@ -94,17 +94,6 @@
         <dmx.security.initial_admin_password></dmx.security.initial_admin_password>
         <dmx.security.new_accounts_are_enabled>true</dmx.security.new_accounts_are_enabled>
         <dmx.security.site_salt></dmx.security.site_salt>
-        <!-- LDAP -->
-        <dmx.ldap.protocol>LDAP</dmx.ldap.protocol>
-        <dmx.ldap.server>127.0.0.1</dmx.ldap.server>
-        <dmx.ldap.port>389</dmx.ldap.port>
-        <dmx.ldap.manager></dmx.ldap.manager>
-        <dmx.ldap.password></dmx.ldap.password>
-        <dmx.ldap.user_base></dmx.ldap.user_base>
-        <dmx.ldap.user_attribute></dmx.ldap.user_attribute>
-        <dmx.ldap.user_filter></dmx.ldap.user_filter>
-        <dmx.ldap.user_member_group></dmx.ldap.user_member_group>
-        <dmx.ldap.logging>INFO</dmx.ldap.logging>
 
         <!-- Workspace Sharing Modes -->
         <dmx.workspaces.private.enabled>true</dmx.workspaces.private.enabled>
