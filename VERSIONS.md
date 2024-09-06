@@ -8,6 +8,30 @@ Version History
 
 not released
 
+#### Bug fixes
+
+- Major bug fix: topic labels and icons appear correctly on canvas (since DMX 5.3.4 there was a regression in certain browsers) (Thanks to @gevlish!)
+    - Topic labels and icons on canvas now render as DOM, no SVG anymore
+    - No need to load Fontawesome SVG glyphs anymore, 450K less network traffic
+- Content-Type is set in WOFF/WOFF2 and CSS responses
+
+#### Improvements:
+
+- Also the Webclient supports creation of LDAP accounts
+    - DMX platform's account management is refactored (Thanks to @thebohemian!)
+    - New config property: `dmx.accountmanagement.manager`
+- Minor visual improvement during create-association (drag'n'drop)
+
+#### Plugin development
+
+- Extended Topicmaps API for better view props handling
+- Revised Files API:
+    - Supports transforming an uploaded file before storing
+    - Disable disk-quota-check for code running as "system"
+- Build system:
+    - Plugins run unit tests and code coverage by default, based on SonarQube and Jacoco (Thanks to @thebohemian!)
+    - Babel is upgraded from version 6 to 7
+
 
 5.3.4
 -----
