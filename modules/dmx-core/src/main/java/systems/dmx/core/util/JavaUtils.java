@@ -86,6 +86,18 @@ public class JavaUtils {
             return "font/woff";
         } else if (extension.equals("woff2")) {
             return "font/woff2";
+        } else if (extension.equals("doc")) {
+            return "application/msword";
+        } else if (extension.equals("docx")) {
+            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else if (extension.equals("xls")) {
+            return "application/vnd.ms-excel";
+        } else if (extension.equals("xlsx")) {
+            return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        } else if (extension.equals("ppt")) {
+            return "application/vnd.ms-powerpoint";
+        } else if (extension.equals("pptx")) {
+            return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
         }
         // TODO: use a system property instead a hardcoded list
         //
