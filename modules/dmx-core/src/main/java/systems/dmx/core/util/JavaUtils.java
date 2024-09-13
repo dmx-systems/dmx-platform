@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -54,7 +55,33 @@ public class JavaUtils {
     // === Files ===
 
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
+    private static Map<String, String> fileTypeMap2 = createFileTypeMap();
 
+    private static Map<String, String> createFileTypeMap() {
+        Map<String, String> map = new HashMap();
+        map.put("json", "application/json");
+        map.put("css", "text/css");
+        map.put("mp3", "audio/mpeg");
+        map.put("mp4", "video/mp4");
+        map.put("avi", "video/avi");
+        map.put("wmv", "video/x-ms-wmv");
+        map.put("flv", "video/x-flv");
+        map.put("svg", "image/svg+xml");
+        map.put("woff", "font/woff");
+        map.put("woff2", "font/woff2");
+        map.put("doc", "application/msword");
+        map.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        map.put("xls", "application/vnd.ms-excel");
+        map.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        map.put("ppt", "application/vnd.ms-powerpoint");
+        map.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+        map.put("odt", "application/vnd.oasis.opendocument.text");
+        map.put("ods", "application/vnd.oasis.opendocument.spreadsheet");
+        map.put("odp", "application/vnd.oasis.opendocument.presentation");
+        return map;
+    }
+
+    // TODO: rename to getContentType()
     public static String getFileType(String fileName) {
         String extension = getExtension(fileName);
         if (!extension.equals("avi")) {
@@ -66,42 +93,7 @@ public class JavaUtils {
             }
         }
         // fallback
-        if (extension.equals("json")) {
-            return "application/json";
-        } else if (extension.equals("css")) {
-            return "text/css";
-        } else if (extension.equals("mp3")) {
-            return "audio/mpeg";
-        } else if (extension.equals("mp4")) {
-            return "video/mp4";
-        } else if (extension.equals("avi")) {
-            return "video/avi";
-        } else if (extension.equals("wmv")) {
-            return "video/x-ms-wmv";
-        } else if (extension.equals("flv")) {
-            return "video/x-flv";
-        } else if (extension.equals("svg")) {
-            return "image/svg+xml";
-        } else if (extension.equals("woff")) {
-            return "font/woff";
-        } else if (extension.equals("woff2")) {
-            return "font/woff2";
-        } else if (extension.equals("doc")) {
-            return "application/msword";
-        } else if (extension.equals("docx")) {
-            return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        } else if (extension.equals("xls")) {
-            return "application/vnd.ms-excel";
-        } else if (extension.equals("xlsx")) {
-            return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        } else if (extension.equals("ppt")) {
-            return "application/vnd.ms-powerpoint";
-        } else if (extension.equals("pptx")) {
-            return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-        }
-        // TODO: use a system property instead a hardcoded list
-        //
-        return null;
+        return fileTypeMap2.get(extension);
     }
 
     public static String getFilename(String path) {
