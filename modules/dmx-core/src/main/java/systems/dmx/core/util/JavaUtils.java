@@ -81,7 +81,7 @@ public class JavaUtils {
         return map;
     }
 
-    // TODO: rename to getContentType()
+    // TODO: rename to getMediaType()/getContentType()
     public static String getFileType(String fileName) {
         String extension = getExtension(fileName);
         if (!extension.equals("avi")) {
