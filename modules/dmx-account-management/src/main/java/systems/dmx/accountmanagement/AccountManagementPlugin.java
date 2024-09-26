@@ -3,6 +3,8 @@ package systems.dmx.accountmanagement;
 import systems.dmx.accesscontrol.AccessControlService;
 import systems.dmx.accesscontrol.AuthorizationMethod;
 import systems.dmx.accesscontrol.DeprecatedUserAccountMethods;
+import systems.dmx.accesscontrol.identityproviderredirect.IdentityProviderRedirectAdapter;
+import systems.dmx.accesscontrol.identityproviderredirect.SingleUseAuthenticator;
 import systems.dmx.accountmanagement.configuration.Configuration;
 import systems.dmx.accountmanagement.usecase.IsPasswordComplexEnoughUseCase;
 import systems.dmx.core.ChildTopics;
@@ -25,8 +27,10 @@ import systems.dmx.core.service.event.PreUpdateTopic;
 import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.workspaces.WorkspacesService;
 
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.net.URI;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -274,25 +278,76 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
     private AuthorizationMethod asAuthorizationMethod(final AccountManager amm) {
         // Implements an AuthorizationMethod that uses the AccountManagementMethod to check the credentials interpreting
         // its complex result and doing a username topic lookup and creation if necessary.
-        return credentials -> {
-            CheckCredentialsResult result = amm.checkCredentials(credentials);
-            if (result.success) {
-                if (result.usernameTopic != null) {
-                    logger.info(String.format("Credentials check successful and username topic present for %s",
-                        credentials.username));
-                    // topic already present, just return it
-                    return result.usernameTopic;
+        return new AuthorizationMethod() {
+            @Override
+            public Topic checkCredentials(Credentials credentials) {
+                CheckCredentialsResult result = amm.checkCredentials(credentials);
+                if (result.success) {
+                    if (result.usernameTopic != null) {
+                        logger.info(String.format("Credentials check successful and username topic present for %s",
+                                credentials.username));
+                        // topic already present, just return it
+                        return result.usernameTopic;
+                    } else {
+                        logger.info(String.format("Credentials check successful but lookup or creation required for %s",
+                                credentials.username));
+                        // lookup and possible creation necessary
+                        return lookupOrCreateUsernameTopic(credentials.username, amm.name());
+                    }
                 } else {
-                    logger.info(String.format("Credentials check successful but lookup or creation required for %s",
-                        credentials.username));
-                    // lookup and possible creation necessary
-                    return lookupOrCreateUsernameTopic(credentials.username, amm.name());
+                    // credential check failed
+                    logger.info(String.format("Credentials check failed for %s", credentials.username));
+                    return null;
                 }
-            } else {
-                // credential check failed
-                logger.info(String.format("Credentials check failed for %s", credentials.username));
-                return null;
             }
+
+            @Override
+            public IdentityProviderRedirectAdapter getIdentityProviderRedirectAdapter() {
+                IdentityProviderRedirectAdapter adapter =
+                        amm.getIdentityProviderRedirectAdapter();
+                if (adapter == null) {
+                    return null;
+                }
+                return wrap(adapter);
+            }
+        };
+    }
+
+    private IdentityProviderRedirectAdapter wrap(final IdentityProviderRedirectAdapter adapter) {
+        return new IdentityProviderRedirectAdapter() {
+            @Override
+            public String getName() {
+                return adapter.getName();
+            }
+
+            @Override
+            public String getLabel() { return adapter.getLabel(); }
+
+            @Override
+            public URI getImageUri() {
+                return adapter.getImageUri();
+            }
+
+            @Override
+            public URI createIdentityProviderRedirectUri(SingleUseAuthenticator singleUseAuthenticator) {
+                // Wraps original SingleUseAuthenticator to include the
+                // automatic username and workspace creation.
+                return adapter.createIdentityProviderRedirectUri(wrap(singleUseAuthenticator, adapter.getName()));
+            }
+
+            @Override
+            public URI createLogoutUri(HttpSession httpSession) {
+                return adapter.createLogoutUri(httpSession);
+            }
+        };
+    }
+
+    private SingleUseAuthenticator wrap(final SingleUseAuthenticator authenticator,
+                                        String methodName) {
+        return identityAssertion -> {
+            authenticator.authenticate(identityAssertion);
+            lookupOrCreateUsernameTopic(identityAssertion.getUsername(),
+                    methodName);
         };
     }
 

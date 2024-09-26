@@ -9,6 +9,7 @@ import systems.dmx.core.service.accesscontrol.Permissions;
 import systems.dmx.core.service.accesscontrol.SharingMode;
 import systems.dmx.core.util.IdList;
 
+import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -72,7 +73,7 @@ public interface AccessControlService {
      * supposed to shutdown the DM GUI then. The webclient of a "private" DM installation must only be visible/usable
      * when logged in.
      */
-    void logout();
+    LogoutResponse logout();
 
     // ---
 

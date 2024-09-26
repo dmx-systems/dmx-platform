@@ -1,5 +1,6 @@
 package systems.dmx.accountmanagement;
 
+import systems.dmx.accesscontrol.identityproviderredirect.IdentityProviderRedirectAdapter;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.service.CoreService;
@@ -40,6 +41,11 @@ final class DmxAccountManager implements AccountManager {
     public CheckCredentialsResult checkCredentials(Credentials credentials) {
         Topic usernameTopic = dmx.getPrivilegedAccess().checkCredentials(credentials);
         return (usernameTopic != null) ? CheckCredentialsResult.success(usernameTopic) : CheckCredentialsResult.failed();
+    }
+
+    @Override
+    public IdentityProviderRedirectAdapter getIdentityProviderRedirectAdapter() {
+        return null;
     }
 
     @Override

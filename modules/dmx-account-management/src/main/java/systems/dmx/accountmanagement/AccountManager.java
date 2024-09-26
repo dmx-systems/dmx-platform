@@ -1,5 +1,6 @@
 package systems.dmx.accountmanagement;
 
+import systems.dmx.accesscontrol.identityproviderredirect.IdentityProviderRedirectAdapter;
 import systems.dmx.core.service.accesscontrol.Credentials;
 
 
@@ -39,5 +40,7 @@ public interface AccountManager {
      * @return
      */
     CheckCredentialsResult checkCredentials(Credentials credentials);
+
+    IdentityProviderRedirectAdapter getIdentityProviderRedirectAdapter();
 
 }

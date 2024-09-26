@@ -1,85 +1,46 @@
 package systems.dmx.accesscontrol;
 
-import static systems.dmx.accesscontrol.Constants.*;
-
+import com.sun.jersey.spi.container.ContainerRequest;
+import org.eclipse.jetty.http.HttpStatus;
 import systems.dmx.accesscontrol.event.PostLoginUser;
 import systems.dmx.accesscontrol.event.PostLogoutUser;
-import systems.dmx.config.ConfigCustomizer;
-import systems.dmx.config.ConfigDef;
-import systems.dmx.config.ConfigModRole;
-import systems.dmx.config.ConfigService;
-import systems.dmx.config.ConfigTarget;
-import static systems.dmx.core.Constants.*;
-import systems.dmx.core.Assoc;
-import systems.dmx.core.AssocType;
-import systems.dmx.core.DMXObject;
-import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.Topic;
-import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssocModel;
-import systems.dmx.core.model.AssocPlayerModel;
-import systems.dmx.core.model.PlayerModel;
-import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
+import systems.dmx.accesscontrol.identityproviderredirect.*;
+import systems.dmx.config.*;
+import systems.dmx.core.*;
+import systems.dmx.core.model.*;
 import systems.dmx.core.osgi.PluginActivator;
-import systems.dmx.core.service.ChangeReport;
-import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.EventListener;
-import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.Transactional;
+import systems.dmx.core.service.*;
 import systems.dmx.core.service.accesscontrol.AccessControlException;
 import systems.dmx.core.service.accesscontrol.Credentials;
 import systems.dmx.core.service.accesscontrol.Operation;
 import systems.dmx.core.service.accesscontrol.Permissions;
-import systems.dmx.core.service.event.CheckAssocReadAccess;
-import systems.dmx.core.service.event.CheckAssocWriteAccess;
-import systems.dmx.core.service.event.CheckTopicReadAccess;
-import systems.dmx.core.service.event.CheckTopicWriteAccess;
-import systems.dmx.core.service.event.PostCreateAssoc;
-import systems.dmx.core.service.event.PostCreateTopic;
-import systems.dmx.core.service.event.PostUpdateAssoc;
-import systems.dmx.core.service.event.PostUpdateTopic;
-import systems.dmx.core.service.event.PreCreateAssoc;
-import systems.dmx.core.service.event.ServiceRequestFilter;
-import systems.dmx.core.service.event.StaticResourceFilter;
+import systems.dmx.core.service.event.*;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
 import systems.dmx.core.util.JavaUtils;
-import static systems.dmx.files.Constants.*;
 import systems.dmx.files.FilesService;
 import systems.dmx.files.event.CheckDiskQuota;
-import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.workspaces.WorkspacesService;
-
-// ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
-import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import static systems.dmx.accesscontrol.Constants.*;
+import static systems.dmx.core.Constants.DEFAULT;
+import static systems.dmx.files.Constants.FILE;
+import static systems.dmx.workspaces.Constants.WORKSPACE;
+import static systems.dmx.workspaces.Constants.WORKSPACE_ASSIGNMENT;
 
 
 @Path("/access-control")
@@ -211,7 +172,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @POST
     @Path("/logout")
     @Override
-    public void logout() {
+    public LogoutResponse logout() {
+        // TODO: If an idp login was present, then return the redirect URI
+        // TODO: Introduce separate new API that only does anything for IDP
+        HttpSession session = request.getSession(false);
+        String adapterName = (String) session.getAttribute("idpAdapterName");
+        // If user was authenticated with idp it also needs to be logged out this way.
+        if (adapterName != null) {
+            List<IdentityProviderRedirectAdapter> matchingAdapters =
+                    authorizationMethods.values().stream().map(AuthorizationMethod::getIdentityProviderRedirectAdapter)
+                            .filter(Objects::nonNull)
+                            .filter((it) -> it.getName().equals(adapterName))
+                            .collect(Collectors.toList());
+            if (matchingAdapters.size() == 1) {
+                URI logoutUri = matchingAdapters.get(0).createLogoutUri(session);
+                // Might only happen at a later point
+                _logout(request);
+                return new LogoutResponse(logoutUri);
+            }
+        }
+
         _logout(request);
         //
         // For a "private" DMX installation: emulate a HTTP logout by forcing the webbrowser to bring up its
@@ -220,6 +200,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (!IS_PUBLIC_INSTALLATION) {
             throw401Unauthorized(true);     // showBrowserLoginDialog=true
         }
+
+        return new LogoutResponse(null);
     }
 
     // ---
@@ -505,7 +487,51 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dmx.getAssocsByProperty(CREATOR, username);
     }
 
+    // === Identity Provider Redirect ===
 
+    @GET
+    @Path("/identity-provider-redirect/configuration")
+    public List<IdentityProviderRedirectConfiguration>
+    getIdentityProviderRedirectConfiguration() {
+        return authorizationMethods
+                .values()
+                .stream()
+                .map(AuthorizationMethod::getIdentityProviderRedirectAdapter)
+                .filter(Objects::nonNull)
+                .map(IdentityProviderRedirectConfiguration::new)
+                .collect(Collectors.toList());
+    }
+
+    @GET
+    @Path("/identity-provider-redirect/uri")
+    public Response getIdentityProviderUri(@QueryParam("name") String name) {
+        // Finds all adapters with the provided name
+        List<IdentityProviderRedirectAdapter> matchingAdapters =
+            authorizationMethods
+                .values()
+                .stream()
+                .map(AuthorizationMethod::getIdentityProviderRedirectAdapter)
+                .filter((it) -> (it != null && it.getName().equals(name)))
+                .collect(Collectors.toList());
+
+        switch (matchingAdapters.size()) {
+            case 0:
+                return Response.status(Status.NOT_FOUND).build();
+            case 1:
+                IdentityProviderRedirectAdapter adapter = matchingAdapters.get(0);
+                // when there is just one adapter, create a URI and provide a
+                // single use authenticator to the adapter
+                URI redirectUri = adapter
+                        .createIdentityProviderRedirectUri(
+                                newSingleUseAuthenticator(adapter.getName()));
+                return Response
+                        .status(302)
+                        .location(redirectUri)
+                        .build();
+            default:
+                return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     // === Authorization Methods ===
 
@@ -704,6 +730,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    SingleUseAuthenticator newSingleUseAuthenticator(String name) {
+        return new SingleUseAuthenticator() {
+
+            private AtomicBoolean used = new AtomicBoolean(false);
+
+            @Override
+            public void authenticate(IdentityAssertion identityAssertion) throws SingleUseAuthenticationFailedException {
+                try {
+                    if (used.get()) {
+                        throw new SingleUseAuthenticationFailedException("Already attempted a login", null);
+                    }
+                    _login(identityAssertion.getUsername(), request);
+                    request.getSession(false).setAttribute("idpAdapterName", name);
+                } finally {
+                    used.set(true);
+                }
+            }
+        };
+    }
 
     /**
      * Checks a "workspaceId" argument. 2 checks are performed:

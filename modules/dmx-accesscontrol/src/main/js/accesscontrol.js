@@ -18,7 +18,10 @@ const actions = {
     DEV && console.log('Logout', state.username)
     // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
     // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
-    dmx.rpc.logout().then(() => {
+    dmx.rpc.logout().then((data) => {
+        if (data.logoutRedirectUri) {
+            window.location.href = data.logoutRedirectUri;
+        }
       state.username = undefined
       dispatch('loggedOut')
     })
