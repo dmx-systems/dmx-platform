@@ -433,6 +433,7 @@ public class PluginImpl implements Plugin, EventHandler {
         if (service instanceof CoreService) {
             logger.fine("Adding DMX core service to " + this);
             setCoreService((CoreServiceImpl) service);
+            pluginContext.serviceArrived(service);
             publishWebResources();
             publishRestResources();
         } else if (service instanceof EventAdmin) {
