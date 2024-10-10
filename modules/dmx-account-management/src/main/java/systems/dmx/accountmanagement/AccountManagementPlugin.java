@@ -11,6 +11,7 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.ChangeReport;
+import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.service.accesscontrol.Credentials;
@@ -77,9 +78,11 @@ public class AccountManagementPlugin extends PluginActivator implements AccountM
 
     @Override
     public void serviceArrived(Object service) {
-        if (service instanceof AccessControlService) {
+        if (service instanceof AccessControlService || service instanceof CoreService) {
             // registers built-in account manager
-            registerAccountManager(new DmxAccountManager(dmx, mf, SITE_SALT));
+            if (accessControlService != null && dmx != null) {
+                registerAccountManager(new DmxAccountManager(dmx, mf, SITE_SALT));
+            }
         }
     }
 
