@@ -28,12 +28,19 @@ public class Migration6 extends Migration {
     @Override
     public void run() {
         List office = Arrays.asList("doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp");
-        int f = 0;
-        int o = 0;
-        int r = 0;
+        int f = 0;  // files
+        int o = 0;  // office
+        int r = 0;  // repaired
+        int c = 0;  // corrupt
         for (Topic file : dmx.getTopicsByType(FILE)) {
             f++;
-            String fileName = file.getChildTopics().getString(FILE_NAME);
+            String fileName = file.getChildTopics().getString(FILE_NAME, null);
+            if (fileName == null) {
+                c++;
+                logger.warning(String.format("File %d has no name, path=%s", file.getId(),
+                    file.getChildTopics().getString(FILE_NAME, null)));
+                continue;
+            }
             String ext = JavaUtils.getExtension(fileName);
             if (office.contains(ext)) {
                 o++;
@@ -46,6 +53,6 @@ public class Migration6 extends Migration {
             }
         }
         logger.info(String.format("### Office media type migration complete\n  File topics: %d\n  Office files: %d\n" +
-          "  Office files repaired: %d", f, o, r));
+          "  Office files repaired: %d\n  Corrupt files: %d", f, o, r, c));
     }
 }
