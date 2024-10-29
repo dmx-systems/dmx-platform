@@ -28,6 +28,7 @@ maven-install:
     - docker
   script:
     - export MAVEN_OPTS="-Xmx512m"
+    - npm cache clean --force
     - mvn install -P all,dist
   artifacts:
     paths:
