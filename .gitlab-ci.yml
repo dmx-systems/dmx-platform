@@ -27,7 +27,7 @@ maven-install:
   tags:
     - docker
   script:
-    - npm config set @my.scope:registry https://github.com/dmx-systems/dmx-cytoscape-renderer.git
+    - npm config set @my.scope:registry git+https://github.com/dmx-systems/dmx-cytoscape-renderer.git
     - npm i
     - export MAVEN_OPTS="-Xmx512m"
     - mvn install -P all,dist
