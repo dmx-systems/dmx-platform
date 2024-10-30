@@ -8,7 +8,7 @@ import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
 import './country-flag-polyfill'
 
-console.log('[DMX] 2024/10/29')
+console.log('[DMX] 2024/10/30')
 
 const messageHandler = message => {
   store.dispatch('_' + message.type, message.args)    // FIXME: use message bus instead of actions
