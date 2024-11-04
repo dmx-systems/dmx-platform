@@ -12,6 +12,7 @@ import systems.dmx.core.model.TopicDeletionModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicReferenceModel;
 import systems.dmx.core.model.TypeModel;
+import systems.dmx.core.service.Cookies;
 import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -213,16 +214,21 @@ class ValueIntegrator {
         TopicModelImpl topic;
         boolean created = false;
         SimpleValue newValue = newValues.value.trim();
-        // Note: only readable topics can be reused (access control is applied)
-        List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue);
+        // Note 1: only readable topics can be reused (access control is applied)
+        // Note 2: only topics of the target workspace can be reused, otherwise access is not guaranteed by other users
+        long wsId = targetWorkspaceId();
+        List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue).stream().filter(_topic -> {
+            return al.pa.getAssignedWorkspaceId(_topic.id) == wsId;
+        }).collect(Collectors.toList());
         int size = topics.size();
         if (size > 0) {
             topic = topics.get(0);
-            // Note: values are not globally unique due to asymmetric access realms (user A's content might be readable
-            // by user B but not vice versa)
+            // Note: within the target workspace values are expected to be unique
             if (size > 1) {
-                logger.warning("ValueIntegrator ambiguity: there are " + size + " readable \"" + newValue +
-                    "\" topics (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(topics) + ") => using " + topic.id);
+                throw new RuntimeException("ValueIntegrator ambiguity: there are " + size + " \"" + newValue + "\" " +
+                    "topics in workspace " + wsId + " (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(topics) + ")");
+                //logger.warning("ValueIntegrator ambiguity: there are " + size + " readable \"" + newValue +
+                //    "\" topics (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(topics) + ") => using " + topic.id);
             }
             logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
@@ -232,6 +238,26 @@ class ValueIntegrator {
                 "\")");
         }
         return new UnifiedValue(topic, created);
+    }
+
+    // Note: this is a principle copy of private workspaceId() method in WorkspacesPlugin.java
+    // TODO: make this one the principal one. Requires refactoring of custom workspace assignment via preCreateTopic()
+    // (setting Workspace Facet in Object model) as this one is called *before* it is decided whether to call
+    // createTopic at all.
+    private long targetWorkspaceId() {
+        // 1) Execution context
+        Long workspaceId = al.pa.getWorkspaceContext();
+        if (workspaceId != null) {
+            return workspaceId;
+        }
+        // 2) Workspace cookie
+        Cookies cookies = Cookies.get();
+        if (cookies.has("dmx_workspace_id")) {
+            workspaceId = cookies.getLong("dmx_workspace_id");
+            return workspaceId;
+        }
+        //
+        return -1;
     }
 
     // --- Composite ---

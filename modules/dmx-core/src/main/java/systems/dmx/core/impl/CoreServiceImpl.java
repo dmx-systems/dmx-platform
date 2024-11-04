@@ -42,7 +42,6 @@ public class CoreServiceImpl implements CoreService {
     AccessLayer al;
     EventManager em;
     ModelFactoryImpl mf;
-    PrivilegedAccess ac;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     WebSocketServiceImpl wss;
@@ -60,7 +59,6 @@ public class CoreServiceImpl implements CoreService {
         this.al = al;
         this.em = al.em;
         this.mf = al.mf;
-        this.ac = new PrivilegedAccessImpl(al);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.wss = new WebSocketServiceImpl(this);
@@ -471,7 +469,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public PrivilegedAccess getPrivilegedAccess() {
-        return ac;
+        return al.pa;
     }
 
     @Override

@@ -7,6 +7,7 @@ import systems.dmx.core.model.RelatedObjectModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.service.CriticalityLevel;
 import systems.dmx.core.service.DMXException;
+import systems.dmx.core.service.accesscontrol.PrivilegedAccess;
 import systems.dmx.core.storage.spi.DMXStorage;
 import systems.dmx.core.util.DMXUtils;
 
@@ -38,6 +39,7 @@ public final class AccessLayer {
     TypeStorage typeStorage;
     EventManager em;
     ModelFactoryImpl mf;
+    PrivilegedAccess pa;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -50,6 +52,7 @@ public final class AccessLayer {
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) db.getModelFactory();
         this.typeStorage = new TypeStorage(this);
+        this.pa = new PrivilegedAccessImpl(this);
         //
         // Note: this is a constructor side effect. This is a cyclic dependency.
         // ### TODO: explain why we do it.
