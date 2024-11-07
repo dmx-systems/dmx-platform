@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -217,9 +218,8 @@ class ValueIntegrator {
         // Note 1: only readable topics can be reused (access control is applied)
         // Note 2: only topics of the target workspace can be reused, otherwise access is not guaranteed by other users
         long wsId = targetWorkspaceId();
-        List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue).stream().filter(_topic -> {
-            return al.pa.getAssignedWorkspaceId(_topic.id) == wsId;
-        }).collect(Collectors.toList());
+        List<TopicModelImpl> topics = al.getTopicsByValue(type.uri, newValue).stream()
+            .filter(createReusablePredicat()).collect(Collectors.toList());
         int size = topics.size();
         if (size > 0) {
             topic = topics.get(0);
@@ -238,6 +238,17 @@ class ValueIntegrator {
                 "\")");
         }
         return new UnifiedValue(topic, created);
+    }
+
+    private Predicate<TopicModelImpl> createReusablePredicat() {
+        long targetWsId = targetWorkspaceId();
+        return topic -> {
+            // Allow reusing an existing child topic in a different parent context (instead of creating a new child
+            // topic) if 1) existing topic has no workspace assignment, or 2) existing topic is assigned to the target
+            // workspace, that is the workspace where topic creation would take place
+            long wsId = al.pa.getAssignedWorkspaceId(topic.id);
+            return wsId == -1 || wsId == targetWsId;
+        };
     }
 
     // Note: this is a principle copy of private workspaceId() method in WorkspacesPlugin.java
