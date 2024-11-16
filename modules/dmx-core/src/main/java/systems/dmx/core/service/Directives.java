@@ -41,6 +41,10 @@ public class Directives implements Iterable<Directives.Entry> {
         directives.add(new Entry(dir, arg));
     }
 
+    public void clear() {
+        directives.clear();
+    }
+
     public JSONArray toJSONArray() {
         return DMXUtils.toJSONArray(directives);
     }
