@@ -9,7 +9,7 @@ import java.net.URL;
 
 
 
-public interface FilesService {
+public interface FilesService extends PathMapper {
 
 
 
@@ -155,7 +155,7 @@ public interface FilesService {
      *                      <p>
      *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
      *                      as the repository path the workspace prefix is determined automatically with the
-     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie. ### FIXDOC
      *                      <p>
      *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *

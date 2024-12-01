@@ -12,10 +12,17 @@ import org.apache.commons.io.IOUtils;
 
 
 /**
- * An uploaded file.
+ * An InputStream attributable by name and size values. TODO: rename to NamedInputStream
+ * <p>
+ * 2 use cases:
+ * <ol>
+ * <li>Representation of an uploaded file
  * <p>
  * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to a resource method
  * which consumes <code>multipart/form-data</code> and has UploadedFile as its entity parameter.
+ * <li>Created via constructor to represent any streamable (possibly in-memory) data and additional size and (optional)
+ * name information.
+ * </ol>
  *
  * @author <a href="mailto:jri@dmx.berlin">Jörg Richter</a>
  */
@@ -29,6 +36,9 @@ public class UploadedFile {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   name    optional: a sole filename, no path information
+     */
     public UploadedFile(String name, long size, InputStream in) {
         this.name = name;
         this.size = size;
@@ -99,13 +109,6 @@ public class UploadedFile {
         }
     }
 
-    /**
-     * Returns the contents of the uploaded file as an array of bytes.
-     * TODO
-    public byte[] getBytes() {
-        return fileItem.get();
-    }*/
-
 
 
     // === Java API ===
@@ -118,7 +121,7 @@ public class UploadedFile {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Writes this uploaded file to disk.
+     * Writes this uploaded file to disk. ### FIXDOC
      */
     void write(File file) {
         try {
