@@ -57,18 +57,24 @@ public class JavaUtils {
     private static FileNameMap fileTypeMap = URLConnection.getFileNameMap();
     private static Map<String, String> fileTypeMap2 = createFileTypeMap();
 
+    // fallback list when not provided by JDK
     private static Map<String, String> createFileTypeMap() {
         Map<String, String> map = new HashMap();
-        map.put("json", "application/json");
+        map.put("js", "text/javascript");
+        map.put("mjs", "text/javascript");
         map.put("css", "text/css");
         map.put("mp3", "audio/mpeg");
+        map.put("m4a", "audio/mp4");
         map.put("mp4", "video/mp4");
+        map.put("m4v", "video/mp4");
         map.put("avi", "video/avi");
         map.put("wmv", "video/x-ms-wmv");
         map.put("flv", "video/x-flv");
         map.put("svg", "image/svg+xml");
         map.put("woff", "font/woff");
         map.put("woff2", "font/woff2");
+        map.put("json", "application/json");
+        map.put("epub", "application/epub+zip");
         map.put("doc", "application/msword");
         map.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         map.put("xls", "application/vnd.ms-excel");
