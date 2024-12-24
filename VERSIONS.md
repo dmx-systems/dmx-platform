@@ -8,29 +8,41 @@ Version History
 
 not released
 
-#### Bug fixes
+#### Major bug fix
 
-- Major bug fix: topic labels and icons appear correctly on canvas (since DMX 5.3.4 there was a regression in certain browsers) (Thanks to @gevlish!)
-    - Topic labels and icons on canvas now render as DOM, no SVG anymore
-    - No need to load Fontawesome SVG glyphs anymore, 450K less network traffic
-- Content-Type is set in WOFF/WOFF2 and CSS responses
+- Topic labels and icons appear correctly on canvas. Since DMX 5.3.4 there was a regression in certain browsers (#541) (Thanks to @gevlish!)
+    - Topic labels and icons on canvas now render as DOM, no draw-SVG-image-on-canvas anymore
+    - Side effect: no need to load Fontawesome SVG glyphs anymore, 450K less network traffic on DMX Webclient launch
 
 #### Improvements:
 
-- Also the Webclient supports creation of LDAP accounts
-    - DMX platform's account management is refactored (Thanks to @thebohemian!)
+- The DMX Webclient's rich text editor is upgraded to Quill 2 (#561)
+- Minor visual improvement during create-association (drag'n'drop) (#541)
+- Also the DMX Webclient supports creation of LDAP accounts (#75)
+    - DMX platform's account management is refactored (#544) (Thanks to @thebohemian!)
     - New config property: `dmx.accountmanagement.manager`
-- Minor visual improvement during create-association (drag'n'drop)
+- Improved Core support for collaboration and value sharing (#558)
+    - Child topics are shared (between parent topics) only within same workspace or when they have *no* workspace assignment
+- Content-Type support for `js`, `mjs`, `css`, `woff`, `woff2`, `m4a`, `m4v`, `epub` files (#542, #564)
+    - MS Office and Libre Office: `doc`, `docx`, `xls`, `xlsx`, `ppt`, `pptx`, `odt`, `ods`, `odp` (dmx-plugins/dmx-linqa#77)
+- Platform's config.properties file:
+    - Properties from external plugin ("DMX LDAP") are removed (#550) (Thanks to @thebohemian!)
+    - Some property decriptions are clarified (#553) (Thanks to Jürgen Neumann!)
 
 #### Plugin development
 
-- Extended Topicmaps API for better view props handling
 - Revised Files API:
-    - Supports transforming an uploaded file before storing
-    - Disable disk-quota-check for code running as "system"
+    - Supports transforming an uploaded file before storing, e.g. scale-down image files (#537)
+    - Disable disk-quota-check for code running as "system" (#537)
+    - New method `repoPath(File path)` to get repo path from an absolute path (#563)
+- Extended Topicmaps API:
+    - More support for handling view properties (#540)
+- Revised plugin hooks:
+    - Trigger `serviceArrived()` hook also for `CoreService` (#556)
+    - Allow plugins to send responses w/o including directives (#560) (Thanks to @gevlish!)
 - Build system:
-    - Plugins run unit tests and code coverage by default, based on SonarQube and Jacoco (Thanks to @thebohemian!)
-    - Babel is upgraded from version 6 to 7
+    - Plugins run unit tests and code coverage by default, based on SonarQube and Jacoco (#546) (Thanks to @thebohemian!)
+    - Babel is upgraded from version 6 to 7 (#541)
 
 
 5.3.4
