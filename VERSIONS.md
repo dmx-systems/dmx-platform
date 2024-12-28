@@ -6,7 +6,7 @@ Version History
 5.3.5
 -----
 
-not released
+Dec 28, 2024
 
 #### Major bug fix
 
