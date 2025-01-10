@@ -1,9 +1,11 @@
+/bin/
+/bundle/
+/bundle-cache/
+/bundle-deploy/
+/bundle-disabled/
 /dmx-db/
 /dmx-*-db/
 /dmx-files/
-/runner/
-/bundle-deploy/
-/bundle-disabled/
 /modules-external/
 /modules-nodejs/
 

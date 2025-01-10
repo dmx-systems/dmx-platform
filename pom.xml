@@ -67,81 +67,9 @@
         </developer>
     </developers>
 
-    <!-- For a description of the config properties see /modules/dmx-distribution/conf/config.properties -->
     <properties>
-        <!-- Webserver -->
-        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
-        <org.apache.felix.http.session.timeout>0</org.apache.felix.http.session.timeout>
-        <!-- HTTPS -->
-        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
-        <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
-        <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
-        <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
-        <!-- WebSockets -->
-        <dmx.websockets.url>ws://localhost:8080/websocket</dmx.websockets.url>
-
-        <!-- Request Filter -->
-        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
-        <!-- Line breaks and tab characters are allowed however.                                     -->
-        <dmx.security.anonymous_read_allowed>ALL</dmx.security.anonymous_read_allowed>
-        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
-        <!-- Line breaks and tab characters are allowed however.                                     -->
-        <dmx.security.anonymous_write_allowed>NONE</dmx.security.anonymous_write_allowed>
-        <dmx.security.subnet_filter>127.0.0.1/32</dmx.security.subnet_filter>
-
-        <!-- User Accounts -->
-        <dmx.accountmanagement.manager>DMX</dmx.accountmanagement.manager>
-        <dmx.security.initial_admin_password></dmx.security.initial_admin_password>
-        <dmx.security.new_accounts_are_enabled>true</dmx.security.new_accounts_are_enabled>
-        <dmx.security.site_salt></dmx.security.site_salt>
-
-        <!-- Workspace Sharing Modes -->
-        <dmx.workspaces.private.enabled>true</dmx.workspaces.private.enabled>
-        <dmx.workspaces.confidential.enabled>true</dmx.workspaces.confidential.enabled>
-        <dmx.workspaces.collaborative.enabled>true</dmx.workspaces.collaborative.enabled>
-        <dmx.workspaces.public.enabled>true</dmx.workspaces.public.enabled>
-        <dmx.workspaces.common.enabled>true</dmx.workspaces.common.enabled>
-
-        <!-- File Repository -->
-        <dmx.filerepo.path>/</dmx.filerepo.path>
-        <dmx.filerepo.per_workspace>false</dmx.filerepo.per_workspace>
-        <dmx.filerepo.disk_quota>-1</dmx.filerepo.disk_quota>
-
-        <!-- Hot Deployment -->
-        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
-        <!-- Line breaks and tab characters are allowed however.                                     -->
-        <felix.fileinstall.dir>
-            ${project.basedir}/bundle-deploy
-        </felix.fileinstall.dir>
-
-        <!-- Host -->
-        <dmx.host.url>http://localhost:${org.osgi.service.http.port}</dmx.host.url>
-
-        <!-- Webservice -->
-        <dmx.webservice.path>/</dmx.webservice.path>
-
-        <!-- Database -->
-        <dmx.database.path>${project.basedir}/dmx-db</dmx.database.path>
-        <dmx.database.keep_tx_log>2 days</dmx.database.keep_tx_log>
-
-        <!-- Logging -->
-        <java.util.logging.config.file>
-            ${project.basedir}/modules/dmx-distribution/conf/logging.properties
-        </java.util.logging.config.file>
-        <!-- To see any Felix/File Install logging set the level to at least 4 -->
-        <felix.log.level>0</felix.log.level>
-        <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
-
-        <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Time Zone -->
-        <!-- user.timezone>CET</user.timezone -->
-
-        <!-- OSGi Container -->
-        <org.osgi.framework.bootdelegation>javax.xml.*,org.xml.*,org.w3c.dom</org.osgi.framework.bootdelegation>
     </properties>
 
     <dependencyManagement>
@@ -269,35 +197,143 @@
 
     <profiles>
         <profile>
-            <id>run</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <!-- Provisioning an OSGi runtime: mvn -P provision dependency:copy -->
+            <id>provision</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.ops4j</groupId>
-                        <artifactId>maven-pax-plugin</artifactId>
-                        <version>1.4</version>
-                        <configuration>
-                            <runner>1.8.6</runner>
-                            <deployPoms>
-                                modules/dmx-provision/3rd-party-bundles/pom.xml,
-                                modules/dmx-provision/felix-bundles/pom.xml
-                            </deployPoms>
-                        </configuration>
-                    </plugin>
-                    <!-- Deletes OSGi container configuration as created by Pax Runner -->
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>2.4.1</version>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.8.1</version>
                         <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>runner</directory>
-                                </fileset>
-                            </filesets>
+                            <outputDirectory>bundle</outputDirectory>
+                            <artifactItems>
+                                <!-- Basically copied from dmx-distribution -->
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.main</artifactId>
+                                    <version>4.4.1</version>
+                                    <outputDirectory>bin</outputDirectory>
+                                    <destFileName>felix.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.gogo.command</artifactId>
+                                    <version>0.12.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.gogo.runtime</artifactId>
+                                    <version>0.10.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.gogo.shell</artifactId>
+                                    <version>0.10.0</version>
+                                </artifactItem>
+                                <!-- Basically copied from dmx-provision/felix-bundles -->
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.configadmin</artifactId>
+                                    <version>1.8.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.eventadmin</artifactId>
+                                    <version>1.4.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.fileinstall</artifactId>
+                                    <version>3.1.10</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.http.jetty</artifactId>
+                                    <version>2.3.2</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.http.api</artifactId>
+                                    <version>2.3.2</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.felix</groupId>
+                                    <artifactId>org.apache.felix.http.servlet-api</artifactId>
+                                    <version>1.0.1</version>
+                                </artifactItem>
+                                <!-- Basically copied from dmx-provision/3rd-party-bundles -->
+                                <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-core</artifactId>
+                                    <version>1.14</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-server</artifactId>
+                                    <version>1.14</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-servlet</artifactId>
+                                    <version>1.14</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.xml.bind</groupId>
+                                    <artifactId>jaxb-api</artifactId>
+                                    <version>2.3.1</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jettison</groupId>
+                                    <artifactId>jettison</artifactId>
+                                    <version>1.3.2</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.slf4j</groupId>
+                                    <artifactId>slf4j-api</artifactId>
+                                    <version>2.0.9</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.slf4j</groupId>
+                                    <artifactId>slf4j-jdk14</artifactId>
+                                    <version>2.0.9</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.aries.spifly</groupId>
+                                    <artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>
+                                    <version>1.3.7</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm</artifactId>
+                                    <version>9.6</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm-commons</artifactId>
+                                    <version>9.6</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm-tree</artifactId>
+                                    <version>9.6</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm-util</artifactId>
+                                    <version>9.6</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm-analysis</artifactId>
+                                    <version>9.6</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.servicemix.bundles</groupId>
+                                    <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+                                    <version>1.3.2_5</version>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -349,26 +385,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>gitlab-maven-deployment</id>
-            <repositories>
-                <repository>
-                    <id>gitlab-maven</id>
-                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
-                </repository>
-            </repositories>
-            <distributionManagement>
-                <repository>
-                    <id>gitlab-maven</id>
-                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
-                </repository>
-                <snapshotRepository>
-                    <id>gitlab-maven</id>
-                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
 
         <profile>
@@ -475,6 +491,26 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>gitlab-maven-deployment</id>
+            <repositories>
+                <repository>
+                    <id>gitlab-maven</id>
+                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
+                </repository>
+            </repositories>
+            <distributionManagement>
+                <repository>
+                    <id>gitlab-maven</id>
+                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
+                </repository>
+                <snapshotRepository>
+                    <id>gitlab-maven</id>
+                    <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
 
         <profile>
