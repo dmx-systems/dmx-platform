@@ -72,8 +72,8 @@ export default {
 
   components: {
     'el-time-picker': () => {
-      import('element-ui/lib/theme-chalk/time-picker.css' /* webpackChunkName: "el-time-picker" */)
-      return import('element-ui/lib/time-picker.js'       /* webpackChunkName: "el-time-picker" */)
+      import('element-ui/lib/theme-chalk/time-picker.css')
+      return import('element-ui/lib/time-picker.js')
     }
   }
 }

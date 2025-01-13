@@ -45,7 +45,7 @@ export default {
   components: {
     'dmx-comp-def': require('./dmx-comp-def').default,
     draggable: () => ({
-      component: import('vuedraggable' /* webpackChunkName: "vuedraggable" */),
+      component: import('vuedraggable'),
       loading: require('modules/dmx-webclient/src/main/js/components/dmx-spinner')
     })
   }

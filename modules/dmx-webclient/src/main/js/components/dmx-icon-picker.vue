@@ -44,7 +44,7 @@ export default {
 
   components: {
     'fa-search': () => ({
-      component: import('vue-font-awesome-search' /* webpackChunkName: "vue-font-awesome-search" */),
+      component: import('vue-font-awesome-search'),
       loading: require('./dmx-spinner')
     })
   }

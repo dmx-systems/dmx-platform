@@ -57,7 +57,7 @@ export default ({store, dmx}) => {
     topicmapType: {
       uri: 'dmx.topicmaps.topicmap',
       name: 'Topicmap',
-      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
+      renderer: () => import('dmx-cytoscape-renderer')
     },
 
     topicmapCommands: {
