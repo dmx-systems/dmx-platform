@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import { MessageBox } from 'element-ui'
 import dmx from 'dmx-api'
 import Selection from './selection'
@@ -84,7 +83,7 @@ const actions = {
   displayTopicmap ({getters, rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
     // update state
-    Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
+    state.selectedTopicmapId[_workspaceId(rootState)] = id
     dmx.utils.setCookie('dmx_topicmap_id', id)
     // update state + update view
     return _displayTopicmap(getters, dispatch).then(() => {
@@ -387,7 +386,7 @@ const actions = {
         if (!topics.length) {
           throw Error(`workspace ${workspaceId} has no topicmap`)
         }
-        Vue.set(state.topicmapTopics, workspaceId, topics)
+        state.topicmapTopics[workspaceId] = topics
         topics.forEach(topic => {
           initSelection(topic.id, dispatch)
         })
@@ -556,7 +555,7 @@ export default {
 function updateTopicmap (topic) {
   // console.log('updateTopicmap', topic)
   // update state
-  findTopicmapTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
+  findTopicmapTopic(topic.id, (topics, i) => topics[i] = topic)
 }
 
 /**

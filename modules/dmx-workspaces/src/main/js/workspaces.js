@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import dmx from 'dmx-api'
 
 window.addEventListener('focus', updateWorkspaceCookie)
@@ -187,7 +186,7 @@ function updateWorkspaceCookie () {
  */
 function updateWorkspace (topic) {
   // update state
-  findWorkspaceTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
+  findWorkspaceTopic(topic.id, (topics, i) => topics[i] = topic)
 }
 
 /**
