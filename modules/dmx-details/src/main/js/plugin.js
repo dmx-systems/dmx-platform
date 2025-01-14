@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { nextTick } from 'vue'
 
 export default ({store}) => {
   return {
@@ -15,7 +15,7 @@ export default ({store}) => {
     storeWatcher: [{
       getter: state => state.details.visible,
       callback: (visible) => {
-        Vue.nextTick(() => {
+        nextTick(() => {
           if (visible) {
             document.querySelector('.dmx-resizer').__vue__.resize()
           }

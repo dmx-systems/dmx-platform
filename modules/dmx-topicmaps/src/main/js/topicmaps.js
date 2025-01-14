@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import {MessageBox} from 'element-ui'
+import { MessageBox } from 'element-ui'
 import dmx from 'dmx-api'
 import Selection from './selection'
 

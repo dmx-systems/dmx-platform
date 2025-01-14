@@ -4,9 +4,9 @@
  * - Adapts app state when URL changes.
  */
 
-import Vue from 'vue'
+import { nextTick } from 'vue'
 import VueRouter from 'vue-router'
-import {MessageBox} from 'element-ui'
+import { MessageBox } from 'element-ui'
 import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
 import dmx from 'dmx-api'
@@ -275,7 +275,7 @@ function navigate (to, from) {
   p2?.catch(e => {
     console.warn(`Route ${to.path} failed (${e})`)
     // give detail panel time to appear (before it closes again), it's DOM is needed for the imminent dirty check
-    Vue.nextTick(() => {
+    nextTick(() => {
       redirectToTopicmap(topicmapId)      // strip selection
     })
   })
