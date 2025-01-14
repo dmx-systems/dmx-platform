@@ -1,11 +1,10 @@
-import Vue from 'vue'
-import App from './components/App'
 import dmx from 'dmx-api'
 import store from './store/webclient'
 import initRouter from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import extraElementUI from './element-ui'
+import app from './app'
 import './country-flag-polyfill'
 
 console.log('[DMX] 5.3.5')
@@ -26,13 +25,10 @@ const typeCacheReady = dmx.init({
 // 2) Load plugins
 store.state.pluginsReady = loadPlugins(extraElementUI)
 
-// 3) Create Vue root instance
-new Vue({
-  el: '#app',
-  store,
-  router: initRouter(),
-  render: h => h(App)
-})
+// 3) Register app assets and mount root component
+app.use(store)
+app.use(initRouter())
+app.mount('body')
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {
