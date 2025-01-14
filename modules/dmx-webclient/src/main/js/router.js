@@ -6,9 +6,9 @@
 
 import { nextTick } from 'vue'
 import VueRouter from 'vue-router'
-import { MessageBox } from 'element-ui'
 import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
+import app from './app'
 import dmx from 'dmx-api'
 
 export default initRouter
@@ -191,7 +191,7 @@ function performDirtyCheck (to, from) {
       const isDirty = detailPanel.isDirty()
       // console.log('isDirty', isDirty, store.state.object.id)
       if (isDirty) {
-        MessageBox.confirm('There are unsaved changes', 'Warning', {
+        app.config.globalProperties.$confirm('There are unsaved changes', 'Warning', {
           type: 'warning',
           confirmButtonText: 'Save',
           cancelButtonText: 'Discard Changes',

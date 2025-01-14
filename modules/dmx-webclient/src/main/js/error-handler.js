@@ -1,4 +1,4 @@
-import {Notification} from 'element-ui'
+import app from './app'
 
 Error.prototype.toString = function () {
   return `${this.message}${this.cause ? `, Caused by ${this.cause}` : ''}`
@@ -10,7 +10,7 @@ export default function onHttpError (error) {
   error.cause = error.response.data.cause
   // alert box
   const level = error.response.data.level || 'ERROR'
-  Notification({
+  app.config.globalProperties.$notify({
     title: level,
     type: level.toLowerCase(),
     message: `<p>${error.message}</p>${error.cause ? `<p>Cause: ${error.cause}</p>` : ''}`,

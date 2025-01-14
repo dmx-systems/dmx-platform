@@ -3,7 +3,7 @@ import store from './store/webclient'
 import initRouter from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
-import extraElementUI from './element-ui'
+import extraElementPlus from './element-plus'
 import app from './app'
 import './country-flag-polyfill'
 
@@ -23,7 +23,7 @@ const typeCacheReady = dmx.init({
 })
 
 // 2) Load plugins
-store.state.pluginsReady = loadPlugins(extraElementUI)
+store.state.pluginsReady = loadPlugins(extraElementPlus)
 
 // 3) Register app assets and mount root component
 app.use(store)

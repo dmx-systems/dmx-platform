@@ -1,5 +1,5 @@
-import { MessageBox } from 'element-ui'
 import dmx from 'dmx-api'
+import app from 'modules/dmx-webclient/src/main/js/app'
 import Selection from './selection'
 
 const state = {
@@ -650,7 +650,7 @@ function confirmDeletion (idLists) {
     message = `You're about to delete a ${viewObject(idLists).typeName}!`
     buttonText = 'Delete'
   }
-  return MessageBox.confirm(message, 'Warning', {
+  return app.config.globalProperties.$confirm(message, 'Warning', {
     type: 'warning',
     confirmButtonText: buttonText,
     confirmButtonClass: 'el-button--danger',
