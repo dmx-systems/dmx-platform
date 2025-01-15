@@ -26,6 +26,20 @@ const typeCacheReady = dmx.init({
 store.state.pluginsReady = loadPlugins(extraElementPlus)
 
 // 3) Register app assets and mount root component
+// Global component registrations
+// Allow plugins to reuse Webclient components (instead of rebundle the component along with the plugin)
+app.component('dmx-object-renderer', require('dmx-object-renderer').default)
+app.component('dmx-assoc',           require('dmx-object-renderer/src/components/dmx-assoc').default)
+app.component('dmx-boolean-field',   require('dmx-object-renderer/src/components/dmx-boolean-field').default)
+app.component('dmx-child-topic',     require('dmx-object-renderer/src/components/dmx-child-topic').default)
+app.component('dmx-child-topics',    require('dmx-object-renderer/src/components/dmx-child-topics').default)
+app.component('dmx-html-field',      require('dmx-object-renderer/src/components/dmx-html-field').default)
+app.component('dmx-number-field',    require('dmx-object-renderer/src/components/dmx-number-field').default)
+app.component('dmx-player',          require('dmx-object-renderer/src/components/dmx-player').default)
+app.component('dmx-select-field',    require('dmx-object-renderer/src/components/dmx-select-field').default)
+app.component('dmx-text-field',      require('dmx-object-renderer/src/components/dmx-text-field').default)
+app.component('dmx-value-renderer',  require('dmx-object-renderer/src/components/dmx-value-renderer').default)
+app.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 app.use(store)
 app.use(router)
 app.mount('body')
