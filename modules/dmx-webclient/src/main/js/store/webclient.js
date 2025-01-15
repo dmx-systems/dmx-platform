@@ -14,6 +14,7 @@ window.addEventListener('resize', e => {
 const store = createStore({
 
   state: {
+
     object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
                               // This object is displayed in detail panel or as in-map details. Its ID appears in the
                               // browser URL.
@@ -199,7 +200,7 @@ const store = createStore({
       return state.object && (state.object.isType     ? state.object.asType() :
                               state.object.isCompDef  ? state.object.asCompDef() :
                               state.object.isRoleType ? state.object.asRoleType() :
-                              state.object)                                                     /* eslint indent: "off" */
+                              state.object)                                                   /* eslint indent: "off" */
       // logical copy in createDetail()/updateDetail() (topicmap-model.js of dmx-cytoscape-renderer module)
     },
 

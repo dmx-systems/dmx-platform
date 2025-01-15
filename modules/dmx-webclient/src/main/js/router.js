@@ -5,73 +5,67 @@
  */
 
 import { nextTick } from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
 import app from './app'
 import dmx from 'dmx-api'
 
-export default initRouter
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: '/topicmap/:topicmapId',
+      name: 'topicmap',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/topic/:topicId',
+      name: 'topic',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId',
+      name: 'assoc',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/topic/:topicId/:detail',
+      name: 'topicDetail',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
+      name: 'assocDetail',
+      component: Webclient
+    }
+  ]
+})
 
-Vue.use(VueRouter)
-
-let router    // initialized by initRouter()
-
-function initRouter () {
-  router = new VueRouter({
-    routes
+// global guard
+router.beforeEach((to, from, next) => {
+  // console.log('### beforeEach', to, from)
+  performDirtyCheck(to, from).then(abort => {
+    if (abort) {
+      next(false)
+    } else {
+      next()
+    }
   })
-  // global guard
-  router.beforeEach((to, from, next) => {
-    // console.log('### beforeEach', to, from)
-    performDirtyCheck(to, from).then(abort => {
-      if (abort) {
-        next(false)
-      } else {
-        next()
-      }
-    })
-  })
-  // store module
-  store.registerModule('routerModule', {
-    state: {router},
-    actions
-  })
-  return router
-}
+})
 
-const routes = [
-  {
-    path: '/topicmap/:topicmapId',
-    name: 'topicmap',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/topic/:topicId',
-    name: 'topic',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/assoc/:assocId',
-    name: 'assoc',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/topic/:topicId/:detail',
-    name: 'topicDetail',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
-    name: 'assocDetail',
-    component: Webclient
-  }
-]
+export default router
+
+// store module
+store.registerModule('routerModule', {
+  state: {router},
+  actions
+})
 
 const actions = {
 
   initialNavigation () {
-    navigate(router.currentRoute, {params: {}})
+    navigate(router.currentRoute.value, {params: {}})
     registerRouteWatcher()
   },
 
@@ -352,7 +346,7 @@ function callObjectRoute (id, paramName, routeName, detailRouteName) {
     location.name = detailRouteName
     // fallback to "info" tab
     // Note: when the detail panel is empty there is no "detail" route segment
-    const detail = router.currentRoute.params.detail
+    const detail = router.currentRoute.value.params.detail
     if (!detail || detail === 'edit') {
       location.params.detail = 'info'
     }

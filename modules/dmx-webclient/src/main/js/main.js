@@ -1,6 +1,6 @@
 import dmx from 'dmx-api'
 import store from './store/webclient'
-import initRouter from './router'
+import router from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import extraElementPlus from './element-plus'
@@ -27,7 +27,7 @@ store.state.pluginsReady = loadPlugins(extraElementPlus)
 
 // 3) Register app assets and mount root component
 app.use(store)
-app.use(initRouter())
+app.use(router)
 app.mount('body')
 
 // 4) Register own renderers
