@@ -1,4 +1,10 @@
-export default ({store}) => ({
+export default ({store, dmx}) => ({
+
+  init () {
+    dmx.rpc.getUsername().then(username => {
+      store.state.accesscontrol.username = username
+    })
+  },
 
   storeModule: {
     name: 'accesscontrol',
