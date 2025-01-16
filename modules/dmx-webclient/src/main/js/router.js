@@ -58,104 +58,106 @@ export default router
 
 // store module
 store.registerModule('routerModule', {
-  state: {router},
-  actions
-})
 
-const actions = {
-
-  initialNavigation () {
-    navigate(router.currentRoute.value, {params: {}})
-    registerRouteWatcher()
+  state: {
+    router
   },
 
-  callRoute (_, location) {
-    router.push(location)
-  },
+  actions: {
 
-  callTopicmapRoute (_, id) {
-    router.push({
-      name: 'topicmap',
-      params: {topicmapId: id}
-    })
-  },
+    initialNavigation () {
+      navigate(router.currentRoute.value, {params: {}})
+      registerRouteWatcher()
+    },
 
-  callTopicRoute (_, id) {
-    callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
-  },
+    callRoute (_, location) {
+      router.push(location)
+    },
 
-  callAssocRoute (_, id) {
-    callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
-  },
+    callTopicmapRoute (_, id) {
+      router.push({
+        name: 'topicmap',
+        params: {topicmapId: id}
+      })
+    },
 
-  /**
-   * @param   noViewUpdate  if true the topicmap renderer's view will not be updated, only its selection-model. This
-   *                        might be needed when strip-selection is triggered programmatically in the course of an hide/
-   *                        delete operation. In this case the renderer's view might not be able to update anymore as
-   *                        certain on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already.
-   *                        The view update can be safely omitted as the object is about to disappear anyways.
-   */
-  stripSelectionFromRoute (_, noViewUpdate) {
-    router.push({
-      name: 'topicmap',
-      params: {noViewUpdate}    // misuse "params" for transporting that flag to the router's navigate() function
-    })
-  },
+    callTopicRoute (_, id) {
+      callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
+    },
 
-  /**
-   * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
-   *
-   * Prerequisite: a single selection
-   *
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callDetailRoute ({rootState}, detail) {
-    const object = rootState.object
-    if (!object) {
-      throw Error('callDetailRoute() when there is no single selection')
+    callAssocRoute (_, id) {
+      callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
+    },
+
+    /**
+     * @param   noViewUpdate  if true the topicmap renderer's view will not be updated, only its selection-model. This
+     *                        might be needed when strip-selection is triggered programmatically in the course of an hide/
+     *                        delete operation. In this case the renderer's view might not be able to update anymore as
+     *                        certain on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already.
+     *                        The view update can be safely omitted as the object is about to disappear anyways.
+     */
+    stripSelectionFromRoute (_, noViewUpdate) {
+      router.push({
+        name: 'topicmap',
+        params: {noViewUpdate}    // misuse "params" for transporting that flag to the router's navigate() function
+      })
+    },
+
+    /**
+     * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
+     *
+     * Prerequisite: a single selection
+     *
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callDetailRoute ({rootState}, detail) {
+      const object = rootState.object
+      if (!object) {
+        throw Error('callDetailRoute() when there is no single selection')
+      }
+      router.push({
+        name: object.isTopic ? 'topicDetail' : 'assocDetail',
+        params: {detail}
+      })
+    },
+
+    /**
+     * Redirects to "topicDetail" route.
+     *
+     * @param   id        a topic ID
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callTopicDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'topicDetail',
+        params: {topicId: id, detail}
+      })
+    },
+
+    /**
+     * Redirects to "assocDetail" route.
+     *
+     * @param   id        an assoc ID
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callAssocDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'assocDetail',
+        params: {assocId: id, detail}
+      })
+    },
+
+    stripDetailFromRoute ({rootState}) {
+      const object = rootState.object
+      if (!object) {
+        throw Error('stripDetailFromRoute() when there is no single selection')
+      }
+      router.push({
+        name: object.isTopic ? 'topic' : 'assoc'
+      })
     }
-    router.push({
-      name: object.isTopic ? 'topicDetail' : 'assocDetail',
-      params: {detail}
-    })
-  },
-
-  /**
-   * Redirects to "topicDetail" route.
-   *
-   * @param   id        a topic ID
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callTopicDetailRoute (_, {id, detail}) {
-    router.push({
-      name: 'topicDetail',
-      params: {topicId: id, detail}
-    })
-  },
-
-  /**
-   * Redirects to "assocDetail" route.
-   *
-   * @param   id        an assoc ID
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callAssocDetailRoute (_, {id, detail}) {
-    router.push({
-      name: 'assocDetail',
-      params: {assocId: id, detail}
-    })
-  },
-
-  stripDetailFromRoute ({rootState}) {
-    const object = rootState.object
-    if (!object) {
-      throw Error('stripDetailFromRoute() when there is no single selection')
-    }
-    router.push({
-      name: object.isTopic ? 'topic' : 'assoc'
-    })
   }
-}
+})
 
 function registerRouteWatcher () {
   store.watch(
