@@ -70,11 +70,12 @@ export default {
     }
   },
 
+  /* ### TODO: async loading
   components: {
     'el-time-picker': () => {
-      import('element-ui/lib/theme-chalk/time-picker.css')
-      return import('element-ui/lib/time-picker.js')
+      import('element-plus/theme-chalk/el-time-picker.css')
+      return import('element-plus/lib/components/time-picker/index.js')
     }
-  }
+  } */
 }
 </script>
