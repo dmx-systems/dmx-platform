@@ -1,37 +1,30 @@
 import dmx from 'dmx-api'
 
-const actions = {
-
-  createTopicType ({dispatch}, {name, pos}) {
-    // console.log('Creating topic type', name)
-    dmx.rpc.createTopicType(defaultTopicType(name)).then(topicType => {
-      // console.log('Created', topicType)
-      dispatch('putTopicType', topicType)
-      dispatch('revealTopic', {topic: topicType, pos})
-    })
-  },
-
-  createAssocType ({dispatch}, {name, pos}) {
-    // console.log('Creating assoc type', name)
-    dmx.rpc.createAssocType(defaultAssocType(name)).then(assocType => {
-      // console.log('Created', assocType)
-      dispatch('putAssocType', assocType)
-      dispatch('revealTopic', {topic: assocType, pos})
-    })
-  },
-
-  createRoleType ({dispatch}, {name, pos}) {
-    // console.log('Creating role type', name)
-    dmx.rpc.createRoleType(defaultRoleType(name)).then(roleType => {
-      // console.log('Created', roleType)
-      dispatch('putRoleType', roleType)
-      dispatch('revealTopic', {topic: roleType, pos})
-    })
-  }
-}
-
 export default {
-  actions
+
+  actions: {
+
+    createTopicType ({dispatch}, {name, pos}) {
+      dmx.rpc.createTopicType(defaultTopicType(name)).then(topicType => {
+        dispatch('putTopicType', topicType)
+        dispatch('revealTopic', {topic: topicType, pos})
+      })
+    },
+
+    createAssocType ({dispatch}, {name, pos}) {
+      dmx.rpc.createAssocType(defaultAssocType(name)).then(assocType => {
+        dispatch('putAssocType', assocType)
+        dispatch('revealTopic', {topic: assocType, pos})
+      })
+    },
+
+    createRoleType ({dispatch}, {name, pos}) {
+      dmx.rpc.createRoleType(defaultRoleType(name)).then(roleType => {
+        dispatch('putRoleType', roleType)
+        dispatch('revealTopic', {topic: roleType, pos})
+      })
+    }
+  }
 }
 
 function defaultTopicType (name) {
