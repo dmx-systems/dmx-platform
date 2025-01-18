@@ -1,3 +1,4 @@
+import { markRaw } from 'vue'
 import dmx from 'dmx-api'
 import app from 'modules/dmx-webclient/src/main/js/app'
 import Selection from './selection'
@@ -386,7 +387,7 @@ export default {
       const c = state.topicmapCommands
       const uri = command.topicmapTypeUri
       const commands = c[uri] || (c[uri] = [])
-      commands.push(command.comp)
+      commands.push(markRaw(command.comp))          // Vue component internals are not treated as reactive
     },
 
     //

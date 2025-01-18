@@ -1,3 +1,4 @@
+import { markRaw } from 'vue'
 import { createStore } from 'vuex'
 import dmx from 'dmx-api'
 
@@ -115,7 +116,7 @@ const store = createStore({
 
     registerComponent ({state}, compDef) {
       const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
-      compDefs.push(compDef)
+      compDefs.push(markRaw(compDef))       // Vue component internals are not treated as reactive (compDef.comp)
     },
 
     /**

@@ -26,7 +26,7 @@ export default {
     dmx, axios
   },
 
-  data() {
+  data () {
     return {
       isResizing: false
     }

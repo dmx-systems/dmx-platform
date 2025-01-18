@@ -1,3 +1,4 @@
+import { markRaw } from 'vue'
 import dmx from 'dmx-api'
 
 export default {
@@ -77,7 +78,7 @@ export default {
       const c = state.workspaceCommands
       const uri = command.topicmapTypeUri
       const commands = c[uri] || (c[uri] = [])
-      commands.push(command.comp)
+      commands.push(markRaw(command.comp))          // Vue component internals are not treated as reactive
     },
 
     //
