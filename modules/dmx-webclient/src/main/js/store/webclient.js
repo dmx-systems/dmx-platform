@@ -90,7 +90,7 @@ const store = createStore({
       ]
     },
 
-    pluginsReady: undefined   // a promise resolved once all plugins are loaded and initialized
+    pluginsReady: undefined   // a promise resolved once all plugins are loaded and initialized       // ### TODO: drop?
   },
 
   actions: {
