@@ -27,24 +27,24 @@ export default ({store}) => {
       {
         comp: require('dmx-detail-panel').default,
         mount: 'webclient',
-        props: {
-          object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
-          writable:        state => state.writable,
-          visible:         state => state.details.visible,
-          pinned:          state => state.details.pinned,
-          tab:             state => state.details.tab,
-          mode:            state => state.details.mode,
-          configDefs:      state => state.details.configDefs,
-          markerTopicIds:  (_, getters) => getters && getters.visibleTopicIds,
-          detailRenderers: state => state.detailRenderers,
-          extraButtons:    state => state.detailPanelButtons,
-          types:           state => ({
-                             assocTypes: state.typeCache.assocTypes,
-                             roleTypes:  state.typeCache.roleTypes
-                           }),                                                                /* eslint indent: "off" */
-          quillConfig:     state => state.quillConfig,
-          transX:          state => state.resizerPos
-        },
+        props: () => ({
+          object:          store.getters.object,
+          writable:        store.state.writable,
+          visible:         store.state.details.visible,
+          pinned:          store.state.details.pinned,
+          tab:             store.state.details.tab,
+          mode:            store.state.details.mode,
+          configDefs:      store.state.details.configDefs,
+          markerTopicIds:  store.getters.visibleTopicIds,
+          detailRenderers: store.state.detailRenderers,
+          extraButtons:    store.state.detailPanelButtons,
+          types:           {
+                             assocTypes: store.state.typeCache.assocTypes,
+                             roleTypes:  store.state.typeCache.roleTypes
+                           },                                                                /* eslint indent: "off" */
+          quillConfig:     store.state.quillConfig,
+          transX:          store.state.resizerPos
+        }),
         listeners: {
           'tab-click':           tabClick,
           edit:                  ()              => store.dispatch('callDetailRoute', 'edit'),

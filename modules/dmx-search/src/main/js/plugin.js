@@ -13,16 +13,16 @@ export default ({store}) => {
       {
         comp: require('dmx-search-widget').default,
         mount: 'webclient',
-        props: {
-          visible:          state => state.search.visible,
-          extraMenuItems:   state => state.search.extraMenuItems,
-          createEnabled:    state => state.workspaces.isWritable,
-          markerTopicIds:   (_, getters) => getters?.visibleTopicIds,
-          markerAssocIds:   (_, getters) => getters?.visibleAssocIds,
-          createTopicTypes: (_, getters) => getters?.createTopicTypes,    // TODO: getters is undefined at startup
-          searchAssocTypes: () => dmx.typeCache.getAllAssocTypes(),
-          topicmapTypes:    state => Object.values(state.topicmaps.topicmapTypes)
-        },
+        props: () => ({
+          visible:          store.state.search.visible,
+          extraMenuItems:   store.state.search.extraMenuItems,
+          createEnabled:    store.state.workspaces.isWritable,
+          markerTopicIds:   store.getters.visibleTopicIds,
+          markerAssocIds:   store.getters.visibleAssocIds,
+          createTopicTypes: store.getters.createTopicTypes,
+          searchAssocTypes: dmx.typeCache.getAllAssocTypes(),
+          topicmapTypes:    Object.values(store.state.topicmaps.topicmapTypes)
+        }),
         listeners: {
           'topic-click':     revealTopic,
           'icon-click':      revealTopicNoSelect,

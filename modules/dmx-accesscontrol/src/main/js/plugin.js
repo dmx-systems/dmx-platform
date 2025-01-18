@@ -15,10 +15,10 @@ export default ({store, dmx}) => ({
     {
       comp: require('dmx-login-dialog').default,
       mount: 'webclient',
-      props: {
-        visible:    state => state.accesscontrol.visible,
-        extensions: state => state.accesscontrol.extensions
-      },
+      props: () => ({
+        visible:    store.state.accesscontrol.visible,
+        extensions: store.state.accesscontrol.extensions
+      }),
       listeners: {
         'logged-in': username => store.dispatch('initTypeCache').then(() => {
                                    store.dispatch('loggedIn', username)

@@ -39,9 +39,7 @@ export default {
     props (compDef) {
       const t = typeof compDef.props
       // console.log('# props', compDef, t)
-      if (t === 'object') {
-        return compDef.props
-      } else if (t === 'function') {
+      if (t === 'function') {
         return compDef.props()
       } else if (t === 'undefined') {
         return {}
