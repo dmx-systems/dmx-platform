@@ -1,5 +1,5 @@
 <template>
-  <el-button type="text" class="fa fa-compress" title="Reset Zoom and Pan" @click="resetTopicmapViewport">
+  <el-button type="primary" link class="fa fa-compress" title="Reset Zoom and Pan" @click="resetTopicmapViewport">
   </el-button>
 </template>
 

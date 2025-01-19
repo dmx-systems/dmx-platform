@@ -1,7 +1,7 @@
 <template>
   <div class="dmx-login-state">
     <el-dropdown v-if="username" size="medium" trigger="click" @command="handle">
-      <el-button type="text" class="fa fa-user-circle">
+      <el-button type="primary" link class="fa fa-user-circle">
         <span class="el-icon-arrow-down el-icon--right"></span>
       </el-button>
       <el-dropdown-menu slot="dropdown">

@@ -1,6 +1,6 @@
 <template>
   <el-dropdown class="dmx-help-menu" size="medium" trigger="click" @command="handle">
-    <el-button type="text" class="fa fa-question-circle">
+    <el-button type="primary" link class="fa fa-question-circle">
       <span class="el-icon-arrow-down el-icon--right"></span>
     </el-button>
     <el-dropdown-menu slot="dropdown">
