@@ -157,10 +157,25 @@ const store = createStore({
       state.detailPanelButtons[typeUri] = state.detailPanelButtons[typeUri].concat(buttons)
     },
 
-    // Resizer
+    // Split Panel
 
     setResizerPos ({state}, pos) {
       state.resizerPos = pos
+    },
+
+    /**
+     * Adapts left/right panel's width according to model ("resizerPos").
+     * Dispatched when Detail Panel becomes visible.
+     * Precondition: Detail Panel is in DOM already.
+     */
+    adaptPanelsWidth ({state}) {
+      const container  = document.querySelector('.dmx-webclient')
+      const leftPanel  = document.querySelector('.dmx-topicmap-panel')
+      const rightPanel = document.querySelector('.dmx-detail-panel')
+      const leftPanelWidth = state.resizerPos
+      const rightPanelWidth = container.clientWidth - leftPanelWidth
+      leftPanel.style.width  = `${leftPanelWidth}px`
+      rightPanel.style.width = `${rightPanelWidth}px`
     },
 
     //

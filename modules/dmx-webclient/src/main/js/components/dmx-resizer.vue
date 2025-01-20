@@ -49,18 +49,6 @@ export default {
 
       addEventListener('mousemove', onMouseMove)
       addEventListener('mouseup', onMouseUp)
-    },
-
-    // Public API
-
-    resize () {
-      const container = document.querySelector('.dmx-webclient')        //
-      const panelL    = document.querySelector('.dmx-topicmap-panel')   // TODO: DRY
-      const panelR    = document.querySelector('.dmx-detail-panel')     //
-      const paneLWidth = this.left
-      const paneRWidth = container.clientWidth - paneLWidth
-      panelL.style.width = `${paneLWidth}px`
-      panelR.style.width = `${paneRWidth}px`
     }
   }
 }

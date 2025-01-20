@@ -43,6 +43,7 @@ const router = createRouter({
 })
 
 // global guard
+/* ### TODO: eliminate "__vue__"
 router.beforeEach((to, from, next) => {
   // console.log('### beforeEach', to, from)
   performDirtyCheck(to, from).then(abort => {
@@ -53,6 +54,7 @@ router.beforeEach((to, from, next) => {
     }
   })
 })
+*/
 
 export default router
 

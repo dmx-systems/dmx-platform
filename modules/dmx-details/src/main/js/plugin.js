@@ -17,7 +17,7 @@ export default ({store}) => {
       callback: (visible) => {
         nextTick(() => {
           if (visible) {
-            document.querySelector('.dmx-resizer').__vue__.resize()
+            store.dispatch('adaptPanelsWidth')
           }
         })
       }
