@@ -116,14 +116,14 @@ const store = createStore({
 
     registerComponent ({state}, compDef) {
       const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
-      compDefs.push(markRaw(compDef))       // Vue component internals are not treated as reactive (compDef.comp)
+      compDefs.push(markRaw(compDef))       // Vue component internals are not made reactive (compDef.comp)
     },
 
     /**
      * @param   renderer    "object" or "value"
      */
     registerDetailRenderer ({state}, {renderer, typeUri, component}) {
-      state.detailRenderers[renderer][typeUri] = component
+      state.detailRenderers[renderer][typeUri] = markRaw(component)     // Vue component internals are not made reactive
     },
 
     registerIconRenderer ({state}, {typeUri, iconFunc}) {

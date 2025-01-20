@@ -78,7 +78,7 @@ export default {
       const c = state.workspaceCommands
       const uri = command.topicmapTypeUri
       const commands = c[uri] || (c[uri] = [])
-      commands.push(markRaw(command.comp))          // Vue component internals are not treated as reactive
+      commands.push(markRaw(command.comp))          // Vue component internals are not made reactive
     },
 
     //

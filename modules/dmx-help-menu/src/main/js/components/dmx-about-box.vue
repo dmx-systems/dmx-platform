@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="About DMX" custom-class="dmx-about-box" :visible="visible" :modal="false" @close="close">
+  <el-dialog title="About DMX" class="dmx-about-box" :model-value="visible" :modal="false" @close="close">
     <img src="../dmx-logo.svg">
     <div>
       <div class="field">
