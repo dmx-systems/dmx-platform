@@ -2,19 +2,21 @@
   <div :class="['dmx-comp-def-list', mode]">
     <div class="field-label">Composition Definitions ({{compDefs.length}})</div>
     <template v-if="infoMode">
-      <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
-        :key="compDef.compDefUri" @click.native="click(compDef)">
+      <dmx-comp-def v-for="compDef in compDefs" :comp-def :class="{marked: marked(compDef)}" :key="compDef.compDefUri"
+        @click="click(compDef)">
       </dmx-comp-def>
     </template>
     <draggable v-else :list="compDefs" item-key="compDefUri" :animation="300">
       <template #item="{element: compDef}">
-        <dmx-comp-def :comp-def="compDef" :class="{marked: marked(compDef)}" @click="click(compDef)"></dmx-comp-def>
+        <dmx-comp-def :comp-def :class="{marked: marked(compDef)}" @click="click(compDef)"></dmx-comp-def>
       </template>
     </draggable>
   </div>
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
+
 export default {
 
   created () {
@@ -43,9 +45,9 @@ export default {
 
   components: {
     'dmx-comp-def': require('./dmx-comp-def').default,
-    draggable: () => ({
-      component: import('vuedraggable'),
-      loading: require('modules/dmx-webclient/src/main/js/components/dmx-spinner')
+    draggable: defineAsyncComponent({
+      loader: () => import('vuedraggable'),
+      loadingComponent: require('modules/dmx-webclient/src/main/js/components/dmx-spinner')
     })
   }
 }

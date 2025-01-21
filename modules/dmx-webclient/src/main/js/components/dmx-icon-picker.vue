@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
+
 export default {
 
   mixins: [
@@ -43,9 +45,9 @@ export default {
   },
 
   components: {
-    'fa-search': () => ({
-      component: import('vue-font-awesome-search'),
-      loading: require('./dmx-spinner')
+    'fa-search': defineAsyncComponent({
+      loader: () => import('vue-font-awesome-search'),
+      loadingComponent: require('./dmx-spinner')
     })
   }
 }
