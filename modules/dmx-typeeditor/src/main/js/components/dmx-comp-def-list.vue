@@ -6,11 +6,10 @@
         :key="compDef.compDefUri" @click.native="click(compDef)">
       </dmx-comp-def>
     </template>
-    <draggable v-else :list="compDefs" :animation="300">
-      <!-- 3 lines duplicated in favor of code splitting -->
-      <dmx-comp-def v-for="compDef in compDefs" :comp-def="compDef" :class="{marked: marked(compDef)}"
-        :key="compDef.compDefUri" @click.native="click(compDef)">
-      </dmx-comp-def>
+    <draggable v-else :list="compDefs" item-key="compDefUri" :animation="300">
+      <template #item="{element: compDef}">
+        <dmx-comp-def :comp-def="compDef" :class="{marked: marked(compDef)}" @click="click(compDef)"></dmx-comp-def>
+      </template>
     </draggable>
   </div>
 </template>
@@ -19,7 +18,7 @@
 export default {
 
   created () {
-    // console.log('dmx-comp-def-list created')
+    // console.log('# dmx-comp-def-list', this.compDefs)
   },
 
   mixins: [
