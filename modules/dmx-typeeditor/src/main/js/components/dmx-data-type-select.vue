@@ -1,5 +1,5 @@
 <template>
-  <el-select v-model="type.dataTypeUri"><!-- eslint-disable-line vue/no-mutating-props -->
+  <el-select class="dmx-data-type-select" v-model="type.dataTypeUri"><!-- eslint-disable-line vue/no-mutating-props -->
     <el-option-group label="Simple">
       <el-option :label="dataTypes['dmx.core.text'].value"     :value="dataTypes['dmx.core.text'].uri">
       </el-option>
@@ -47,3 +47,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.dmx-data-type-select.el-select {
+  max-width: 200px;
+}
+</style>

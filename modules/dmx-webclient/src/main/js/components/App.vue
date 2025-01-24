@@ -141,12 +141,10 @@ button {
   padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
 }
 
-/* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__wrap {
-  max-height: 100vh !important;                   /* was 274px */
+  max-height: calc(100vh - 7px) !important;       /* Element Plus default is 274px */
 }
 
-/* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__item .icon {
   color: var(--color-topic-icon);
   margin-right: var(--icon-spacing);
