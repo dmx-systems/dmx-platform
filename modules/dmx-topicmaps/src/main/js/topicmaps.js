@@ -201,18 +201,13 @@ export default {
      * - "selections" state is up-to-date.
      *
      * @param   id            id of the topic/assoc to unselect
-     * @param   noViewUpdate  if true the actual renderer's view will not be updated, only its model. This might be
-     *                        needed when unset-selection is triggered programmatically in the course of an hide/delete
-     *                        operation. In this case the renderer's view might not be able to update anymore as certain
-     *                        on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already. The
-     *                        view update can be safely omitted as the object is about to disappear anyways.
      */
-    unsetSelection ({getters, dispatch}, {id, noViewUpdate}) {
+    unsetSelection ({getters, dispatch}, id) {
       const selection = getters.selection
       if (typeof id !== 'number') {
         throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
       }
-      dispatch('renderAsUnselected', noViewUpdate)  // update view
+      dispatch('renderAsUnselected')                // update view
       if (!selection) {
         // This can happen while workspace deletion. The workspace topic is removed from the topicmap, causing
         // unsetSelection(). The topicmap might be deleted aleady in the course of deleting the workspace content.
@@ -274,7 +269,7 @@ export default {
       !noSelect && dispatch('callAssocRoute', assoc.id)                   // dispatch into app
     },
 
-    revealRelatedTopic ({getters, dispatch}, {relTopic, pos, noSelect}) {
+    revealRelatedTopic ({dispatch}, {relTopic, pos, noSelect}) {
       // Note: in case selection is requested (noSelect=falsish) auto-panning is performed through route change
       // (see "renderAsSelected" action in topicmap-model, dmx-cytoscape-renderer module)
       dispatch('renderRelatedTopic', {relTopic, pos, autoPan: noSelect})  // dispatch into topicmap renderer
@@ -827,7 +822,7 @@ function shrinkSelection (selection, state) {
 
 function unselectIf (id, getters, rootState, dispatch) {
   if (isSelected(id, rootState)) {
-    dispatch('stripSelectionFromRoute', true)     // noViewUpdate=true
+    dispatch('stripSelectionFromRoute')
   }
   getters.selection.remove(id)
 }
