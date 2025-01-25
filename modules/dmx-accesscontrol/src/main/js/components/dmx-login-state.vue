@@ -1,19 +1,21 @@
 <template>
   <div class="dmx-login-state">
-    <el-dropdown v-if="username" size="medium" trigger="click" @command="handle">
+    <el-dropdown v-if="username" trigger="click" @command="handle">
       <el-button type="primary" link class="fa fa-user-circle">
         <span class="el-icon-arrow-down el-icon--right"></span>
       </el-button>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item command="revealUsername" title="Reveal Username topic">
-          <b>{{username}}</b>
-        </el-dropdown-item>
-        <el-dropdown-item command="logout" divided>
-          Logout
-        </el-dropdown-item>
-      </el-dropdown-menu>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="revealUsername" title="Reveal Username topic">
+            <b>{{username}}</b>
+          </el-dropdown-item>
+          <el-dropdown-item command="logout" divided>
+            Logout
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
     </el-dropdown>
-    <el-button v-else class="sign-in" type="primary" @click="login">Sign in</el-button>
+    <el-button v-else class="sign-in-button" type="primary" @click="login">Sign in</el-button>
   </div>
 </template>
 
@@ -44,13 +46,10 @@ export default {
   margin-left: 12px;
 }
 
-.dmx-login-state .el-dropdown .el-button {
-  padding-left:  0px !important;
-  padding-right: 0px !important;
-}
-
-.dmx-login-state .el-button.sign-in {
+.dmx-login-state .sign-in-button {
   font-size: var(--label-font-size) !important;
-  padding: 4px 8px !important;
+  height: 28px;           /* Element Plus default is 32px */
+  padding-left: 8px;      /* Element Plus default is 15px */
+  padding-right: 8px;     /* Element Plus default is 15px */
 }
 </style>

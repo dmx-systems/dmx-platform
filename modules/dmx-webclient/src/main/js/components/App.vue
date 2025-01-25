@@ -73,12 +73,12 @@ body {
 
 input {
   font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
-  font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes ### TODO: still useful? */
 }
 
 button {
   font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
-  font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes ### TODO: still useful? */
 }
 
 /* Reusable classes */
@@ -102,10 +102,12 @@ button {
   e-button                  14px      12px      12px
 */
 
+/* TODO: still needed? */
 .el-button--mini {
   padding: 6px 13px !important;                   /* was 7px 15px */
 }
 
+/* TODO: still needed? */
 .el-input__inner {
   padding: 0px 8px !important;                    /* was 0px 15px */
 }
