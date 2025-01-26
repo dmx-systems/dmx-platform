@@ -2,7 +2,7 @@
   <div class="dmx-login-state">
     <el-dropdown v-if="username" trigger="click" @command="handle">
       <el-button type="primary" link class="fa fa-user-circle">
-        <span class="el-icon-arrow-down el-icon--right"></span>
+        <el-icon class="el-icon--right"><arrow-down></arrow-down></el-icon>
       </el-button>
       <template #dropdown>
         <el-dropdown-menu>
@@ -43,7 +43,7 @@ export default {
 
 <style>
 .dmx-login-state {
-  margin-left: 12px;
+  margin-left: 8px;
 }
 
 .dmx-login-state .sign-in-button {
