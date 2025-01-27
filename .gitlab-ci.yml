@@ -112,6 +112,7 @@ deploy-to-central:
   script:
     - export MAVEN_OPTS="-Xmx512m"
     - mvn -v
+    - cat /root/.m2/settings.xml
     - mvn help:effective-settings -DshowPasswords=true clean deploy -P release
   only:
     - tags
