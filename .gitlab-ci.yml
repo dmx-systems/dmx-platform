@@ -111,7 +111,8 @@ deploy-to-central:
     - docker
   script:
     - export MAVEN_OPTS="-Xmx512m"
-    - mvn clean deploy -P release
+    - mvn -v
+    - mvn help:effective-settings -DshowPasswords=true clean deploy -P release
   only:
     - tags
 
