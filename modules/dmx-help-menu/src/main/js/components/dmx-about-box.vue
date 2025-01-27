@@ -46,7 +46,6 @@ export default {
 <style>
 .dmx-about-box .el-dialog__body {
   display: flex;
-  padding: 20px !important;   /* Element UI default is 30px 20px (was overrideen in App.vue) */
 }
 
 .dmx-about-box img {

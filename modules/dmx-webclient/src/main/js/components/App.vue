@@ -94,7 +94,7 @@ button {
   margin-bottom: 0.2em !important;
 }
 
-/* Element UI */
+/* Element Plus overrides */
 
 /*
   Element UI font sizes     Default   small     mini
@@ -116,31 +116,32 @@ button {
   font-weight: unset !important;                  /* was 500 */
 }
 
+.el-dialog {
+  padding: 0 !important;                          /* Element Plus default is 16px (--el-dialog-padding-primary) */
+}
+
 .el-dialog__header {
-  padding: 4px 15px 3px !important;               /* was 20px 20px 10px */
+  padding-left: 20px;
+  padding-bottom: 0 !important;                   /* Element Plus default is 16px (--el-dialog-padding-primary) */
   background-image: url("../../resources-build/dots.png");
 }
 
 .el-dialog__title {
-  font-size: var(--main-font-size) !important;    /* was 18px */
-  line-height: unset !important;                  /* was 24px */
-  color: var(--label-color) !important;
+  font-size: var(--main-font-size) !important;    /* Element Plus default is 18px (--el-dialog-title-font-size) */
+  color: var(--label-color) !important;           /* Element Plus default is #303133 (--el-text-color-primary) */
 }
 
 .el-dialog__headerbtn {
-  top: 1px !important;                            /* was 20px */
-  right: 2px !important;                          /* was 20px */
+  width: 24px !important;                         /* Element Plus default is 48px */
+  height: 24px !important;                        /* Element Plus default is 48px */
 }
 
 .el-dialog__body {
-  padding: 15px !important;                       /* was 30px 20px */
-  line-height: unset !important;                  /* was 24px */
-  word-break: normal !important;                  /* was "break-all" */
-  overflow-wrap: anywhere;
+  padding: 20px;
 }
 
 .el-dialog__footer {
-  padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
+  padding: 0 20px 20px !important;                /* Default padding-top is 16px (--el-dialog-padding-primary) */
 }
 
 .el-select-dropdown__wrap {
