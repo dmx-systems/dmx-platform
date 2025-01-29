@@ -69,29 +69,17 @@ publish-apidocs:
     - master
     - main
 
-publish-snapshot:
+publish-download:
   stage: deploy
   tags:
     - shell
   script:
-    - ci-publish.sh snapshot
+    - ci-publish.sh
   dependencies:
     - maven-install
   only:
     - master
     - main
-  except:
-    - tags
-
-publish-release:
-  stage: deploy
-  tags:
-    - shell
-  script:
-    - ci-publish.sh release
-  dependencies:
-    - maven-install
-  only:
     - tags
 
 deploy-to-gitlab-maven:
