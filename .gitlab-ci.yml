@@ -37,6 +37,7 @@ maven-install:
   only:
     - master
     - main
+    - tags
 
 javadoc:
   image: container-registry.dmx.systems/dmx-intern/docker-images/maven-npm-nodejs
@@ -76,9 +77,11 @@ publish-snapshot:
     - ci-publish.sh snapshot
   dependencies:
     - maven-install
-  rules:
-    - if: $CI_COMMIT_BRANCH == 'master' && $CI_COMMIT_TAG == null && $CI_PIPELINE_SOURCE != 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TAG == null && $CI_PIPELINE_SOURCE != 'merge_request_event'
+  only:
+    - master
+    - main
+  except:
+    - tags
 
 publish-release:
   stage: deploy
@@ -110,7 +113,7 @@ deploy-to-central:
     - docker
   script:
     - export MAVEN_OPTS="-Xmx512m"
-    - mvn clean deploy -P release
+    - mvn clean deploy -P release -DskipTests=true
   only:
     - tags
 
