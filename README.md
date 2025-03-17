@@ -43,7 +43,7 @@ Source code:
 ### Copyright + Licensing
 
 Copyright (C) 2000-2018 Jörg Richter <jri@dmx.berlin> et al.  
-Copyright (C) 2019-2024 DMX Systems <https://dmx.systems>
+Copyright (C) 2019-2025 DMX Systems <https://dmx.systems>
 
 DMX is available freely under the GNU Affero General Public License, version 3.
 
@@ -51,4 +51,4 @@ All third party components incorporated into the DMX Software are licensed under
 
 
 ------------
-Dec 28, 2024
+Mar 17, 2025

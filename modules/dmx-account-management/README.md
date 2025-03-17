@@ -25,4 +25,4 @@ account manager beforehand. If that mechanism is used, the configured account ma
 the configured account manager is only used when during the account creation, no account manager was selected
 explicitly. 
 
-Copyright (c) 2024-2024 DMX Systems
+Copyright (c) 2024-2025 DMX Systems

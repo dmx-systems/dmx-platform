@@ -5,11 +5,11 @@
     <div>
       <div class="field">
         <div class="field-label">Version</div>
-        5.3.5
+        5.4-SNAPSHOT
       </div>
       <div class="field">
         <div class="field-label">Released</div>
-        Dec 28, 2024
+        Mar 17, 2025
       </div>
       <div class="field">
         <div class="field-label">License</div>
@@ -19,7 +19,7 @@
       </div>
       <div class="field">
         <div class="field-label">Copyright</div>
-        2024&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
+        2025&nbsp;&nbsp;<el-link href="https://dmx.systems" type="primary" :underline="false" target="dmx">
           DMX Systems
         </el-link>
       </div>
