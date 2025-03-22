@@ -23,6 +23,7 @@
             <includes>
                 <include>systems.dmx:*:jar</include>
                 <include>com.sun.jersey:*</include>
+                <include>javax.xml.bind:*</include>
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.eventadmin</include>
                 <include>org.apache.felix:org.apache.felix.fileinstall</include>
@@ -51,12 +52,11 @@
         </file>
         <!-- copy config files to /conf -->
         <file>
-            <source>conf/config.properties</source>
+            <source>../../conf/config.properties</source>
             <outputDirectory>conf</outputDirectory>
-            <filtered>true</filtered>
         </file>
         <file>
-            <source>conf/logging.properties</source>
+            <source>../../conf/logging.properties</source>
             <outputDirectory>conf</outputDirectory>
         </file>
         <!-- add bundle-deploy directory -->
@@ -74,7 +74,7 @@
     <fileSets>
         <!-- copy start scripts to / -->
         <fileSet>
-            <directory>script</directory>
+            <directory>../..</directory>
             <fileMode>0555</fileMode>
             <outputDirectory>/</outputDirectory>
             <includes>
