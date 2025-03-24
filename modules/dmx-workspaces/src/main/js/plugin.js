@@ -1,6 +1,14 @@
 export default ({store}) => {
   return {
 
+    init () {
+      store.state.workspaces.ready = store.dispatch('fetchWorkspaceTopics')   // ### FIXME: init state too late?
+      //
+      window.addEventListener('focus', () => {
+        store.dispatch('updateWorkspaceCookie')
+      })
+    },
+
     storeModule: {
       name: 'workspaces',
       module: require('./workspaces').default

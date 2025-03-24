@@ -37,4 +37,7 @@ export default {
 </script>
 
 <style>
+.dmx-arrow-select .el-select {
+  width: 200px !important;
+}
 </style>

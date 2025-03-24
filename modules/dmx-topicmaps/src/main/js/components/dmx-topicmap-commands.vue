@@ -54,14 +54,10 @@ export default {
 
 .dmx-topicmap-commands .el-select {
   margin-right: 4px;
-}
-
-.dmx-topicmap-commands .el-button {
-  padding-left:  2px !important;
-  padding-right: 2px !important;
+  width: 200px;
 }
 
 .dmx-topicmap-commands .el-button + .el-button {
-  margin-left: 4px;     /* Element UI default is 10px */
+  margin-left: 4px;     /* Element Plus default is 12px */
 }
 </style>

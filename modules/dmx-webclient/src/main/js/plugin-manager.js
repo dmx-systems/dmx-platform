@@ -1,7 +1,6 @@
 import store from './store/webclient'
 import dmx from 'dmx-api'
 import axios from 'axios'
-import Vue from 'vue'
 
 const plugins = []        // installed plugins; array of plugin config objects
 let _extraElementUI       // a function that loads the extra Element UI components
@@ -54,7 +53,7 @@ export default extraElementUI => {
  * @param   pluginConfig    either a plugin config object or a function that returns a plugin config object.
  */
 function initPlugin (pluginConfig) {
-  const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dmx, axios, Vue}) : pluginConfig
+  const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dmx, axios}) : pluginConfig
   // register plugin
   plugins.push(_pluginConfig)
   // store module
@@ -64,7 +63,7 @@ function initPlugin (pluginConfig) {
     // console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
-      typeof module === 'function' ? module({dmx, axios, Vue}) : module
+      typeof module === 'function' ? module({dmx, axios}) : module
     )
   }
   // store watcher

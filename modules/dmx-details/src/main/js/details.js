@@ -1,6 +1,6 @@
-export default ({dmx}) => {
+export default ({dmx}) => ({
 
-  const state = {
+  state: {
 
     visible: false,     // Detail panel visibility
     pinned: false,      // Pin toggle state
@@ -11,12 +11,12 @@ export default ({dmx}) => {
     mode: 'info',       // Mode of the "info" tab: 'info' or 'form'.
 
     configDefs: {}      // As received from BE's ConfigService
-  }
+  },
 
-  const actions = {
+  actions: {
 
     // TODO: combine with selectDetail action?
-    setDetailPanelVisibility (_, visible) {
+    setDetailPanelVisibility ({state}, visible) {
       // console.log('setDetailPanelVisibility', visible)
       // Note: we expect actual boolean values (not truish/falsish).
       // The watcher is supposed to fire only on actual visibility changes (see plugin.js).
@@ -26,7 +26,7 @@ export default ({dmx}) => {
       state.visible = visible
     },
 
-    setDetailPanelPinned ({rootState}, pinned) {
+    setDetailPanelPinned ({state, rootState}, pinned) {
       state.pinned = pinned
       // When unpinning an empty detail panel close it.
       // Note: no route change is involved.
@@ -35,8 +35,7 @@ export default ({dmx}) => {
       }
     },
 
-    selectDetail (_, detail) {
-      // console.log('selectDetail', detail)
+    selectDetail ({state}, detail) {
       if (!['info', 'edit', 'related', 'meta', 'config'].includes(detail)) {
         throw Error(`"${detail}" is not an expected detail name`)
       }
@@ -51,10 +50,9 @@ export default ({dmx}) => {
       }
     },
 
-    initConfigDefs () {
+    initConfigDefs ({state}) {
       dmx.rpc.getConfigDefs().then(configDefs => {
         state.configDefs = configDefs
-        // console.log(state.configDefs)
       })
     },
 
@@ -72,9 +70,4 @@ export default ({dmx}) => {
       dispatch('initConfigDefs')
     }
   }
-
-  return {
-    state,
-    actions
-  }
-}
+})

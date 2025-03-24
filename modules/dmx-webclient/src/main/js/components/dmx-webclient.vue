@@ -1,62 +1,63 @@
 <template>
   <div class="dmx-webclient" :style="{userSelect}">
     <dmx-resizer @resizeStart="resizeStart" @resizeStop="resizeStop"></dmx-resizer>
+    <component v-for="compDef in compDefs" :is="compDef.comp" v-bind="props(compDef)" v-on="listeners(compDef)">
+    </component>
   </div>
 </template>
 
 <script>
 import dmx from 'dmx-api'
 import axios from 'axios'
-import Vue from 'vue'
-
-// Global component registrations
-// Allow plugins to reuse Webclient components (instead of rebundle the component along with the plugin)
-
-Vue.component('dmx-object-renderer', require('dmx-object-renderer').default)
-Vue.component('dmx-assoc',           require('dmx-object-renderer/src/components/dmx-assoc').default)
-Vue.component('dmx-boolean-field',   require('dmx-object-renderer/src/components/dmx-boolean-field').default)
-Vue.component('dmx-child-topic',     require('dmx-object-renderer/src/components/dmx-child-topic').default)
-Vue.component('dmx-child-topics',    require('dmx-object-renderer/src/components/dmx-child-topics').default)
-Vue.component('dmx-html-field',      require('dmx-object-renderer/src/components/dmx-html-field').default)
-Vue.component('dmx-number-field',    require('dmx-object-renderer/src/components/dmx-number-field').default)
-Vue.component('dmx-player',          require('dmx-object-renderer/src/components/dmx-player').default)
-Vue.component('dmx-select-field',    require('dmx-object-renderer/src/components/dmx-select-field').default)
-Vue.component('dmx-text-field',      require('dmx-object-renderer/src/components/dmx-text-field').default)
-Vue.component('dmx-value-renderer',  require('dmx-object-renderer/src/components/dmx-value-renderer').default)
-
-Vue.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 
 export default {
 
-  mounted () {
-    // Note: in order to allow external plugins to provide Webclient toplevel components -- in particular el-dialog
-    // boxes -- component mounting must perform not before all plugins are loaded.
-    // Another approach would be not to collect the toplevel components and then mounting all at once but to mount a
-    // plugin's components immediately while plugin initialization. However this would result in unresolved circular
-    // dependencies, e.g. the Webclient plugin depends on Search plugin's `registerExtraMenuItems` action while
-    // the Search plugin on the other hand depends on Workspaces `isWritable` state.
-    this.$store.state.pluginsReady.then(() => {
-      this.mountComponents()
-    })
-  },
-
   provide: {
-    dmx, axios, Vue
+    dmx, axios
   },
 
-  data() {
+  data () {
     return {
       isResizing: false
     }
   },
 
   computed: {
-    userSelect() {
+
+    compDefs () {
+      return this.$store.state.compDefs.webclient
+    },
+
+    userSelect () {
       return this.isResizing ? 'none' : ''
     }
   },
 
   methods: {
+
+    // ### TODO
+    props (compDef) {
+      const t = typeof compDef.props
+      // console.log('# props', compDef, t)
+      if (t === 'function') {
+        return compDef.props()
+      } else if (t === 'undefined') {
+        return {}
+      }
+      throw Error(`Unexpected compDef props: ${t}`)
+    },
+
+    // ### TODO
+    listeners (compDef) {
+      const t = typeof compDef.listeners
+      // console.log('# listeners', compDef, t)
+      if (t === 'object') {
+        return compDef.listeners
+      } else if (t === 'undefined') {
+        return {}
+      }
+      throw Error(`Unexpected compDef listeners: ${t}`)
+    },
 
     resizeStart () {
       this.isResizing = true
@@ -64,56 +65,6 @@ export default {
 
     resizeStop () {
       this.isResizing = false
-    },
-
-    /**
-     * Instantiates and mounts Webclient toplevel components provided by plugins (as registered for mount point
-     * "webclient").
-     */
-    mountComponents () {
-      const state = this.$store.state
-      state.compDefs.webclient.forEach(compDef => {
-        // 1) init props
-        // Note 1: props must be inited explicitly. E.g. the "detailRenderers" store state is populated while
-        // loading plugins and does not change afterwards. The watcher (see step 3) would not fire as it is
-        // registered *after* the plugins are loaded. ### TODO: still true?
-        // TODO: think about startup order: instantiating the Webclient component vs. loading the plugins.
-        // Note 2: props must be inited *before* the component is instantiated (see step 2). While instantiation
-        // the component receives the declared "default" value (plugin.js), if no value is set already.
-        // The default value must not be overridden by an undefined init value. ### TODO: still true?
-        const propsData = {}
-        for (const prop in compDef.props) {
-          propsData[prop] = compDef.props[prop](state)    // call getter function
-        }
-        // 2) instantiate & mount
-        // Note: to manually mounted components the store must be passed explicitly resp. "parent" must be set.
-        // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
-        const comp = new Vue({parent: this, propsData, ...compDef.comp}).$mount()
-        this.$el.appendChild(comp.$el)
-        // 3) make props reactive
-        for (const prop in compDef.props) {
-          this.watchProp(comp, prop, compDef.props[prop])
-        }
-        // 4) add event listeners
-        for (const eventName in compDef.listeners) {
-          comp.$on(eventName, compDef.listeners[eventName])
-        }
-        // TODO: unregister listeners?
-      })
-    },
-
-    watchProp (comp, prop, getter) {
-      // console.log('watchProp', prop)
-      this.$store.watch(
-        getter,
-        val => {
-          // console.log(`"${prop}" changed`, val)
-          // Note: the top-level webclient components follow the convention of mirroring its "props" through "data".
-          // To avoid the "Avoid mutating a prop directly" Vue warning here we update the data, not the props.
-          // The components name the data like the prop but with an underscore appended.
-          comp[prop + '_'] = val
-        }
-      )
     }
   },
 

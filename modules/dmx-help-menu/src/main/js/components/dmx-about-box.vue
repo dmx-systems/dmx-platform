@@ -1,6 +1,5 @@
 <template>
-  <el-dialog title="About DMX" custom-class="dmx-about-box" :visible="visible" :modal="false" v-draggable
-      @close="close">
+  <el-dialog title="About DMX" class="dmx-about-box" :model-value="visible" :modal="false" @close="close">
     <img src="../dmx-logo.svg">
     <div>
       <div class="field">
@@ -47,7 +46,6 @@ export default {
 <style>
 .dmx-about-box .el-dialog__body {
   display: flex;
-  padding: 20px !important;   /* Element UI default is 30px 20px (was overrideen in App.vue) */
 }
 
 .dmx-about-box img {

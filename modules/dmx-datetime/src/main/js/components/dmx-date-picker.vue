@@ -71,11 +71,12 @@ export default {
     }
   },
 
+  /* ### TODO: async loading
   components: {
     'el-date-picker': () => {
-      import('element-ui/lib/theme-chalk/date-picker.css' /* webpackChunkName: "el-date-picker" */)
-      return import('element-ui/lib/date-picker.js'       /* webpackChunkName: "el-date-picker" */)
+      import('element-plus/theme-chalk/el-date-picker.css')
+      return import('element-plus/lib/components/date-picker/index.js')
     }
-  }
+  } */
 }
 </script>

@@ -1,10 +1,5 @@
 <template>
   <router-view></router-view>
-  <!--
-    Note: the Vue template compiler is not available as we use the Vue runtime.
-    So we can't put <router-view> in index.html but must render the root component
-    (= this one) via render function (see main.js).
-  -->
 </template>
 
 <style>
@@ -78,12 +73,12 @@ body {
 
 input {
   font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
-  font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes ### TODO: still useful? */
 }
 
 button {
   font-family: var(--main-font-family);            /* defaults: Firefox (Mac): "-apple-system", Chrome (Mac): "Arial" */
-  font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes ### TODO: still useful? */
 }
 
 /* Reusable classes */
@@ -99,7 +94,7 @@ button {
   margin-bottom: 0.2em !important;
 }
 
-/* Element UI */
+/* Element Plus overrides */
 
 /*
   Element UI font sizes     Default   small     mini
@@ -107,10 +102,12 @@ button {
   e-button                  14px      12px      12px
 */
 
+/* TODO: still needed? */
 .el-button--mini {
   padding: 6px 13px !important;                   /* was 7px 15px */
 }
 
+/* TODO: still needed? */
 .el-input__inner {
   padding: 0px 8px !important;                    /* was 0px 15px */
 }
@@ -119,39 +116,38 @@ button {
   font-weight: unset !important;                  /* was 500 */
 }
 
+.el-dialog {
+  padding: 0 !important;                          /* Element Plus default is 16px (--el-dialog-padding-primary) */
+}
+
 .el-dialog__header {
-  padding: 4px 15px 3px !important;               /* was 20px 20px 10px */
+  padding-left: 20px;
+  padding-bottom: 0 !important;                   /* Element Plus default is 16px (--el-dialog-padding-primary) */
   background-image: url("../../resources-build/dots.png");
 }
 
 .el-dialog__title {
-  font-size: var(--main-font-size) !important;    /* was 18px */
-  line-height: unset !important;                  /* was 24px */
-  color: var(--label-color) !important;
+  font-size: var(--main-font-size) !important;    /* Element Plus default is 18px (--el-dialog-title-font-size) */
+  color: var(--label-color) !important;           /* Element Plus default is #303133 (--el-text-color-primary) */
 }
 
 .el-dialog__headerbtn {
-  top: 1px !important;                            /* was 20px */
-  right: 2px !important;                          /* was 20px */
+  width: 24px !important;                         /* Element Plus default is 48px */
+  height: 24px !important;                        /* Element Plus default is 48px */
 }
 
 .el-dialog__body {
-  padding: 15px !important;                       /* was 30px 20px */
-  line-height: unset !important;                  /* was 24px */
-  word-break: normal !important;                  /* was "break-all" */
-  overflow-wrap: anywhere;
+  padding: 20px;
 }
 
 .el-dialog__footer {
-  padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
+  padding: 0 20px 20px !important;                /* Default padding-top is 16px (--el-dialog-padding-primary) */
 }
 
-/* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__wrap {
-  max-height: 100vh !important;                   /* was 274px */
+  max-height: calc(100vh - 7px) !important;       /* Element Plus default is 274px */
 }
 
-/* Note: this is a global rule as el-selects are <body> mounted */
 .el-select-dropdown__item .icon {
   color: var(--color-topic-icon);
   margin-right: var(--icon-spacing);

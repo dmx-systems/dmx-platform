@@ -5,7 +5,7 @@
     <div class="field-label">Folder Content</div>
     <ul class="listing">
       <li v-for="(item, i) in items">
-        <el-button type="text" @click="reveal(item)">
+        <el-button type="primary" link @click="reveal(item)">
           <span :class="['fa', 'fa-fw', icons[i]]"></span> {{item.name}}
         </el-button>
       </li>

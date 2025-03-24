@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { nextTick } from 'vue'
 
 /**
  * Tracks single select/unselect operations while current tick
@@ -143,7 +143,7 @@ export default class Selection {
 
   _defer () {
     if (!this._p) {
-      Vue.nextTick(() => {
+      nextTick(() => {
         this._handler(this)
         this._p = false
       })

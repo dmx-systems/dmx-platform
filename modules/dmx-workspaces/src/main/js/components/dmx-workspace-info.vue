@@ -1,5 +1,5 @@
 <template>
-  <el-button type="text" class="fa fa-info-circle" title="Reveal Workspace Topic" @click="revealWorkspaceTopic">
+  <el-button type="primary" link class="fa fa-info-circle" title="Reveal Workspace Topic" @click="revealWorkspaceTopic">
   </el-button>
 </template>
 

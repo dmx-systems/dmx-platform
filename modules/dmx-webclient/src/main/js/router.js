@@ -4,164 +4,154 @@
  * - Adapts app state when URL changes.
  */
 
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import {MessageBox} from 'element-ui'
+import { nextTick } from 'vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Webclient from './components/dmx-webclient'
 import store from './store/webclient'
+import app from './app'
 import dmx from 'dmx-api'
 
-export default initRouter
-
-Vue.use(VueRouter)
-
-let router    // initialized by initRouter()
-
-function initRouter () {
-  router = new VueRouter({
-    routes
-  })
-  // global guard
-  router.beforeEach((to, from, next) => {
-    // console.log('### beforeEach', to, from)
-    performDirtyCheck(to, from).then(abort => {
-      if (abort) {
-        next(false)
-      } else {
-        next()
-      }
-    })
-  })
-  // store module
-  store.registerModule('routerModule', {
-    state: {router},
-    actions
-  })
-  return router
-}
-
-const routes = [
-  {
-    path: '/topicmap/:topicmapId',
-    name: 'topicmap',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/topic/:topicId',
-    name: 'topic',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/assoc/:assocId',
-    name: 'assoc',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/topic/:topicId/:detail',
-    name: 'topicDetail',
-    component: Webclient
-  },
-  {
-    path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
-    name: 'assocDetail',
-    component: Webclient
-  }
-]
-
-const actions = {
-
-  initialNavigation () {
-    navigate(router.currentRoute, {params: {}})
-    registerRouteWatcher()
-  },
-
-  callRoute (_, location) {
-    router.push(location)
-  },
-
-  callTopicmapRoute (_, id) {
-    router.push({
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: '/topicmap/:topicmapId',
       name: 'topicmap',
-      params: {topicmapId: id}
-    })
-  },
-
-  callTopicRoute (_, id) {
-    callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
-  },
-
-  callAssocRoute (_, id) {
-    callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
-  },
-
-  /**
-   * @param   noViewUpdate  if true the topicmap renderer's view will not be updated, only its selection-model. This
-   *                        might be needed when strip-selection is triggered programmatically in the course of an hide/
-   *                        delete operation. In this case the renderer's view might not be able to update anymore as
-   *                        certain on-screen parts (e.g. the Cytoscape renderer's Topic DOM) are disposed of already.
-   *                        The view update can be safely omitted as the object is about to disappear anyways.
-   */
-  stripSelectionFromRoute (_, noViewUpdate) {
-    router.push({
-      name: 'topicmap',
-      params: {noViewUpdate}    // misuse "params" for transporting that flag to the router's navigate() function
-    })
-  },
-
-  /**
-   * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
-   *
-   * Prerequisite: a single selection
-   *
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callDetailRoute ({rootState}, detail) {
-    const object = rootState.object
-    if (!object) {
-      throw Error('callDetailRoute() when there is no single selection')
-    }
-    router.push({
-      name: object.isTopic ? 'topicDetail' : 'assocDetail',
-      params: {detail}
-    })
-  },
-
-  /**
-   * Redirects to "topicDetail" route.
-   *
-   * @param   id        a topic ID
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callTopicDetailRoute (_, {id, detail}) {
-    router.push({
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/topic/:topicId',
+      name: 'topic',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId',
+      name: 'assoc',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/topic/:topicId/:detail',
       name: 'topicDetail',
-      params: {topicId: id, detail}
-    })
-  },
-
-  /**
-   * Redirects to "assocDetail" route.
-   *
-   * @param   id        an assoc ID
-   * @param   detail    "info", "related", "meta", "config" or "edit"
-   */
-  callAssocDetailRoute (_, {id, detail}) {
-    router.push({
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
       name: 'assocDetail',
-      params: {assocId: id, detail}
-    })
+      component: Webclient
+    }
+  ]
+})
+
+// global guard
+/* ### TODO: eliminate "__vue__"
+router.beforeEach((to, from, next) => {
+  // console.log('### beforeEach', to, from)
+  performDirtyCheck(to, from).then(abort => {
+    if (abort) {
+      next(false)
+    } else {
+      next()
+    }
+  })
+})
+*/
+
+export default router
+
+// store module
+store.registerModule('routerModule', {
+
+  state: {
+    router
   },
 
-  stripDetailFromRoute ({rootState}) {
-    const object = rootState.object
-    if (!object) {
-      throw Error('stripDetailFromRoute() when there is no single selection')
+  actions: {
+
+    initialNavigation () {
+      navigate(router.currentRoute.value, {params: {}})
+      registerRouteWatcher()
+    },
+
+    callRoute (_, location) {
+      router.push(location)
+    },
+
+    callTopicmapRoute (_, id) {
+      router.push({
+        name: 'topicmap',
+        params: {topicmapId: id}
+      })
+    },
+
+    callTopicRoute (_, id) {
+      callObjectRoute(id, 'topicId', 'topic', 'topicDetail')
+    },
+
+    callAssocRoute (_, id) {
+      callObjectRoute(id, 'assocId', 'assoc', 'assocDetail')
+    },
+
+    stripSelectionFromRoute () {
+      router.push({
+        name: 'topicmap'
+      })
+    },
+
+    /**
+     * Redirects to "topicDetail" or "assocDetail" route, depending on current selection.
+     *
+     * Prerequisite: a single selection
+     *
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callDetailRoute ({rootState}, detail) {
+      const object = rootState.object
+      if (!object) {
+        throw Error('callDetailRoute() when there is no single selection')
+      }
+      router.push({
+        name: object.isTopic ? 'topicDetail' : 'assocDetail',
+        params: {detail}
+      })
+    },
+
+    /**
+     * Redirects to "topicDetail" route.
+     *
+     * @param   id        a topic ID
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callTopicDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'topicDetail',
+        params: {topicId: id, detail}
+      })
+    },
+
+    /**
+     * Redirects to "assocDetail" route.
+     *
+     * @param   id        an assoc ID
+     * @param   detail    "info", "related", "meta", "config" or "edit"
+     */
+    callAssocDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'assocDetail',
+        params: {assocId: id, detail}
+      })
+    },
+
+    stripDetailFromRoute ({rootState}) {
+      const object = rootState.object
+      if (!object) {
+        throw Error('stripDetailFromRoute() when there is no single selection')
+      }
+      router.push({
+        name: object.isTopic ? 'topic' : 'assoc'
+      })
     }
-    router.push({
-      name: object.isTopic ? 'topic' : 'assoc'
-    })
   }
-}
+})
 
 function registerRouteWatcher () {
   store.watch(
@@ -191,7 +181,7 @@ function performDirtyCheck (to, from) {
       const isDirty = detailPanel.isDirty()
       // console.log('isDirty', isDirty, store.state.object.id)
       if (isDirty) {
-        MessageBox.confirm('There are unsaved changes', 'Warning', {
+        app.config.globalProperties.$confirm('There are unsaved changes', 'Warning', {
           type: 'warning',
           confirmButtonText: 'Save',
           cancelButtonText: 'Discard Changes',
@@ -264,18 +254,15 @@ function navigate (to, from) {
   } else if ((assocChanged || topicmapChanged) && assocId) {
     p2 = fetchAndDisplayAssoc(assocId, p)
   } else if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {     // Note: 0 is a valid topic ID
-    store.dispatch('emptyDisplay')                        // -> dmx-webclient
+    store.dispatch('emptyDisplay')                              // -> dmx-webclient
     if (!topicmapChanged) {
-      p.then(() => store.dispatch('unsetSelection', {     // -> dmx-topicmaps
-        id: oldId,
-        noViewUpdate: to.params.noViewUpdate
-      }))
+      p.then(() => store.dispatch('unsetSelection', oldId))     // -> dmx-topicmaps
     }
   }
   p2?.catch(e => {
     console.warn(`Route ${to.path} failed (${e})`)
     // give detail panel time to appear (before it closes again), it's DOM is needed for the imminent dirty check
-    Vue.nextTick(() => {
+    nextTick(() => {
       redirectToTopicmap(topicmapId)      // strip selection
     })
   })
@@ -352,7 +339,7 @@ function callObjectRoute (id, paramName, routeName, detailRouteName) {
     location.name = detailRouteName
     // fallback to "info" tab
     // Note: when the detail panel is empty there is no "detail" route segment
-    const detail = router.currentRoute.params.detail
+    const detail = router.currentRoute.value.params.detail
     if (!detail || detail === 'edit') {
       location.params.detail = 'info'
     }

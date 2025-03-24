@@ -10,20 +10,20 @@ export default ({store, dmx}) => {
       {
         comp: require('dmx-topicmap-panel').default,
         mount: 'webclient',
-        props: {
-          object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
-          writable:        state => state.writable,
-          detailRenderers: state => state.detailRenderers,
-          topicmap:        state => state.topicmaps.topicmap,
-          topicmapTypes:   state => state.topicmaps.topicmapTypes,
-          toolbarCompDefs: state => ({
-            left:  state.compDefs['toolbar-left'],
-            right: state.compDefs['toolbar-right']
-          }),
-          contextCommands: state => state.contextCommands,
-          dropHandler:     state => state.dropHandler,
-          quillConfig:     state => state.quillConfig
-        },
+        props: () => ({
+          object:          store.getters.object,
+          writable:        store.state.writable,
+          detailRenderers: store.state.detailRenderers,
+          topicmap:        store.state.topicmaps.topicmap,
+          topicmapTypes:   store.state.topicmaps.topicmapTypes,
+          toolbarCompDefs: {
+            left:  store.state.compDefs['toolbar-left'],
+            right: store.state.compDefs['toolbar-right']
+          },
+          contextCommands: store.state.contextCommands,
+          dropHandler:     store.state.dropHandler,
+          quillConfig:     store.state.quillConfig
+        }),
         listeners: {
           'topic-select':         id             => store.dispatch('selectTopic', id),
           'topic-unselect':       id             => store.dispatch('unselectTopic', id),
@@ -57,7 +57,7 @@ export default ({store, dmx}) => {
     topicmapType: {
       uri: 'dmx.topicmaps.topicmap',
       name: 'Topicmap',
-      renderer: () => import('dmx-cytoscape-renderer' /* webpackChunkName: "dmx-cytoscape-renderer" */)
+      renderer: () => import('dmx-cytoscape-renderer')
     },
 
     topicmapCommands: {
