@@ -1,5 +1,5 @@
 include:
   - project: 'devops/ci-templates'
-    ref: main
+    ref: node20
     file:
       - '/.platform-templates.yml'
