@@ -1,26 +1,25 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const { VueLoaderPlugin } = require('vue-loader')
-const { DefinePlugin } = require('webpack')
-const AutoImport = require('unplugin-auto-import/webpack').default
-const Components = require('unplugin-vue-components/webpack').default
-const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
-const path = require('path')
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import { VueLoaderPlugin } from 'vue-loader'
+import webpack from 'webpack'
+const { DefinePlugin } = webpack
+import ElementPlus from 'unplugin-element-plus/webpack'
+import path from 'path'
 
-module.exports = env => {
+export default env => {
 
   const webpackConfig = {
     entry: './modules/dmx-webclient/src/main/js/main.js',
     output: {
-      path: path.join(__dirname, '/modules/dmx-webclient/target/classes/web'),
+      path: path.join(import.meta.dirname, '/modules/dmx-webclient/target/classes/web'),
       filename: env.WEBPACK_SERVE ? '[name].js' : '[contenthash].[name].js'
     },
     resolve: {
       extensions: ['.js', '.vue'],
       alias: {
         // used by plugin-manager.js
-        modules:            path.join(__dirname, '/modules'),
-        'modules-external': path.join(__dirname, '/modules-external')
+        modules:            path.join(import.meta.dirname, '/modules'),
+        'modules-external': path.join(import.meta.dirname, '/modules-external')
       }
     },
     module: {
@@ -61,12 +60,7 @@ module.exports = env => {
         __VUE_PROD_DEVTOOLS__: 'false',
         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
       }),
-      AutoImport({
-        resolvers: [ElementPlusResolver()]
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()]
-      })
+      ElementPlus({})
     ],
     stats: {
       assets: false,
