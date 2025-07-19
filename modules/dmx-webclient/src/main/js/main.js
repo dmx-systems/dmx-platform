@@ -3,11 +3,11 @@ import store from './store/webclient'
 import router from './router'
 import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
-import extraElementPlus from './element-plus'
+import extraElementComponentsLoader from './element-plus'
 import app from './app'
 import './country-flag-polyfill'
 
-console.log('[DMX] 2025/07/18')
+console.log('[DMX] 2025/07/19')
 
 const messageHandler = message => {
   store.dispatch('_' + message.type, message.args)    // FIXME: use message bus instead of actions
@@ -22,10 +22,7 @@ const typeCacheReady = dmx.init({
   iconRenderers: store.state.iconRenderers
 })
 
-// 2) Load plugins
-store.state.pluginsReady = loadPlugins(extraElementPlus)
-
-// 3) Register app assets and mount root component
+// 2) Register app assets
 // Global component registrations
 // Allow plugins to reuse Webclient components (instead of rebundle the component along with the plugin)
 app.component('dmx-object-renderer', require('dmx-object-renderer').default)
@@ -42,7 +39,9 @@ app.component('dmx-value-renderer',  require('dmx-object-renderer/src/components
 app.component('dmx-topic-list', require('dmx-topic-list').default)    // Required e.g. by dmx-geomaps
 app.use(store)
 app.use(router)
-app.mount('body')
+
+// 3) Load plugins and mount root component
+loadPlugins(extraElementComponentsLoader).then(() => app.mount('body'))
 
 // 4) Register own renderers
 store.dispatch('registerDetailRenderer', {

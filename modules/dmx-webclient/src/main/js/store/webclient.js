@@ -88,9 +88,7 @@ const store = createStore({
         require('../quill-extensions/topic-link').default,
         require('../quill-extensions/video').default
       ]
-    },
-
-    pluginsReady: undefined   // a promise resolved once all plugins are loaded and initialized       // ### TODO: drop?
+    }
   },
 
   actions: {

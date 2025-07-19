@@ -2,16 +2,19 @@ import store from './store/webclient'
 import dmx from 'dmx-api'
 import axios from 'axios'
 
-const plugins = []        // installed plugins; array of plugin config objects
-let _extraElementUI       // a function that loads the extra Element UI components
+export default loadPlugins
+
+const plugins = []      // installed plugins; array of plugin config objects; pushed to by initPlugin()
 
 /**
- * @returns   a promise resolved once all plugins are loaded and initialized.
+ * Loads and initializes all plugins.
+ *
+ * @param   extraElementComponentsLoader
+ *              A function that loads the extra Element Plus components and returns a promise resolved once done.
+ *
+ * @returns     a promise resolved once all plugins are loaded and initialized.
  */
-export default extraElementUI => {
-  //
-  _extraElementUI = extraElementUI
-  //
+function loadPlugins (extraElementComponentsLoader) {
   // Init order notes:
   //  1. dmx-search provides the registerExtraMenuItems() action.
   //     dmx-search must be inited *before* any plugin which registers extra menu items.
@@ -44,6 +47,10 @@ export default extraElementUI => {
   // invoke init hook
   return p.then(() => {
     plugins.forEach(plugin => plugin.init && plugin.init())
+    // extra Element UI components
+    if (plugins.some(plugin => plugin.extraElementComponents)) {
+      return extraElementComponentsLoader()
+    }
   })
 }
 
@@ -71,8 +78,6 @@ function initPlugin (pluginConfig) {
   storeWatcher && storeWatcher.forEach(watcher => {
     store.watch(watcher.getter, watcher.callback)
   })
-  // extra Element UI components
-  _pluginConfig.extraElementUI && _extraElementUI()
   // webclient components
   const components = _pluginConfig.components
   components && components.forEach(compDef => store.dispatch('registerComponent', compDef))
