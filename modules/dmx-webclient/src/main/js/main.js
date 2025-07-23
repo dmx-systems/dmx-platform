@@ -7,7 +7,7 @@ import extraElementComponentsLoader from './element-plus'
 import app from './app'
 import './country-flag-polyfill'
 
-console.log('[DMX] 2025/07/19')
+console.log('[DMX] 2025/07/23')
 
 const messageHandler = message => {
   store.dispatch('_' + message.type, message.args)    // FIXME: use message bus instead of actions
